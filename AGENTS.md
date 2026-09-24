@@ -61,6 +61,8 @@ Approved exceptions:
 ## Dependencies
 
 - `shared-ci` `761fe6b0b3ca5e2c57d244182d495ab8041851fa` — https://github.com/LeePepe/shared-ci/blob/761fe6b0b3ca5e2c57d244182d495ab8041851fa/ai/
+- `shared-design-tokens` `0.1.0` — `LeePepe/shared-design-tokens@0.1.0/ai/`
+  (tag `v0.1.0`: https://github.com/LeePepe/shared-design-tokens/tree/v0.1.0/ai; SwiftPM `exact: "0.1.0"`, product `DesignTokens`)
 
 ## Delivery
 

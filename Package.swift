@@ -10,7 +10,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/LeePepe/shared-design-tokens.git",
-            revision: "1db868db3be99ce9904304fdf1ec81acaf44605a"
+            exact: "0.1.0"
         )
     ],
     targets: [

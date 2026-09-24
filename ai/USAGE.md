@@ -1,6 +1,6 @@
 # NativeTokenColor usage
 
-This is the descriptive contract for the T021-A color bridge working candidate, not the complete versioned-library AI contract. Dependency identity, exact candidate revision, scoped verification results, and remaining compatibility limits are recorded in [COMPATIBILITY.md](COMPATIBILITY.md).
+This is the descriptive contract for the T021-A color bridge working candidate, not the complete versioned-library AI contract. Dependency identity, exact Tokens version, scoped verification results, and remaining compatibility limits are recorded in [COMPATIBILITY.md](COMPATIBILITY.md).
 
 ## Current interface
 
@@ -22,4 +22,4 @@ Lookup errors propagate unchanged. An unknown ID throws `TokenError.unknownToken
 
 ## Scope
 
-This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The private Tokens dependency remains private; the manifest reference neither includes its contents nor establishes publication permission.
+This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The Tokens dependency is pinned at exactly `0.1.0`; the manifest reference does not vendor its contents.
