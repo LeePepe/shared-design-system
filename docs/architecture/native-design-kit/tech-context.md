@@ -8,6 +8,8 @@ owns:
   - ai/**
 depends_on: []
 gate:
+  docs: python3 scripts/ci/check-ai.py
+  docs_test: python3 scripts/ci/test-ai.py
   build: scripts/ci/swift-package.sh build
   test: scripts/ci/swift-package.sh test
   ios: scripts/ci/swift-package.sh ios

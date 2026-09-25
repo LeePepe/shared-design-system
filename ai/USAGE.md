@@ -1,6 +1,6 @@
 # NativeTokenColor usage
 
-This is the descriptive contract for the T021-A color bridge working candidate, not the complete versioned-library AI contract. Dependency identity, exact Tokens version, scoped verification results, and remaining compatibility limits are recorded in [COMPATIBILITY.md](COMPATIBILITY.md).
+This is the public API contract for the unreleased 0.1.0 color-bridge candidate. Start with [README.md](README.md) for integration, executable examples and migration routes. Dependency identity, exact Tokens version and remaining compatibility limits are recorded in [COMPATIBILITY.md](COMPATIBILITY.md).
 
 ## Current interface
 
