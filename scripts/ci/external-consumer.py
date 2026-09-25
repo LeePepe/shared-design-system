@@ -51,7 +51,7 @@ def main():
         run("python3", str(checkout / "scripts/ci/check-ai.py"), cwd=checkout)
         run("swift", "build", cwd=consumer)
         run("swift", "test", cwd=consumer)
-        run("xcodebuild", "-quiet", "-scheme", "SamplePalette",
+        run("xcodebuild", "-quiet", "-scheme", "NativeDesignConsumer",
             "-destination", "generic/platform=iOS Simulator",
             "-derivedDataPath", str(root / "DerivedData"),
             "CODE_SIGNING_ALLOWED=NO", "build", cwd=consumer)
