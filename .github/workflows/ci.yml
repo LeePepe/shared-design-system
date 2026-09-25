@@ -27,7 +27,7 @@ jobs:
     uses: LeePepe/shared-ci/.github/workflows/quality.yml@761fe6b0b3ca5e2c57d244182d495ab8041851fa
     with:
       runs-on: macos-15
-      verify-command: scripts/verify --all
+      verify-command: scripts/verify --all && python3 scripts/ci/external-consumer.py --revision "$(git rev-parse HEAD)"
       contract-audit: true
       workflow-lint: true
       timeout-minutes: 45
