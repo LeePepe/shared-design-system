@@ -9,6 +9,13 @@ import subprocess
 import tempfile
 
 
+PACKAGE_REQUIREMENT_PATTERN = (
+    r'(?m)^([ \t]*\.package\(url: "https://github\.com/LeePepe/shared-design-system\.git", )'
+    r'(?:revision: "[0-9a-f]{40}"|exact: "[0-9]+\.[0-9]+\.[0-9]+")'
+    r'(\))'
+)
+
+
 def run(*args, cwd):
     subprocess.run(args, cwd=cwd, check=True)
 
@@ -30,9 +37,11 @@ def main():
         shutil.copytree(fixture, consumer)
         manifest = consumer / "Package.swift"
         requirement = f'revision: "{value}"' if args.revision else f'exact: "{value}"'
-        content, count = re.subn(r'revision: "[0-9a-f]{40}"', requirement, manifest.read_text())
+        content, count = re.subn(PACKAGE_REQUIREMENT_PATTERN,
+                                lambda match: match[1] + requirement + match[2],
+                                manifest.read_text())
         if count != 1:
-            raise RuntimeError("fixture must contain one candidate revision pin")
+            raise RuntimeError("fixture must contain exactly one shared-design-system revision or exact version pin")
         manifest.write_text(content)
         run("swift", "package", "resolve", cwd=consumer)
         resolved = json.loads((consumer / "Package.resolved").read_text())

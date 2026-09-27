@@ -6,10 +6,14 @@ The package declares Swift tools 6.0, iOS 15 and macOS 12. See the distinction
 between declared and tested support in [COMPATIBILITY.md](COMPATIBILITY.md).
 There are no credentials, network calls, persistence or runtime permissions.
 
-No release tag exists yet. For candidate evaluation, use a reviewed full commit
-SHA. After an approved `v0.1.0` release, the dependency declaration becomes
-`.package(url: "https://github.com/LeePepe/shared-design-system.git", exact: "0.1.0")`.
-That declaration is a release-time instruction, not a claim of publication.
+Pin the NativeDesignKit 0.1.0 release with:
+
+```swift
+.package(url: "https://github.com/LeePepe/shared-design-system.git", exact: "0.1.0")
+```
+
+Use a reviewed full 40-character commit SHA with `revision:` only when
+evaluating unreleased future revisions, not as the release dependency.
 
 The executable fixture in [EXAMPLES.md](EXAMPLES.md) shows a complete manifest.
 Consumers that name `Theme` or `TokenError` also declare the `DesignTokens`
@@ -30,7 +34,7 @@ supply a fallback, cache, default theme or business-series binding.
 
 ## Verify and uninstall
 
-Run the revision-bound external consumer command in [EXAMPLES.md](EXAMPLES.md).
+Run the exact-version external consumer command in [EXAMPLES.md](EXAMPLES.md).
 Its tests resolve every public ID in both themes and verify exact unknown-ID
 errors. iOS build evidence and a visual demo are separate checks; compiling a
 color bridge is not visual, accessibility or minimum-OS acceptance.

@@ -1,6 +1,6 @@
 # NativeTokenColor usage
 
-This is the public API contract for the unreleased 0.1.0 color-bridge candidate. Start with [README.md](README.md) for integration, executable examples and migration routes. Dependency identity, exact Tokens version and remaining compatibility limits are recorded in [COMPATIBILITY.md](COMPATIBILITY.md).
+This is the public API contract for the NativeDesignKit 0.1.0 color-bridge release. Start with [README.md](README.md) for integration, executable examples and migration routes. Dependency identity, exact Tokens version and remaining compatibility limits are recorded in [COMPATIBILITY.md](COMPATIBILITY.md).
 
 ## Current interface
 

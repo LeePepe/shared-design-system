@@ -1,6 +1,6 @@
 # NativeDesignKit compatibility
 
-NativeDesignKit 0.1.0 is an unreleased candidate. [USAGE.md](USAGE.md) describes its current interface and conversion semantics. The [contract entry](README.md) and [external fixture](EXAMPLES.md) travel with the source revision; neither implies publication.
+NativeDesignKit 0.1.0 is the first release (Git tag `v0.1.0`). [USAGE.md](USAGE.md) describes its interface and conversion semantics. The [contract entry](README.md) and [external fixture](EXAMPLES.md) travel with the release source revision; tag-time validation results are recorded in the GitHub release notes.
 
 ## Fixed dependency
 
@@ -26,12 +26,12 @@ Independent verification recorded on 2026-09-24 used macOS 27.2 arm64 and Apple 
 
 The selected methods covered every public ID in both themes, a theme-varying light→dark→light sequence, exact unknown-ID errors in both themes, and synthetic asymmetric RGB with alpha 0, 0.25, and 1 through the production helper. This exercised real AppKit numeric sRGB extraction, not color equality alone. Zero-alpha checks intentionally ignore hidden RGB. Actor isolation for native extraction stays test-side; the public resolver has no added actor requirement.
 
-The prior results apply only to the candidate tested then. Fresh PR checks and external-consumer results must name their own SHA; they do not inherit this historical pass.
+The prior results apply only to the revision tested then. Fresh PR checks and external-consumer results must name their own SHA; they do not inherit this historical pass.
 
 ## Remaining gates
 
-Release-time exact-tag consumer validation, minimum deployment OS versions and Swift 6.0 require their own evidence. The package declares iOS 15/macOS 12, but downstream dependencies can impose a higher effective minimum; inspect the resolved Tokens manifest when targeting the minimum OS. No platform change or expanded support is approved by this candidate.
+Exact-tag external consumer validation runs against `v0.1.0` after the tag is created on the PR's merge commit; its results are recorded in the GitHub release notes, not claimed here. Minimum deployment OS versions and Swift 6.0 still require their own evidence. The package declares iOS 15/macOS 12, but downstream dependencies can impose a higher effective minimum; inspect the resolved Tokens manifest when targeting the minimum OS. No platform change or expanded support is introduced by this release.
 
-Coverage metrics and full D1/6DQ remain unmeasured. The external runner isolates its source/build/DerivedData but does not prove crash/concurrency cleanup or all tool-cache isolation. Dependency/security scans, real UI demos and Owner style approval, consumer-specific migration/rollback, independent delivery review and publication remain separate gates. The initial bridge's retain/revert decision and repository licensing are Owner decisions; this work does not decide them.
+Coverage metrics and full D1/6DQ remain unmeasured. The external runner isolates its source/build/DerivedData but does not prove crash/concurrency cleanup or all tool-cache isolation. Dependency/security scans, real UI demos and Owner style approval, consumer-specific migration/rollback and independent delivery review remain separate gates. The Owner has retained the initial bridge (#1), and the repository is MIT licensed.
 
 No deprecation is introduced. There is no previously published NativeDesignKit version to deprecate. A future removal must be documented with a from/to migration and reviewed consumer upgrade; no unsupported compatibility period is promised.
