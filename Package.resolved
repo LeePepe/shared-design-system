@@ -1,13 +1,13 @@
 {
-  "originHash" : "d0ac63d85b6f1b5a93d2036b2b4f671ae23c1b63a2f1e789fc12a2073870f136",
+  "originHash" : "df16d8f61bd769da1aed3349e7112ddaefb7698a55e649fc3d23983d4f5d7847",
   "pins" : [
     {
       "identity" : "shared-design-tokens",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/LeePepe/shared-design-tokens.git",
       "state" : {
-        "revision" : "3a6d70f3ff2e01148ea303ea9219e08e877ca76c",
-        "version" : "0.1.0"
+        "revision" : "234b7d0b058474f1aa3f0edeab1be6084ad7eca5",
+        "version" : "0.1.1"
       }
     }
   ],

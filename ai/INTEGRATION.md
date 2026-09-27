@@ -13,9 +13,9 @@ That declaration is a release-time instruction, not a claim of publication.
 
 The executable fixture in [EXAMPLES.md](EXAMPLES.md) shows a complete manifest.
 Consumers that name `Theme` or `TokenError` also declare the `DesignTokens`
-product from `shared-design-tokens`, at exact `0.1.0`. The library does not
+product from `shared-design-tokens`, at exact `0.1.1`. The library does not
 re-export those types. Keep `Package.resolved` under consumer policy and confirm
-the Tokens revision is `3a6d70f3ff2e01148ea303ea9219e08e877ca76c`.
+the Tokens revision is `234b7d0b058474f1aa3f0edeab1be6084ad7eca5`.
 
 ## Minimal wiring
 

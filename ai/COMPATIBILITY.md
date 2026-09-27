@@ -4,9 +4,9 @@ NativeDesignKit 0.1.0 is an unreleased candidate. [USAGE.md](USAGE.md) describes
 
 ## Fixed dependency
 
-The manifest consumes the public repository `https://github.com/LeePepe/shared-design-tokens.git` at exactly release `0.1.0` (tag `v0.1.0`, `exact: "0.1.0"`). Its SPM identity is `shared-design-tokens`; its exported product and module are `DesignTokens`. The dependency's package display name `DesignSystem` is not the product name. Both the library and test target declare the `DesignTokens` product dependency.
+The manifest consumes the public repository `https://github.com/LeePepe/shared-design-tokens.git` at exactly release `0.1.1` (tag `v0.1.1`, `exact: "0.1.1"`). Its SPM identity is `shared-design-tokens`; its exported product and module are `DesignTokens`. The dependency's package display name `DesignSystem` is not the product name. Both the library and test target declare the `DesignTokens` product dependency.
 
-This replaces the earlier candidate revision pin `1db868d`; 0.1.0 carries the same runtime API and color data. No dependency contents are vendored by this slice. Upgrades follow the Tokens `ai/MIGRATION.md` of the target version.
+This replaces the earlier candidate revision pin `1db868d` and the later `0.1.0` release pin; 0.1.1 carries the same runtime API and color data as both and adds only MIT license metadata and the LICENSE file. No dependency contents are vendored by this slice. Upgrades follow the Tokens `ai/MIGRATION.md` of the target version.
 
 ## Declared versus tested
 
@@ -15,7 +15,7 @@ This replaces the earlier candidate revision pin `1db868d`; 0.1.0 carries the sa
 | Package | `NativeDesignKit` library product and module; Swift tools 6.0 | Evaluated and compiled in the scoped run below; Swift 6.0 itself **NOT TESTED** |
 | iOS | iOS 15 minimum; SwiftUI bridge with UIKit test extraction | Simulator build and tests run in CI (`ios` gate, newest available iPhone simulator); device and minimum-OS verification **NOT RUN** |
 | macOS | macOS 12 minimum; SwiftUI bridge with AppKit test extraction | AppKit path exercised in the scoped run below; macOS 12 **NOT TESTED** |
-| Tokens | Exact release `0.1.0`; top-level `Theme` and public RGBA facade | Resolved from the public tag by CI on every PR (`scripts/verify --all`) |
+| Tokens | Exact release `0.1.1`; top-level `Theme` and public RGBA facade | Resolved from the public tag by CI on every PR (`scripts/verify --all`) |
 | External consumer | Separate Swift package using public products only | [Fixture and runner](EXAMPLES.md); matching revision/version results belong in the PR/release notes, not inferred from `@testable` tests |
 
 Only iOS and macOS are declared here. The dependency's own platform declarations or historical test results do not establish NativeDesignKit coverage. No watchOS, other-platform, accessibility, visual, performance, or G1 pass is claimed.
