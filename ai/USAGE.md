@@ -22,4 +22,4 @@ Lookup errors propagate unchanged. An unknown ID throws `TokenError.unknownToken
 
 ## Scope
 
-This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The Tokens dependency is pinned at exactly `0.1.0`; the manifest reference does not vendor its contents.
+This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The Tokens dependency is pinned at exactly `0.1.1`; the manifest reference does not vendor its contents.

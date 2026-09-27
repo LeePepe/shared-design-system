@@ -3,7 +3,7 @@
 ## Unreleased — 0.1.0 candidate
 
 - SwiftUI `NativeTokenColor.resolve(_:theme:)` bridge over exact DesignTokens
-  0.1.0, with explicit themes, encoded sRGB conversion and unchanged errors.
+  0.1.1, with explicit themes, encoded sRGB conversion and unchanged errors.
 - Versioned AI-contract entry, integration/migration guidance, machine registry
   and an ordinary external SwiftPM consumer fixture.
 - No API or platform change is introduced by the release-readiness work.

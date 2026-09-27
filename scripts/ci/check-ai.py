@@ -68,7 +68,7 @@ def check(root):
             "public static func resolve(_ id: String, theme: Theme) throws -> SwiftUI.Color" in source,
             "AI_API", "public resolver no longer matches registry")
     manifest = (root / "Package.swift").read_text()
-    require('exact: "0.1.0"' in manifest, "AI_DEPENDENCY", "Tokens exact pin changed")
+    require('exact: "0.1.1"' in manifest, "AI_DEPENDENCY", "Tokens exact pin changed")
     for source_file in (ai / "examples").rglob("*.swift"):
         require("@testable" not in source_file.read_text(), "AI_EXAMPLE", "consumer uses test-only API")
     print("AI_OK: registry, local links, public API and candidate dependency contract")
