@@ -46,7 +46,7 @@ def check(root):
     ai = root / "ai"
     registry = json.loads((ai / "registry.json").read_text())
     schema_check(registry, json.loads((ai / "registry.schema.json").read_text()))
-    require(registry["version"] == "0.1.0", "AI_VERSION", "candidate version drift")
+    require(registry["version"] == "0.1.0", "AI_VERSION", "contract version drift")
 
     def resolve(base, name):
         path = (base / name.split("#", 1)[0]).resolve()
@@ -56,6 +56,12 @@ def check(root):
 
     for name in registry["documents"].values():
         resolve(ai, name)
+    if registry["releaseStatus"] == "released":
+        changelog = (root / "CHANGELOG.md").read_text()
+        require(re.search(r"^## 0\.1\.0(?:[ \t]|$)", changelog, re.MULTILINE) is not None,
+                "AI_RELEASE", "released contract requires a 0.1.0 changelog heading")
+        require("Unreleased — 0.1.0" not in changelog,
+                "AI_RELEASE", "released contract contains an unreleased 0.1.0 changelog marker")
     for capability in registry["capabilities"]:
         for field in ("source", "documentation", "example"):
             resolve(ai, capability[field])
@@ -71,7 +77,7 @@ def check(root):
     require('exact: "0.1.1"' in manifest, "AI_DEPENDENCY", "Tokens exact pin changed")
     for source_file in (ai / "examples").rglob("*.swift"):
         require("@testable" not in source_file.read_text(), "AI_EXAMPLE", "consumer uses test-only API")
-    print("AI_OK: registry, local links, public API and candidate dependency contract")
+    print("AI_OK: registry, release changelog, local links, public API and dependency contract")
 
 
 if __name__ == "__main__":

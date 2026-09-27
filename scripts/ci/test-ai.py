@@ -44,6 +44,27 @@ class ContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "AI_VERSION"):
             CHECK.check(self.root)
 
+    def test_released_requires_changelog_heading(self):
+        self.mutate_registry(lambda r: r.update(releaseStatus="released"))
+        for content in ("# Changelog\n", "# Changelog\n\nRelease: ## 0.1.0\n",
+                        "# Changelog\n\n## 0.1.01\n"):
+            with self.subTest(content=content):
+                (self.root / "CHANGELOG.md").write_text(content)
+                with self.assertRaisesRegex(ValueError, "AI_RELEASE"):
+                    CHECK.check(self.root)
+
+    def test_released_rejects_unreleased_changelog_marker(self):
+        self.mutate_registry(lambda r: r.update(releaseStatus="released"))
+        (self.root / "CHANGELOG.md").write_text(
+            "# Changelog\n\n## 0.1.0 — first release\n\nUnreleased — 0.1.0\n")
+        with self.assertRaisesRegex(ValueError, "AI_RELEASE"):
+            CHECK.check(self.root)
+
+    def test_unreleased_does_not_require_release_heading(self):
+        self.mutate_registry(lambda r: r.update(releaseStatus="unreleased"))
+        (self.root / "CHANGELOG.md").write_text("# Changelog\n\n## Unreleased — 0.1.0\n")
+        CHECK.check(self.root)
+
     def test_invalid_schema(self):
         self.mutate_registry(lambda r: r.update(schemaVersion=2))
         with self.assertRaisesRegex(ValueError, "AI_SCHEMA"):

@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "library": "NativeDesignKit",
   "version": "0.1.0",
-  "releaseStatus": "unreleased",
+  "releaseStatus": "released",
   "releaseUnit": {"ecosystem": "swiftpm", "product": "NativeDesignKit", "module": "NativeDesignKit"},
   "documents": {
     "entry": "README.md",
