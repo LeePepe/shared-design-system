@@ -5,4 +5,4 @@ built on [`shared-design-tokens`](https://github.com/LeePepe/shared-design-token
 
 - Agents and contributors: start with [AGENTS.md](AGENTS.md).
 - Architecture: [layer map](docs/architecture/tech-context.md).
-- Consumers: read `ai/` from the exact release you pin.
+- Consumers: read the `ai/` directory from the exact release you pin.
