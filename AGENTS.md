@@ -13,8 +13,8 @@ etc.) only point here.
 
 ## Protocol
 
-Follow `LeePepe/shared-ci@761fe6b0b3ca5e2c57d244182d495ab8041851fa/ai/agent-protocol.md`
-(https://github.com/LeePepe/shared-ci/blob/761fe6b0b3ca5e2c57d244182d495ab8041851fa/ai/agent-protocol.md).
+Follow `LeePepe/shared-ci@6e354f476bc53d68f0f09fc231d5cd938466af9c/ai/agent-protocol.md`
+(https://github.com/LeePepe/shared-ci/blob/6e354f476bc53d68f0f09fc231d5cd938466af9c/ai/agent-protocol.md).
 It must be the same SHA as the `uses:` pins in `.github/workflows/`.
 
 ## Verify
@@ -34,6 +34,10 @@ never weaken or skip tests, never edit policy/gates to pass.
 Merging to `main` requires (target ruleset; applying it is an Owner step):
 
 - `quality / aggregate`
+- `codex-review-gate`
+
+`codex-review-gate` becomes ruleset-required after positive/negative probe
+acceptance, as a separate Owner ruleset step.
 
 `quality / aggregate` fails unless every lane of the shared-ci quality gate
 passed on the PR head: `scripts/verify --all` on macOS (host build and test,
@@ -52,15 +56,9 @@ iOS simulator build and test), contract audit, workflow-lint and the PR-body che
   local file with a committed `.example` template.
 - No personal account names, credential-profile paths or local home paths in the repo.
 
-Approved exceptions:
-
-- No `codex-review-target` review caller: this repository has no self-hosted
-  review runner (S7 rollout decision). The required list above omits
-  `codex-review-target / codex-review` until one exists.
-
 ## Dependencies
 
-- `shared-ci` `761fe6b0b3ca5e2c57d244182d495ab8041851fa` — https://github.com/LeePepe/shared-ci/blob/761fe6b0b3ca5e2c57d244182d495ab8041851fa/ai/
+- `shared-ci` `6e354f476bc53d68f0f09fc231d5cd938466af9c` — https://github.com/LeePepe/shared-ci/blob/6e354f476bc53d68f0f09fc231d5cd938466af9c/ai/
 - `shared-design-tokens` `0.1.1` — `LeePepe/shared-design-tokens@0.1.1/ai/`
   (tag `v0.1.1`: https://github.com/LeePepe/shared-design-tokens/tree/v0.1.1/ai; SwiftPM `exact: "0.1.1"`, product `DesignTokens`)
 
