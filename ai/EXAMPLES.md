@@ -26,10 +26,13 @@ python3 scripts/ci/external-consumer.py --revision <full-40-character-commit-SHA
 
 In revision mode, the runner tests the complete 0.2.0 candidate contract (direct color resolver, `NativeDesignTheme`, and `NativeCard`).
 
-The runner copies the fixture to its own temporary directory, replaces only
-the shared-design-system dependency requirement with the requested exact
-version or immutable SHA, resolves from the public repository, checks the
-actual resolved version or SHA and shipped `ai/` entry,
+The runner copies the fixture to its own temporary directory and resolves
+from the public repository. In revision mode, it replaces only the
+shared-design-system dependency requirement with the requested immutable SHA,
+testing the complete unreleased 0.2.0 candidate contract. In `--version 0.1.0`
+mode, it replaces the dependency requirement with exact `0.1.0` and adapts
+`SamplePalette.swift` and `SamplePaletteTests.swift` to 0.1.0's color-only interface.
+It checks the actual resolved version or SHA and shipped `ai/` entry,
 then runs `swift build`, `swift test` and an iOS-simulator compile with an
 isolated DerivedData directory. It never uses a local path dependency. Failure
 of any command, missing docs, or a resolution mismatch fails the run. Version
