@@ -170,8 +170,8 @@ The exact shared public-contract path set `C1` is: `ai/README.md`, `ai/USAGE.md`
 ## `T501` — Read-only exact-SHA integration gate
 
 - **Kind:** acceptance verification, not an implementation task/branch/PR
-- **Outcome:** On the final pushed candidate/main revision, prove every stable AC, compatibility/rollback, source/contract agreement, unchanged token pin/platform floors, fixture evidence review, and SHA identity before release handoff.
-- **Depends on:** merged `T402` PR and green normal CI for the exact revision when CI evidence is an explicit parent acceptance requirement
+- **Outcome:** On the final pushed candidate/main revision, prove every stable AC, compatibility/rollback, source/contract agreement, unchanged token pin/platform floors, fixture evidence review, SHA identity, exact-head online CI conclusions, and the effective server-side required-check state before release handoff.
+- **Depends on:** merged `T402` PR and concluded online CI for the exact revision, with every effectively required check passing
 - **Covers:** final evidence for all ACs, especially `AC-BASE-01`, `AC-BOUNDARY-01`, `AC-CONTRACT-01`, `AC-VERIFY-01`
 - **Commands:**
 
@@ -181,9 +181,13 @@ The exact shared public-contract path set `C1` is: `ai/README.md`, `ai/USAGE.md`
   Tests/Fixtures/NativeDesignKitShowcase/verify macos
   Tests/Fixtures/NativeDesignKitShowcase/verify ios
   python3 scripts/ci/external-consumer.py --revision "$(git rev-parse HEAD)"
+  gh pr view <PR-number> --repo LeePepe/shared-design-system --json headRefOid,baseRefName,url,statusCheckRollup
+  gh api --paginate 'repos/LeePepe/shared-design-system/rulesets?includes_parents=true'
+  gh api 'repos/LeePepe/shared-design-system/rules/branches/main'
+  gh api --include 'repos/LeePepe/shared-design-system/branches/main/protection/required_status_checks'
   ```
 
-- **Evidence:** command/exit-code/test-count and skipped/cancelled tables; exact dependency/manifest inspection; complete AC matrix; PR-attached screenshot/manual manifest and named independent PASS; local HEAD = remote branch = PR head/main evidence; compatibility and rollback audit; residual risks
+- **Evidence:** command/exit-code/test-count and skipped/cancelled tables; exact dependency/manifest inspection; complete AC matrix; PR-attached screenshot/manual manifest and named independent PASS; local HEAD = remote branch = PR head/main evidence; compatibility and rollback audit; exact-head online check table with each check name, conclusion, URL/run ID, and observed head SHA; effective `main` ruleset/branch-protection table with rule IDs/enforcement and actually required context names; set comparison that separately reports checks that ran but are not enforced; residual risks. Workflow-file presence and documented target checks are not enforcement proof. A permissions/API gap is recorded as unverified and blocks `AC-VERIFY-01`; T501 never changes repository settings.
 - **Invalidation:** any tracked correction—source, tests, docs, registry, schema, checker, changelog, fixture, runner, gate, or other file—creates a new candidate SHA and requires all affected contract/full/external/fixture checks, independent exact-revision review, evidence manifest, and SHA reconciliation to run again. No documentation-only exception exists.
 - **Excludes:** self-approval, merge, tag, package publication, consumer migration, repository settings, waived/unreviewed acceptance
 

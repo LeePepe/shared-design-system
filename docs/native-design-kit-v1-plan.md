@@ -153,6 +153,8 @@ python3 scripts/ci/external-consumer.py --revision "$(git rev-parse HEAD)"
 
 The external-consumer command is valid only for a revision reachable by the consumer checkout (normally the pushed PR head). Evidence records commands, exit codes, test counts, skipped/cancelled checks, and exact SHA. Before any review or shipping handoff, local `HEAD`, remote branch SHA, and PR `headRefOid` must match byte-for-byte.
 
+`T501` also owns two separate read-only server observations for that reconciled PR head: the online check runs (name, conclusion, URL/run ID, and head SHA) and the effective required-check configuration applied to `main` (active ruleset/branch-protection evidence and required context names). Its evidence compares the two sets, names checks that ran but were not enforced, and distinguishes the repository's documented target from actual enforcement. Workflow files are not server-enforcement evidence. A permissions/API gap is recorded as unverified and blocks `AC-VERIFY-01`; no task changes repository settings.
+
 ## Fixture and evidence plan
 
 The fixture presents all components with conspicuously synthetic sample values and includes controls that exercise theme changes and all content phases. It provides caller-owned buttons inside Card/Chart/State content to verify that containers preserve interaction.
