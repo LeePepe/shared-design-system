@@ -99,10 +99,10 @@ def check(root):
     require("public struct NativeDesignTheme" in theme_source and
             "public init(theme: Theme) throws" in theme_source,
             "AI_API", "public theme initializer no longer matches registry")
-    public_inits = re.findall(r"public\s+init\s*\((.*?)\)", theme_source)
-    require(len(public_inits) == 1 and public_inits[0].strip() == "theme: Theme",
+    public_inits = [re.sub(r"\s+", " ", p).strip() for p in re.findall(r"public\s+init\s*\((.*?)\)", theme_source, re.DOTALL)]
+    require(len(public_inits) == 1 and public_inits[0] == "theme: Theme",
             "AI_API", "NativeDesignTheme must expose only public init(theme: Theme) throws")
-    require("init()" not in re.findall(r"public\s+init\s*\(\s*\)", theme_source),
+    require(len(re.findall(r"public\s+init\s*\(\s*\)", theme_source, re.DOTALL)) == 0,
             "AI_API", "NativeDesignTheme must not expose a public default initializer")
     require(not any("id" in p or "token" in p for p in public_inits),
             "AI_API", "NativeDesignTheme must not expose a public custom-ID initializer")

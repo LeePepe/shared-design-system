@@ -58,6 +58,45 @@ def main():
             raise RuntimeError(f"resolved checkout AI contract mismatch: expected {expected_version}, got {registry.get('version')}")
         if args.version and registry["releaseStatus"] != "released":
             raise RuntimeError("a release tag cannot ship an unreleased contract")
+        if args.version:
+            # When testing an older released version (such as 0.1.0), adjust the fixture to only test
+            # capabilities supported by that release.
+            if value == "0.1.0":
+                source_file = consumer / "Sources/SamplePalette/SamplePalette.swift"
+                source_file.write_text("""import DesignTokens
+import NativeDesignKit
+import SwiftUI
+
+public enum SamplePalette {
+    public static func color(_ id: String, theme: Theme) throws -> Color {
+        try NativeTokenColor.resolve(id, theme: theme)
+    }
+}
+""")
+                test_file = consumer / "Tests/SamplePaletteTests/SamplePaletteTests.swift"
+                test_file.write_text("""import DesignTokens
+import SamplePalette
+import XCTest
+
+final class SamplePaletteTests: XCTestCase {
+    func testPublicProductResolvesEveryTokenInBothThemes() throws {
+        XCTAssertFalse(DesignTokens.ids.isEmpty)
+        for theme in Theme.allCases {
+            for id in DesignTokens.ids {
+                _ = try SamplePalette.color(id, theme: theme)
+            }
+        }
+    }
+
+    func testUnknownIDPreservesPublicError() {
+        for theme in Theme.allCases {
+            XCTAssertThrowsError(try SamplePalette.color("__unknown_consumer_token__", theme: theme)) {
+                XCTAssertEqual($0 as? TokenError, .unknownToken("__unknown_consumer_token__"))
+            }
+        }
+    }
+}
+""")
         run("python3", str(checkout / "scripts/ci/check-ai.py"), cwd=checkout)
         run("swift", "build", cwd=consumer)
         run("swift", "test", cwd=consumer)

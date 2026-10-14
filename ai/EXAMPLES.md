@@ -3,7 +3,8 @@
 The fixture at [examples/consumer](examples/consumer/Package.swift) is a separate
 Swift package. [SamplePalette.swift](examples/consumer/Sources/SamplePalette/SamplePalette.swift)
 uses only public products. Its [tests](examples/consumer/Tests/SamplePaletteTests/SamplePaletteTests.swift)
-cover every token/light-dark combination and unchanged unknown-token errors.
+cover every token/light-dark combination, unchanged unknown-token errors, and
+`NativeDesignTheme` / `NativeCard` composition in both themes.
 It is not a graphical demo and does not prove visual/interaction acceptance.
 
 From this repository, validate the exact 0.1.0 release with:
@@ -14,13 +15,16 @@ python3 scripts/ci/external-consumer.py --version 0.1.0
 
 This release validation runs after Git tag `v0.1.0` is created on the PR's
 merge commit. Its results are recorded in the GitHub release notes; the
-command here does not claim that tag-time validation has already run.
+command here does not claim that tag-time validation has already run. When testing
+the 0.1.0 release, the runner dynamically adapts the fixture to 0.1.0's color-only interface.
 
 For pushed PR/pre-release revisions, use revision mode instead:
 
 ```sh
 python3 scripts/ci/external-consumer.py --revision <full-40-character-commit-SHA>
 ```
+
+In revision mode, the runner tests the complete 0.2.0 candidate contract (direct color resolver, `NativeDesignTheme`, and `NativeCard`).
 
 The runner copies the fixture to its own temporary directory, replaces only
 the shared-design-system dependency requirement with the requested exact

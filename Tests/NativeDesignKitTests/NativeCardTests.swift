@@ -11,6 +11,14 @@ final class NativeCardTests: XCTestCase {
         XCTAssertEqual(NativeCardRoleModel.foregroundRole.tokenID, "product.text.primary")
     }
 
+    func testCardRoleModelDirectlyMatchesThemeProductionColors() throws {
+        for theme in Theme.allCases {
+            let resolvedTheme = try NativeDesignTheme(theme: theme)
+            XCTAssertEqual(resolvedTheme.color(for: NativeCardRoleModel.backgroundRole), resolvedTheme.surfaceRaised)
+            XCTAssertEqual(resolvedTheme.color(for: NativeCardRoleModel.foregroundRole), resolvedTheme.textPrimary)
+        }
+    }
+
     @MainActor
     func testPublicCardConstructionWithGenericContent() throws {
         for theme in Theme.allCases {

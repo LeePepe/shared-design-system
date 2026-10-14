@@ -31,6 +31,22 @@ public struct NativeDesignTheme: Sendable {
     let statusOnCritical: Color
     let surfaceCanvas: Color
 
+    /// Color lookup by pure semantic token role.
+    func color(for role: SemanticTokenRole) -> Color {
+        switch role {
+        case .surfaceRaised: return surfaceRaised
+        case .textPrimary: return textPrimary
+        case .textSecondary: return textSecondary
+        case .statusInfo: return statusInfo
+        case .statusOnInfo: return statusOnInfo
+        case .statusWarning: return statusWarning
+        case .statusOnWarning: return statusOnWarning
+        case .statusCritical: return statusCritical
+        case .statusOnCritical: return statusOnCritical
+        case .surfaceCanvas: return surfaceCanvas
+        }
+    }
+
     /// Resolves required semantic token colors for the explicit caller-supplied theme.
     public init(theme: Theme) throws {
         try self.init(theme: theme, resolve: NativeTokenColor.resolve)

@@ -97,17 +97,21 @@ class ContractTests(unittest.TestCase):
 
     def test_theme_public_default_init_rejected(self):
         theme_path = self.root / "Sources/NativeDesignKit/NativeDesignTheme.swift"
-        content = theme_path.read_text() + "\nextension NativeDesignTheme { public init() {} }\n"
-        theme_path.write_text(content)
-        with self.assertRaisesRegex(ValueError, "AI_API"):
-            CHECK.check(self.root)
+        for suffix in ("\nextension NativeDesignTheme { public init() {} }\n",
+                       "\nextension NativeDesignTheme {\npublic init(\n) {}\n}\n"):
+            with self.subTest(suffix=suffix):
+                theme_path.write_text(ROOT.joinpath("Sources/NativeDesignKit/NativeDesignTheme.swift").read_text() + suffix)
+                with self.assertRaisesRegex(ValueError, "AI_API"):
+                    CHECK.check(self.root)
 
     def test_theme_public_custom_id_init_rejected(self):
         theme_path = self.root / "Sources/NativeDesignKit/NativeDesignTheme.swift"
-        content = theme_path.read_text() + "\nextension NativeDesignTheme { public init(customID: String) throws {} }\n"
-        theme_path.write_text(content)
-        with self.assertRaisesRegex(ValueError, "AI_API"):
-            CHECK.check(self.root)
+        for suffix in ("\nextension NativeDesignTheme { public init(customID: String) throws {} }\n",
+                       "\nextension NativeDesignTheme {\npublic init(\ncustomID: String\n) throws {}\n}\n"):
+            with self.subTest(suffix=suffix):
+                theme_path.write_text(ROOT.joinpath("Sources/NativeDesignKit/NativeDesignTheme.swift").read_text() + suffix)
+                with self.assertRaisesRegex(ValueError, "AI_API"):
+                    CHECK.check(self.root)
 
     def test_invalid_schema(self):
         self.mutate_registry(lambda r: r.update(schemaVersion=2))

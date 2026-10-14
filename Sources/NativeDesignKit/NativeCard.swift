@@ -22,11 +22,11 @@ public struct NativeCard<Content: View>: View {
 
     public var body: some View {
         content
-            .foregroundColor(theme.textPrimary)
+            .foregroundColor(theme.color(for: NativeCardRoleModel.foregroundRole))
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(theme.surfaceRaised)
+                    .fill(theme.color(for: NativeCardRoleModel.backgroundRole))
             )
     }
 }
