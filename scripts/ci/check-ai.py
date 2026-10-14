@@ -15,7 +15,8 @@ def schema_check(value, schema, path="registry"):
     # Deliberately implements only the keywords used by the checked-in schema.
     # Unknown keywords fail closed rather than silently weakening validation.
     known = {"$schema", "title", "type", "additionalProperties", "required",
-             "properties", "const", "enum", "pattern", "minItems", "items"}
+             "properties", "const", "enum", "pattern", "minItems", "maxItems",
+             "items", "prefixItems"}
     require(not set(schema) - known, "AI_SCHEMA", f"unsupported keyword at {path}")
     kind = schema.get("type")
     types = {"object": dict, "array": list, "string": str}
@@ -36,9 +37,27 @@ def schema_check(value, schema, path="registry"):
             if key in properties:
                 schema_check(item, properties[key], f"{path}.{key}")
     if kind == "array":
-        require(len(value) >= schema.get("minItems", 0), "AI_SCHEMA", path)
-        for index, item in enumerate(value):
-            schema_check(item, schema["items"], f"{path}[{index}]")
+        if "minItems" in schema:
+            require(len(value) >= schema["minItems"], "AI_SCHEMA", f"too few items at {path}")
+        if "maxItems" in schema:
+            require(len(value) <= schema["maxItems"], "AI_SCHEMA", f"too many items at {path}")
+        if "prefixItems" in schema:
+            prefix = schema["prefixItems"]
+            require(len(value) >= len(prefix), "AI_SCHEMA", f"missing prefix items at {path}")
+            for index, item_schema in enumerate(prefix):
+                if index < len(value):
+                    schema_check(value[index], item_schema, f"{path}[{index}]")
+            if schema.get("items") is False:
+                require(len(value) == len(prefix), "AI_SCHEMA", f"extra items past prefix at {path}")
+            elif "items" in schema and isinstance(schema["items"], dict):
+                for index in range(len(prefix), len(value)):
+                    schema_check(value[index], schema["items"], f"{path}[{index}]")
+        elif "items" in schema:
+            if isinstance(schema["items"], dict):
+                for index, item in enumerate(value):
+                    schema_check(item, schema["items"], f"{path}[{index}]")
+            elif schema["items"] is False:
+                require(len(value) == 0, "AI_SCHEMA", f"no items allowed at {path}")
 
 
 def check(root):
@@ -56,12 +75,15 @@ def check(root):
 
     for name in registry["documents"].values():
         resolve(ai, name)
+    changelog = (root / "CHANGELOG.md").read_text()
     if registry["releaseStatus"] == "released":
-        changelog = (root / "CHANGELOG.md").read_text()
         require(re.search(r"^## 0\.2\.0(?:[ \t]|$)", changelog, re.MULTILINE) is not None,
                 "AI_RELEASE", "released contract requires a 0.2.0 changelog heading")
         require("Unreleased — 0.2.0" not in changelog,
                 "AI_RELEASE", "released contract contains an unreleased 0.2.0 changelog marker")
+    elif registry["releaseStatus"] == "unreleased":
+        require(re.search(r"^## Unreleased — 0\.2\.0(?:[ \t]|$)", changelog, re.MULTILINE) is not None,
+                "AI_RELEASE", "unreleased contract requires an 'Unreleased — 0.2.0' changelog heading")
     for capability in registry["capabilities"]:
         for field in ("source", "documentation", "example"):
             resolve(ai, capability[field])
@@ -77,6 +99,13 @@ def check(root):
     require("public struct NativeDesignTheme" in theme_source and
             "public init(theme: Theme) throws" in theme_source,
             "AI_API", "public theme initializer no longer matches registry")
+    public_inits = re.findall(r"public\s+init\s*\((.*?)\)", theme_source)
+    require(len(public_inits) == 1 and public_inits[0].strip() == "theme: Theme",
+            "AI_API", "NativeDesignTheme must expose only public init(theme: Theme) throws")
+    require("init()" not in re.findall(r"public\s+init\s*\(\s*\)", theme_source),
+            "AI_API", "NativeDesignTheme must not expose a public default initializer")
+    require(not any("id" in p or "token" in p for p in public_inits),
+            "AI_API", "NativeDesignTheme must not expose a public custom-ID initializer")
     card_source = (root / "Sources/NativeDesignKit/NativeCard.swift").read_text()
     require("public struct NativeCard" in card_source and
             "public init(" in card_source,

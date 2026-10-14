@@ -26,26 +26,48 @@
       }
     },
     "capabilities": {
-      "type": "array", "minItems": 1,
-      "items": {
-        "type": "object", "additionalProperties": false,
-        "required": ["id", "symbol", "source", "documentation", "example"],
-        "properties": {
-          "id": {"enum": ["native-token-color", "native-design-theme", "native-card"]},
-          "symbol": {"enum": [
-            "NativeTokenColor.resolve(_:theme:)",
-            "NativeDesignTheme.init(theme:)",
-            "NativeCard.init(theme:content:)"
-          ]},
-          "source": {"enum": [
-            "../Sources/NativeDesignKit/NativeTokenColor.swift",
-            "../Sources/NativeDesignKit/NativeDesignTheme.swift",
-            "../Sources/NativeDesignKit/NativeCard.swift"
-          ]},
-          "documentation": {"const": "USAGE.md"},
-          "example": {"const": "examples/consumer/Sources/SamplePalette/SamplePalette.swift"}
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "symbol", "source", "documentation", "example"],
+          "properties": {
+            "id": {"const": "native-token-color"},
+            "symbol": {"const": "NativeTokenColor.resolve(_:theme:)"},
+            "source": {"const": "../Sources/NativeDesignKit/NativeTokenColor.swift"},
+            "documentation": {"const": "USAGE.md"},
+            "example": {"const": "examples/consumer/Sources/SamplePalette/SamplePalette.swift"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "symbol", "source", "documentation", "example"],
+          "properties": {
+            "id": {"const": "native-design-theme"},
+            "symbol": {"const": "NativeDesignTheme.init(theme:)"},
+            "source": {"const": "../Sources/NativeDesignKit/NativeDesignTheme.swift"},
+            "documentation": {"const": "USAGE.md"},
+            "example": {"const": "examples/consumer/Sources/SamplePalette/SamplePalette.swift"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "symbol", "source", "documentation", "example"],
+          "properties": {
+            "id": {"const": "native-card"},
+            "symbol": {"const": "NativeCard.init(theme:content:)"},
+            "source": {"const": "../Sources/NativeDesignKit/NativeCard.swift"},
+            "documentation": {"const": "USAGE.md"},
+            "example": {"const": "examples/consumer/Sources/SamplePalette/SamplePalette.swift"}
+          }
         }
-      }
+      ],
+      "items": false
     }
   }
 }

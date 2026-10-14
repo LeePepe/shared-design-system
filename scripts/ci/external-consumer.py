@@ -53,8 +53,9 @@ def main():
             raise RuntimeError("Tokens 0.1.1 revision mismatch")
         checkout = consumer / ".build/checkouts/shared-design-system"
         registry = json.loads((checkout / "ai/registry.json").read_text())
-        if registry["library"] != "NativeDesignKit" or registry["version"] != "0.2.0":
-            raise RuntimeError("resolved checkout AI contract mismatch")
+        expected_version = value if args.version else "0.2.0"
+        if registry["library"] != "NativeDesignKit" or registry["version"] != expected_version:
+            raise RuntimeError(f"resolved checkout AI contract mismatch: expected {expected_version}, got {registry.get('version')}")
         if args.version and registry["releaseStatus"] != "released":
             raise RuntimeError("a release tag cannot ship an unreleased contract")
         run("python3", str(checkout / "scripts/ci/check-ai.py"), cwd=checkout)

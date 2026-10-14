@@ -23,16 +23,32 @@ the Tokens revision is `234b7d0b058474f1aa3f0edeab1be6084ad7eca5`.
 
 ## Minimal wiring
 
-Import `NativeDesignKit` and `DesignTokens`. Construct
-`let theme = try NativeDesignTheme(theme: selectedTheme)` and pass it to
-components such as `NativeCard(theme: theme) { ... }`, or call
-`try NativeTokenColor.resolve(id, theme: theme)` for direct color resolution.
-The fixture's `SamplePalette` implements this using public imports only.
-Never use `@testable import` in a consumer.
+### Released 0.1.0 (Color bridge only)
+When consuming the released 0.1.0 tag, import `NativeDesignKit` and `DesignTokens`, and call `try NativeTokenColor.resolve(id, theme: selectedTheme)` with an explicit `DesignTokens.Theme`:
 
-Construct a new `NativeDesignTheme` when the theme changes. Handle `TokenError`
-at the consumer boundary according to the product's policy. The library does not
-supply a fallback, cache, default theme or business-series binding.
+```swift
+import DesignTokens
+import NativeDesignKit
+import SwiftUI
+
+let color = try NativeTokenColor.resolve("product.surface.raised", theme: selectedTheme)
+```
+
+### Unreleased 0.2.0 candidate (Theme seam & Components)
+When evaluating the unreleased 0.2.0 candidate revision, construct an explicit `NativeDesignTheme` and pass it to presentation primitives:
+
+```swift
+import DesignTokens
+import NativeDesignKit
+import SwiftUI
+
+let theme = try NativeDesignTheme(theme: selectedTheme)
+let card = NativeCard(theme: theme) {
+    Text("Card Content")
+}
+```
+
+Construct a new `NativeDesignTheme` (or re-resolve direct colors with `selectedTheme`) when the theme changes. Handle `TokenError` at the consumer boundary according to product policy. The library does not supply a fallback, cache, default theme or business-series binding.
 
 ## Verify and uninstall
 

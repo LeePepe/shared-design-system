@@ -25,10 +25,20 @@ public struct NativeCard<Content: View>: View {
 
 ## Theme resolution and errors
 
-`NativeDesignTheme.init(theme:) throws` establishes an explicit, throwing resolution boundary before view rendering. It freshly resolves all required semantic tokens from `DesignTokens` for the explicit theme:
+`NativeDesignTheme.init(theme:) throws` establishes an explicit, throwing resolution boundary before view rendering. It freshly resolves all ten required semantic tokens from `DesignTokens` for the explicit theme:
 
-- Card background: `product.surface.raised`
-- Card inherited foreground: `product.text.primary`
+1. `product.surface.raised` (used by `NativeCard` background)
+2. `product.text.primary` (used by `NativeCard` inherited default foreground)
+3. `product.text.secondary`
+4. `status.info`
+5. `status.on-info`
+6. `status.warning`
+7. `status.on-warning`
+8. `status.critical`
+9. `status.on-critical`
+10. `product.surface.canvas`
+
+In S1, `NativeCard` consumes `product.surface.raised` and `product.text.primary`; the remaining eight roles are resolved atomically as part of the theme snapshot for upcoming primitive wiring.
 
 Theme is required on every construction. The resulting `NativeDesignTheme` is an immutable snapshot; it does not detect the system environment or automatically track later theme changes. When the caller switches between light and dark, it constructs a new `NativeDesignTheme` value. The library maintains no global cache, memoization, or default theme.
 

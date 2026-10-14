@@ -60,10 +60,54 @@ class ContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "AI_RELEASE"):
             CHECK.check(self.root)
 
+    def test_unreleased_requires_unreleased_changelog_heading(self):
+        self.mutate_registry(lambda r: r.update(releaseStatus="unreleased"))
+        for content in ("# Changelog\n", "# Changelog\n\n## 0.2.0\n", "# Changelog\n\n## Unreleased — 0.1.0\n"):
+            with self.subTest(content=content):
+                (self.root / "CHANGELOG.md").write_text(content)
+                with self.assertRaisesRegex(ValueError, "AI_RELEASE"):
+                    CHECK.check(self.root)
+
     def test_unreleased_does_not_require_release_heading(self):
         self.mutate_registry(lambda r: r.update(releaseStatus="unreleased"))
         (self.root / "CHANGELOG.md").write_text("# Changelog\n\n## Unreleased — 0.2.0\n")
         CHECK.check(self.root)
+
+    def test_capability_omission(self):
+        self.mutate_registry(lambda r: r.update(capabilities=r["capabilities"][:2]))
+        with self.assertRaisesRegex(ValueError, "AI_SCHEMA"):
+            CHECK.check(self.root)
+
+    def test_capability_duplicate_and_extra(self):
+        self.mutate_registry(lambda r: r.update(capabilities=r["capabilities"] + [r["capabilities"][0]]))
+        with self.assertRaisesRegex(ValueError, "AI_SCHEMA"):
+            CHECK.check(self.root)
+
+    def test_capability_tuple_mismatch(self):
+        bad_cap = {
+            "id": "native-design-theme",
+            "symbol": "NativeCard.init(theme:content:)",
+            "source": "../Sources/NativeDesignKit/NativeCard.swift",
+            "documentation": "USAGE.md",
+            "example": "examples/consumer/Sources/SamplePalette/SamplePalette.swift"
+        }
+        self.mutate_registry(lambda r: r.update(capabilities=[r["capabilities"][0], bad_cap, r["capabilities"][2]]))
+        with self.assertRaisesRegex(ValueError, "AI_SCHEMA"):
+            CHECK.check(self.root)
+
+    def test_theme_public_default_init_rejected(self):
+        theme_path = self.root / "Sources/NativeDesignKit/NativeDesignTheme.swift"
+        content = theme_path.read_text() + "\nextension NativeDesignTheme { public init() {} }\n"
+        theme_path.write_text(content)
+        with self.assertRaisesRegex(ValueError, "AI_API"):
+            CHECK.check(self.root)
+
+    def test_theme_public_custom_id_init_rejected(self):
+        theme_path = self.root / "Sources/NativeDesignKit/NativeDesignTheme.swift"
+        content = theme_path.read_text() + "\nextension NativeDesignTheme { public init(customID: String) throws {} }\n"
+        theme_path.write_text(content)
+        with self.assertRaisesRegex(ValueError, "AI_API"):
+            CHECK.check(self.root)
 
     def test_invalid_schema(self):
         self.mutate_registry(lambda r: r.update(schemaVersion=2))

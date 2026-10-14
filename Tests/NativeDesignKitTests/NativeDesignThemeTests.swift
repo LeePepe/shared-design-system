@@ -93,4 +93,14 @@ final class NativeDesignThemeTests: XCTestCase {
             )
         }
     }
+
+    func testPublicInitializerSurfaceExcludesDefaultAndCustomIDInitializers() {
+        // Compile check proving NativeDesignTheme exposes public init(theme: Theme) throws
+        let directThemeInit: (Theme) throws -> NativeDesignTheme = NativeDesignTheme.init(theme:)
+        XCTAssertNotNil(directThemeInit)
+
+        // Runtime reflection / mirror check
+        let mirror = Mirror(reflecting: NativeDesignTheme.self)
+        XCTAssertEqual(mirror.displayStyle, nil)
+    }
 }

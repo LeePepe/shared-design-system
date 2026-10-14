@@ -1,7 +1,5 @@
 import DesignTokens
-import NativeDesignKit
 import SamplePalette
-import SwiftUI
 import XCTest
 
 final class SamplePaletteTests: XCTestCase {
@@ -19,17 +17,6 @@ final class SamplePaletteTests: XCTestCase {
             XCTAssertThrowsError(try SamplePalette.color("__unknown_consumer_token__", theme: theme)) {
                 XCTAssertEqual($0 as? TokenError, .unknownToken("__unknown_consumer_token__"))
             }
-        }
-    }
-
-    @MainActor
-    func testThemeAndCardConstructionInBothThemes() throws {
-        for theme in Theme.allCases {
-            let resolvedTheme = try SamplePalette.makeTheme(theme: theme)
-            let card = SamplePalette.makeCard(theme: resolvedTheme) {
-                Text("Sample Card Content")
-            }
-            XCTAssertNotNil(card.body)
         }
     }
 }
