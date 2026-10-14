@@ -1,8 +1,6 @@
 # NativeDesignKit consumer contract
 
-Release unit: `NativeDesignKit` (SwiftPM), released version **0.1.0** (Git tag
-`v0.1.0`). Use documents from the same immutable revision as the resolved
-package; do not substitute documentation from `main`.
+Release unit: `NativeDesignKit` (SwiftPM), version **0.2.0** (unreleased candidate staged on `main`; released version 0.1.0, Git tag `v0.1.0`). Use documents from the same immutable revision as the resolved package; do not substitute documentation from `main`.
 
 | Task | Start here |
 | --- | --- |

@@ -2,8 +2,8 @@
   "$schema": "registry.schema.json",
   "schemaVersion": 1,
   "library": "NativeDesignKit",
-  "version": "0.1.0",
-  "releaseStatus": "released",
+  "version": "0.2.0",
+  "releaseStatus": "unreleased",
   "releaseUnit": {"ecosystem": "swiftpm", "product": "NativeDesignKit", "module": "NativeDesignKit"},
   "documents": {
     "entry": "README.md",
@@ -14,11 +14,27 @@
     "migration": "MIGRATION.md",
     "changelog": "../CHANGELOG.md"
   },
-  "capabilities": [{
-    "id": "native-token-color",
-    "symbol": "NativeTokenColor.resolve(_:theme:)",
-    "source": "../Sources/NativeDesignKit/NativeTokenColor.swift",
-    "documentation": "USAGE.md",
-    "example": "examples/consumer/Sources/SamplePalette/SamplePalette.swift"
-  }]
+  "capabilities": [
+    {
+      "id": "native-token-color",
+      "symbol": "NativeTokenColor.resolve(_:theme:)",
+      "source": "../Sources/NativeDesignKit/NativeTokenColor.swift",
+      "documentation": "USAGE.md",
+      "example": "examples/consumer/Sources/SamplePalette/SamplePalette.swift"
+    },
+    {
+      "id": "native-design-theme",
+      "symbol": "NativeDesignTheme.init(theme:)",
+      "source": "../Sources/NativeDesignKit/NativeDesignTheme.swift",
+      "documentation": "USAGE.md",
+      "example": "examples/consumer/Sources/SamplePalette/SamplePalette.swift"
+    },
+    {
+      "id": "native-card",
+      "symbol": "NativeCard.init(theme:content:)",
+      "source": "../Sources/NativeDesignKit/NativeCard.swift",
+      "documentation": "USAGE.md",
+      "example": "examples/consumer/Sources/SamplePalette/SamplePalette.swift"
+    }
+  ]
 }

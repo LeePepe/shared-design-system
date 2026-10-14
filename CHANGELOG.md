@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — 0.2.0
+
+- Added explicit throwing `NativeDesignTheme(theme:)` seam resolving semantic tokens once for explicit theme without caching or defaulting.
+- Added generic `NativeCard` container providing raised-surface and primary-foreground styling for caller-owned SwiftUI content.
+- Preserved all `NativeTokenColor` 0.1.0 behavior, Swift 6, iOS 15, and macOS 12 platform floors, and exact `shared-design-tokens` 0.1.1 pin.
+- Updated AI consumer contract, registry, schema, and external-consumer fixtures to staged unreleased 0.2.0.
+
 ## 0.1.0 — first release (Git tag v0.1.0)
 
 - SwiftUI `NativeTokenColor.resolve(_:theme:)` bridge over exact DesignTokens

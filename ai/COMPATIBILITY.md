@@ -1,6 +1,6 @@
 # NativeDesignKit compatibility
 
-NativeDesignKit 0.1.0 is the first release (Git tag `v0.1.0`). [USAGE.md](USAGE.md) describes its interface and conversion semantics. The [contract entry](README.md) and [external fixture](EXAMPLES.md) travel with the release source revision; tag-time validation results are recorded in the GitHub release notes.
+NativeDesignKit 0.2.0 is an unreleased candidate staged on `main` (prior release: 0.1.0, Git tag `v0.1.0`). [USAGE.md](USAGE.md) describes its interface and conversion semantics. The [contract entry](README.md) and [external fixture](EXAMPLES.md) travel with the release source revision; tag-time validation results are recorded in the GitHub release notes.
 
 ## Fixed dependency
 

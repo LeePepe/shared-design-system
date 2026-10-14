@@ -23,13 +23,15 @@ the Tokens revision is `234b7d0b058474f1aa3f0edeab1be6084ad7eca5`.
 
 ## Minimal wiring
 
-Import `NativeDesignKit` and `DesignTokens`; call
-`try NativeTokenColor.resolve(id, theme: theme)` with an explicit `Theme`.
+Import `NativeDesignKit` and `DesignTokens`. Construct
+`let theme = try NativeDesignTheme(theme: selectedTheme)` and pass it to
+components such as `NativeCard(theme: theme) { ... }`, or call
+`try NativeTokenColor.resolve(id, theme: theme)` for direct color resolution.
 The fixture's `SamplePalette` implements this using public imports only.
 Never use `@testable import` in a consumer.
 
-Resolve again when the theme changes. Handle `TokenError.unknownToken(id)` at
-the consumer boundary according to the product's policy. The library does not
+Construct a new `NativeDesignTheme` when the theme changes. Handle `TokenError`
+at the consumer boundary according to the product's policy. The library does not
 supply a fallback, cache, default theme or business-series binding.
 
 ## Verify and uninstall

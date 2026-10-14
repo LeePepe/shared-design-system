@@ -1,5 +1,12 @@
 # Migration and rollback
 
+## NativeDesignKit 0.1.0 → 0.2.0 (unreleased candidate)
+
+The 0.2.0 release candidate is fully backward-compatible with 0.1.0:
+- Existing `NativeTokenColor.resolve(_:theme:)` callers require no changes.
+- To use components, construct `let theme = try NativeDesignTheme(theme: selectedTheme)` and pass it to `NativeCard(theme: theme) { ... }`.
+- Rollback: remove calls to `NativeDesignTheme` and `NativeCard`, then pin exact `0.1.0`. No data migration or persistent state exists.
+
 ## Local bridge → NativeDesignKit 0.1.0
 
 There is no earlier NativeDesignKit release. The supported interface is a

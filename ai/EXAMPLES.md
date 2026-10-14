@@ -3,7 +3,8 @@
 The fixture at [examples/consumer](examples/consumer/Package.swift) is a separate
 Swift package. [SamplePalette.swift](examples/consumer/Sources/SamplePalette/SamplePalette.swift)
 uses only public products. Its [tests](examples/consumer/Tests/SamplePaletteTests/SamplePaletteTests.swift)
-cover every token/light-dark combination and unchanged unknown-token errors.
+cover every token/light-dark combination, unchanged unknown-token errors, and
+`NativeDesignTheme` / `NativeCard` composition in both themes.
 It is not a graphical demo and does not prove visual/interaction acceptance.
 
 From this repository, validate the exact 0.1.0 release with:
