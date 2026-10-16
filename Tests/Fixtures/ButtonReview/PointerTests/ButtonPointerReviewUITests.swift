@@ -5,11 +5,14 @@ import XCTest
 final class ButtonPointerReviewUITests: XCTestCase {
     func testPointerHoverForEveryVariant() {
         let app = launch(scenario: "specimen")
+        capture("button-pointer-idle", app: app)
         for id in ["save", "secondary", "ghost"] {
             let button = app.buttons["specimen-\(id)"]
             XCTAssertTrue(button.isEnabled)
             button.hover()
-            capture("button-macos-hover-\(id)", app: app)
+            let frame = button.frame
+            print("BUTTON_POINTER \(id) control=\(frame) viewport=\(app.frame)")
+            capture("button-pointer-hover-\(id)", app: app)
         }
     }
 
@@ -18,7 +21,7 @@ final class ButtonPointerReviewUITests: XCTestCase {
         app.typeKey("s", modifierFlags: .command)
         XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")
         app.typeKey(.tab, modifierFlags: [])
-        capture("button-macos-keyboard-navigation", app: app)
+        capture("button-keyboard-navigation", app: app)
         app.buttons["toggle-disabled"].click()
         app.typeKey("s", modifierFlags: .command)
         XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")

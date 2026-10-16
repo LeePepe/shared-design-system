@@ -139,12 +139,27 @@ private struct NativeActionButtonStyle: ButtonStyle {
     let surface: NativeSurfaceStyle
     let isLoading: Bool
     let reduceMotion: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        NativeActionButtonBody(configuration: configuration, theme: theme, variant: variant,
+                               surface: surface, isLoading: isLoading, reduceMotion: reduceMotion)
+    }
+}
+
+/// The rendered view owns interaction state so pointer changes invalidate its body.
+private struct NativeActionButtonBody: View {
+    let configuration: ButtonStyleConfiguration
+    let theme: NativeDesignTheme
+    let variant: NativeButtonVariant
+    let surface: NativeSurfaceStyle
+    let isLoading: Bool
+    let reduceMotion: Bool
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
     @Environment(\.nativeReduceTransparencyOverride) private var reduceTransparencyOverride
     @State private var isHovered = false
 
-    func makeBody(configuration: Configuration) -> some View {
+    var body: some View {
         let responds = isEnabled && !isLoading
         let pressed = responds && configuration.isPressed
         let hovered = responds && isHovered
