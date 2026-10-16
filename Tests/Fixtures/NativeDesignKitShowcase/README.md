@@ -13,20 +13,20 @@ library's `swift build` and `swift test` from the repository root. Then, here:
 
 ```sh
 ./prepare.sh /path/to/reviewed/shared-design-tokens
-xcodebuild -list -json -project NativeDesignKitShowcase.xcodeproj
-xcodebuild test -project NativeDesignKitShowcase.xcodeproj \
-  -scheme Showcase-macOS -destination 'platform=macOS,arch=arm64' \
-  -derivedDataPath /tmp/ndk-showcase/mac \
-  -resultBundlePath /tmp/ndk-showcase/mac.xcresult
-xcodebuild test -project NativeDesignKitShowcase.xcodeproj \
-  -scheme Showcase-iOS -destination 'platform=iOS Simulator,id=<dedicated-UDID>' \
-  -derivedDataPath /tmp/ndk-showcase/ios \
-  -resultBundlePath /tmp/ndk-showcase/ios.xcresult
+./verify macos --output /tmp/ndk-showcase/review-macos
+./verify ios --device <dedicated-iPhone-UDID> --output /tmp/ndk-showcase/review-iphone
+./verify ios --device <dedicated-iPad-UDID> --output /tmp/ndk-showcase/review-ipad
+# Both UI-test platforms (requires an active macOS desktop session):
+./verify all --device <dedicated-iPhone-UDID> --output /tmp/ndk-showcase/review-all
+# Separately labelled headless native rendering evidence:
+./verify macos-render --output /tmp/ndk-showcase/review-mac-render
 ```
 
 `prepare.sh` copies the provider's actual `dist/styles.resolved.json` into ignored
-`StyleProvider/`, records its Git revision and SHA256, and regenerates the ignored
-Xcode project. Regenerate after adding files. The JSON adapter validates required
+`StyleProvider/`, records its Git revision and SHA256, and regenerates the checked-in portable
+Xcode project/shared schemes from canonical `project.yml`. Regenerate after adding
+files and commit the project changes. Relative local-package references remain
+portable; generated workspace user state and resolution cache stay ignored. The JSON adapter validates required
 fields and reports setup failure instead of applying fallback styles. It maps
 provider typography to SwiftUI font categories/weights, leading, tracking and
 monospaced digits. These mappings are platform adapters, not a local value table.
@@ -34,7 +34,20 @@ monospaced digits. These mappings are platform adapters, not a local value table
 The main library's published dependency remains exact Tokens 0.1.1. This sample's
 style JSON integration is **local-only** evidence for the separately recorded
 provider revision/hash, not consumption of a published style release. No generated
-project, style artifact, screenshot, baseline, DerivedData or xcresult is committed.
+style artifact, screenshot, baseline, DerivedData or xcresult is committed. The
+generated project and shared schemes are committed alongside canonical YAML.
+
+`verify` is the fixture build/test entry point. `macos`, `ios` and `all` build
+and test the named app/UI-test schemes; errors, missing schemes/destinations and
+macOS UI-session failures return nonzero. `macos-render` builds/tests the separate
+hostless render target and does not satisfy macOS UI interaction acceptance. No
+mode substitutes rendering for failed UI tests. Output includes the exact Git
+revision, dirty status, provider revision/hash, environment, resolved destination,
+log, dedicated DerivedData and xcresult; an existing result path fails rather
+than overwriting evidence. Use a fresh revision-specific `--output` directory.
+Without `--device`, iOS requires one available simulator named
+`NDK-Controls-Narrow`. `--device` explicitly selects an available dedicated phone
+or tablet. The runner does not create, erase or shut down user simulators.
 
 Use a dedicated iPhone and iPad simulator for narrow/wide iOS coverage. Preserve
 existing user devices. UI tests launch real apps, assert action counts, loading
@@ -99,6 +112,14 @@ This test-only renderer supplies the key control-active state and explicit Aqua/
 Dark Aqua appearance, and explicitly requests bordered/opaque fallbacks because
 Glass uses compositor layers that bitmap cache capture cannot represent; it does not establish macOS keyboard/pointer interactions
 or active-window Glass composition. It is useful on hosts where XCUIAutomation
-cannot obtain a display. Run it using the same project with scheme
-`ShowcaseRender-macOS`; export attachments from its xcresult. AppKit is confined
+cannot obtain a display. Run it using `./verify macos-render`; export attachments from its xcresult. AppKit is confined
 to `RenderTests/`. Native controls are rendered by macOS, not drawn mockups.
+
+
+The library's package rendering tests additionally force the real legacy
+TextEditor background route on current macOS/iOS runtimes. They host explicit
+dark under light native appearance and explicit light under dark native
+appearance, assert editable native views, retained text, native appearance and
+text/background contrast, and attach actual PNGs. They do not claim execution on
+iOS 15/macOS 12 themselves. The Controls fixture does not finish the original
+T401 full component/keyboard matrix; that acceptance remains unverified.

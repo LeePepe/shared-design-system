@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Fixture-only build/test entry. macos requires a working desktop UI session;
+# macos-render is explicitly separate native bitmap evidence, never a UI-test skip.
+set -euo pipefail
+fixture_dir="$(cd "$(dirname "$0")" && pwd)"
+repo_dir="$(cd "$fixture_dir/../../.." && pwd)"
+mode="${1:-}"
+case "$mode" in macos|ios|all|macos-render) shift ;; *)
+  printf '%s\n' 'usage: verify macos|ios|all|macos-render [--device UDID] [--output DIRECTORY]' >&2
+  exit 2 ;;
+esac
+device=""
+revision="$(git -C "$repo_dir" rev-parse HEAD)"
+output="${TMPDIR:-/tmp}/ndk-showcase/$revision/$mode"
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --device) device="${2:?missing device UDID}"; shift 2 ;;
+    --output) output="${2:?missing output directory}"; shift 2 ;;
+    *) printf 'unknown argument: %s\n' "$1" >&2; exit 2 ;;
+  esac
+done
+mkdir -p "$output"
+output="$(cd "$output" && pwd)"
+project="$fixture_dir/NativeDesignKitShowcase.xcodeproj"
+test -s "$project/project.pbxproj"
+test -s "$fixture_dir/StyleProvider/styles.resolved.json" || {
+  printf '%s\n' 'Run prepare.sh with the reviewed provider checkout first.' >&2; exit 1;
+}
+# The canonical generated project is portable; application code consumes public APIs.
+python3 - "$fixture_dir" <<'PY'
+from pathlib import Path
+import re, sys
+root = Path(sys.argv[1])
+project = (root / 'NativeDesignKitShowcase.xcodeproj/project.pbxproj').read_text()
+if re.search(r'(?:path|relativePath) = "?/', project):
+    raise SystemExit('absolute project path is forbidden')
+for source in root.rglob('*.swift'):
+    if '@testable' in source.read_text():
+        raise SystemExit(f'fixture requires public imports: {source.name}')
+PY
+{
+  printf 'revision=%s\nmode=%s\n' "$revision" "$mode"
+  git -C "$repo_dir" status --short
+  xcodebuild -version
+  sw_vers
+  cat "$fixture_dir/StyleProvider/provider-revision.txt"
+  shasum -a 256 "$fixture_dir/StyleProvider/styles.resolved.json"
+} > "$output/environment.txt"
+if [ "$mode" = ios ] || [ "$mode" = all ]; then
+  # Use the task's dedicated phone by default, never an arbitrary user simulator.
+  xcrun simctl list devices available --json > "$output/devices.json"
+  device="$(python3 - "$output/devices.json" "$device" <<'PY'
+import json, sys
+all_devices = [d for group in json.load(open(sys.argv[1]))['devices'].values() for d in group]
+requested = sys.argv[2]
+matches = [d for d in all_devices if d.get('isAvailable') and
+           (d['udid'] == requested if requested else d['name'] == 'NDK-Controls-Narrow')]
+if len(matches) != 1:
+    raise SystemExit('One available dedicated simulator is required; pass --device UDID.')
+print(matches[0]['udid'])
+PY
+)"
+fi
+run_suite() {
+  local scheme="$1" destination="$2" lane="$3"
+  local result="$output/$lane.xcresult"
+  test ! -e "$result" || { printf 'Result already exists: %s\n' "$result" >&2; exit 1; }
+  printf 'scheme=%s\ndestination=%s\nresult=%s\n' "$scheme" "$destination" "$result" | tee "$output/$lane-destination.txt"
+  # test builds the app and its real test bundle. Any unavailable destination,
+  # missing scheme, UI-session failure, assertion or compiler failure is nonzero.
+  xcodebuild test -project "$project" -scheme "$scheme" \
+    -destination "$destination" -destination-timeout 30 \
+    -derivedDataPath "$output/$lane-derived" -resultBundlePath "$result" \
+    -parallel-testing-enabled NO -test-timeouts-enabled YES \
+    -default-test-execution-time-allowance 600 -maximum-test-execution-time-allowance 900 \
+    CODE_SIGNING_ALLOWED=NO 2>&1 | tee "$output/$lane.log"
+}
+if [ "$mode" = macos ] || [ "$mode" = all ]; then
+  run_suite Showcase-macOS "platform=macOS,arch=$(uname -m)" macos
+fi
+if [ "$mode" = ios ] || [ "$mode" = all ]; then
+  run_suite Showcase-iOS "platform=iOS Simulator,id=$device" ios
+fi
+if [ "$mode" = macos-render ]; then
+  run_suite ShowcaseRender-macOS "platform=macOS,arch=$(uname -m)" macos-render
+fi
