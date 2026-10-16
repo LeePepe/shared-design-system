@@ -25,18 +25,37 @@ heading semantics apply only to the header slot.
 - Public-import compilation covers all four slots, the content-only initializer,
   empty slots, both provider
   brands, explicit light/dark and solid/glass choices.
-- Actual hosted SwiftUI renders cover the same layout across that matrix, plus
+- Actual iOS SwiftUI runtime screenshots cover the same layout across that matrix, plus
   long text, narrow width and Reduce Transparency. The internal test preference
   is explicitly labeled; it does not claim the host system setting was changed.
-  Pixel checks verify Glass differs over the token backdrop and its fallback
-  matches the explicit theme's solid surface.
+  `verify-material.py` compares the original XCTest PNG pixels: Glass differs
+  over the token backdrop and its fallback matches the explicit solid surface.
 - Layout checks compare fitting heights and ensure content can grow; no card
-  gesture wraps or intercepts descendants. A macOS hosted event-dispatch test
-  checks a caller button's action and a disabled descendant's suppression.
-  iOS separately measures semantic-font growth at accessibility Dynamic Type;
-  macOS screenshots make no text-scaling claim.
-- PNG evidence is generated outside git with `NDK_SNAPSHOT_DIR`; PR evidence
+  gesture wraps or intercepts descendants. Real XCTest UI taps check a caller
+  button's action and a disabled descendant's suppression. Real iOS frames
+  measure semantic-font growth at accessibility Dynamic Type.
+- PNG evidence is exported outside git from XCTest attachments; PR evidence
   records the exact source SHA, platform and image paths. Images are not shipped
   as resources or represented as minimum-OS, interaction or release acceptance.
 - Repository `scripts/verify` covers host and required iOS simulator build/test.
   Minimum supported OS runtimes require separate evidence when available.
+
+The [portable CardReview fixture](../../Tests/Fixtures/CardReview/README.md)
+uses SwiftUI and XCTest UI automation, respecting the leaf restriction that
+UIKit/AppKit test APIs are only for numeric color extraction.
+
+The earlier hosting tests move to equivalent or stronger real UI assertions;
+their assertions are preserved by the following mapping:
+
+| Previous test | Current coverage |
+| --- | --- |
+| `testLongContentGrowsAtNarrowWidth` | `testLongTextAndAccessibilityDynamicTypeGrowWithoutHorizontalOverflow` |
+| `testAccessibilityDynamicTypeExpandsContent` | Same UI test: regular → accessibility3 height growth, horizontal bounds, ordered slots and scrollable actions |
+| `testThemeMaterialAndTransparencyChangesKeepTheSameLayout` | `testThemeMaterialAndTransparencyKeepStableLayout`: all 16 combinations |
+| `testContentOnlyInitializerDoesNotReserveEmptySections` | `testContentOnlyAndEmptySlotsHaveTheSameCompactLayout` |
+| `testCallerButtonsKeepTheirNativeActionsAndDisabledState` | `testCallerActionsAndDisabledDescendantRemainIndependent`: real taps and disabled coordinate taps |
+| `testGlassFallbackRendersTheExplicitThemesSolidSurface` | Four visual UI tests plus `verify-material.py`: actual solid/Glass/fallback pixel checks |
+| `testHostedSwiftUIEvidenceMatrix` | Four `testVisual…` UI tests and named XCTest attachments, plus narrow/accessibility segments |
+
+The public-import compile tests remain in the package unchanged. No gate,
+policy or preexisting numeric color-extraction test is changed by this move.
