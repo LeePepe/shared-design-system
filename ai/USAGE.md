@@ -43,3 +43,8 @@ Internal component material composition distinguishes outer regions and dense
 reading planes, shares one native blur through nested surfaces, and removes
 material decorations on solid/Reduce Transparency paths. No environment theme,
 default brand, fallback palette, native color literals or cache is introduced.
+
+`success`, `successSurface`, and `chartPrimary` expose brand-independent provider
+roles `status.strata.success`, `status.strata.success-surface`, and
+`product.strata.chart.primary` for caller-owned synthetic composition. These
+meanings remain independent of brand; chart color does not imply status.

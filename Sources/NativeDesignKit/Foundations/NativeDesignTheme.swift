@@ -18,6 +18,9 @@ public struct NativeDesignTheme {
     public let accentHover: Color
     public let accentActive: Color
     public let accentSubtle: Color
+    public let success: Color
+    public let successSurface: Color
+    public let chartPrimary: Color
     private let region: Color
     private let inset: Color
     private let hover: Color
@@ -79,6 +82,9 @@ public struct NativeDesignTheme {
             accentHover = try color(brandPrefix + "hover", theme)
             accentActive = try color(brandPrefix + "active", theme)
             accentSubtle = try color(brandPrefix + "subtle", theme)
+            success = try color("status.strata.success", theme)
+            successSurface = try color("status.strata.success-surface", theme)
+            chartPrimary = try color("product.strata.chart.primary", theme)
             critical = try color("status.strata.error", theme)
             onCritical = try color("status.strata.error-surface", theme)
             material = try NativeMaterialColors(prefix: prefix, theme: theme, color: color)
@@ -95,6 +101,11 @@ public struct NativeDesignTheme {
             region = surface; inset = surface; hover = surface; selected = surface
             brandSeed = accent; brandSeedInk = onAccent; brandText = accent
             accentHover = accent; accentActive = accent; accentSubtle = surface
+            // Additional brand-independent semantics are explicit provider roles.
+            // Existing legacy colors and their resolution order are unchanged.
+            success = try color("status.strata.success", theme)
+            successSurface = try color("status.strata.success-surface", theme)
+            chartPrimary = try color("product.strata.chart.primary", theme)
             material = NativeMaterialColors(legacy: surface, foreground: foreground, accent: accent)
         }
     }

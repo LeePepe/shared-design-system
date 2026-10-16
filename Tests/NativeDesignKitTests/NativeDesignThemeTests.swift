@@ -62,7 +62,7 @@ final class NativeDesignThemeTests: XCTestCase {
                 return NativeTokenColor.color(from: try DesignTokens.brandColor(brand, role: role, theme: theme))
             })
         }
-        let roles = ["product.surface.canvas", "product.surface.raised", "product.text.primary", "product.text.secondary", "ocean.accent", "ocean.onAccent", "status.critical", "status.on-critical"]
+        let roles = ["product.surface.canvas", "product.surface.raised", "product.text.primary", "product.text.secondary", "ocean.accent", "ocean.onAccent", "status.critical", "status.on-critical", "status.strata.success", "status.strata.success-surface", "product.strata.chart.primary"]
         XCTAssertEqual(requests, roles + roles + roles)
     }
 

@@ -15,6 +15,9 @@ final class NativeStrataFoundationTests: XCTestCase {
                 for (actual, id) in [(theme.brandSeed, "seed"), (theme.brandSeedInk, "seed-ink"), (theme.brandText, "text"), (theme.accentHover, "hover"), (theme.accentActive, "active"), (theme.accentSubtle, "subtle")] {
                     XCTAssertEqual(actual, try NativeTokenColor.resolve(prefix + id, theme: mode))
                 }
+                XCTAssertEqual(theme.success, try NativeTokenColor.resolve("status.strata.success", theme: mode))
+                XCTAssertEqual(theme.successSurface, try NativeTokenColor.resolve("status.strata.success-surface", theme: mode))
+                XCTAssertEqual(theme.chartPrimary, try NativeTokenColor.resolve("product.strata.chart.primary", theme: mode))
                 XCTAssertEqual(theme.material.panel, try NativeTokenColor.resolve("product.strata.\(family).material.panel", theme: mode))
             }
         }
