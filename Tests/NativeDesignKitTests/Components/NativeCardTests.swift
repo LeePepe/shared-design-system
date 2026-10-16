@@ -325,11 +325,12 @@ final class NativeCardTests: XCTestCase {
         #elseif os(iOS)
         let host = UIHostingController(rootView: content.frame(width: width))
         host.loadViewIfNeeded()
-        return host.view.systemLayoutSizeFitting(
-            CGSize(width: width, height: UIView.layoutFittingCompressedSize.height),
-            withHorizontalFittingPriority: .required,
-            verticalFittingPriority: .fittingSizeLevel
-        ).height
+        // Ask SwiftUI for its content height at this width. A compressed UIKit
+        // proposal instead requests zero height and permits text compression.
+        let proposal = CGSize(width: width, height: 10_000)
+        host.view.frame = CGRect(origin: .zero, size: proposal)
+        host.view.layoutIfNeeded()
+        return host.sizeThatFits(in: proposal).height
         #endif
     }
 }
