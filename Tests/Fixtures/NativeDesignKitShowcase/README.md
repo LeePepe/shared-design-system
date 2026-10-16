@@ -125,3 +125,20 @@ appearance, assert editable native views, retained text, native appearance and
 text/background contrast, and attach actual PNGs. They do not claim execution on
 iOS 15/macOS 12 themselves. The Controls fixture does not finish the original
 T401 full component/keyboard matrix; that acceptance remains unverified.
+
+## Focused component design review
+
+`FIXTURE_PAGE=Button|Toggle|TextField` selects the component review boards, separate
+from the retained plural catalog. `ComponentReviewUITests` captures matching light,
+dark and accessibility3 iPhone boards and performs real native actions, switch
+changes and text submission. Button tests tap unavailable targets and repeat a tap
+during loading, checking action counts and geometry before completion. The native
+render target captures the same focused boards in a 480x1000-point macOS viewport.
+
+For these singular pages, `FIXTURE_ACCESSIBILITY=1` means a forced SwiftUI
+accessibility3 text environment only; it does not force reduced transparency or
+motion. Glass captions reflect the actual selected native/fallback path. macOS
+Dynamic Type environment injection does not itself establish larger desktop text.
+Hostless desktop rendering is static evidence; keyboard, hover and live compositor
+Glass require a functioning desktop UI session. Raw captures and recordings are
+external review evidence, never generated library assets or golden baselines.

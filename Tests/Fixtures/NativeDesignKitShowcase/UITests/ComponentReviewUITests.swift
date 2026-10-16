@@ -50,11 +50,18 @@ final class ComponentReviewUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["review-count"].label, "Actions: 1")
         XCTAssertFalse(app.buttons["review-disabled"].isEnabled)
         XCTAssertFalse(app.buttons["review-loading"].isEnabled)
+        #if os(iOS)
+        app.buttons["review-disabled"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        XCTAssertEqual(app.staticTexts["review-count"].label, "Actions: 1")
+        #endif
         let copy = app.buttons["review-start-loading"]
         reveal(copy, in: app)
         let idleFrame = copy.frame
         activate(copy)
         XCTAssertFalse(copy.isEnabled)
+        #if os(iOS)
+        copy.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        #endif
         XCTAssertEqual(copy.frame.size.width, idleFrame.size.width, accuracy: 0.5)
         XCTAssertEqual(copy.frame.size.height, idleFrame.size.height, accuracy: 0.5)
         capture(app, "interaction-Button-loading")
@@ -73,6 +80,65 @@ final class ComponentReviewUITests: XCTestCase {
         let glass = app.buttons["review-glass"]
         reveal(glass, in: app)
         capture(app, "interaction-Button-floating")
+    }
+
+    func testToggleInteraction() {
+        let app = launch("Toggle")
+        let on = app.switches["review-toggle-on"]
+        XCTAssertTrue(on.waitForExistence(timeout: 5))
+        XCTAssertEqual(on.value as? String, "1")
+        activate(on)
+        XCTAssertEqual(on.value as? String, "0")
+        let off = app.switches["review-toggle-off"]
+        XCTAssertEqual(off.value as? String, "0")
+        activate(off)
+        XCTAssertEqual(off.value as? String, "1")
+        for id in ["review-toggle-disabled-on", "review-toggle-disabled-off"] {
+            let disabled = app.switches[id]
+            reveal(disabled, in: app)
+            XCTAssertFalse(disabled.isEnabled)
+            let value = disabled.value as? String
+            #if os(iOS)
+            disabled.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            #endif
+            XCTAssertEqual(disabled.value as? String, value)
+        }
+        let context = app.switches["review-toggle-context"]
+        reveal(context, in: app)
+        XCTAssertEqual(app.staticTexts["review-toggle-result"].label, "Details excluded")
+        activate(context)
+        XCTAssertEqual(context.value as? String, "1")
+        XCTAssertEqual(app.staticTexts["review-toggle-result"].label, "Details included")
+        capture(app, "interaction-Toggle-on")
+        activate(context)
+        XCTAssertEqual(context.value as? String, "0")
+        XCTAssertEqual(app.staticTexts["review-toggle-result"].label, "Details excluded")
+        capture(app, "interaction-Toggle-off")
+    }
+
+    func testTextFieldInteraction() {
+        let app = launch("TextField")
+        XCTAssertFalse(app.textFields["review-field-disabled"].isEnabled)
+        let context = app.textFields["review-field-context"]
+        reveal(context, in: app)
+        activate(context)
+        #if os(iOS)
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        #endif
+        capture(app, "interaction-TextField-focused")
+        let statusY = app.staticTexts["review-field-result"].frame.minY
+        context.typeText("\n")
+        XCTAssertTrue(app.staticTexts["review-field-context-error"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["review-field-result"].label, "Not submitted")
+        XCTAssertEqual(app.staticTexts["review-field-result"].frame.minY, statusY, accuracy: 1,
+                       "The actual helper/error messages must reserve stable space")
+        capture(app, "interaction-TextField-error")
+        context.typeText("Draft")
+        XCTAssertEqual(context.value as? String, "Draft")
+        capture(app, "interaction-TextField-filled")
+        context.typeText("\n")
+        XCTAssertTrue(app.staticTexts["Submitted: Draft"].waitForExistence(timeout: 5))
+        capture(app, "interaction-TextField-submitted")
     }
 
     func testComponentBoards() {
