@@ -121,6 +121,7 @@ final class ButtonReviewUITests: XCTestCase {
                 XCTAssertEqual(actual.width, frame.width, accuracy: 0.5)
                 XCTAssertEqual(actual.height, frame.height, accuracy: 0.5)
             }
+            recordCompositeGeometry(name: "button-strata-purple-dark-reduced-transparency", brand: "strata-purple", mode: "dark", app: app)
             capture("button-strata-purple-dark-reduced-transparency", app: app)
             app.terminate()
         }
@@ -172,7 +173,9 @@ final class ButtonReviewUITests: XCTestCase {
             ("loading", "Loading", "brand.\(brand).on-accent")
         ] {
             let control = app.buttons["specimen-\(id)"]
-            samples.append(["role": id, "token": token, "text": rectangle(control.staticTexts[label].frame),
+            let measured = (control.value as? String)?.split(separator: ",").compactMap { Double($0) } ?? []
+            XCTAssertEqual(measured.count, 4, "Require actual SwiftUI Text bounds for \(id)")
+            samples.append(["role": id, "token": token, "text": measured,
                             "control": rectangle(control.frame)])
         }
         for (id, token) in [("specimen-state-label", "product.strata.text.secondary"),
@@ -276,11 +279,16 @@ final class ButtonReviewUITests: XCTestCase {
         let toggle = settings.switches.matching(NSPredicate(format: "label IN %@", [name, translatedName])).firstMatch
         guard toggle.waitForExistence(timeout: 5) else { XCTFail("System setting unavailable: \(name)"); return }
         let original = String(describing: toggle.value)
-        if (toggle.value as? String) != "1" { toggle.tap() }
-        XCTAssertEqual(toggle.value as? String, "1")
+        if (toggle.value as? String) != "1" {
+            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+        }
+        let enabled = expectation(for: NSPredicate(format: "value == '1'"), evaluatedWith: toggle)
+        wait(for: [enabled], timeout: 5)
         defer {
             settings.activate()
-            if String(describing: toggle.value) != original { toggle.tap() }
+            if String(describing: toggle.value) != original {
+                toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+            }
             XCTAssertEqual(String(describing: toggle.value), original, "Restore the prior simulator preference.")
             settings.terminate()
         }

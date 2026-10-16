@@ -79,6 +79,7 @@ private struct ButtonReviewBoard: View {
     @State private var buttonBounds: CGRect = .zero
     @State private var idleLabelBounds: CGRect = .zero
     @State private var loadingLabelBounds: CGRect = .zero
+    @State private var specimenTextBounds: [String: CGRect] = [:]
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     private var theme: NativeDesignTheme { configuration.theme }
@@ -106,6 +107,7 @@ private struct ButtonReviewBoard: View {
             }
         }
         .dynamicTypeSize(.large)
+        .onPreferenceChange(SpecimenTextBounds.self) { specimenTextBounds = $0 }
     }
 
     private var specimen: some View {
@@ -114,12 +116,17 @@ private struct ButtonReviewBoard: View {
                 VStack(alignment: .leading, spacing: 16) {
                     HStack(spacing: 8) {
                         specimenButton(.primary, id: "specimen-save") {
-                            Label("Save", systemImage: "checkmark")
+                            HStack(spacing: 8) {
+                                Image(systemName: "checkmark").accessibilityHidden(true)
+                                specimenLabel("Save", id: "specimen-save")
+                            }
                         }
-                        specimenButton(.secondary, id: "specimen-secondary") { Text("Secondary") }
+                        specimenButton(.secondary, id: "specimen-secondary") {
+                            specimenLabel("Secondary", id: "specimen-secondary")
+                        }
                         specimenButton(.ghost, id: "specimen-ghost") {
                             HStack(spacing: 6) {
-                                Text("Ghost")
+                                specimenLabel("Ghost", id: "specimen-ghost")
                                 Image(systemName: "arrow.right").accessibilityHidden(true)
                             }
                         }
@@ -129,15 +136,17 @@ private struct ButtonReviewBoard: View {
                             .accessibilityIdentifier("specimen-state-label")
                         NativeButton(theme: theme, variant: .secondary, surface: configuration.surface,
                                      isLoading: false, action: { actionCount += 1 }) {
-                            Text("Disabled")
+                            specimenLabel("Disabled", id: "specimen-disabled")
                         } loadingLabel: { Text("Working…") }
                         .disabled(true)
                         .accessibilityIdentifier("specimen-disabled")
+                        .accessibilityValue(textRectangle(for: "specimen-disabled"))
                         NativeButton(theme: theme, variant: .primary, surface: configuration.surface,
                                      isLoading: true, action: { actionCount += 1 }) {
                             Text("Load")
-                        } loadingLabel: { Text("Loading") }
+                        } loadingLabel: { specimenLabel("Loading", id: "specimen-loading") }
                         .accessibilityIdentifier("specimen-loading")
+                        .accessibilityValue(textRectangle(for: "specimen-loading"))
                     }
                     Text("44 pt targets · Adaptive capsules")
                         .font(.caption).foregroundStyle(theme.secondaryForeground)
@@ -161,6 +170,20 @@ private struct ButtonReviewBoard: View {
         }
         .fixedSize(horizontal: true, vertical: false)
         .accessibilityIdentifier(id)
+        .accessibilityValue(textRectangle(for: id))
+    }
+
+    private func specimenLabel(_ text: String, id: String) -> some View {
+        Text(text).background {
+            GeometryReader { proxy in
+                Color.clear.preference(key: SpecimenTextBounds.self, value: [id: proxy.frame(in: .global)])
+            }
+        }
+    }
+
+    private func textRectangle(for id: String) -> String {
+        let rect = specimenTextBounds[id] ?? .zero
+        return [rect.minX, rect.minY, rect.width, rect.height].map { String(Double($0)) }.joined(separator: ",")
     }
 
     private var matrix: some View {
@@ -291,6 +314,13 @@ private struct ButtonBounds: PreferenceKey {
     static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
         let next = nextValue()
         if !next.isEmpty { value = next }
+    }
+}
+
+private struct SpecimenTextBounds: PreferenceKey {
+    static let defaultValue: [String: CGRect] = [:]
+    static func reduce(value: inout [String: CGRect], nextValue: () -> [String: CGRect]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, latest in latest })
     }
 }
 
