@@ -37,3 +37,8 @@ That tag is never pushed and does not establish a provider release. Every run
 records native/provider SHA and candidate-only provenance. A final committed
 lockfile and remote required checks wait for a separately authorized immutable
 provider release; source or visual success alone does not satisfy that gate.
+
+Explicit legacy Card planes use 94% of the existing raised-surface provider
+color, with the same shared material edge/shadow roles. Tests composite against
+both black and white extremes and require secondary text >=4.5. Existing no-role
+legacy callers retain their previous treatment; no legacy RGB values change.

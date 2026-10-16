@@ -106,7 +106,7 @@ public struct NativeDesignTheme {
             success = try color("status.strata.success", theme)
             successSurface = try color("status.strata.success-surface", theme)
             chartPrimary = try color("product.strata.chart.primary", theme)
-            material = NativeMaterialColors(legacy: surface, foreground: foreground, accent: accent)
+            material = try NativeMaterialColors(legacy: surface, foreground: foreground, theme: theme, color: color)
         }
     }
 }
@@ -136,10 +136,16 @@ struct NativeMaterialColors {
         ambientEdge = try color(prefix + "material.ambient-edge", theme)
     }
 
-    init(legacy: Color, foreground: Color, accent: Color) {
-        panel = legacy; content = legacy; control = legacy
-        edge = foreground.opacity(0); highlight = foreground.opacity(0)
-        innerEdge = foreground.opacity(0); shadow = foreground.opacity(0)
-        ambient = accent.opacity(0); ambientSoft = accent.opacity(0); ambientEdge = accent.opacity(0)
+    init(legacy: Color, foreground: Color, theme: Theme,
+         color: (String, Theme) throws -> Color) throws {
+        panel = legacy.opacity(theme == .light ? 0.62 : 0.72)
+        // Worst-case black/light and white/dark backdrops retain >=4.5 secondary contrast.
+        content = legacy.opacity(NativeSurfaceTreatment.legacyReadingOpacity)
+        control = legacy
+        edge = try color("product.strata.material.edge", theme)
+        highlight = try color("product.strata.material.highlight", theme)
+        innerEdge = try color("product.strata.material.inner-edge", theme)
+        shadow = try color("product.strata.material.shadow", theme)
+        ambient = foreground.opacity(0); ambientSoft = foreground.opacity(0); ambientEdge = foreground.opacity(0)
     }
 }

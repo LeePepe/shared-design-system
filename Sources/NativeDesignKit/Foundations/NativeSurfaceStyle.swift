@@ -37,6 +37,7 @@ extension EnvironmentValues {
 
 /// Separates readable fills from a single inherited native blur.
 struct NativeSurfaceTreatment: Equatable {
+    static let legacyReadingOpacity = 0.94
     let glass: Bool
     let blur: Bool
     let decoration: Bool
@@ -72,7 +73,7 @@ struct NativeSurfaceModifier: ViewModifier {
             .foregroundStyle(theme.foreground)
             .environment(\.nativeMaterialAncestor, treatment.glass || materialAncestor)
             .background {
-                if let role, theme.isStrata {
+                if let role {
                     roleBackground(role)
                 } else if treatment.glass {
                     // Existing callers retain their unadorned material treatment.

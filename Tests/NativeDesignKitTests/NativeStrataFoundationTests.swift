@@ -57,4 +57,19 @@ final class NativeStrataFoundationTests: XCTestCase {
             NativeTokenColor.color(from: try DesignTokens.brandColor(brand, role: role, theme: mode))
         })) { XCTAssertEqual($0 as? TokenError, expected) }
     }
+    func testLegacyDenseReadingPlaneKeepsSecondaryContrastOnExtremeBackdrops() throws {
+        for mode in Theme.allCases {
+            let base = try DesignTokens.color("product.surface.raised", theme: mode)
+            let text = try DesignTokens.color("product.text.secondary", theme: mode)
+            let alpha = NativeSurfaceTreatment.legacyReadingOpacity
+            for backdrop in [0.0, 255.0] {
+                let composite = try RGBA(
+                    red: Int((Double(base.r) * alpha + backdrop * (1 - alpha)).rounded()),
+                    green: Int((Double(base.g) * alpha + backdrop * (1 - alpha)).rounded()),
+                    blue: Int((Double(base.b) * alpha + backdrop * (1 - alpha)).rounded()))
+                XCTAssertGreaterThanOrEqual(try text.contrast(with: composite), 4.5)
+            }
+        }
+    }
+
 }
