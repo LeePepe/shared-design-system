@@ -42,10 +42,20 @@ without installing an exclusive gesture or covering the editor with an overlay.
 The minimum-target assertion rounds at 1/1000 pt solely for floating-point AX
 conversion noise, retaining the 44 pt intent.
 
-The package retains a public-construction test for generic labels, optional
-prompts, unchanged caller input and ordinary SwiftUI input/submit/disabled
-modifiers. `NativeTokenColorTests` is unchanged. No test is skipped or expected
-to fail; no gate or policy changes are involved.
+The component accepts arbitrary `Label: View` content through
+`init(theme:text:prompt:accessibilityLabel:label:)`; the caller supplies a
+localized `Text` naming the native editor. For `Label == Text`, the concise
+`init(theme:text:prompt:label:)` reuses that text for both purposes. The matrix
+exercises both forms. Geometry-instrumented labels use the explicit name too,
+because their modifiers produce generic views. The native editor receives
+the `Text` accessibility label directly; the separate visible label is hidden
+from accessibility. UI assertions check the actual native editor's full name
+for every matrix state, editing and long-label scenarios.
+
+The package retains a public-construction test for both initializer forms,
+optional prompts, unchanged caller input and ordinary SwiftUI
+input/submit/disabled modifiers. `NativeTokenColorTests` is unchanged. No test
+is skipped or expected to fail; no gate or policy changes are involved.
 
 ## Evidence limits
 

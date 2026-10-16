@@ -6,20 +6,23 @@ public struct NativeTextField<Label: View>: View {
     private let theme: NativeDesignTheme
     @Binding private var text: String
     private let prompt: Text?
+    private let inputAccessibilityLabel: Text
     private let label: Label
     @Environment(\.isEnabled) private var isEnabled
     @FocusState private var isFocused: Bool
-    @Namespace private var accessibilityPair
 
+    /// Supplies a caller-localized editor name alongside arbitrary visible content.
     public init(
         theme: NativeDesignTheme,
         text: Binding<String>,
         prompt: Text? = nil,
+        accessibilityLabel: Text,
         @ViewBuilder label: () -> Label
     ) {
         self.theme = theme
         _text = text
         self.prompt = prompt
+        inputAccessibilityLabel = accessibilityLabel
         self.label = label()
     }
 
@@ -29,16 +32,15 @@ public struct NativeTextField<Label: View>: View {
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(theme.foreground)
                 .fixedSize(horizontal: false, vertical: true)
-                .accessibilityElement(children: .combine)
-                .accessibilityLabeledPair(role: .label, id: "input", in: accessibilityPair)
+                .accessibilityHidden(true)
 
             TextField(
                 text: $text,
                 prompt: prompt?.foregroundColor(theme.secondaryForeground)
             ) {
-                label
+                inputAccessibilityLabel
             }
-            .accessibilityLabeledPair(role: .content, id: "input", in: accessibilityPair)
+            .accessibilityLabel(inputAccessibilityLabel)
             .textFieldStyle(.plain)
             .font(.body)
             .foregroundStyle(theme.foreground)
@@ -67,5 +69,20 @@ public struct NativeTextField<Label: View>: View {
             })
         }
         .accessibilityElement(children: .contain)
+    }
+}
+
+public extension NativeTextField where Label == Text {
+    /// Uses the caller's localized text for both the visible label and editor name.
+    init(
+        theme: NativeDesignTheme,
+        text: Binding<String>,
+        prompt: Text? = nil,
+        @ViewBuilder label: () -> Text
+    ) {
+        let label = label()
+        self.init(theme: theme, text: text, prompt: prompt, accessibilityLabel: label) {
+            label
+        }
     }
 }

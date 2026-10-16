@@ -27,11 +27,25 @@ struct NameInput: View {
 ```
 
 The public generic shape is `NativeTextField<Label: View>`. Its initializer is
-`init(theme:text:prompt:label:)`, where `text` is `Binding<String>`, `prompt` is
-an optional `Text` defaulting to `nil`, and `label` is a required `@ViewBuilder`.
-Supply localized label and prompt content. SwiftUI pairs the visible label
-with the native text input for accessibility, avoiding a duplicate standalone
-label announcement and retaining generic caller-provided label content.
+`init(theme:text:prompt:accessibilityLabel:label:)`, where `text` is
+`Binding<String>`, `prompt` is an optional `Text` defaulting to `nil`,
+`accessibilityLabel` is a required caller-localized `Text`, and `label` is a
+required `@ViewBuilder`. Arbitrary label content needs an explicit editor name:
+
+```swift
+NativeTextField(theme: theme, text: $name,
+                accessibilityLabel: Text("Display name")) {
+    Label("Display name", systemImage: "person")
+}
+```
+
+For `Label == Text`, `init(theme:text:prompt:label:)` uses that same `Text`
+for both the visible label and the native editor's accessibility label, as in
+the first example. Supply localized labels and prompts; the component never
+extracts strings from generic views. The visible label is hidden from
+accessibility to avoid a duplicate standalone announcement. The explicit
+`Text` label is attached directly to the native input at the iOS 15 / macOS 12
+deployment floor.
 
 The input remains a SwiftUI `TextField`: `.disabled`, `.onSubmit`, `.submitLabel`,
 native editing, selection and keyboard behavior remain available. The full

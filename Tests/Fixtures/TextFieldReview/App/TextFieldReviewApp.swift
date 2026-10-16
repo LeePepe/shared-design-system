@@ -100,7 +100,8 @@ private struct TextFieldReviewBoard: View {
                 Text("A longer label that can wrap at narrow widths")
             }
             .accessibilityIdentifier("matrix-empty")
-            NativeTextField(theme: theme, text: $unavailable) {
+            NativeTextField(theme: theme, text: $unavailable,
+                            accessibilityLabel: Text("Unavailable field")) {
                 Label("Unavailable field", systemImage: "lock")
             }
             .disabled(true)
@@ -123,7 +124,8 @@ private struct TextFieldReviewBoard: View {
 
     private var interaction: some View {
         VStack(alignment: .leading, spacing: 16) {
-            NativeTextField(theme: theme, text: $name, prompt: Text("Enter a value")) {
+            NativeTextField(theme: theme, text: $name, prompt: Text("Enter a value"),
+                            accessibilityLabel: Text("Display name")) {
                 Text("Display name")
                     .recordBounds("active-label", color: theme.surface)
             }
@@ -137,7 +139,8 @@ private struct TextFieldReviewBoard: View {
             Text(name).accessibilityIdentifier("caller-value")
             Text("Edits: \(edits)").accessibilityIdentifier("edit-count")
             Text("Submissions: \(submissions)").accessibilityIdentifier("submit-count")
-            NativeTextField(theme: theme, text: $unavailable) {
+            NativeTextField(theme: theme, text: $unavailable,
+                            accessibilityLabel: Text("Unavailable field")) {
                 Text("Unavailable field")
                     .recordBounds("disabled-label", color: theme.surface)
             }
@@ -153,7 +156,8 @@ private struct TextFieldReviewBoard: View {
     private var longLabel: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 16) {
-                NativeTextField(theme: theme, text: $note) {
+                NativeTextField(theme: theme, text: $note,
+                                accessibilityLabel: Text("Vollständiger Anzeigename für die gemeinsame Zusammenarbeit")) {
                     Text("Vollständiger Anzeigename für die gemeinsame Zusammenarbeit")
                         .recordBounds("long-label", color: theme.surface)
                 }
