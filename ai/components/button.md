@@ -49,16 +49,22 @@ network call, retry policy or state transition.
 SwiftUI `Button` retains its native action and accessibility semantics and
 supports caller `.keyboardShortcut(...)`. The hit area is at least 44 × 44 pt;
 semantic font sizes, wrapping, and intrinsic height allow longer localized
-labels. Caller actions remain caller owned. macOS captures cover both provider
-brands, both themes, three variants and normal/loading/disabled states, plus a
-320 pt narrow-layout case requesting an accessibility environment value.
-macOS semantic fonts do not demonstrate iOS Dynamic Type scaling. A separate
-iOS hosting test measures long-label height growth at an accessibility size,
-width containment and a stable loading footprint. Opaque provider RGBA checks
+labels. Caller actions remain caller owned. The standalone SwiftUI ButtonReview
+fixture uses XCTest UI automation and actual iOS runtime screenshots for both
+provider brands, both themes, three variants and normal/loading/disabled states,
+plus a 320 pt board with German localized labels at accessibility2. UI tests
+measure long-label growth, full text/viewport containment, a stable loading
+footprint and ≥44 pt targets. Actual enabled taps dispatch; disabled/loading
+coordinate taps do not. Run `python3 Tests/Fixtures/Support/run.py ButtonReview
+--results <external-new-path>.xcresult --screenshots <external-empty-directory>`
+from the checkout; full instructions and the moved-test mapping are in
+`Tests/Fixtures/Support/README.md` and `Tests/Fixtures/ButtonReview/README.md`.
+This fixture is separate from package gates. macOS package checks do not claim
+rendered UI or iOS Dynamic Type evidence. Opaque provider RGBA checks
 require at least 4.5:1 for onAccent/accent and foreground/surface in both brands
 and themes; this does not establish contrast on arbitrary Glass backgrounds.
-Screenshots do not prove VoiceOver, physical
-device touch or minimum-OS behavior; those require separate consumer validation.
+Screenshots do not prove VoiceOver, physical device touch, minimum-OS behavior
+or live keyboard/focus interaction; those require separate observed validation.
 
 Existing `NativeTokenColor` behavior, dependency and platform floors are
 unchanged. To roll back, remove this API's call sites and restore the previously

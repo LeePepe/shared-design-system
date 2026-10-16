@@ -3,3 +3,7 @@
 .DS_Store
 .shared-ci/
 __pycache__/
+Tests/Fixtures/**/*.xcodeproj/
+Tests/Fixtures/**/*.xcworkspace/
+Tests/Fixtures/**/DerivedData/
+Tests/Fixtures/**/*.xcresult/
