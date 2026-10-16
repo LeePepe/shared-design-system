@@ -11,11 +11,12 @@ final class ProgressBarReviewUITests: XCTestCase {
         let next = app.buttons["next-state"]
         XCTAssertGreaterThanOrEqual((next.frame.width * 1_000).rounded() / 1_000, 44)
         XCTAssertGreaterThanOrEqual((next.frame.height * 1_000).rounded() / 1_000, 44)
-        let expected = ["0%", "50%", "100%", "Waiting for update", "0%", "100%"]
+        let expected = ["0%", "50%", "100%", "", "0%", "100%"]
         for state in expected.indices {
             XCTAssertEqual(app.staticTexts["caller-state"].label, "State: \(state)")
             if state == 3 {
-                XCTAssertTrue(String(describing: progress.value).contains(expected[state]), app.debugDescription)
+                XCTAssertTrue((progress.value as? String ?? "").isEmpty, "Indeterminate progress must not announce a percentage.")
+                XCTAssertTrue(app.staticTexts["Waiting for update"].exists, app.debugDescription)
             } else {
                 XCTAssertEqual(progress.value as? String, expected[state], app.debugDescription)
             }
@@ -60,7 +61,8 @@ final class ProgressBarReviewUITests: XCTestCase {
         print("Reduce Motion request evidence: \(app.staticTexts["motion-observed"].label)")
         let waiting = app.progressIndicators["matrix-indeterminate"]
         XCTAssertEqual(waiting.label, "Waiting")
-        XCTAssertTrue(String(describing: waiting.value).contains("Waiting for the next update"), app.debugDescription)
+        XCTAssertTrue((waiting.value as? String ?? "").isEmpty, "Indeterminate progress must not announce a percentage.")
+        XCTAssertTrue(app.staticTexts["Waiting for the next update…"].exists, app.debugDescription)
         assertMatrixVisible(app)
         capture("progress-bar-reduced-motion-request", app: app)
     }
@@ -87,6 +89,11 @@ final class ProgressBarReviewUITests: XCTestCase {
             XCTAssertTrue(progress.exists, app.debugDescription)
             XCTAssertFalse(progress.frame.isEmpty)
             XCTAssertTrue(viewport.contains(progress.frame), "Every complete progress indicator must be onscreen: \(id)")
+        }
+        for current in ["0 of 100 files · 0%", "50 of 100 files · 50%", "100 of 100 files · 100%", "Waiting for the next update…"] {
+            let text = app.staticTexts[current]
+            XCTAssertTrue(text.exists, app.debugDescription)
+            XCTAssertTrue(viewport.contains(text.frame))
         }
         XCTAssertTrue(app.frame.contains(app.staticTexts["review-end"].frame))
     }

@@ -29,23 +29,25 @@ public struct NativeProgressBar<Label: View, CurrentValueLabel: View>: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(theme.foreground)
                 .fixedSize(horizontal: false, vertical: true)
-                .accessibilityHidden(true)
             currentValueLabel
                 .font(.caption)
                 .foregroundStyle(theme.secondaryForeground)
                 .fixedSize(horizontal: false, vertical: true)
-                .accessibilityHidden(true)
-            ProgressView(value: progress.value, total: progress.total) {
-                label
-            } currentValueLabel: {
-                currentValueLabel
-            }
-            .labelsHidden()
+            ProgressView(value: progress.value, total: progress.total)
             .progressViewStyle(.linear)
             .tint(theme.accent)
             .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
             .background(theme.surface, in: Capsule())
             .frame(minHeight: 8)
+        }
+        .accessibilityRepresentation {
+            // Native automatic progress preserves the indicator role and name
+            // even where the platform's visual linear style omits nil progress.
+            VStack {
+                ProgressView(value: progress.value, total: progress.total) { label }
+                    .progressViewStyle(.automatic)
+                currentValueLabel
+            }
         }
     }
 }

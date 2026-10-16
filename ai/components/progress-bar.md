@@ -49,8 +49,12 @@ owned. No per-control glass, custom animation, timer, task, networking or
 loading engine is added. A Reduce Motion request introduces no custom motion;
 the component does not claim to stop SwiftUI's native indeterminate animation.
 
-Native `ProgressView` owns progress accessibility semantics and receives both
-builders. Visible duplicate labels are hidden from accessibility. This is a
+An explicit SwiftUI accessibility representation uses an automatic native
+`ProgressView` with the caller label and exposes the current-value builder as
+readable content. This preserves the native progress role/name when a platform's
+visual `.linear` style omits indeterminate semantics, without announcing a
+fabricated percentage. The visual linear track can be absent for nil progress
+on a platform; caller waiting text remains visible. This is a
 read-only indicator: it adds no action, selection, binding or keyboard target.
 Caller changes to value/total rebuild native progress; no state is stored. The
 same label/current-value content reserves the same footprint across zero,
