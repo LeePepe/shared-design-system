@@ -19,6 +19,7 @@ private struct SurfaceModifier: ViewModifier {
 
     @ViewBuilder func body(content: Content) -> some View {
         let shape = RoundedRectangle(cornerRadius: metrics.cornerRadius, style: .continuous)
+        #if compiler(>=6.2)
         if #available(iOS 26, macOS 26, *), style.usesGlass(supported: true, reduceTransparency: reduceTransparency) {
             if style == .interactiveGlass {
                 content.glassEffect(.regular.tint(theme.surfaceRaised).interactive(), in: shape)
@@ -26,12 +27,19 @@ private struct SurfaceModifier: ViewModifier {
                 content.glassEffect(.regular.tint(theme.surfaceRaised), in: shape)
             }
         } else {
-            content.background(shape.fill(theme.surfaceRaised))
-                .overlay(shape.strokeBorder(theme.textSecondary.opacity(metrics.borderOpacity),
-                                            lineWidth: metrics.borderWidth))
-                .shadow(color: theme.textPrimary.opacity(metrics.shadowOpacity),
-                        radius: metrics.shadowRadius, x: metrics.shadowX, y: metrics.shadowY)
+            opaqueSurface(content, in: shape)
         }
+        #else
+        opaqueSurface(content, in: shape)
+        #endif
+    }
+
+    private func opaqueSurface(_ content: Content, in shape: RoundedRectangle) -> some View {
+        content.background(shape.fill(theme.surfaceRaised))
+            .overlay(shape.strokeBorder(theme.textSecondary.opacity(metrics.borderOpacity),
+                                        lineWidth: metrics.borderWidth))
+            .shadow(color: theme.textPrimary.opacity(metrics.shadowOpacity),
+                    radius: metrics.shadowRadius, x: metrics.shadowX, y: metrics.shadowY)
     }
 }
 

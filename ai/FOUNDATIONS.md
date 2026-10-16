@@ -37,14 +37,20 @@ Button(action: action) { Image(systemName: symbol) }
 `View.nativeSurface(theme:metrics:style:)` requires the throwing, explicitly
 constructed `NativeDesignTheme` snapshot. `NativeSurfaceStyle` is `.opaque`,
 `.glass`, or `.interactiveGlass`. Apply the modifier after padding/layout; reserve
-interactive Glass for actual controls. iOS 26/macOS 26 support native Liquid Glass.
-Older systems and Reduce Transparency use an opaque raised token surface with
-explicit border/shadow metrics. Explicit tint, fill, border, and shadow colors
+interactive Glass for actual controls. Native Liquid Glass requires building with
+the Xcode 26 or newer SDKs and their Swift 6.2 or newer compiler, then running on
+iOS 26/macOS 26 or newer. The implementation uses `#if compiler(>=6.2)` around
+Glass API references and retains runtime `#available` checks; Swift 6 language
+mode and the iOS 15/macOS 12 deployment minimums remain supported. Builds with
+older Xcode/Swift 6 toolchains, older runtime systems, and Reduce Transparency
+all use the same opaque raised token surface with explicit border/shadow metrics.
+Explicit tint, fill, border, and shadow colors
 all use the supplied theme. Errors are resolved before rendering and never caught
 or replaced by a fallback color. The system material still follows the OS native
 material and accessibility policy; callers should align their appearance with
-the explicitly selected theme. Use native `GlassEffectContainer` in an
-availability branch when composing nearby related Glass controls.
+the explicitly selected theme. When composing nearby related Glass controls with
+native `GlassEffectContainer`, guard direct use with `#if compiler(>=6.2)` and
+runtime availability checks as well.
 
 `View.nativeFocusOutline(theme:focused:cornerRadius:width:)` draws an optional
 semantic-info outline from a caller's `FocusState`; it does not capture focus or
