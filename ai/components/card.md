@@ -36,7 +36,9 @@ struct CardExample: View {
         } supporting: {
             Text("Supporting context")
         } actions: {
-            Button("Continue") { /* Caller-owned action. */ }
+            Button { /* Caller-owned action. */ } label: {
+                Text("Continue").frame(minHeight: 44)
+            }
         }
     }
 }
