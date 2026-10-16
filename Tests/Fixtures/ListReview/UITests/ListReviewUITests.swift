@@ -124,6 +124,11 @@ final class ListReviewUITests: XCTestCase {
             restored.name = "system-transparency-restored"
             restored.lifetime = .keepAlways
             add(restored)
+            let restoredApp = launch(scenario: "system-fallback")
+            XCTAssertEqual(restoredApp.staticTexts["system-transparency"].label,
+                           original == "1" ? "System transparency: reduced" : "System transparency: full",
+                           "SwiftUI must observe the restored actual system preference.")
+            restoredApp.terminate()
             settings.terminate()
         }
         setSwitch(toggle, in: settings, to: "1")
@@ -225,10 +230,21 @@ final class ListReviewUITests: XCTestCase {
         } else {
             XCTFail("Missing runtime text geometry for " + name)
         }
-        let attachment = XCTAttachment(screenshot: app.screenshot())
+        let attachment = XCTAttachment(screenshot: settledScreenshot(app))
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+
+    private func settledScreenshot(_ app: XCUIApplication) -> XCUIScreenshot {
+        var previous = app.screenshot()
+        for _ in 0..<6 {
+            let current = app.screenshot()
+            if current.pngRepresentation == previous.pngRepresentation { return current }
+            previous = current
+        }
+        XCTFail("Runtime capture must settle before it becomes visual evidence.")
+        return previous
     }
 
     private func launch(scenario: String = "specimen", brand: String = "strata-blue", mode: String = "light",

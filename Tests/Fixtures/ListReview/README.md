@@ -61,6 +61,8 @@ heading/footer. It omits showcase chrome so the test measures List text reflow.
 
 Each screenshot also attaches `-geometry.json` telemetry with the SwiftUI
 text frames, the observed heading accessibility frame and viewport size.
+Captures require two consecutive identical actual runtime screenshots so
+selection-label transitions cannot become the final evidence image.
 `verify-contrast.py` reads those attachments and the exact provider artifact,
 then inspects full-coverage glyph pixels and adjacent actual surface pixels.
 It also checks solid/forced-fallback image equality in the specimen area.
