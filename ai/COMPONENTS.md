@@ -3,8 +3,8 @@
 The component API in this checkout is **unreleased**. NativeDesignKit 0.1.0
 contains only `NativeTokenColor`; it does not contain these components. Evaluate
 this work using an explicitly reviewed immutable revision until a component
-release is published. The existing exact DesignTokens 0.1.1 pin and platform
-floors remain unchanged.
+release is published. The Strata foundation candidate targets exact DesignTokens 0.2.0; platform
+floors remain unchanged. Candidate-only and released-dependency evidence are separate.
 
 The current rebuild replaces the old unmerged component implementations and
 old v1 component scope following the Owner's request. Only the
@@ -25,7 +25,8 @@ let theme = try NativeDesignTheme(theme: .light, brand: "ocean")
 ```
 
 Both arguments are required. `Theme` comes from `DesignTokens`; this library
-does not re-export it. Provider-supported brands are `ocean` and `graphite`.
+does not re-export it. Provider brands include legacy `ocean`/`graphite` and explicit `strata-blue`,
+`strata-green`, `strata-pink`, `strata-yellow`, `strata-purple`.
 An unknown brand throws the provider's exact `TokenError.unknownBrand`.
 Every construction resolves the required colors afresh and propagates any
 provider error unchanged. Reconstruct when the caller changes theme or brand.
@@ -36,8 +37,9 @@ Public immutable properties are `mode: Theme` and SwiftUI colors `canvas`,
 and `onCritical`. The first four come from `product.surface.canvas`,
 `product.surface.raised`, `product.text.primary`, and `product.text.secondary`;
 the accent pair uses `DesignTokens.brandColor` and the critical pair uses
-`status.critical` / `status.on-critical`. No further brand colors are invented;
-the five-color Strata direction remains a provider gap.
+`status.critical` / `status.on-critical`. For Strata families, the named page/card/text/error roles replace those legacy
+roles. Additive brand-state colors and neutral surface roles are documented in
+[Usage](USAGE.md#strata-foundation-candidate-unreleased). No local palette is introduced.
 
 `NativeSurfaceStyle` has exactly `.solid` and `.glass`. Components that expose
 this choice use one native SwiftUI material layer for suitable outer surfaces.

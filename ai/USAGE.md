@@ -23,3 +23,23 @@ Lookup errors propagate unchanged. An unknown ID throws `TokenError.unknownToken
 ## Scope
 
 This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The Tokens dependency is pinned at exactly `0.1.1`; the manifest reference does not vendor its contents.
+
+## Strata foundation candidate (unreleased)
+
+`NativeDesignTheme(theme:brand:)` additionally resolves explicit provider brands
+`strata-blue`, `strata-green`, `strata-pink`, `strata-yellow`, `strata-purple` from
+the proposed DesignTokens 0.2.0 candidate. They do not alias ocean or graphite.
+Legacy brands keep their original lookup behavior. The dependency must be
+released and resolved remotely before this candidate is released to consumers.
+
+Additive immutable color properties are `brandSeed`, `brandSeedInk`, `brandText`,
+`accentHover`, `accentActive`, `accentSubtle`. `NativeSurfaceRole` has `region`,
+`card`, `inset`, `hover`, `selected`; `theme.surface(role)` returns its opaque
+provider color. Existing `canvas` is page and `surface` is card for Strata.
+The semantic foreground pair and critical/error pair come from Strata roles.
+All values resolve afresh; provider errors propagate unchanged.
+
+Internal component material composition distinguishes outer regions and dense
+reading planes, shares one native blur through nested surfaces, and removes
+material decorations on solid/Reduce Transparency paths. No environment theme,
+default brand, fallback palette, native color literals or cache is introduced.

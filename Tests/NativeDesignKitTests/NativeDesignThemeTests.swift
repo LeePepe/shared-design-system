@@ -27,14 +27,16 @@ final class NativeDesignThemeTests: XCTestCase {
             for mode in [Theme.light, .dark, .light] {
                 let theme = try NativeDesignTheme(theme: mode, brand: brand)
                 XCTAssertEqual(theme.mode, mode)
-                XCTAssertEqual(theme.canvas, try NativeTokenColor.resolve("product.surface.canvas", theme: mode))
-                XCTAssertEqual(theme.surface, try NativeTokenColor.resolve("product.surface.raised", theme: mode))
-                XCTAssertEqual(theme.foreground, try NativeTokenColor.resolve("product.text.primary", theme: mode))
-                XCTAssertEqual(theme.secondaryForeground, try NativeTokenColor.resolve("product.text.secondary", theme: mode))
+                let family = brand.hasPrefix("strata-") ? String(brand.dropFirst(7)) : nil
+                let prefix = family.map { "product.strata.\($0)." }
+                XCTAssertEqual(theme.canvas, try NativeTokenColor.resolve(prefix.map { $0 + "surface.page" } ?? "product.surface.canvas", theme: mode))
+                XCTAssertEqual(theme.surface, try NativeTokenColor.resolve(prefix.map { $0 + "surface.card" } ?? "product.surface.raised", theme: mode))
+                XCTAssertEqual(theme.foreground, try NativeTokenColor.resolve(family == nil ? "product.text.primary" : "product.strata.text.primary", theme: mode))
+                XCTAssertEqual(theme.secondaryForeground, try NativeTokenColor.resolve(family == nil ? "product.text.secondary" : "product.strata.text.secondary", theme: mode))
                 XCTAssertEqual(theme.accent, NativeTokenColor.color(from: try DesignTokens.brandColor(brand, role: .accent, theme: mode)))
                 XCTAssertEqual(theme.onAccent, NativeTokenColor.color(from: try DesignTokens.brandColor(brand, role: .onAccent, theme: mode)))
-                XCTAssertEqual(theme.critical, try NativeTokenColor.resolve("status.critical", theme: mode))
-                XCTAssertEqual(theme.onCritical, try NativeTokenColor.resolve("status.on-critical", theme: mode))
+                XCTAssertEqual(theme.critical, try NativeTokenColor.resolve(family == nil ? "status.critical" : "status.strata.error", theme: mode))
+                XCTAssertEqual(theme.onCritical, try NativeTokenColor.resolve(family == nil ? "status.on-critical" : "status.strata.error-surface", theme: mode))
             }
         }
     }

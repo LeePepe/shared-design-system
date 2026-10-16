@@ -35,3 +35,8 @@ Exact-tag external consumer validation runs against `v0.1.0` after the tag is cr
 Coverage metrics and full D1/6DQ remain unmeasured. The external runner isolates its source/build/DerivedData but does not prove crash/concurrency cleanup or all tool-cache isolation. Dependency/security scans, real UI demos and Owner style approval, consumer-specific migration/rollback and independent delivery review remain separate gates. The Owner has retained the initial bridge (#1), and the repository is MIT licensed.
 
 No deprecation is introduced. There is no previously published NativeDesignKit version to deprecate. A future removal must be documented with a from/to migration and reviewed consumer upgrade; no unsupported compatibility period is promised.
+
+The unreleased Strata repair targets additive DesignTokens 0.2.0. Its public
+surface-role and brand-state additions preserve existing source signatures and
+legacy brand values. Candidate mirror evidence is distinct from released remote
+dependency checks. iOS 15/macOS 12 floors and explicit-theme behavior remain.

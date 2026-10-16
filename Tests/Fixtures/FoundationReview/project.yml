@@ -1,0 +1,32 @@
+name: FoundationReview
+options:
+  bundleIdPrefix: org.nativedesignkit.fixtures
+  deploymentTarget:
+    iOS: "15.0"
+packages:
+  NativeDesignKit:
+    path: ../../..
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    GENERATE_INFOPLIST_FILE: YES
+    CODE_SIGNING_ALLOWED: NO
+    ENABLE_TESTABILITY: YES
+    TARGETED_DEVICE_FAMILY: "1"
+targets:
+  FoundationReview:
+    type: application
+    platform: iOS
+    sources: [App, ../Shared]
+    dependencies:
+      - package: NativeDesignKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.FoundationReview
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+schemes:
+  FoundationReview:
+    build:
+      targets:
+        FoundationReview: all
