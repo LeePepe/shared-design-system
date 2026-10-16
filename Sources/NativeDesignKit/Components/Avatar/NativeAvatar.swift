@@ -44,13 +44,17 @@ public struct NativeAvatar<Content: View>: View {
     }
 
     public var body: some View {
-        content
-            .font(size.font.weight(.semibold))
-            .foregroundStyle(theme.foreground)
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
+        Circle()
+            .fill(theme.surface)
             .frame(width: size.diameter, height: size.diameter)
-            .background(theme.surface)
+            .overlay {
+                content
+                    .font(size.font.weight(.semibold))
+                    .foregroundStyle(theme.foreground)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .frame(width: size.diameter, height: size.diameter)
+            }
             .clipShape(Circle())
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(accessibilityLabel)

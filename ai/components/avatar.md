@@ -65,9 +65,11 @@ control an appropriate action label and at least a 44-point hit region; the
 32-point avatar alone is not an interactive target. A disabled environment
 does not dim a noninteractive avatar.
 
-Hosted test screenshots cover ocean/graphite in light/dark, initials, SF Symbol,
-caller-provided fit/fill images, all three sizes and narrow adjacent long text.
-Hosted accessibility-tree and layout tests are separate from screenshots.
+XCTest UI screenshots of the SwiftUI fixture app cover ocean/graphite in
+light/dark, initials, SF Symbol, a caller-provided local template image with
+fit/fill, an empty visual, all three sizes and narrow adjacent long text.
+UI assertions check image semantics, labels, fixed size, intentional clipping,
+caller-owned Button composition and iOS accessibility text sizes.
 These do not establish VoiceOver speech, device behavior, minimum-OS support,
 or macOS Dynamic Type scaling. The five Strata colors remain a provider gap.
 To roll back, remove these call sites and restore the reviewed package revision;
