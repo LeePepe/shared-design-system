@@ -17,7 +17,7 @@ final class AvatarReviewUITests: XCTestCase {
                 XCTAssertEqual(app.images.matching(identifier: identifier).count, 1)
                 let image = app.images[identifier]
                 XCTAssertEqual(image.elementType, .image)
-                XCTAssertEqual(image.descendants(matching: .any).count, 0)
+                XCTAssertEqual(image.descendants(matching: .any).count, 0, image.debugDescription)
                 XCTAssertEqual(app.buttons.matching(identifier: identifier).count, 0)
                 XCTAssertEqual(image.label, "\(rowTitle(kind)), \(size) example visual")
             }

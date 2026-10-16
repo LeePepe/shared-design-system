@@ -57,8 +57,15 @@ public struct NativeAvatar<Content: View>: View {
                     .accessibilityHidden(true)
             }
             .clipShape(Circle())
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(accessibilityLabel)
-            .accessibilityAddTraits(.isImage)
+            // A replacement representation keeps arbitrary caller content decorative
+            // and prevents oversized image bounds from expanding the accessible image.
+            .accessibilityRepresentation {
+                Circle()
+                    .fill(theme.surface)
+                    .frame(width: size.diameter, height: size.diameter)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(accessibilityLabel)
+                    .accessibilityAddTraits(.isImage)
+            }
     }
 }
