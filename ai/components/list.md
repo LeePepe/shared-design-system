@@ -87,8 +87,8 @@ explicit palette/mode and layout. The fixture composes through shared
 Primary text uses semibold `.body`; secondary text uses `.subheadline` and
 metadata/selected labels use `.caption`, all from explicit theme roles.
 Header uses `.headline`; footer uses `.caption`. Text grows vertically without
-a line limit or fixed row height. At accessibility sizes, metadata/selection
-moves below the icon and copy so primary text keeps usable width. Leading
+a line limit or fixed row height. At accessibility sizes, primary/secondary
+copy uses the full row width, with the icon and metadata/selection below it. Leading
 content is decorative for accessibility; put meaningful icon information in
 the primary or secondary slot. Caller content may override semantic styling.
 

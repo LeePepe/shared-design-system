@@ -112,13 +112,21 @@ final class ListReviewUITests: XCTestCase {
         XCTAssertTrue(toggle.waitForExistence(timeout: 5))
         let original = try XCTUnwrap(toggle.value as? String)
         XCTAssertTrue(["0", "1"].contains(original))
+        let originalEvidence = XCTAttachment(string: "Original Reduce Transparency: \(original); frame: \(toggle.frame)")
+        originalEvidence.name = "system-transparency-original"
+        originalEvidence.lifetime = .keepAlways
+        add(originalEvidence)
         defer {
             settings.activate()
-            if toggle.value as? String != original { toggle.tap() }
+            setSwitch(toggle, to: original)
             XCTAssertEqual(toggle.value as? String, original, "Restore the original simulator preference.")
+            let restored = XCTAttachment(string: "Restored Reduce Transparency: \(toggle.value as? String ?? "missing")")
+            restored.name = "system-transparency-restored"
+            restored.lifetime = .keepAlways
+            add(restored)
             settings.terminate()
         }
-        if toggle.value as? String != "1" { toggle.tap() }
+        setSwitch(toggle, to: "1")
         XCTAssertEqual(toggle.value as? String, "1")
         let app = launch(scenario: "system-fallback")
         XCTAssertEqual(app.staticTexts["system-transparency"].label, "System transparency: reduced")
@@ -127,6 +135,15 @@ final class ListReviewUITests: XCTestCase {
         row(titles[1], in: app).tap()
         XCTAssertTrue(row(titles[1], in: app).isSelected)
         app.terminate()
+    }
+
+    private func setSwitch(_ toggle: XCUIElement, to value: String) {
+        if toggle.value as? String != value {
+            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.94, dy: 0.5)).tap()
+        }
+        let changed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: toggle)
+        XCTAssertEqual(XCTWaiter.wait(for: [changed], timeout: 5), .completed,
+                       "The actual Settings switch must reach \(value).")
     }
 
     func testInvalidBrandDoesNotRenderFallbackList() {
@@ -176,6 +193,8 @@ final class ListReviewUITests: XCTestCase {
            let data = raw.data(using: .utf8),
            var frames = (try? JSONSerialization.jsonObject(with: data)) as? [String: [Double]] {
             XCTAssertFalse(frames.isEmpty, "Runtime text frames must accompany actual PNG contrast inspection.")
+            XCTAssertEqual(frames["_systemReduced"], [name == "list-system-reduced-transparency" ? 1 : 0],
+                           "Capture labels must agree with the observed system transparency setting.")
             let heading = app.staticTexts["list-heading"].frame
             frames["_headingAX"] = [heading.minX, heading.minY, heading.width, heading.height]
             frames["_screen"] = [0, 0, app.frame.width, app.frame.height]

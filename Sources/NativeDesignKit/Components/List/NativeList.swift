@@ -224,8 +224,12 @@ private struct NativeListItemContent<Leading: View, Primary: View, Secondary: Vi
         Group {
             if typeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 8) {
-                    copyWithIcon
-                    rowEnd.frame(maxWidth: .infinity, alignment: .trailing)
+                    copy
+                    HStack(spacing: 12) {
+                        leadingContent
+                        Spacer(minLength: 0)
+                        rowEnd
+                    }
                 }
             } else {
                 HStack(spacing: 12) {
@@ -240,19 +244,27 @@ private struct NativeListItemContent<Leading: View, Primary: View, Secondary: Vi
 
     private var copyWithIcon: some View {
         HStack(alignment: .top, spacing: 12) {
-            leading
-                .font(.body)
-                .foregroundStyle(theme.secondaryForeground)
-                .frame(width: 28)
-                .frame(minHeight: 28)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 4) {
-                primary.font(.body.weight(.semibold))
-                    .foregroundStyle(isEnabled ? theme.foreground : theme.secondaryForeground)
-                secondary.font(.subheadline).foregroundStyle(theme.secondaryForeground)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            leadingContent
+            copy
         }
+    }
+
+    private var leadingContent: some View {
+        leading
+            .font(.body)
+            .foregroundStyle(theme.secondaryForeground)
+            .frame(width: 28)
+            .frame(minHeight: 28)
+            .accessibilityHidden(true)
+    }
+
+    private var copy: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            primary.font(.body.weight(.semibold))
+                .foregroundStyle(isEnabled ? theme.foreground : theme.secondaryForeground)
+            secondary.font(.subheadline).foregroundStyle(theme.secondaryForeground)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder private var rowEnd: some View {

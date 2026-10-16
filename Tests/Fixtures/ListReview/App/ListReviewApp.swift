@@ -139,7 +139,7 @@ private struct ListReviewBoard: View {
         .frame(maxWidth: .infinity, alignment: .top)
         .accessibilityIdentifier("review-scroll")
         .onPreferenceChange(ListTextFrames.self) { textFrames = $0 }
-        .dynamicTypeSize(configuration.size)
+        .dynamicTypeSize(isLong ? .large : configuration.size)
         .environment(\.nativeReduceTransparencyOverride, configuration.reduceTransparency ? true : nil)
     }
 
@@ -149,12 +149,17 @@ private struct ListReviewBoard: View {
             selection: selection, selectedLabel: Text("已选"),
             isRowEnabled: { configuration.scenario != "interaction" || $0.id != "type" }
         ) {
-            HStack {
-                Text("设计笔记").accessibilityIdentifier("list-heading").background(measure("heading"))
-                Spacer(minLength: 8)
-                Text("示例列表").background(measure("badge")).font(.caption).foregroundStyle(theme.secondaryForeground)
-                    .padding(.horizontal, 8).padding(.vertical, 4)
-                    .background(theme.surface(.inset), in: Capsule())
+            if isLong {
+                Text("长文本示例").font(.caption)
+                    .accessibilityIdentifier("list-heading").background(measure("heading"))
+            } else {
+                HStack {
+                    Text("设计笔记").accessibilityIdentifier("list-heading").background(measure("heading"))
+                    Spacer(minLength: 8)
+                    Text("示例列表").background(measure("badge")).font(.caption).foregroundStyle(theme.secondaryForeground)
+                        .padding(.horizontal, 8).padding(.vertical, 4)
+                        .background(theme.surface(.inset), in: Capsule())
+                }
             }
         } leading: { note in
             Image(systemName: note.symbol)
@@ -168,19 +173,23 @@ private struct ListReviewBoard: View {
             Text(note.metadata).background(measure("metadata-" + note.id))
         } footer: {
             VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .top) {
-                    Text("当前：\(currentTitle)").accessibilityIdentifier("selection-context").background(measure("context"))
-                    Spacer(minLength: 8)
-                    Text("点击切换").background(measure("instruction"))
+                if !isLong {
+                    HStack(alignment: .top) {
+                        Text("当前：\(currentTitle)").accessibilityIdentifier("selection-context").background(measure("context"))
+                        Spacer(minLength: 8)
+                        Text("点击切换").background(measure("instruction"))
+                    }
                 }
                 Text("\(selectedCount) 项已选").accessibilityIdentifier("selected-count").background(measure("count"))
             }
         }
         .disabled(isDisabled)
+        .dynamicTypeSize(configuration.size)
     }
 
     private var frameJSON: String {
-        let payload = textFrames.mapValues { [$0.minX, $0.minY, $0.width, $0.height] }
+        var payload = textFrames.mapValues { [$0.minX, $0.minY, $0.width, $0.height] }
+        payload["_systemReduced"] = [systemReduceTransparency ? 1 : 0]
         guard let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
               let text = String(data: data, encoding: .utf8) else { return "{}" }
         return text
