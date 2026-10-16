@@ -5,6 +5,7 @@ public struct NativeToggle<Label: View>: View {
     private let metrics: NativeControlMetrics
     @Binding private var isOn: Bool
     private let label: Label
+    @Environment(\.isEnabled) private var isEnabled
 
     public init(isOn: Binding<Bool>, theme: NativeDesignTheme, metrics: NativeControlMetrics,
                 @ViewBuilder label: () -> Label) {
@@ -15,9 +16,14 @@ public struct NativeToggle<Label: View>: View {
     }
 
     public var body: some View {
-        Toggle(isOn: $isOn) { label }.toggleStyle(.switch)
-            .frame(minHeight: metrics.minimumHitSize)
-            .modifier(ControlChrome(theme: theme, metrics: metrics))
+        Toggle(isOn: $isOn) {
+            // Keep the minimum inside the native label, rather than an inactive outer frame.
+            label.nativeGrowingText().nativeMinimumHitTarget(metrics.minimumHitSize)
+                .foregroundColor(isEnabled ? theme.textPrimary : theme.textSecondary)
+        }
+        // The native switch owns disabled opacity, focus, press and pointer feedback.
+        .toggleStyle(.switch)
+        .tint(theme.statusInfo)
     }
 }
 
