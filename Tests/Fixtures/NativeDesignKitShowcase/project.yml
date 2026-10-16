@@ -70,6 +70,10 @@ targets:
     sources:
       - Sources/FixtureStyle.swift
       - Sources/ShowcaseCatalog.swift
+      - Sources/ComponentReview.swift
+      - Sources/ButtonReviewBoard.swift
+      - Sources/ToggleReviewBoard.swift
+      - Sources/TextFieldReviewBoard.swift
       - RenderTests
       - path: StyleProvider/styles.resolved.json
         buildPhase: resources

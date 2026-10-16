@@ -28,6 +28,7 @@ struct FixtureConfiguration {
 struct FixtureResources {
     let theme: NativeDesignTheme
     let metrics: NativeControlMetrics
+    let reviewMetrics: NativeControlMetrics
     let surface: NativeSurfaceMetrics
     let motion: NativeMotionSpec
     let primary: Color
@@ -52,6 +53,15 @@ struct FixtureResources {
         let explicitTheme: Theme = config.dark ? .dark : .light
         theme = try NativeDesignTheme(theme: explicitTheme)
         metrics = try provider.controlMetrics()
+        #if os(macOS)
+        let target = try provider.number("dimension.control.compact")
+        #else
+        let target = try provider.number("dimension.hit.minimum")
+        #endif
+        reviewMetrics = try NativeControlMetrics(padding: provider.number("spacing.sm"),
+            spacing: provider.number("spacing.sm"), cornerRadius: provider.number("radius.small"),
+            minimumHitSize: target, iconSize: provider.number("dimension.icon.medium"),
+            borderWidth: provider.number("border.regular"), disabledOpacity: provider.number("opacity.disabled"))
         surface = try provider.surfaceMetrics()
         motion = try provider.motion()
         primary = try NativeTokenColor.resolve("product.text.primary", theme: explicitTheme)
@@ -86,7 +96,7 @@ struct FixtureEntry: View {
     var body: some View {
         switch resources {
         case let .success(result):
-            Catalog(resources: result, config: config)
+            ReviewOrCatalog(resources: result, config: config)
                 .preferredColorScheme(config.dark ? .dark : .light)
                 .environment(\.dynamicTypeSize, config.accessible ? .accessibility3 : .large)
                 .environment(\.layoutDirection, config.rtl ? .rightToLeft : .leftToRight)
