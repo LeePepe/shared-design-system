@@ -6,8 +6,13 @@ synthetic state, not a product screen or additional library product. See the
 `project.yml` is canonical; XcodeGen generates the shared `ButtonReview` scheme.
 The local package path is `../../..`. No dependency pin or platform floor changes.
 
-The UI tests provide all required `NDK_BRAND`, `NDK_THEME`, `NDK_SCENARIO`,
-`NDK_TEXT_SIZE` and `NDK_LANGUAGE` launch inputs. Matrix captures show all three
+The UI tests provide all required `NDK_BRAND`, `NDK_THEME`, `NDK_SURFACE`,
+`NDK_SCENARIO`, `NDK_TEXT_SIZE` and `NDK_LANGUAGE` launch inputs. Optional
+`NDK_REDUCE_MOTION=1` stops nonessential animation without hiding loading text.
+`specimen` uses the shared `StrataSpecimen` shell and a dense inner stage,
+with five real Strata palettes × light/dark × Glass/solid (20 named captures).
+The compact normal row shows Primary, Secondary and Ghost, followed by
+disabled/loading examples. `matrix` retains the original behavior boards. Matrix captures show all three
 variants in normal/loading/disabled states for ocean/graphite × light/dark.
 The 320 pt board uses German localized labels and actual iOS accessibility2
 typography. XCTest captures the running app, not a hosted view bitmap.
@@ -54,3 +59,11 @@ rectangle when it contains its corners. A capsule control must reject the idle
 text bounds, proving this case exercises the former shape-escape bug rather
 than just rectangular containment. The visible result accompanies the actual
 accessibility screenshot; no text is clipped or reduced to fit.
+
+The XcodeGen app target explicitly includes `../Shared/StrataSpecimen.swift`.
+This shared test-only helper belongs to the foundation; ButtonReview supplies
+its own controls and stage. No RGB palette or glass recipe is duplicated here.
+The exact source/provider revisions, clean-tree receipt and external candidate
+mirror configuration belong with each result bundle; a local candidate mirror
+does not establish that the provider version is released or that remote gates
+passed. Run simulator work through the coordinator's serial lock.

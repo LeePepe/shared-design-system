@@ -10,6 +10,7 @@ public enum NativeButtonVariant: Equatable, Sendable {
 public struct NativeButton<Label: View, LoadingLabel: View>: View {
     private let theme: NativeDesignTheme
     private let variant: NativeButtonVariant
+    private let surface: NativeSurfaceStyle
     private let isLoading: Bool
     private let action: () -> Void
     private let label: Label
@@ -26,8 +27,23 @@ public struct NativeButton<Label: View, LoadingLabel: View>: View {
         @ViewBuilder label: () -> Label,
         @ViewBuilder loadingLabel: () -> LoadingLabel
     ) {
+        self.init(theme: theme, variant: variant, surface: .solid, isLoading: isLoading,
+                  action: action, label: label, loadingLabel: loadingLabel)
+    }
+
+    /// Material is explicit for new compositions; primary actions always stay solid.
+    public init(
+        theme: NativeDesignTheme,
+        variant: NativeButtonVariant,
+        surface: NativeSurfaceStyle,
+        isLoading: Bool,
+        action: @escaping () -> Void,
+        @ViewBuilder label: () -> Label,
+        @ViewBuilder loadingLabel: () -> LoadingLabel
+    ) {
         self.theme = theme
         self.variant = variant
+        self.surface = surface
         self.isLoading = isLoading
         self.action = action
         self.label = label()
@@ -41,20 +57,21 @@ public struct NativeButton<Label: View, LoadingLabel: View>: View {
                     .opacity(isLoading ? 0 : 1)
                     .accessibilityHidden(isLoading)
                 HStack(spacing: 8) {
-                    Image(systemName: "hourglass")
+                    NativeButtonSpinner(isActive: isLoading, reduceMotion: reduceMotion)
                         .accessibilityHidden(true)
                     loadingLabel
                 }
                 .opacity(isLoading ? 1 : 0)
                 .accessibilityHidden(!isLoading)
             }
-            .font(.body.weight(.semibold))
-            .padding(.horizontal, 20)
+            .font(.callout.weight(.semibold))
+            .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .frame(minWidth: 44, minHeight: 44)
             .contentShape(NativeButtonShape())
         }
-        .buttonStyle(NativeActionButtonStyle(theme: theme, variant: variant, isLoading: isLoading, reduceMotion: reduceMotion))
+        .buttonStyle(NativeActionButtonStyle(theme: theme, variant: variant, surface: surface,
+                                            isLoading: isLoading, reduceMotion: reduceMotion))
         .focused($isFocused)
         .overlay {
             if isFocused {
@@ -67,6 +84,27 @@ public struct NativeButton<Label: View, LoadingLabel: View>: View {
 
     private func activate() {
         NativeButtonActivation.perform(isEnabled: isEnabled, isLoading: isLoading, action: action)
+    }
+}
+
+/// A circular activity cue that remains recognizable when Reduce Motion stops rotation.
+private struct NativeButtonSpinner: View {
+    let isActive: Bool
+    let reduceMotion: Bool
+    @ScaledMetric(relativeTo: .body) private var size: CGFloat = 16
+    @State private var rotating = false
+
+    var body: some View {
+        Circle()
+            .trim(from: 0.08, to: 0.82)
+            .stroke(style: StrokeStyle(lineWidth: 2, lineCap: .round))
+            .frame(width: size, height: size)
+            .rotationEffect(.degrees(rotating && !reduceMotion ? 360 : 0))
+            .animation(reduceMotion || !isActive ? nil : .linear(duration: 0.9).repeatForever(autoreverses: false),
+                       value: rotating)
+            .onAppear { rotating = isActive && !reduceMotion }
+            .onChange(of: isActive) { rotating = $0 && !reduceMotion }
+            .onChange(of: reduceMotion) { rotating = isActive && !$0 }
     }
 }
 
@@ -98,34 +136,66 @@ enum NativeButtonActivation {
 private struct NativeActionButtonStyle: ButtonStyle {
     let theme: NativeDesignTheme
     let variant: NativeButtonVariant
+    let surface: NativeSurfaceStyle
     let isLoading: Bool
     let reduceMotion: Bool
     @Environment(\.isEnabled) private var isEnabled
+    @State private var isHovered = false
 
     func makeBody(configuration: Configuration) -> some View {
+        let responds = isEnabled && !isLoading
+        let pressed = responds && configuration.isPressed
+        let hovered = responds && isHovered
+        let paint = NativeButtonPaint(theme: theme, variant: variant, isEnabled: isEnabled,
+                                      isLoading: isLoading, isPressed: pressed, isHovered: hovered)
         configuration.label
-            .foregroundStyle(foreground)
             .background {
                 switch variant {
                 case .primary:
-                    NativeButtonShape().fill(isEnabled || isLoading ? theme.accent : theme.surface)
+                    if let fill = paint.fill { NativeButtonShape().fill(fill) }
                 case .secondary:
-                    NativeButtonShape().fill(theme.surface)
+                    // The shared dense role supplies a restrained edge without another blur.
+                    Color.clear
+                        .nativeSurface(theme: theme, style: surface, cornerRadius: 22, role: .card)
+                        .overlay {
+                            if let fill = paint.fill { NativeButtonShape().fill(fill) }
+                        }
                 case .ghost:
-                    NativeButtonShape().strokeBorder(theme.secondaryForeground, lineWidth: configuration.isPressed ? 2 : 0)
+                    if let fill = paint.fill { NativeButtonShape().fill(fill) }
                 }
             }
+            .foregroundStyle(paint.foreground)
             .overlay {
-                if configuration.isPressed && variant != .ghost {
-                    NativeButtonShape().strokeBorder(foreground, lineWidth: 2)
+                if pressed {
+                    NativeButtonShape().strokeBorder(paint.foreground, lineWidth: 2)
                 }
             }
-            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.98 : 1)
-            .animation(reduceMotion ? nil : .easeOut(duration: 0.14), value: configuration.isPressed)
+            .onHover { isHovered = $0 }
+            .scaleEffect(pressed && !reduceMotion ? 0.98 : 1)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.14), value: pressed)
     }
+}
 
-    private var foreground: Color {
-        if !isEnabled && !isLoading { return theme.secondaryForeground }
-        return variant == .primary ? theme.onAccent : theme.foreground
+/// Shared by rendering and numeric contrast checks; no opacity is applied to content.
+struct NativeButtonPaint {
+    let foreground: Color
+    let fill: Color?
+
+    init(theme: NativeDesignTheme, variant: NativeButtonVariant, isEnabled: Bool,
+         isLoading: Bool, isPressed: Bool, isHovered: Bool) {
+        if !isEnabled && !isLoading {
+            foreground = theme.secondaryForeground
+            fill = variant == .ghost ? nil : theme.surface(.inset)
+            return
+        }
+        foreground = variant == .primary ? theme.onAccent : variant == .ghost ? theme.brandText : theme.foreground
+        switch variant {
+        case .primary:
+            fill = isLoading ? theme.accent : isPressed ? theme.accentActive : isHovered ? theme.accentHover : theme.accent
+        case .secondary:
+            fill = isLoading ? nil : isPressed ? theme.surface(.selected) : isHovered ? theme.surface(.hover) : nil
+        case .ghost:
+            fill = !isLoading && (isPressed || isHovered) ? theme.accentSubtle : nil
+        }
     }
 }

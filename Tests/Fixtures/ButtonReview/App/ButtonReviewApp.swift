@@ -11,6 +11,7 @@ struct ButtonReviewApp: App {
             switch configuration {
             case .success(let configuration):
                 ButtonReviewBoard(configuration: configuration)
+                    .environment(\.accessibilityReduceMotion, configuration.reduceMotion)
                     .preferredColorScheme(configuration.isDark ? .dark : .light)
                     .environment(\.locale, Locale(identifier: configuration.language))
             case .failure(let error):
@@ -30,6 +31,8 @@ private struct ReviewConfiguration {
     let brand: String
     let mode: String
     let scenario: String
+    let surface: NativeSurfaceStyle
+    let reduceMotion: Bool
     let textSize: DynamicTypeSize
     let language: String
     var isDark: Bool { mode == "dark" }
@@ -45,9 +48,15 @@ private struct ReviewConfiguration {
         brand = try required("NDK_BRAND")
         mode = try required("NDK_THEME")
         scenario = try required("NDK_SCENARIO")
-        guard ["matrix", "interaction", "long-label"].contains(scenario) else {
+        guard ["specimen", "matrix", "interaction", "long-label"].contains(scenario) else {
             throw ConfigurationError.invalid("NDK_SCENARIO")
         }
+        switch try required("NDK_SURFACE") {
+        case "glass": surface = .glass
+        case "solid": surface = .solid
+        default: throw ConfigurationError.invalid("NDK_SURFACE")
+        }
+        reduceMotion = environment["NDK_REDUCE_MOTION"] == "1"
         switch mode {
         case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
         case "dark": theme = try NativeDesignTheme(theme: .dark, brand: brand)
@@ -78,10 +87,8 @@ private struct ButtonReviewBoard: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Native Button").font(.title.bold())
-                Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · iOS SwiftUI")
-                    .font(.subheadline).foregroundStyle(theme.secondaryForeground)
                 switch configuration.scenario {
+                case "specimen": specimen
                 case "matrix": matrix
                 case "long-label": longLabel
                 default: interaction
@@ -96,6 +103,58 @@ private struct ButtonReviewBoard: View {
         .dynamicTypeSize(.large)
     }
 
+    private var specimen: some View {
+        StrataSpecimen(theme: theme, surface: configuration.surface, title: "01  Button") {
+            VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack(spacing: 8) {
+                        specimenButton(.primary, id: "specimen-save") {
+                            Label("Save", systemImage: "checkmark")
+                        }
+                        specimenButton(.secondary, id: "specimen-secondary") { Text("Secondary") }
+                        specimenButton(.ghost, id: "specimen-ghost") {
+                            HStack(spacing: 6) {
+                                Text("Ghost")
+                                Image(systemName: "arrow.right").accessibilityHidden(true)
+                            }
+                        }
+                    }
+                    HStack(spacing: 8) {
+                        Text("States").font(.caption).foregroundStyle(theme.secondaryForeground)
+                        NativeButton(theme: theme, variant: .secondary, surface: configuration.surface,
+                                     isLoading: false, action: { actionCount += 1 }) {
+                            Text("Disabled")
+                        } loadingLabel: { Text("Working…") }
+                        .disabled(true)
+                        .accessibilityIdentifier("specimen-disabled")
+                        NativeButton(theme: theme, variant: .primary, surface: configuration.surface,
+                                     isLoading: true, action: { actionCount += 1 }) {
+                            Text("Load")
+                        } loadingLabel: { Text("Loading") }
+                        .accessibilityIdentifier("specimen-loading")
+                    }
+                    Text("44 pt targets · Adaptive capsules")
+                        .font(.caption).foregroundStyle(theme.secondaryForeground)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .nativeSurface(theme: theme, style: configuration.surface, cornerRadius: 24, role: .card)
+                Text(actionCount == 0 ? "Tap Save to try a native action." : "Example saved · \(actionCount)")
+                    .font(.subheadline).foregroundStyle(theme.secondaryForeground)
+                    .accessibilityIdentifier("specimen-feedback")
+            }
+        }
+    }
+
+    private func specimenButton<Content: View>(_ variant: NativeButtonVariant, id: String,
+                                               @ViewBuilder content: () -> Content) -> some View {
+        NativeButton(theme: theme, variant: variant, surface: configuration.surface,
+                     isLoading: false, action: { actionCount += 1 }, label: content) {
+            Text(variant == .primary ? "Save" : "Wait")
+        }
+        .accessibilityIdentifier(id)
+    }
+
     private var matrix: some View {
         VStack(alignment: .leading, spacing: 12) {
             ForEach(["primary", "secondary", "ghost"], id: \.self) { variant in
@@ -105,7 +164,7 @@ private struct ButtonReviewBoard: View {
                         HStack(spacing: 12) {
                             Text(state.capitalized).font(.caption)
                                 .frame(width: 60, alignment: .leading)
-                            NativeButton(theme: theme, variant: variantValue(variant),
+                            NativeButton(theme: theme, variant: variantValue(variant), surface: configuration.surface,
                                          isLoading: state == "loading", action: { actionCount += 1 }) {
                                 Text(variant == "primary" ? "Continue" : variant == "secondary" ? "Save draft" : "Learn more")
                             } loadingLabel: { Text("Working…") }
@@ -123,7 +182,7 @@ private struct ButtonReviewBoard: View {
 
     private var interaction: some View {
         VStack(alignment: .leading, spacing: 20) {
-            NativeButton(theme: theme, variant: .primary, isLoading: isLoading,
+            NativeButton(theme: theme, variant: .primary, surface: configuration.surface, isLoading: isLoading,
                          action: { actionCount += 1 }) {
                 Text("Save")
             } loadingLabel: { Text("Saving all your changes…") }
@@ -138,7 +197,7 @@ private struct ButtonReviewBoard: View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 16) {
                 Text("320 pt narrow layout").font(.headline)
-                NativeButton(theme: theme, variant: .primary, isLoading: isLoading,
+                NativeButton(theme: theme, variant: .primary, surface: configuration.surface, isLoading: isLoading,
                              action: { actionCount += 1 }) {
                     Text("confirm_selection")
                         .background {

@@ -67,10 +67,62 @@ final class ButtonReviewUITests: XCTestCase {
     func testVisualMatrixGraphiteLight() { matrix(brand: "graphite", mode: "light") }
     func testVisualMatrixGraphiteDark() { matrix(brand: "graphite", mode: "dark") }
 
+    func testSpecimenBlueLightGlass() { specimen(brand: "strata-blue", mode: "light", surface: "glass") }
+    func testSpecimenBlueLightSolid() { specimen(brand: "strata-blue", mode: "light", surface: "solid") }
+    func testSpecimenBlueDarkGlass() { specimen(brand: "strata-blue", mode: "dark", surface: "glass") }
+    func testSpecimenBlueDarkSolid() { specimen(brand: "strata-blue", mode: "dark", surface: "solid") }
+    func testSpecimenGreenLightGlass() { specimen(brand: "strata-green", mode: "light", surface: "glass") }
+    func testSpecimenGreenLightSolid() { specimen(brand: "strata-green", mode: "light", surface: "solid") }
+    func testSpecimenGreenDarkGlass() { specimen(brand: "strata-green", mode: "dark", surface: "glass") }
+    func testSpecimenGreenDarkSolid() { specimen(brand: "strata-green", mode: "dark", surface: "solid") }
+    func testSpecimenPinkLightGlass() { specimen(brand: "strata-pink", mode: "light", surface: "glass") }
+    func testSpecimenPinkLightSolid() { specimen(brand: "strata-pink", mode: "light", surface: "solid") }
+    func testSpecimenPinkDarkGlass() { specimen(brand: "strata-pink", mode: "dark", surface: "glass") }
+    func testSpecimenPinkDarkSolid() { specimen(brand: "strata-pink", mode: "dark", surface: "solid") }
+    func testSpecimenYellowLightGlass() { specimen(brand: "strata-yellow", mode: "light", surface: "glass") }
+    func testSpecimenYellowLightSolid() { specimen(brand: "strata-yellow", mode: "light", surface: "solid") }
+    func testSpecimenYellowDarkGlass() { specimen(brand: "strata-yellow", mode: "dark", surface: "glass") }
+    func testSpecimenYellowDarkSolid() { specimen(brand: "strata-yellow", mode: "dark", surface: "solid") }
+    func testSpecimenPurpleLightGlass() { specimen(brand: "strata-purple", mode: "light", surface: "glass") }
+    func testSpecimenPurpleLightSolid() { specimen(brand: "strata-purple", mode: "light", surface: "solid") }
+    func testSpecimenPurpleDarkGlass() { specimen(brand: "strata-purple", mode: "dark", surface: "glass") }
+    func testSpecimenPurpleDarkSolid() { specimen(brand: "strata-purple", mode: "dark", surface: "solid") }
+
+    func testReduceMotionLoadingRetainsReadableStateAndFootprint() {
+        let app = launch(scenario: "interaction", reduceMotion: true)
+        let target = app.buttons["action-target"]
+        let idle = target.frame
+        app.buttons["toggle-loading"].tap()
+        XCTAssertTrue(target.label.contains("Saving all your changes…"))
+        XCTAssertFalse(target.isEnabled)
+        XCTAssertEqual(target.frame.width, idle.width, accuracy: 0.5)
+        XCTAssertEqual(target.frame.height, idle.height, accuracy: 0.5)
+        capture("button-reduce-motion-loading", app: app)
+    }
+
     func testInvalidBrandShowsErrorWithoutFallback() {
         let app = launch(scenario: "matrix", brand: "__unknown_brand__", expectsError: true)
         XCTAssertTrue(app.staticTexts["fixture-error"].label.contains("__unknown_brand__"))
         XCTAssertFalse(app.buttons["matrix-primary-normal"].exists)
+    }
+
+    private func specimen(brand: String, mode: String, surface: String) {
+        let app = launch(scenario: "specimen", brand: brand, mode: mode, surface: surface)
+        let scale = screenshotScale(app)
+        for id in ["save", "secondary", "ghost", "disabled", "loading"] {
+            let target = app.buttons["specimen-\(id)"]
+            XCTAssertTrue(target.exists)
+            XCTAssertEqual(target.isEnabled, id != "disabled" && id != "loading")
+            assertMinimumTarget(target, scale: scale)
+            XCTAssertTrue(app.scrollViews["review-scroll"].frame.contains(target.frame), id)
+        }
+        capture("button-\(brand)-\(mode)-\(surface)", app: app)
+        app.buttons["specimen-save"].tap()
+        XCTAssertTrue(app.staticTexts["specimen-feedback"].label.contains("Example saved · 1"))
+        for id in ["disabled", "loading"] {
+            app.buttons["specimen-\(id)"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        }
+        XCTAssertTrue(app.staticTexts["specimen-feedback"].label.contains("Example saved · 1"))
     }
 
     private func matrix(brand: String, mode: String) {
@@ -127,11 +179,12 @@ final class ButtonReviewUITests: XCTestCase {
         add(attachment)
     }
 
-    private func launch(scenario: String, brand: String = "ocean", mode: String = "light",
-                        size: String = "large", language: String = "en", expectsError: Bool = false) -> XCUIApplication {
+    private func launch(scenario: String, brand: String = "strata-blue", mode: String = "light", surface: String = "glass",
+                        size: String = "large", language: String = "en", reduceMotion: Bool = false, expectsError: Bool = false) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment = ["NDK_SCENARIO": scenario, "NDK_BRAND": brand, "NDK_THEME": mode,
-                                 "NDK_TEXT_SIZE": size, "NDK_LANGUAGE": language]
+                                 "NDK_TEXT_SIZE": size, "NDK_LANGUAGE": language, "NDK_SURFACE": surface,
+                                 "NDK_REDUCE_MOTION": reduceMotion ? "1" : "0"]
         app.launch()
         let ready = expectsError ? app.staticTexts["fixture-error"] : app.scrollViews["review-scroll"]
         XCTAssertTrue(ready.waitForExistence(timeout: 10), app.debugDescription)
