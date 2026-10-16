@@ -55,3 +55,7 @@ Lookup errors propagate unchanged. If token resolution fails, `init(theme:)` thr
 ## Scope
 
 This library provides SwiftUI presentation primitives and explicit theme resolution. Business models, networking, persistence, and product workflows remain outside this interface. The Tokens dependency is pinned at exactly `0.1.1`.
+
+## Foundation adaptations
+
+The additive [foundation API contract](FOUNDATIONS.md) covers explicit typography/metrics, native surfaces and Liquid Glass, layouts, focus, interpolation, replay/cancellation and accessibility motion policy.
