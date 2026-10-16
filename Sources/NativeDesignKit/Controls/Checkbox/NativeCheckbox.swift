@@ -30,6 +30,7 @@ public struct NativeCheckbox<Label: View>: View {
         #else
         .toggleStyle(NativeCheckboxStyle(theme: theme))
         #endif
+        .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
     }
 }
 
