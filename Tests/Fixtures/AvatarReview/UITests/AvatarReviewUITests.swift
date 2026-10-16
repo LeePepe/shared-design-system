@@ -77,8 +77,7 @@ final class AvatarReviewUITests: XCTestCase {
         XCTAssertEqual(avatar.frame.height, original.height, accuracy: 0.5)
         let button = app.buttons["composed-action"]
         XCTAssertEqual(button.label, "Open example member")
-        XCTAssertGreaterThanOrEqual(button.frame.width, 44)
-        XCTAssertGreaterThanOrEqual(button.frame.height, 44)
+        assertMinimumTarget(button, app: app)
         button.tap()
         XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")
         app.buttons["toggle-disabled"].tap()
@@ -118,6 +117,18 @@ final class AvatarReviewUITests: XCTestCase {
     private func assertSize(_ target: XCUIElement, diameter: CGFloat) {
         XCTAssertEqual(target.frame.width, diameter, accuracy: 0.5)
         XCTAssertEqual(target.frame.height, diameter, accuracy: 0.5)
+    }
+
+    private func assertMinimumTarget(_ target: XCUIElement, app: XCUIApplication) {
+        // Physical pixel edges avoid AX subtraction noise at exactly 44 pt.
+        let png = [UInt8](app.screenshot().pngRepresentation)
+        let pixels = png[16..<20].reduce(0) { ($0 << 8) | Int($1) }
+        let scale = CGFloat(pixels) / app.frame.width
+        let frame = target.frame
+        let width = (frame.maxX * scale).rounded() - (frame.minX * scale).rounded()
+        let height = (frame.maxY * scale).rounded() - (frame.minY * scale).rounded()
+        XCTAssertGreaterThanOrEqual(width, (44 * scale).rounded(.up))
+        XCTAssertGreaterThanOrEqual(height, (44 * scale).rounded(.up))
     }
 
     private func capture(_ name: String, app: XCUIApplication) {

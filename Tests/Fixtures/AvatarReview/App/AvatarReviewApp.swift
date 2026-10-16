@@ -138,7 +138,6 @@ private struct AvatarReviewBoard: View {
         }
         .environment(\.dynamicTypeSize, configuration.textSize)
         .frame(width: 280, alignment: .leading)
-        .accessibilityIdentifier("narrow-board")
     }
 
     private var clipping: some View {

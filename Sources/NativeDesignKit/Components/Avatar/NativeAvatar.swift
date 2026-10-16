@@ -54,6 +54,7 @@ public struct NativeAvatar<Content: View>: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                     .frame(width: size.diameter, height: size.diameter)
+                    .accessibilityHidden(true)
             }
             .clipShape(Circle())
             .accessibilityElement(children: .ignore)
