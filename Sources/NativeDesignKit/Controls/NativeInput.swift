@@ -5,6 +5,7 @@ public struct NativeTextField: View {
     @Binding private var text: String
     private let theme: NativeDesignTheme
     private let metrics: NativeControlMetrics
+    @Environment(\.isEnabled) private var isEnabled
 
     public init(_ title: LocalizedStringKey, text: Binding<String>, theme: NativeDesignTheme,
                 metrics: NativeControlMetrics) {
@@ -12,8 +13,15 @@ public struct NativeTextField: View {
     }
 
     public var body: some View {
-        TextField(title, text: $text).textFieldStyle(.plain)
-            .modifier(FieldChrome(theme: theme, metrics: metrics))
+        TextField(title, text: $text)
+            .textFieldStyle(.roundedBorder)
+            // The native style owns bezel insets and keyboard-focus feedback.
+            .nativeMinimumHitTarget(metrics.minimumHitSize)
+            .foregroundColor(isEnabled ? theme.textPrimary : theme.textSecondary)
+            .tint(theme.statusInfo)
+            // Keep native placeholder, selection and bezel appearance with the
+            // explicit theme, including inside an oppositely themed parent.
+            .colorScheme(theme.theme == .dark ? .dark : .light)
     }
 }
 
