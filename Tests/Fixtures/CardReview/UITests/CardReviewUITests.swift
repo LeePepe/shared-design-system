@@ -128,20 +128,36 @@ final class CardReviewUITests: XCTestCase {
 
     func testSystemReduceTransparencyUsesTheSameSolidCardRole() {
         let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
+        // Scope language to this Settings process; never change the simulator locale.
+        settings.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         settings.launch()
-        let accessibility = settings.staticTexts["Accessibility"]
+        let root = settings.navigationBars.matching(NSPredicate(format: "identifier IN %@", ["Settings", "设置"])).firstMatch
+        for _ in 0..<4 where !root.exists {
+            let back = settings.navigationBars.buttons.firstMatch
+            if !back.exists { break }
+            back.tap()
+        }
+        let accessibility = settings.staticTexts.matching(
+            NSPredicate(format: "label IN %@", ["Accessibility", "辅助功能"])).firstMatch
+        // Settings may remember a scroll position below the desired row.
+        for _ in 0..<8 where !accessibility.isHittable { settings.swipeDown() }
         for _ in 0..<8 where !accessibility.isHittable { settings.swipeUp() }
-        XCTAssertTrue(accessibility.waitForExistence(timeout: 5))
+        guard accessibility.waitForExistence(timeout: 5) else {
+            XCTFail("Accessibility settings not found: \(settings.debugDescription)")
+            settings.terminate()
+            return
+        }
         accessibility.tap()
-        settings.staticTexts["Display & Text Size"].tap()
-        let preference = settings.switches["Reduce Transparency"]
+        settings.staticTexts.matching(NSPredicate(format: "label IN %@", ["Display & Text Size", "显示与文字大小"])).firstMatch.tap()
+        let preference = settings.switches.matching(
+            NSPredicate(format: "label IN %@", ["Reduce Transparency", "降低透明度"])).firstMatch
+        for _ in 0..<4 where !preference.isHittable { settings.swipeUp() }
         XCTAssertTrue(preference.waitForExistence(timeout: 5))
         guard let original = preference.value as? String, ["0", "1"].contains(original) else {
             XCTFail("Reduce Transparency did not expose a readable system preference")
             settings.terminate()
             return
         }
-        if original != "1" { preference.tap() }
         defer {
             settings.activate()
             if (preference.value as? String) != original { preference.tap() }
@@ -149,6 +165,12 @@ final class CardReviewUITests: XCTestCase {
             print("CARD_SYSTEM_TRANSPARENCY original=\(original) restored=\(preference.value ?? "unreadable")")
             settings.terminate()
         }
+        // Exercise a real change even when the original setting was already on.
+        if original == "1" {
+            preference.tap()
+            XCTAssertEqual(preference.value as? String, "0")
+        }
+        preference.tap()
         XCTAssertEqual(preference.value as? String, "1")
         let app = launchSpecimen(preference: "system")
         XCTAssertEqual(app.staticTexts["system-transparency"].label, "System Reduce Transparency: on")
