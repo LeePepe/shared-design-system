@@ -221,4 +221,5 @@ private struct BoundSwitch: View {
         NativeSwitch(theme: theme, isOn: state.binding) { Text("Enable notifications") }
     }
 }
+
 #endif

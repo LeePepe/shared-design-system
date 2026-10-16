@@ -52,6 +52,8 @@ activation require separate validation. macOS PNGs cover both
 brands and themes, on/off and disabled states, and narrow long labels. iOS
 hosting tests compare default and accessibility Dynamic Type layout. A macOS
 Dynamic Type environment alone does not prove macOS typography scaling.
+The macOS snapshot host renders native tracks in neutral colors; these PNGs
+do not visually establish brand accent rendering on active platform chrome.
 Screenshots do not establish VoiceOver speech, physical-device interaction or
 minimum-OS acceptance.
 
