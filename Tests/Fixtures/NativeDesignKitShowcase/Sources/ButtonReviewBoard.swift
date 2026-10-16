@@ -8,7 +8,7 @@ struct ButtonReviewBoard: View {
     var body: some View {
         ReviewSection(title: "Actions", r: r) {
             ForEach(NativeButtonPresentation.allCases, id: \.self) { style in
-                NativeButton(theme: r.theme, metrics: r.reviewMetrics, presentation: style,
+                NativeButton(theme: r.theme, metrics: r.reviewMetrics, presentation: style == .glass && !config.allowsGlass ? .bordered : style,
                     isLoading: false, loadingLabel: Text("Saving"), action: { count += 1 }) {
                     Text("Save Changes")
                 }
