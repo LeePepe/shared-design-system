@@ -4,6 +4,24 @@ import XCTest
 @testable import NativeDesignKit
 
 final class NativeDesignThemeTests: XCTestCase {
+    func testOpaqueTextPairsMeetNormalTextContrastForEveryBrandAndTheme() throws {
+        for brand in DesignTokens.brandIDs {
+            for mode in Theme.allCases {
+                let accent = try DesignTokens.brandColor(brand, role: .accent, theme: mode)
+                let onAccent = try DesignTokens.brandColor(brand, role: .onAccent, theme: mode)
+                let foreground = try DesignTokens.color("product.text.primary", theme: mode)
+                let surface = try DesignTokens.color("product.surface.raised", theme: mode)
+                // The provider rejects translucent pairs; no assumed compositing background.
+                let actionContrast = try onAccent.contrast(with: accent)
+                let surfaceContrast = try foreground.contrast(with: surface)
+                let context = "\(brand)/\(mode.rawValue)"
+                XCTAssertGreaterThanOrEqual(actionContrast, 4.5, "\(context) onAccent/accent")
+                XCTAssertGreaterThanOrEqual(surfaceContrast, 4.5, "\(context) foreground/surface")
+                print("Contrast \(context): onAccent/accent=\(actionContrast), foreground/surface=\(surfaceContrast)")
+            }
+        }
+    }
+
     func testAllProviderBrandsAndThemesResolveFreshSnapshots() throws {
         for brand in DesignTokens.brandIDs {
             for mode in [Theme.light, .dark, .light] {

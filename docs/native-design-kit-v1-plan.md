@@ -1,5 +1,9 @@
 # NativeDesignKit v1 implementation plan
 
+> Superseded for the current [Strata component rebuild](strata-component-rebuild.md).
+> The original planning status and content below are retained as history, not
+> the active implementation plan for this rebuild.
+
 Status: proposed for independent spec-gate review
 
 Specification: `docs/native-design-kit-v1-spec.md`

@@ -5,6 +5,8 @@ import XCTest
 
 #if os(macOS)
 import AppKit
+#elseif os(iOS)
+import UIKit
 #endif
 
 final class NativeButtonTests: XCTestCase {
@@ -19,6 +21,39 @@ final class NativeButtonTests: XCTestCase {
             }
         }
     }
+
+    #if os(iOS)
+    @MainActor
+    func testLongLabelsGrowAtAccessibilitySizeWithinNarrowIOSHost() throws {
+        let theme = try NativeDesignTheme(theme: .light, brand: "ocean")
+        let width: CGFloat = 272 // 320 pt host minus 24 pt padding on each side.
+        func measure(_ size: DynamicTypeSize, loading: Bool) -> CGSize {
+            let button = NativeButton(theme: theme, variant: .primary, isLoading: loading, action: {}) {
+                Text("Confirm your selection and save all changes")
+            } loadingLabel: {
+                Text("Preparing your selection and saving all changes…")
+            }
+            .environment(\.dynamicTypeSize, size)
+            let host = UIHostingController(rootView: button)
+            host.loadViewIfNeeded()
+            host.view.frame = CGRect(x: 0, y: 0, width: width, height: 1_000)
+            host.view.layoutIfNeeded()
+            return host.sizeThatFits(in: CGSize(width: width, height: 1_000))
+        }
+
+        let standard = measure(.large, loading: false)
+        let accessible = measure(.accessibility2, loading: false)
+        let loading = measure(.accessibility2, loading: true)
+        XCTAssertGreaterThanOrEqual(standard.height, 44)
+        XCTAssertGreaterThan(accessible.height, standard.height + 20,
+                             "Long text must wrap and increase the button height at iOS accessibility sizes.")
+        XCTAssertLessThanOrEqual(accessible.width, width + 0.5)
+        XCTAssertGreaterThanOrEqual(accessible.width, 44)
+        XCTAssertEqual(accessible.width, loading.width, accuracy: 0.5)
+        XCTAssertEqual(accessible.height, loading.height, accuracy: 0.5)
+        print("iOS Button layout: width=\(width), standard=\(standard), accessibility=\(accessible), loading=\(loading)")
+    }
+    #endif
 
     #if os(macOS)
     @MainActor
@@ -83,7 +118,7 @@ final class NativeButtonTests: XCTestCase {
                 NativeButton(theme: theme, variant: .secondary, isLoading: true, action: {}) {
                     Text("Continue")
                 } loadingLabel: { Text("Preparing your next step") }
-                Text("Accessibility text size · 320 pt width").font(.caption)
+                Text("320 pt narrow layout · accessibility environment requested").font(.caption)
             }
             .padding(24)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)

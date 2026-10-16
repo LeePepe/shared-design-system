@@ -6,12 +6,29 @@ public enum NativeSurfaceStyle: Equatable, Sendable {
     case glass
 }
 
+/// Internal test input; production follows the read-only system preference.
+struct NativeReduceTransparencyOverrideKey: EnvironmentKey {
+    static let defaultValue: Bool? = nil
+}
+
+extension EnvironmentValues {
+    var nativeReduceTransparencyOverride: Bool? {
+        get { self[NativeReduceTransparencyOverrideKey.self] }
+        set { self[NativeReduceTransparencyOverrideKey.self] = newValue }
+    }
+}
+
 /// One outer material layer; readable content inherits an opaque token foreground.
 struct NativeSurfaceModifier: ViewModifier {
     let theme: NativeDesignTheme
     let style: NativeSurfaceStyle
     let cornerRadius: CGFloat
-    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
+    @Environment(\.nativeReduceTransparencyOverride) private var reduceTransparencyOverride
+
+    private var reduceTransparency: Bool {
+        reduceTransparencyOverride ?? systemReduceTransparency
+    }
 
     func body(content: Content) -> some View {
         content

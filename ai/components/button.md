@@ -51,8 +51,13 @@ supports caller `.keyboardShortcut(...)`. The hit area is at least 44 × 44 pt;
 semantic font sizes, wrapping, and intrinsic height allow longer localized
 labels. Caller actions remain caller owned. macOS captures cover both provider
 brands, both themes, three variants and normal/loading/disabled states, plus a
-320 pt case requesting an accessibility Dynamic Type size. macOS does not
-establish iOS Dynamic Type scaling. Screenshots do not prove VoiceOver, physical
+320 pt narrow-layout case requesting an accessibility environment value.
+macOS semantic fonts do not demonstrate iOS Dynamic Type scaling. A separate
+iOS hosting test measures long-label height growth at an accessibility size,
+width containment and a stable loading footprint. Opaque provider RGBA checks
+require at least 4.5:1 for onAccent/accent and foreground/surface in both brands
+and themes; this does not establish contrast on arbitrary Glass backgrounds.
+Screenshots do not prove VoiceOver, physical
 device touch or minimum-OS behavior; those require separate consumer validation.
 
 Existing `NativeTokenColor` behavior, dependency and platform floors are
