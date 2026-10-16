@@ -4,9 +4,9 @@ NativeDesignKit 0.1.0 is the first release (Git tag `v0.1.0`). [USAGE.md](USAGE.
 
 ## Fixed dependency
 
-The manifest consumes the public repository `https://github.com/LeePepe/shared-design-tokens.git` at exactly release `0.1.1` (tag `v0.1.1`, `exact: "0.1.1"`). Its SPM identity is `shared-design-tokens`; its exported product and module are `DesignTokens`. The dependency's package display name `DesignSystem` is not the product name. Both the library and test target declare the `DesignTokens` product dependency.
+The current unreleased manifest consumes `https://github.com/LeePepe/shared-design-tokens.git` at exact `0.2.0` (intended immutable tag `v0.2.0`). Its remote release is pending; local candidate mirror evidence does not establish tag availability. NativeDesignKit v0.1.0 retains its historical exact `0.1.1` requirement. Its SPM identity is `shared-design-tokens`; its exported product and module are `DesignTokens`. The dependency's package display name `DesignSystem` is not the product name. Both the library and test target declare the `DesignTokens` product dependency.
 
-This replaces the earlier candidate revision pin `1db868d` and the later `0.1.0` release pin; 0.1.1 carries the same runtime API and color data as both and adds only MIT license metadata and the LICENSE file. No dependency contents are vendored by this slice. Upgrades follow the Tokens `ai/MIGRATION.md` of the target version.
+The historical 0.1.1 requirement replaced candidate `1db868d` and release `0.1.0` with licensing metadata only. The proposed 0.2.0 dependency adds styles and explicit Strata palettes while preserving legacy colors and APIs. No dependency contents are vendored. Upgrades follow the resolved Tokens revision's `ai/MIGRATION.md`.
 
 ## Declared versus tested
 
@@ -15,7 +15,7 @@ This replaces the earlier candidate revision pin `1db868d` and the later `0.1.0`
 | Package | `NativeDesignKit` library product and module; Swift tools 6.0 | Evaluated and compiled in the scoped run below; Swift 6.0 itself **NOT TESTED** |
 | iOS | iOS 15 minimum; SwiftUI bridge with UIKit test extraction | Simulator build and tests run in CI (`ios` gate, newest available iPhone simulator); device and minimum-OS verification **NOT RUN** |
 | macOS | macOS 12 minimum; SwiftUI bridge with AppKit test extraction | AppKit path exercised in the scoped run below; macOS 12 **NOT TESTED** |
-| Tokens | Exact `0.2.0` candidate; top-level `Theme` and public RGBA facade | Resolved from the public tag by CI on every PR (`scripts/verify --all`) |
+| Tokens | Exact `0.2.0` candidate; top-level `Theme` and public RGBA facade | Local candidate mirror verified; public-tag verification remains pending |
 | External consumer | Separate Swift package using public products only | [Fixture and runner](EXAMPLES.md); matching revision/version results belong in the PR/release notes, not inferred from `@testable` tests |
 
 Only iOS and macOS are declared here. The dependency's own platform declarations or historical test results do not establish NativeDesignKit coverage. No watchOS, other-platform, accessibility, visual, performance, or G1 pass is claimed.
@@ -30,7 +30,7 @@ The prior results apply only to the revision tested then. Fresh PR checks and ex
 
 ## Remaining gates
 
-Exact-tag external consumer validation runs against `v0.1.0` after the tag is created on the PR's merge commit; its results are recorded in the GitHub release notes, not claimed here. Minimum deployment OS versions and Swift 6.0 still require their own evidence. The package declares iOS 15/macOS 12, but downstream dependencies can impose a higher effective minimum; inspect the resolved Tokens manifest when targeting the minimum OS. No platform change or expanded support is introduced by this release.
+Historical exact-tag validation for NativeDesignKit `v0.1.0` uses that tag's own fixture and scripts. Current unreleased revision validation requires the separately released provider0.2.0; results must identify both revisions and do not establish a new NativeDesignKit release. Minimum deployment OS versions and Swift 6.0 still require their own evidence. The package declares iOS 15/macOS 12, but downstream dependencies can impose a higher effective minimum; inspect the resolved Tokens manifest when targeting the minimum OS. No platform change or expanded support is introduced by this release.
 
 Coverage metrics and full D1/6DQ remain unmeasured. The external runner isolates its source/build/DerivedData but does not prove crash/concurrency cleanup or all tool-cache isolation. Dependency/security scans, real UI demos and Owner style approval, consumer-specific migration/rollback and independent delivery review remain separate gates. The Owner has retained the initial bridge (#1), and the repository is MIT licensed.
 

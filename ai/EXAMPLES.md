@@ -6,7 +6,8 @@ uses only public products. Its [tests](examples/consumer/Tests/SamplePaletteTest
 cover every token/light-dark combination and unchanged unknown-token errors.
 It is not a graphical demo and does not prove visual/interaction acceptance.
 
-From this repository, validate the exact 0.1.0 release with:
+From a clean checkout of the historical NativeDesignKit `v0.1.0` tag, validate
+that release with its own fixture and runner (which retain exact Tokens0.1.1):
 
 ```sh
 python3 scripts/ci/external-consumer.py --version 0.1.0
@@ -30,7 +31,10 @@ then runs `swift build`, `swift test` and an iOS-simulator compile with an
 isolated DerivedData directory. It never uses a local path dependency. Failure
 of any command, missing docs, or a resolution mismatch fails the run. Version
 mode also requires the resolved registry's release status to be `released`.
-The fixture defaults to exact `0.1.0`; the Tokens pin remains exact `0.2.0`.
+The current runner replaces the fixture's native requirement with the requested
+immutable revision. Its direct Tokens requirement is exact `0.2.0`; use revision
+mode after the provider release is available. Historical native tag validation
+uses the fixture and runner from that same tag.
 
 Do not report a revision run as release-tag validation. Git/Xcode caches may
 be shared by the tools; source, build outputs and DerivedData for the consumer

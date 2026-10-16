@@ -17,9 +17,12 @@ evaluating unreleased future revisions, not as the release dependency.
 
 The executable fixture in [EXAMPLES.md](EXAMPLES.md) shows a complete manifest.
 Consumers that name `Theme` or `TokenError` also declare the `DesignTokens`
-product from `shared-design-tokens`, at exact `0.2.0`. The library does not
-re-export those types. Keep `Package.resolved` under consumer policy and confirm
-the resolved version/revision matches this checkout’s `Package.resolved`.
+product from `shared-design-tokens`. The released NativeDesignKit0.1.0 uses
+exact Tokens0.1.1. This unreleased checkout and its revision-mode fixture target
+exact Tokens0.2.0, pending its immutable release. Use the contract matching the
+selected native revision and keep both provider version and revision consistent
+with that checkout's `Package.resolved`. The library does not re-export Tokens
+types.
 
 ## Minimal wiring
 
