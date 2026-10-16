@@ -26,6 +26,8 @@ selection-stable bounds, disabled coordinate taps in both states, complete
 native accessibility label and on/off value, exact >=44 pt targets, and narrow
 German text growth at real iOS accessibility2 size. Bounds round only arithmetic
 noise to 1/1000 pt before comparison with the unchanged 44 pt minimum.
+A component-owned ButtonStyle preserves opaque disabled token colors instead
+of the platform plain-style opacity and adds a pressed outline.
 Four normal captures show enabled/disabled checked/unchecked states in both
 provider brands and themes; four additional 320 pt boards show long checked
 labels at accessibility2, with the entire target and fixture ending onscreen.

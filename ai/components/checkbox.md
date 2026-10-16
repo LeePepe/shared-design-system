@@ -22,16 +22,17 @@ and the label content. Reconstruct the explicit theme when mode or brand
 changes. The provider supports ocean/graphite only; token resolution errors
 propagate unchanged through `NativeDesignTheme` construction.
 
-The enabled selected square uses the exact accent/onAccent token pair and a
+On iOS, the enabled selected square uses the exact accent/onAccent token pair and a
 checkmark. Unselected uses a clear fill and neutral secondary-foreground outline.
 Disabled uses unchanged neutral surface/secondary-foreground colors with the
 checkmark retained for selected state. Text is never faded with whole-view
-opacity. No per-control glass or additional palette is introduced.
+opacity; the pressed row has a neutral outline. No per-control glass or additional palette is introduced.
 
 The underlying control is SwiftUI `Toggle`. iOS uses a native `Button` inside
 its `ToggleStyle` for the entire row, with a native Toggle accessibility
 representation exposing label, on/off value and disabled semantics. macOS uses
-SwiftUI's native checkbox style. The row has a minimum 44 pt height/width;
+SwiftUI's native checkbox style, with token accent tint and explicit mode;
+native macOS indicator/disabled rendering remains platform controlled. The row has a minimum 44 pt height/width;
 semantic body text wraps and grows rather than shrinking or truncating.
 Caller accessibility labels/identifiers can be applied to the component.
 

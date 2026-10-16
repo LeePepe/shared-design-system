@@ -66,11 +66,26 @@ private struct NativeCheckboxStyle: ToggleStyle {
             .frame(minWidth: 44, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(NativeCheckboxButtonStyle(theme: theme))
         .accessibilityRepresentation {
             Toggle(isOn: configuration.$isOn) { configuration.label }
                 .toggleStyle(.switch)
         }
+    }
+}
+
+private struct NativeCheckboxButtonStyle: ButtonStyle {
+    let theme: NativeDesignTheme
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .overlay {
+                if configuration.isPressed {
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .strokeBorder(theme.secondaryForeground, lineWidth: 2)
+                        .allowsHitTesting(false)
+                }
+            }
     }
 }
 #endif
