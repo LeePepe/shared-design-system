@@ -15,7 +15,7 @@ This replaces the earlier candidate revision pin `1db868d` and the later `0.1.0`
 | Package | `NativeDesignKit` library product and module; Swift tools 6.0 | Evaluated and compiled in the scoped run below; Swift 6.0 itself **NOT TESTED** |
 | iOS | iOS 15 minimum; SwiftUI bridge with UIKit test extraction | Simulator build and tests run in CI (`ios` gate, newest available iPhone simulator); device and minimum-OS verification **NOT RUN** |
 | macOS | macOS 12 minimum; SwiftUI bridge with AppKit test extraction | AppKit path exercised in the scoped run below; macOS 12 **NOT TESTED** |
-| Tokens | Exact release `0.1.1`; top-level `Theme` and public RGBA facade | Resolved from the public tag by CI on every PR (`scripts/verify --all`) |
+| Tokens | Exact `0.2.0` candidate; top-level `Theme` and public RGBA facade | Resolved from the public tag by CI on every PR (`scripts/verify --all`) |
 | External consumer | Separate Swift package using public products only | [Fixture and runner](EXAMPLES.md); matching revision/version results belong in the PR/release notes, not inferred from `@testable` tests |
 
 Only iOS and macOS are declared here. The dependency's own platform declarations or historical test results do not establish NativeDesignKit coverage. No watchOS, other-platform, accessibility, visual, performance, or G1 pass is claimed.
@@ -35,3 +35,8 @@ Exact-tag external consumer validation runs against `v0.1.0` after the tag is cr
 Coverage metrics and full D1/6DQ remain unmeasured. The external runner isolates its source/build/DerivedData but does not prove crash/concurrency cleanup or all tool-cache isolation. Dependency/security scans, real UI demos and Owner style approval, consumer-specific migration/rollback and independent delivery review remain separate gates. The Owner has retained the initial bridge (#1), and the repository is MIT licensed.
 
 No deprecation is introduced. There is no previously published NativeDesignKit version to deprecate. A future removal must be documented with a from/to migration and reviewed consumer upgrade; no unsupported compatibility period is promised.
+
+The exact 0.2.0 provider adoption is a candidate until its authorized immutable
+release is retrievable. The last released NativeDesignKit 0.1.0 retains its own
+0.1.1 provider contract. Isolated local Git mirrors are test-only evidence;
+remote dependency checks and release notes must name the final provider SHA.

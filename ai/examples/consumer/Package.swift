@@ -7,7 +7,7 @@ let package = Package(
     products: [.library(name: "SamplePalette", targets: ["SamplePalette"])],
     dependencies: [
         .package(url: "https://github.com/LeePepe/shared-design-system.git", exact: "0.1.0"), // runner substitutes the requested revision/version
-        .package(url: "https://github.com/LeePepe/shared-design-tokens.git", exact: "0.1.1")
+        .package(url: "https://github.com/LeePepe/shared-design-tokens.git", exact: "0.2.0")
     ],
     targets: [
         .target(name: "SamplePalette", dependencies: [

@@ -49,8 +49,13 @@ def main():
         field = "revision" if args.revision else "version"
         if pins["shared-design-system"][field] != value:
             raise RuntimeError("resolved package does not match requested immutable dependency")
-        if pins["shared-design-tokens"]["revision"] != "234b7d0b058474f1aa3f0edeab1be6084ad7eca5":
-            raise RuntimeError("Tokens 0.1.1 revision mismatch")
+        checkout = consumer / ".build/checkouts/shared-design-system"
+        expected_tokens = json.loads((checkout / "Package.resolved").read_text())
+        expected_pin = next(pin for pin in expected_tokens["pins"] if pin["identity"] == "shared-design-tokens")
+        if expected_pin["state"].get("version") != "0.2.0":
+            raise RuntimeError("Native contract must lock exact Tokens 0.2.0")
+        if pins["shared-design-tokens"] != expected_pin["state"]:
+            raise RuntimeError("Tokens exact 0.2.0 version/revision mismatch")
         checkout = consumer / ".build/checkouts/shared-design-system"
         registry = json.loads((checkout / "ai/registry.json").read_text())
         if registry["library"] != "NativeDesignKit" or registry["version"] != "0.1.0":
