@@ -1,10 +1,6 @@
-# NativeDesignKit v1 task graph
+# NativeDesignKit v1 reconciliation and replacement graph
 
-> Superseded for the current [Strata component rebuild](strata-component-rebuild.md).
-> The original planning status and content below are retained as history, not
-> the active task graph for this rebuild.
-
-Status: proposed for independent spec-gate review
+Status: proposed for independent exact-revision spec-gate review
 
 Specification: `docs/native-design-kit-v1-spec.md`
 
@@ -12,155 +8,112 @@ Plan: `docs/native-design-kit-v1-plan.md`
 
 ## Execution rules
 
-- This graph is planning input, not authorization to implement. Team Lead dispatches only after this exact revision passes the AI Reviewer spec gate and the planning PR merges to `main`.
-- One dispatchable implementation task owns one branch/worktree, one fixed candidate, one independent content review, and one normal PR. Internal steps are not separate tasks or separately publishable candidates.
-- Tasks are sequential where they update the shared `ai/` contract. No parallel branch may publish a stale registry/schema.
-- All feature implementation belongs to the existing `NativeDesignKit` layer. The pinned `DesignTokens` package is an external dependency, not a local layer or a task to modify.
-- No task changes `Package.swift`, `Package.resolved`, token data, repository settings, or a business application. A concrete need stops that task for reviewed plan revision and Owner approval.
-- Protected `ai/**`, `scripts/ci/**`, `scripts/verify`, and `docs/architecture/**` paths receive repository Owner review. Gates may be extended for real coverage but never weakened.
-- Every task records commands, exit codes, test counts, skipped/cancelled checks, tested SHA, and local/remote/PR SHA equality. Skipped, cancelled, package-only, or macOS-only work is not fixture/iOS success.
+- This graph records disposition and recommends fresh work; it does not authorize implementation, release, merge, or tracker mutation.
+- The completed Strata PRs remain their own deliveries. They are evidence inputs and are never relabelled as old T101–T501.
+- MY-1707 remains cancelled and PR #11 remains closed/unmerged. MY-1708–MY-1712 remain untouched until Team Lead applies the reviewed recommendations below.
+- Every dispatchable replacement task owns one branch/worktree, one fixed candidate, one independent content review, and one normal PR. Internal steps are not separate publishable candidates.
+- All replacement implementation remains within the existing `NativeDesignKit` layer. `DesignTokens` is an exact external dependency and has no task to modify it.
+- `Package.swift`, `Package.resolved`, production source, `ai/**`, changelog, scripts outside fixture support, workflows, policies, token sources, and repository settings are inspection-only for R101–R301.
+- Protected `docs/architecture/**` work is isolated in R201 and requires Owner review. No existing gate or red line may be removed or weakened.
+- Every evidence owner records exact commands, exit codes, test counts, destinations, skipped/cancelled checks, tested SHA, and local/remote/PR SHA equality. A skipped, cancelled, package-only, screenshot-only, or newer-runtime result is not success for the missing evidence it does not cover.
 
-## Dependency graph
+## Graph
 
 ```text
-planning docs → planning PR → exact-revision AI Reviewer PASS → merge to main
-    → T101 theme + Card + atomic consumer contract
-        → T201 Metric + StatusBadge + atomic consumer contract
-            → T301 ChartContainer + states + atomic consumer contract
-                → T401 dual-platform showcase + fixture-local runner
-                    → T402 protected fixture-gate declaration
-                        → T501 exact-SHA integration and independent evidence review
+completed Strata graph + main@6d8dbe1 evidence
+  → P100 planning reconciliation
+    → exact-revision AI Reviewer PASS
+      → Team Lead child disposition and scheduling decision
+        → [explicit later authorization]
+          → R101 accessibility + dual-platform component-fixture evidence
+            → R201 protected aggregate fixture-gate declaration
+              → R301 read-only exact-SHA integration evidence
+
+D-COMPONENTS Owner decision ──yes──→ fresh component spec/plan/tasks
+D-RELEASE Owner decision ─────yes──→ fresh release/contract plan
 ```
 
-The graph is acyclic. `T101`, `T201`, `T301`, `T401`, and `T402` are the only dispatchable implementation tasks and each maps to exactly one PR. `T501` is a read-only acceptance gate, not an implementation branch or PR.
+The graph is acyclic. P100 is the only active task in this planning revision. R101 and R201 are conditional future one-PR tasks; R301 is a future read-only gate. D-COMPONENTS and D-RELEASE are decision boundaries, not implementation tasks.
 
-## Planning publication gate
+## `P100` — Exact-main reconciliation planning
 
-Planner Lead owns the current planning publication as one existing issue/run, not as additional implementation tasks. It must:
-
-1. change only `docs/native-design-kit-v1-spec.md`, `docs/native-design-kit-v1-plan.md`, and `docs/native-design-kit-v1-tasks.md`;
-2. run `git config core.hooksPath .githooks`, `git diff --check`, and `scripts/verify`;
-3. publish one Conventional Commit in a normal non-draft PR to `main` with complete template and exact tested SHA;
-4. request AI Reviewer `PASS` on the exact commit and three artifact blob SHAs;
-5. hand PASS and byte-identical merge evidence to Team Lead before implementation dispatch.
-
-Planner does not merge, implement, tag, publish, or create implementation children before PASS.
-
-The exact shared public-contract path set `C1` is: `ai/README.md`, `ai/USAGE.md`, `ai/INTEGRATION.md`, `ai/EXAMPLES.md`, `ai/COMPATIBILITY.md`, `ai/MIGRATION.md`, `ai/registry.json`, `ai/registry.schema.json`, `ai/examples/consumer/Sources/SamplePalette/SamplePalette.swift`, `ai/examples/consumer/Tests/SamplePaletteTests/SamplePaletteTests.swift`, `CHANGELOG.md`, `scripts/ci/check-ai.py`, `scripts/ci/test-ai.py`, and `scripts/ci/external-consumer.py`. Each public task changes only the members that require content updates, but audits every `C1` member and names unchanged members in its evidence.
-
-## `T101` — Theme, Card, and S1 consumer contract
-
-- **Slice / PR:** `S1`; one `NativeDesignKit` feature/contract PR
-- **Outcome:** Add the explicit throwing theme seam and generic Card while preserving all 0.1.0 behaviour; atomically establish the staged 0.2.0 shipped contract.
-- **Depends on:** planning PASS and planning artifacts merged byte-identically to `main`
-- **Covers:** `AC-BASE-01`, `AC-BOUNDARY-01`, `AC-THEME-01`, `AC-CARD-01`, S1 portions of `AC-A11Y-01`, `AC-PLATFORM-01`, `AC-CONTRACT-01`, `AC-VERIFY-01`
-- **Source paths:** `Sources/NativeDesignKit/NativeDesignTheme.swift`, `Sources/NativeDesignKit/NativeCard.swift`; existing `NativeTokenColor.swift` only for an additive internal refactor with unchanged public behaviour
-- **Test paths:** `Tests/NativeDesignKitTests/NativeDesignThemeTests.swift`, `Tests/NativeDesignKitTests/NativeCardTests.swift`; existing `NativeTokenColorTests.swift` remains passing
-- **Contract paths:** exact path set `C1`
-- **Interface impact:** additive exact `NativeDesignTheme` and `NativeCard` signatures from the spec; `NativeTokenColor` unchanged
-- **Internal steps:**
-  1. Implement `NativeDesignTheme.init(theme:) throws` with no public custom-ID/default/environment API.
-  2. Add an internal `@testable` resolver-injection seam and pure role model; resolve exactly the ten specified semantic IDs per construction.
-  3. Implement Card with raised background, primary inherited foreground, generic content, and no implicit interaction.
-  4. Keep pure mapping/error tests in XCTest; defer rendered hierarchy/focus/action proof to `T401` UI tests.
-  5. Set registry/schema/checker to `version: 0.2.0`, `releaseStatus: unreleased`; create `Unreleased — 0.2.0`; document fixed-version upgrade/rollback without claiming a tag.
-  6. Update strict contract positive/negative tests and pushed-SHA external consumer for resolver/theme/Card.
-- **Required tests:** both themes; exact requested-role order; light → dark → light fresh construction; injected exact `TokenError` identity; no public default/custom-ID surface; all existing all-token/unknown-ID/asymmetric RGB/alpha tests; Card role model and public construction compile test; unreleased registry lifecycle positive/negative fixtures
-- **Excludes:** view-inspection dependency, rendered-once/lifecycle promise, default/environment theme, global cache, fallback, local colors, manifest/lock edit, release/tag, product interaction
-- **Commands:**
+- **Owner:** Planner Lead
+- **Kind:** current planning publication; one planning branch and normal non-draft PR
+- **Outcome:** Replace historical v1 meaning with an exact-main disposition of all 13 stable AC IDs, a truthful completed-delivery graph, a conditional replacement verification graph, and child recommendations.
+- **Depends on:** `main@6d8dbe1ef5753978bc3a5e0b472af829819537ac`
+- **Only paths:** `docs/native-design-kit-v1-spec.md`, `docs/native-design-kit-v1-plan.md`, `docs/native-design-kit-v1-tasks.md`
+- **Covers:** reconciliation of all original ACs; no component implementation AC is claimed by this docs change
+- **Required checks:**
 
   ```sh
-  python3 scripts/ci/check-ai.py
-  python3 scripts/ci/test-ai.py
+  git diff --check
+  scripts/verify
+  ```
+
+- **Required publication evidence:** planning diff contains only the three paths; one Conventional Commit; local HEAD = pushed branch = PR `headRefOid`; base is `main`; artifact blob SHAs for all three documents; AI Reviewer exact-revision Standards `PASS` and Spec `PASS`.
+- **Excludes:** source/tests/fixture/contract/gate/manifest/token edits; old branch/PR revival; child status changes; merge; implementation; release.
+- **Invalidation:** any byte change to the commit or bound artifacts requires a fresh exact-revision review.
+
+## `R101` — Current-inventory accessibility and dual-platform fixture evidence
+
+- **Owner:** one Fullstack Engineer selected by Team Lead after explicit authorization
+- **Kind:** conditional future `NativeDesignKit` test/evidence task; one branch/worktree/PR
+- **Outcome:** Extend the accepted component-owned fixture system so one aggregate command verifies all ten current Strata components on iOS and macOS and produces the missing accessibility/platform evidence on one frozen SHA.
+- **Depends on:** P100 reviewed and reconciled by Team Lead; explicit Team Lead scheduling; no newer contract invalidating the plan
+- **Covers:** remaining evidence for `AC-A11Y-01`, `AC-PLATFORM-01`, and `AC-FIXTURE-01`; fixture portion of `AC-VERIFY-01`
+- **Allowed paths:**
+  - `Tests/Fixtures/Support/**`
+  - `Tests/Fixtures/AvatarReview/**`
+  - `Tests/Fixtures/ButtonReview/**`
+  - `Tests/Fixtures/CardReview/**`
+  - `Tests/Fixtures/CheckboxReview/**`
+  - `Tests/Fixtures/ChipReview/**`
+  - `Tests/Fixtures/ProgressBarReview/**`
+  - `Tests/Fixtures/RadioGroupReview/**`
+  - `Tests/Fixtures/SliderReview/**`
+  - `Tests/Fixtures/SwitchReview/**`
+  - `Tests/Fixtures/TextFieldReview/**`
+- **Interface impact:** test/fixture tooling only; no production or public API change
+- **Required runner interface:**
+
+  ```sh
+  python3 Tests/Fixtures/Support/run-all.py --platform ios --ci
+  python3 Tests/Fixtures/Support/run-all.py --platform macos --ci
+  python3 Tests/Fixtures/Support/run-all.py --platform all --ci
+  ```
+
+- **Runner contract:** discover exactly the ten declared fixture directories; create isolated external build/evidence directories; serialize shared simulator use; resolve and print destination/runtime; record clean SHA and dirty state; fail on missing schemes, fixtures, cells, attachments, exports, tests, or commands; never commit generated projects, DerivedData, `.xcresult`, logs, or PNGs.
+- **Required iOS evidence:** 320 pt and 430 pt representative widths; light/dark; default, XXXL, and accessibility Dynamic Type; native touch/editing/actions; disabled/loading state behaviour where supported; complete-content containment.
+- **Required macOS evidence:** 480×320 and 1000×700 windows; light/dark; default and accessibility typography; keyboard focus/activation; resize; complete-content containment.
+- **Required accessibility evidence:** fixture accessibility identifiers/labels/values/states; live VoiceOver label/value/order/state record; named independent objective review of screenshots and interaction evidence. Screenshots alone never pass VoiceOver.
+- **Minimum-OS evidence:** execute on iOS 15 and macOS 12 runtimes where available and name the runtime. If either cannot be run, report `unverified`; do not substitute a newer runtime or change platform declarations.
+- **Additional commands:**
+
+  ```sh
   scripts/verify --layer NativeDesignKit
   scripts/verify --all
   python3 scripts/ci/external-consumer.py --revision "$(git rev-parse HEAD)"
   ```
 
-  The external-consumer command runs only after the candidate is pushed/reachable.
-- **Completion evidence:** protected-path Owner review, exact commands/counts/SHA, unchanged platform/token pin inspection, local HEAD = remote branch = PR head, independent publication permission
+  The external consumer runs only after the exact candidate is pushed/reachable.
+- **Completion evidence:** command/exit/count table; ten-fixture discovery list; destination/runtime and matrix manifest; artifact links and hashes; live VoiceOver record; named independent review result; unchanged source/manifest/lock/token pin inspection; local/remote/PR SHA equality; independent publication permission.
+- **Excludes:** a revived `NativeDesignKitShowcase`; public API/component work; registry/version/release changes; gate/tech-context/workflow edits; business apps/data; repository settings; synthetic VoiceOver or minimum-OS claims.
 
-## `T201` — Metric, StatusBadge, and S2 consumer contract
+## `R201` — Protected aggregate fixture-gate declaration
 
-- **Slice / PR:** `S2`; one `NativeDesignKit` feature/contract PR
-- **Outcome:** Add exact Metric and StatusBadge APIs with exhaustive token/symbol mapping and atomically extend the staged 0.2.0 contract.
-- **Depends on:** merged `T101` PR; branch from its merged `main`
-- **Covers:** `AC-METRIC-01`, `AC-BADGE-01`, S2 portions of `AC-BOUNDARY-01`, `AC-A11Y-01`, `AC-PLATFORM-01`, `AC-CONTRACT-01`, `AC-VERIFY-01`
-- **Source paths:** `Sources/NativeDesignKit/NativeMetric.swift`, `Sources/NativeDesignKit/NativeStatusBadge.swift`
-- **Test paths:** `Tests/NativeDesignKitTests/NativeMetricTests.swift`, `Tests/NativeDesignKitTests/NativeStatusBadgeTests.swift`
-- **Contract paths:** exact path set `C1`, limited to required S2 content/checker additions with every member audited
-- **Interface impact:** additive exact Metric overload, `NativeStatusTone` cases, and StatusBadge initializer from the spec
-- **Internal steps:**
-  1. Implement Metric role/reading-order model: label/supporting → secondary, value → primary; optional supporting slot only through the exact `EmptyView` overload.
-  2. Implement exactly info/warning/critical badge mappings and exact SF Symbols: `info.circle.fill`, `exclamationmark.triangle.fill`, `exclamationmark.octagon.fill`.
-  3. Add pure exhaustive role/symbol tests and compile/construction tests; rendered wrapping/VoiceOver/focus remains `T401` UI-test evidence.
-  4. Extend the same `0.2.0` / `unreleased` registry, docs, examples, changelog, checker fixtures, and external consumer without claiming release.
-- **Required tests:** exact initializer compile coverage with and without Metric supporting content; exhaustive three-tone role/symbol mapping; symbol availability on iOS 15/macOS 12 in fixture later; caller-generic content compile coverage; schema rejects success/unknown tone and missing source
-- **Excludes:** success/neutral/business status, number/unit formatting, local RGB/hex/opacity colors, implicit button, manifest change, release/tag
-- **Commands:** same five commands as `T101`
-- **Completion evidence:** protected-path Owner review, mapping table, exact commands/counts/SHA, unchanged manifest/lock and pin, SHA equality, independent publication permission
-
-## `T301` — ChartContainer, content states, and S3 consumer contract
-
-- **Slice / PR:** `S3`; one `NativeDesignKit` feature/contract PR
-- **Outcome:** Add the one-content ChartContainer and four-branch ContentStateView exact APIs, then atomically complete the staged v1 public contract.
-- **Depends on:** merged `T201` PR; branch from its merged `main`
-- **Covers:** `AC-CHART-01`, `AC-STATE-01`, S3 portions of `AC-BOUNDARY-01`, `AC-A11Y-01`, `AC-PLATFORM-01`, `AC-CONTRACT-01`, `AC-VERIFY-01`
-- **Source paths:** `Sources/NativeDesignKit/NativeChartContainer.swift`, `Sources/NativeDesignKit/NativeContentStateView.swift`
-- **Test paths:** `Tests/NativeDesignKitTests/NativeChartContainerTests.swift`, `Tests/NativeDesignKitTests/NativeContentStateViewTests.swift`
-- **Contract paths:** exact path set `C1`, limited to required S3 content/checker additions with every member audited
-- **Interface impact:** additive exact ChartContainer, NativeContentPhase, and ContentStateView signatures from the spec
-- **Internal steps:**
-  1. Implement ChartContainer raised/primary defaults around one generic composition; caller places title/legend/controls/renderer inside it.
-  2. Implement a pure phase-routing model and render only the selected branch; do not promise body evaluation counts or caller child-state retention/reset.
-  3. Unit-test role/phase policy and public construction; assign selected/prior-branch hierarchy, actions, and focus to named `T401` UI tests.
-  4. Extend the same `0.2.0` / `unreleased` contract, strict registry/schema/checkers, compileable examples, changelog, and external consumer.
-- **Required tests:** no Swift Charts/new dependency; generic content compile coverage; exhaustive phase mapping; token error not mapped to `.error`; schema/source agreement; external consumer covers complete API
-- **Excludes:** chart data/series/axis/legend meaning, persistence, timers/networking, product errors, implicit retry, stale-child-state guarantee, manifest/lock edit, release/tag
-- **Commands:** same five commands as `T101`
-- **Completion evidence:** protected-path Owner review, dependency diff audit, exact commands/counts/SHA, SHA equality, independent publication permission
-
-## `T401` — Portable dual-platform showcase and fixture-local runner
-
-- **Slice / PR:** `S4a`; one `NativeDesignKit` feature/test PR, no protected gate/architecture edit
-- **Outcome:** Add a portable, sample-only iOS/macOS SwiftUI consumer with named app/UI-test targets, shared schemes, a repository-owned fixture runner, and objective exact-SHA evidence attachments.
-- **Depends on:** merged `T301` PR; branch from its merged `main`
-- **Covers:** implementation/evidence portions of `AC-A11Y-01`, `AC-PLATFORM-01`, `AC-FIXTURE-01`; fixture portions of `AC-VERIFY-01`
-- **Paths:**
-  - `Tests/Fixtures/NativeDesignKitShowcase/NativeDesignKitShowcase.xcodeproj/**`
-  - `Tests/Fixtures/NativeDesignKitShowcase/Shared/**`
-  - `Tests/Fixtures/NativeDesignKitShowcase/iOS/**`
-  - `Tests/Fixtures/NativeDesignKitShowcase/macOS/**`
-  - `Tests/Fixtures/NativeDesignKitShowcase/NativeDesignKitShowcase-iOSUITests/**`
-  - `Tests/Fixtures/NativeDesignKitShowcase/NativeDesignKitShowcase-macOSUITests/**`
-  - `Tests/Fixtures/NativeDesignKitShowcase/verify`
-- **Project contract:** portable relative local-package reference to repository root; public imports only; no `@testable`, absolute path, home path, business dependency/data, network, analytics, or derived/generated evidence committed
-- **Schemes/actions:** shared `NativeDesignKitShowcase-iOS` scheme builds the iOS app and its Test action runs `NativeDesignKitShowcase-iOSUITests`; shared `NativeDesignKitShowcase-macOS` does the same for macOS and `NativeDesignKitShowcase-macOSUITests`
-- **Runner contract:**
-
-  ```sh
-  Tests/Fixtures/NativeDesignKitShowcase/verify macos
-  Tests/Fixtures/NativeDesignKitShowcase/verify ios
-  Tests/Fixtures/NativeDesignKitShowcase/verify all
-  ```
-
-  It validates relative/public-only integration, selects the named macOS destination or newest available iPhone simulator under the pinned repository policy, prints the resolved destination, and builds/tests the named scheme. Missing scheme/target/destination and nonzero build/test are failures. It is the only sanctioned fixture entry point; no task records ad-hoc `xcodebuild` as verification.
-- **Required UI tests:** one structural Card child; Metric reading hierarchy and large-text wrapping; each badge symbol/label and non-color distinction; caller-composed chart title/legend/control and preserved action; only selected phase branch present/accessible after update; iOS touch; macOS keyboard focus/activation; resize; explicit theme reconstruction; public `NativeTokenColor.resolve` invalid-ID error display in a fixture-only diagnostics view
-- **Manual/evidence matrix:** iOS 320/430 pt and macOS 480×320/1000×700; light/dark; default/XXXL/accessibility Dynamic Type; VoiceOver order; touch/focus/resize; four phases; invalid-ID path
-- **Evidence mechanism:** attach screenshots/logs plus a Markdown manifest to the PR comment/review system; filenames/manifest record platform, theme, size, phase, and tested SHA. Generated evidence is not committed. A named independent reviewer must PASS the objective no-missing-content/no-overlap/no-clipping/correct-theme-phase checklist; `not reviewed` remains reported but blocks the mapped ACs.
-- **Additional verification:** `scripts/verify --layer NativeDesignKit`; `scripts/verify --all`; existing pushed-SHA external consumer
-- **Excludes:** protected gate/context edits, business app install/launch/data, TestFlight/App Store, visual score, raw ad-hoc xcodebuild, package/lock change
-- **Completion evidence:** runner outputs/counts/destination, UI/manual matrix, evidence attachment links and reviewer PASS, exact SHA equality, independent publication permission
-
-## `T402` — Protected fixture-gate declaration
-
-- **Slice / PR:** `S4b`; one protected governance PR, no feature/source/fixture change
-- **Outcome:** Make the already-merged fixture runner part of the resolver-driven NativeDesignKit layer gate without editing `scripts/verify` or workflow files.
-- **Depends on:** merged `T401` PR with passing fixture runner and evidence
-- **Covers:** gate portions of `AC-FIXTURE-01`, `AC-PLATFORM-01`, `AC-VERIFY-01`
+- **Owner:** one Fullstack Engineer selected by Team Lead after R101 merges
+- **Kind:** conditional future protected-governance task; one branch/worktree/PR
+- **Outcome:** Make the already-merged, passing aggregate fixture runner part of resolver-driven NativeDesignKit verification.
+- **Depends on:** merged R101 with complete evidence and exact runner interface
+- **Covers:** gate portion of `AC-FIXTURE-01`, `AC-PLATFORM-01`, and `AC-VERIFY-01`
 - **Only changed path:** `docs/architecture/native-design-kit/tech-context.md`
-- **Exact change:** add `showcase: Tests/Fixtures/NativeDesignKitShowcase/verify all` to the existing `gate` mapping and update its prose gate inventory; do not alter red lines, ownership, dependencies, existing gates, workflow, or `scripts/verify`
-- **Required negative proof:** before/after gate inventory shows all five existing gates unchanged plus showcase; missing/broken fixture runner causes layer verification to fail; no skip/cancel-success path
+- **Exact declaration:**
+
+  ```yaml
+  fixtures: python3 Tests/Fixtures/Support/run-all.py --platform all --ci
+  ```
+
+- **Required negative proof:** all existing `docs`, `docs_test`, `build`, `test`, and `ios` gates remain byte-for-byte present; missing fixture/scheme/cell/evidence, nonzero UI test, failed export, or cancelled command makes layer/full verification fail; no skip/cancel-success path exists.
 - **Commands:**
 
   ```sh
@@ -168,22 +121,22 @@ The exact shared public-contract path set `C1` is: `ai/README.md`, `ai/USAGE.md`
   scripts/verify --all
   ```
 
-- **Excludes:** component/fixture code, scripts/CI/workflows, policy weakening, unrelated architecture changes
-- **Completion evidence:** Owner review, exact command/count/SHA, gate inventory, SHA equality, independent publication permission
+- **Completion evidence:** before/after gate inventory; command/exit/count table; exact SHA equality; Owner review of the protected path; independent publication permission.
+- **Excludes:** source/tests/fixture/scripts/workflow changes; policy weakening; repository settings; release or component work.
 
-## `T501` — Read-only exact-SHA integration gate
+## `R301` — Read-only exact-SHA Strata integration evidence
 
-- **Kind:** acceptance verification, not an implementation task/branch/PR
-- **Outcome:** On the final pushed candidate/main revision, prove every stable AC, compatibility/rollback, source/contract agreement, unchanged token pin/platform floors, fixture evidence review, SHA identity, exact-head online CI conclusions, and the effective server-side required-check state before release handoff.
-- **Depends on:** merged `T402` PR and concluded online CI for the exact revision, with every effectively required check passing
-- **Covers:** final evidence for all ACs, especially `AC-BASE-01`, `AC-BOUNDARY-01`, `AC-CONTRACT-01`, `AC-VERIFY-01`
+- **Owner:** Team Lead-assigned read-only verifier after R201 and exact-head online CI conclude
+- **Kind:** conditional future acceptance gate; no implementation branch or PR
+- **Outcome:** On one clean pushed revision, reconcile the current Strata inventory, all replacement fixture evidence, local/full/external verification, exact-head online CI, effective server enforcement, and residual risks.
+- **Depends on:** merged R201; concluded online CI for the exact revision; every effectively required check passing
+- **Covers:** final evidence for satisfied/partial original AC dispositions, especially `AC-BASE-01`, `AC-BOUNDARY-01`, `AC-A11Y-01`, `AC-PLATFORM-01`, `AC-FIXTURE-01`, and `AC-VERIFY-01`. It does not convert superseded Metric/Badge/Chart/State or old contract requirements into passes.
 - **Commands:**
 
   ```sh
   scripts/verify --layer NativeDesignKit
   scripts/verify --all
-  Tests/Fixtures/NativeDesignKitShowcase/verify macos
-  Tests/Fixtures/NativeDesignKitShowcase/verify ios
+  python3 Tests/Fixtures/Support/run-all.py --platform all --ci
   python3 scripts/ci/external-consumer.py --revision "$(git rev-parse HEAD)"
   gh pr view <PR-number> --repo LeePepe/shared-design-system --json headRefOid,baseRefName,url,statusCheckRollup
   gh api --paginate 'repos/LeePepe/shared-design-system/rulesets?includes_parents=true'
@@ -191,26 +144,79 @@ The exact shared public-contract path set `C1` is: `ai/README.md`, `ai/USAGE.md`
   gh api --include 'repos/LeePepe/shared-design-system/branches/main/protection/required_status_checks'
   ```
 
-- **Evidence:** command/exit-code/test-count and skipped/cancelled tables; exact dependency/manifest inspection; complete AC matrix; PR-attached screenshot/manual manifest and named independent PASS; local HEAD = remote branch = PR head/main evidence; compatibility and rollback audit; exact-head online check table with each check name, conclusion, URL/run ID, and observed head SHA; effective `main` ruleset/branch-protection table with rule IDs/enforcement and actually required context names; set comparison that separately reports checks that ran but are not enforced; residual risks. Workflow-file presence and documented target checks are not enforcement proof. A permissions/API gap is recorded as unverified and blocks `AC-VERIFY-01`; T501 never changes repository settings.
-- **Invalidation:** any tracked correction—source, tests, docs, registry, schema, checker, changelog, fixture, runner, gate, or other file—creates a new candidate SHA and requires all affected contract/full/external/fixture checks, independent exact-revision review, evidence manifest, and SHA reconciliation to run again. No documentation-only exception exists.
-- **Excludes:** self-approval, merge, tag, package publication, consumer migration, repository settings, waived/unreviewed acceptance
+- **Evidence:**
+  1. local command/exit/test-count/destination table and every skipped/cancelled lane;
+  2. exact dependency, platform, source-boundary, released/unreleased contract, compatibility, and rollback audit;
+  3. complete fixture matrix, exact-SHA manifest, artifact hashes, live VoiceOver record, and named independent review;
+  4. local HEAD = remote branch = PR head/main proof;
+  5. exact-head online check table with name, conclusion, URL/run ID, and observed SHA;
+  6. effective ruleset/branch-protection table with rule IDs, enforcement, and actually required contexts;
+  7. set comparison naming required checks, checks that ran, present-but-unenforced checks, skipped/cancelled checks, and any permission/API gap;
+  8. residual gaps, including any unavailable minimum-OS or keyboard evidence.
+- **Blocking rules:** workflow-file presence is not enforcement proof; package success is not fixture success; screenshots are not VoiceOver evidence; a newer OS is not minimum-OS evidence; unavailable server evidence is `unverified`. Any of these prevents the mapped partial AC from being closed.
+- **Invalidation:** any tracked correction creates a new candidate SHA and repeats all affected local, fixture, external, online, review, and SHA-reconciliation evidence. There is no docs-only exception.
+- **Excludes:** self-approval, source changes, merge, tag, publication, product adoption, settings changes, waivers, or claims for superseded outcomes.
 
-## Acceptance coverage matrix
+## Decision boundary `D-COMPONENTS`
 
-| Acceptance ID | Implementation owner(s) | Final evidence owner |
-|---|---|---|
-| `AC-BASE-01` | `T101`; regression guard in `T201`/`T301` | `T501` |
-| `AC-BOUNDARY-01` | `T101`, `T201`, `T301` | `T501` |
-| `AC-THEME-01` | `T101` | `T101`, `T401`, `T501` |
-| `AC-CARD-01` | `T101` | `T101`, `T401`, `T501` |
-| `AC-METRIC-01` | `T201` | `T201`, `T401`, `T501` |
-| `AC-BADGE-01` | `T201` | `T201`, `T401`, `T501` |
-| `AC-CHART-01` | `T301` | `T301`, `T401`, `T501` |
-| `AC-STATE-01` | `T301` | `T301`, `T401`, `T501` |
-| `AC-A11Y-01` | `T101`, `T201`, `T301`, `T401` | `T401`, `T501` |
-| `AC-PLATFORM-01` | `T101`, `T201`, `T301`, `T401`, `T402` | `T401`, `T501` |
-| `AC-FIXTURE-01` | `T401`, `T402` | `T401`, `T501` |
-| `AC-CONTRACT-01` | `T101`, `T201`, `T301` | `T501` |
-| `AC-VERIFY-01` | every implementation task | `T501` |
+Owner decides separately whether any of these outcomes enter a future Strata batch:
 
-Coverage is complete: every stable AC has implementation and evidence ownership, every dispatchable task has exact paths/commands and one PR, and the dependency graph is acyclic. Any split, renumbering, or removal of an AC/task dependency requires a reviewed update to all three planning artifacts.
+- Metric with label/value/supporting content;
+- three-tone info/warning/critical status badge;
+- caller-owned generic chart shell;
+- caller-owned four-phase content-state view.
+
+No current task implements them. A positive decision requires a fresh exact API/token/platform/contract/evidence specification against current `NativeDesignTheme(theme:brand:)`, current surface policy, exact DesignTokens 0.1.1 capabilities, and the component-owned fixture system. Old v1 snippets and closed PR code cannot be copied as authority.
+
+## Decision boundary `D-RELEASE`
+
+Owner decides a release version and contract publication model before tagging the ten components. A positive decision must name the atomic path set and evidence for registry/schema, examples, checker tests, fixed-version integration, compatibility, migration/rollback, changelog, external consumer, tag, and release. Current `ai/registry.json` remains correct for released 0.1.0 until that reviewed work changes it.
+
+## Original AC ownership after reconciliation
+
+| Acceptance ID | Current disposition owner | Conditional gap owner | Final evidence owner |
+|---|---|---|---|
+| `AC-BASE-01` | completed main evidence | regression inspection in R101/R201 | R301 |
+| `AC-BOUNDARY-01` | completed main evidence | negative-scope inspection in R101/R201 | R301 |
+| `AC-THEME-01` | completed current replacement API | none; new changes require fresh plan | R301 records current evidence |
+| `AC-CARD-01` | completed current replacement API | none; new changes require fresh plan | R301 records current evidence |
+| `AC-METRIC-01` | D-COMPONENTS; superseded/absent | fresh task only after Owner yes | new plan, not R301 |
+| `AC-BADGE-01` | D-COMPONENTS; superseded/partial analogue | fresh task only after Owner yes | new plan, not R301 |
+| `AC-CHART-01` | D-COMPONENTS; superseded/absent | fresh task only after Owner yes | new plan, not R301 |
+| `AC-STATE-01` | D-COMPONENTS; superseded/absent | fresh task only after Owner yes | new plan, not R301 |
+| `AC-A11Y-01` | partial current evidence | R101 | R301 |
+| `AC-PLATFORM-01` | partial current evidence | R101, R201 | R301 |
+| `AC-FIXTURE-01` | partial replacement topology | R101, R201 | R301 |
+| `AC-CONTRACT-01` | D-RELEASE; superseded/current split coherent | fresh release task only after Owner yes | new release plan, not R301 |
+| `AC-VERIFY-01` | partial current evidence | R101, R201 | R301 |
+
+Every ID has an explicit disposition and evidence owner. Superseded IDs deliberately do not receive implementation owners in this graph.
+
+## Existing child recommendations
+
+Planner recommends; Team Lead alone applies tracker changes.
+
+| Child | Current state | Recommendation | Replacement |
+|---|---|---|---|
+| `MY-1707` | cancelled | preserve cancelled | none; PR #11 remains closed/unmerged |
+| `MY-1708` | backlog, unassigned | cancel as superseded | none unless D-COMPONENTS later authorizes fresh Metric/StatusBadge planning |
+| `MY-1709` | backlog, unassigned | cancel as superseded | none unless D-COMPONENTS later authorizes fresh Chart/ContentState planning |
+| `MY-1710` | backlog, unassigned | cancel as superseded | fresh R101, because current component-owned fixtures replace the old single showcase |
+| `MY-1711` | backlog, unassigned | cancel as superseded | fresh R201 after R101; never revive the nonexistent showcase path |
+| `MY-1712` | backlog, unassigned | cancel as superseded | fresh read-only R301 bound to this reviewed graph and the current inventory |
+
+No old child is rebound in place: its title, path ownership, dependencies, and AC meaning describe obsolete work. Team Lead may create new children only after the exact P100 revision passes review and decides to schedule the conditional graph.
+
+## Planning publication gate
+
+P100 must:
+
+1. change only the three declared planning documents;
+2. run `git diff --check` and `scripts/verify`;
+3. publish one Conventional Commit in a normal non-draft PR to `main`;
+4. reconcile local HEAD, pushed branch, and PR `headRefOid`;
+5. record the spec, plan, and tasks blob SHAs;
+6. obtain AI Reviewer Standards `PASS` and Spec `PASS` on the exact commit and blobs;
+7. return the reviewed revision, AC mapping, dependency graph, and child recommendations to Team Lead.
+
+Planner does not merge, implement, tag, release, create replacement children, or change existing child status.
