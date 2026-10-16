@@ -5,11 +5,13 @@ public enum NativeButtonPresentation: Sendable, CaseIterable {
 }
 
 /// A native Button with a caller-owned label and loading state. Icon-only callers supply
-/// an accessibilityLabel. Loading retains the label's layout and blocks repeated actions.
+/// an accessibilityLabel. Loading retains the visible label, reserves indicator geometry,
+/// and blocks repeated actions. Roles retain their native Button semantics.
 public struct NativeButton<Label: View>: View {
     private let theme: NativeDesignTheme
     private let metrics: NativeControlMetrics
     private let presentation: NativeButtonPresentation
+    private let role: ButtonRole?
     private let isLoading: Bool
     private let loadingLabel: Text
     private let action: () -> Void
@@ -17,12 +19,13 @@ public struct NativeButton<Label: View>: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     public init(theme: NativeDesignTheme, metrics: NativeControlMetrics,
-                presentation: NativeButtonPresentation, isLoading: Bool,
+                presentation: NativeButtonPresentation, role: ButtonRole? = nil, isLoading: Bool,
                 loadingLabel: Text, action: @escaping () -> Void,
                 @ViewBuilder label: () -> Label) {
         self.theme = theme
         self.metrics = metrics
         self.presentation = presentation
+        self.role = role
         self.isLoading = isLoading
         self.loadingLabel = loadingLabel
         self.action = action
@@ -30,22 +33,37 @@ public struct NativeButton<Label: View>: View {
     }
 
     public var body: some View {
-        styledButton.tint(theme.statusInfo).disabled(isLoading)
+        styledButton.tint(actionTint).disabled(isLoading)
             .accessibilityValue(isLoading ? loadingLabel : Text(""))
     }
 
+    private var actionTint: Color {
+        role == .destructive ? theme.statusCritical : theme.statusInfo
+    }
+
+    private var labelColor: Color {
+        if presentation == .prominent {
+            return role == .destructive ? theme.statusOnCritical : theme.statusOnInfo
+        }
+        return role == .destructive ? theme.statusCritical : theme.textPrimary
+    }
+
     private var button: some View {
-        Button(action: action) {
-            label.padding(metrics.padding)
-                .nativeMinimumHitTarget(metrics.minimumHitSize)
-                .foregroundColor(presentation == .prominent ? theme.statusOnInfo : theme.textPrimary)
-                .opacity(isLoading ? 0 : 1)
-                .overlay {
+        Button(role: role, action: action) {
+            // The native style owns bezel padding. Keep the requested target inside
+            // the Button label so its entire area activates the native control.
+            HStack(spacing: metrics.spacing) {
+                label
+                ZStack {
                     if isLoading {
-                        ProgressView().tint(presentation == .prominent ? theme.statusOnInfo : theme.statusInfo)
-                            .accessibilityHidden(true)
+                        ProgressView().tint(presentation == .prominent ? labelColor : actionTint)
                     }
                 }
+                .frame(width: metrics.iconSize, height: metrics.iconSize)
+                .accessibilityHidden(true)
+            }
+            .nativeMinimumHitTarget(metrics.minimumHitSize)
+            .foregroundColor(labelColor)
         }
     }
 
