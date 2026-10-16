@@ -29,9 +29,9 @@ struct NameInput: View {
 The public generic shape is `NativeTextField<Label: View>`. Its initializer is
 `init(theme:text:prompt:label:)`, where `text` is `Binding<String>`, `prompt` is
 an optional `Text` defaulting to `nil`, and `label` is a required `@ViewBuilder`.
-Supply localized label and prompt content. The visible label is decorative to
-accessibility because the same label belongs to the native text input, avoiding
-duplicate announcements.
+Supply localized label and prompt content. SwiftUI pairs the visible label
+with the native text input for accessibility, avoiding a duplicate standalone
+label announcement and retaining generic caller-provided label content.
 
 The input remains a SwiftUI `TextField`: `.disabled`, `.onSubmit`, `.submitLabel`,
 native editing, selection and keyboard behavior remain available. The full

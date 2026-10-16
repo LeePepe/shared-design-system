@@ -27,7 +27,7 @@ final class TextFieldReviewUITests: XCTestCase {
 
     func testNativeEditingPreservesCallerBindingAndSubmits() throws {
         let app = launch(scenario: "interaction")
-        let field = app.textFields["active-input"]
+        let field = input("active-input", app: app)
         XCTAssertEqual(field.value as? String, "Initial value")
         XCTAssertEqual(field.label, "Display name")
         let surface = try geometry("active", app: app).surface
@@ -44,11 +44,15 @@ final class TextFieldReviewUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["caller-value"].label, "Initial value  Caller text  ")
     }
 
-    func testNativeSelectionCanReplaceInputWithoutPaddingGestureInterference() {
+    func testNativeSelectionCanReplaceInputWithoutPaddingGestureInterference() throws {
         let app = launch(scenario: "interaction")
-        let field = app.textFields["active-input"]
-        field.tap()
-        field.press(forDuration: 1.2)
+        let field = input("active-input", app: app)
+        let surface = try geometry("active", app: app).surface
+        // Hit the text's own line, not an AX container that may include its label.
+        let editorPoint = app.coordinate(withNormalizedOffset: .zero)
+            .withOffset(CGVector(dx: surface.minX + 35, dy: surface.midY))
+        editorPoint.tap()
+        editorPoint.press(forDuration: 1.2)
         let selectAll = app.menuItems["Select All"].firstMatch
         let selectAllButton = app.buttons["Select All"].firstMatch
         XCTAssertTrue(selectAll.waitForExistence(timeout: 3) || selectAllButton.waitForExistence(timeout: 3),
@@ -61,7 +65,7 @@ final class TextFieldReviewUITests: XCTestCase {
 
     func testDisabledCoordinateTapsCannotFocusOrEdit() throws {
         let app = launch(scenario: "interaction")
-        let field = app.textFields["disabled-input"]
+        let field = input("disabled-input", app: app)
         XCTAssertFalse(field.isEnabled)
         let surface = try geometry("disabled", app: app).surface
         assertMinimumTarget(surface)
@@ -76,7 +80,7 @@ final class TextFieldReviewUITests: XCTestCase {
         XCTAssertEqual(field.value as? String, "Unavailable")
         XCTAssertEqual(app.staticTexts["disabled-value"].label, "Unavailable")
         // A disabled coordinate tap must not steal focus from a live editor.
-        app.textFields["active-input"].tap()
+        input("active-input", app: app).tap()
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
         tap(CGPoint(x: surface.midX, y: surface.midY), app: app)
         app.typeText("X")
@@ -88,11 +92,11 @@ final class TextFieldReviewUITests: XCTestCase {
     func testLongNarrowAccessibleLabelAndEditorGrowWithoutClipping() throws {
         var app = launch(scenario: "long-label")
         let standard = try geometry("long", app: app)
-        let standardEditorHeight = app.textFields["long-input"].frame.height
+        let standardEditorHeight = input("long-input", app: app).frame.height
         app.terminate()
         app = launch(scenario: "long-label", size: "accessibility2")
         let measured = try geometry("long", app: app)
-        let field = app.textFields["long-input"]
+        let field = input("long-input", app: app)
         XCTAssertEqual(field.label, "Vollständiger Anzeigename für die gemeinsame Zusammenarbeit")
         XCTAssertEqual(field.value as? String, "Notiz")
         XCTAssertTrue(field.isHittable)
@@ -121,14 +125,17 @@ final class TextFieldReviewUITests: XCTestCase {
         let app = launch(scenario: "matrix", brand: brand, mode: mode)
         let viewport = app.scrollViews["review-scroll"].frame
         for state in ["populated", "empty", "disabled", "validation"] {
-            let field = app.textFields["matrix-\(state)"]
+            let field = input("matrix-\(state)", app: app)
             XCTAssertTrue(field.exists)
             XCTAssertEqual(field.isEnabled, state != "disabled")
             assertMinimumTarget(field.frame)
             XCTAssertTrue(viewport.contains(field.frame), "Entire \(state) input must be visible.")
         }
-        XCTAssertEqual(app.textFields["matrix-populated"].label, "Display name")
-        XCTAssertEqual(app.textFields["matrix-empty"].value as? String, "Enter a short note")
+        XCTAssertEqual(input("matrix-populated", app: app).label, "Display name")
+        XCTAssertEqual(input("matrix-empty", app: app).label, "A longer label that can wrap at narrow widths")
+        XCTAssertEqual(input("matrix-disabled", app: app).label, "Unavailable field")
+        XCTAssertEqual(input("matrix-validation", app: app).label, "Email address")
+        XCTAssertEqual(input("matrix-empty", app: app).value as? String, "Enter a short note")
         XCTAssertTrue(viewport.contains(app.staticTexts["caller-validation"].frame))
         XCTAssertTrue(viewport.contains(app.staticTexts["matrix-end"].frame))
         capture("textfield-\(brand)-\(mode)", app: app)
@@ -139,6 +146,14 @@ final class TextFieldReviewUITests: XCTestCase {
         let surface: CGRect
         let component: CGRect
         let board: CGRect
+    }
+
+    private func input(_ identifier: String, app: XCUIApplication) -> XCUIElement {
+        // A containing accessibility group can own the fixture identifier;
+        // assertions still target its real TextField descendant.
+        let field = app.textFields[identifier]
+        if field.exists { return field }
+        return app.otherElements[identifier].textFields.firstMatch
     }
 
     private func geometry(_ prefix: String, app: XCUIApplication) throws -> Geometry {

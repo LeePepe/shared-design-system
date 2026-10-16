@@ -9,6 +9,7 @@ public struct NativeTextField<Label: View>: View {
     private let label: Label
     @Environment(\.isEnabled) private var isEnabled
     @FocusState private var isFocused: Bool
+    @Namespace private var accessibilityPair
 
     public init(
         theme: NativeDesignTheme,
@@ -28,7 +29,7 @@ public struct NativeTextField<Label: View>: View {
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(theme.foreground)
                 .fixedSize(horizontal: false, vertical: true)
-                .accessibilityHidden(true)
+                .accessibilityLabeledPair(role: .label, id: "input", in: accessibilityPair)
 
             TextField(
                 text: $text,
@@ -62,6 +63,8 @@ public struct NativeTextField<Label: View>: View {
             .simultaneousGesture(TapGesture().onEnded {
                 if isEnabled { isFocused = true }
             })
+            .accessibilityLabeledPair(role: .content, id: "input", in: accessibilityPair)
         }
+        .accessibilityElement(children: .contain)
     }
 }
