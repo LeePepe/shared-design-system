@@ -96,7 +96,8 @@ navigation, keyboard traversal, performance or released-provider acceptance.
 `ShowcaseCatalog.swift` and `FixtureStyle.swift` sources, loads the same explicit
 provider JSON, and captures `NSHostingView` through AppKit into PNG attachments.
 This test-only renderer supplies the key control-active state and explicit Aqua/
-Dark Aqua appearance; it does not establish macOS keyboard/pointer interactions
+Dark Aqua appearance, and explicitly requests bordered/opaque fallbacks because
+Glass uses compositor layers that bitmap cache capture cannot represent; it does not establish macOS keyboard/pointer interactions
 or active-window Glass composition. It is useful on hosts where XCUIAutomation
 cannot obtain a display. Run it using the same project with scheme
 `ShowcaseRender-macOS`; export attachments from its xcresult. AppKit is confined

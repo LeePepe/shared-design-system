@@ -13,14 +13,14 @@ final class NativeRenderTests: XCTestCase {
             for appearance in ["light", "dark"] {
                 for page in ["Buttons", "Entry", "Values", "Motion"] {
                     let config = FixtureConfiguration(dark: appearance == "dark", accessible: false,
-                        rtl: false, narrow: width == 480, page: page)
+                        rtl: false, narrow: width == 480, page: page, allowsGlass: false)
                     try render(config: config, width: width, name: "mac-\(Int(width))-\(appearance)-\(page)", output: output)
                 }
             }
         }
         for appearance in ["light", "dark"] {
             let config = FixtureConfiguration(dark: appearance == "dark", accessible: true,
-                                               rtl: false, narrow: true, page: "Motion")
+                                               rtl: false, narrow: true, page: "Motion", allowsGlass: false)
             try render(config: config, width: 480, name: "mac-accessibility-\(appearance)-Motion", output: output)
         }
     }

@@ -8,10 +8,11 @@ struct FixtureConfiguration {
     let rtl: Bool
     let narrow: Bool
     let page: String
+    let allowsGlass: Bool
 
-    init(dark: Bool, accessible: Bool, rtl: Bool, narrow: Bool, page: String) {
+    init(dark: Bool, accessible: Bool, rtl: Bool, narrow: Bool, page: String, allowsGlass: Bool) {
         self.dark = dark; self.accessible = accessible; self.rtl = rtl
-        self.narrow = narrow; self.page = page
+        self.narrow = narrow; self.page = page; self.allowsGlass = allowsGlass
     }
 
     init() {
@@ -20,7 +21,7 @@ struct FixtureConfiguration {
                   accessible: environment["FIXTURE_ACCESSIBILITY"] == "1",
                   rtl: environment["FIXTURE_RTL"] == "1",
                   narrow: environment["FIXTURE_WIDTH"] == "narrow",
-                  page: environment["FIXTURE_PAGE"] ?? "Buttons")
+                  page: environment["FIXTURE_PAGE"] ?? "Buttons", allowsGlass: true)
     }
 }
 
@@ -190,7 +191,7 @@ struct Catalog: View {
                         Image(systemName: "heart")
                     }.accessibilityLabel("Favorite").accessibilityIdentifier("icon-action")
                 }
-                NativeButton(theme: r.theme, metrics: r.metrics, presentation: config.accessible ? .bordered : .glass,
+                NativeButton(theme: r.theme, metrics: r.metrics, presentation: (config.accessible || !config.allowsGlass) ? .bordered : .glass,
                              isLoading: false, loadingLabel: Text("Loading"), action: { actionCount += 1 }) {
                     Label("Glass action", systemImage: "sparkles")
                 }
@@ -324,9 +325,10 @@ struct Catalog: View {
     private var motion: some View {
         NativeAdaptiveGrid(minimumWidth: r.grid, spacing: r.gap) {
             panel("FOUNDATIONS / MOTION", "An intentional final state") {
-                Text(config.accessible ? "Reduced motion · Opaque surfaces" : "Native motion · Glass surface")
+                Text(config.accessible ? "Reduced motion · Opaque surfaces" :
+                     (config.allowsGlass ? "Native motion · Glass surface" : "Bitmap rendering · Opaque surfaces"))
                     .foregroundColor(r.secondary).accessibilityIdentifier("accessibility-mode")
-                NativeButton(theme: r.theme, metrics: r.metrics, presentation: config.accessible ? .bordered : .glass, isLoading: false,
+                NativeButton(theme: r.theme, metrics: r.metrics, presentation: (config.accessible || !config.allowsGlass) ? .bordered : .glass, isLoading: false,
                              loadingLabel: Text("Loading"), action: {
                     Task { await sequence.replay(schedule: NativeStaggerSchedule(count: 3, interval: r.stagger),
                                                  reduceMotion: config.accessible || reduceMotion) }
@@ -334,7 +336,7 @@ struct Catalog: View {
                     .accessibilityIdentifier("replay-sequence")
                 ForEach(0..<sequence.visibleCount, id: \.self) { index in
                     Text("Step \(index + 1) complete").frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(r.gap).nativeSurface(theme: r.theme, metrics: r.surface, style: config.accessible ? .opaque : .glass)
+                        .padding(r.gap).nativeSurface(theme: r.theme, metrics: r.surface, style: (config.accessible || !config.allowsGlass) ? .opaque : .glass)
                         .transition(NativeTransition.opacity.transition(reduceMotion: reduceMotion))
                 }
                 Text("Visible steps: \(sequence.visibleCount)").accessibilityIdentifier("sequence-state")
