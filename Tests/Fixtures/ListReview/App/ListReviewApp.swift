@@ -120,13 +120,40 @@ private struct ListReviewBoard: View {
     }
 
     var body: some View {
+        Group {
+            if isLong {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        list
+                        specimenNote
+                    }
+                    .padding(16)
+                }
+                .background(theme.canvas)
+            } else {
+                specimen
+            }
+        }
+        .frame(width: isLong ? 320 : nil)
+        .frame(maxWidth: .infinity, alignment: .top)
+        .accessibilityIdentifier("review-scroll")
+        .onPreferenceChange(ListTextFrames.self) { textFrames = $0 }
+        .dynamicTypeSize(.large)
+        .environment(\.nativeReduceTransparencyOverride, configuration.reduceTransparency ? true : nil)
+    }
+
+    private var specimenNote: some View {
+        Text("悬停轻提亮；选中加深表面，并显示「✓ 已选」。")
+            .font(.caption).foregroundStyle(theme.secondaryForeground)
+            .accessibilityIdentifier("specimen-note")
+            .background(measure("note"))
+            .accessibilityValue(frameJSON)
+    }
+
+    private var specimen: some View {
         StrataSpecimen(theme: theme, surface: configuration.surface, title: "03  List 列表") {
             list
-            Text("悬停轻提亮；选中加深表面，并显示「✓ 已选」。")
-                .font(.caption).foregroundStyle(theme.secondaryForeground)
-                .accessibilityIdentifier("specimen-note")
-                .background(measure("note"))
-                .accessibilityValue(frameJSON)
+            specimenNote
             if ["interaction", "multiple", "read-only"].contains(configuration.scenario) {
                 behaviorControls
             }
@@ -135,12 +162,6 @@ private struct ListReviewBoard: View {
                     .font(.caption).accessibilityIdentifier("system-transparency")
             }
         }
-        .frame(width: isLong ? 320 : nil)
-        .frame(maxWidth: .infinity, alignment: .top)
-        .accessibilityIdentifier("review-scroll")
-        .onPreferenceChange(ListTextFrames.self) { textFrames = $0 }
-        .dynamicTypeSize(isLong ? .large : configuration.size)
-        .environment(\.nativeReduceTransparencyOverride, configuration.reduceTransparency ? true : nil)
     }
 
     private var list: some View {

@@ -118,7 +118,7 @@ final class ListReviewUITests: XCTestCase {
         add(originalEvidence)
         defer {
             settings.activate()
-            setSwitch(toggle, to: original)
+            setSwitch(toggle, in: settings, to: original)
             XCTAssertEqual(toggle.value as? String, original, "Restore the original simulator preference.")
             let restored = XCTAttachment(string: "Restored Reduce Transparency: \(toggle.value as? String ?? "missing")")
             restored.name = "system-transparency-restored"
@@ -126,7 +126,7 @@ final class ListReviewUITests: XCTestCase {
             add(restored)
             settings.terminate()
         }
-        setSwitch(toggle, to: "1")
+        setSwitch(toggle, in: settings, to: "1")
         XCTAssertEqual(toggle.value as? String, "1")
         let app = launch(scenario: "system-fallback")
         XCTAssertEqual(app.staticTexts["system-transparency"].label, "System transparency: reduced")
@@ -137,9 +137,14 @@ final class ListReviewUITests: XCTestCase {
         app.terminate()
     }
 
-    private func setSwitch(_ toggle: XCUIElement, to value: String) {
+    private func setSwitch(_ toggle: XCUIElement, in settings: XCUIApplication, to value: String) {
         if toggle.value as? String != value {
-            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.94, dy: 0.5)).tap()
+            let controls = settings.cells["REDUCE_TRANSPARENCY"].switches.allElementsBoundByIndex
+            guard let control = controls.first(where: { $0.label.isEmpty && $0.frame.width < 100 }) else {
+                XCTFail("The actual trailing native switch control must exist: \(settings.debugDescription)")
+                return
+            }
+            control.tap()
         }
         let changed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: toggle)
         XCTAssertEqual(XCTWaiter.wait(for: [changed], timeout: 5), .completed,
@@ -199,8 +204,11 @@ final class ListReviewUITests: XCTestCase {
             frames["_headingAX"] = [heading.minX, heading.minY, heading.width, heading.height]
             frames["_screen"] = [0, 0, app.frame.width, app.frame.height]
             for (name, label) in [("_section", "03  List 列表"), ("_masthead", "Strata · 岩层")] {
-                let frame = app.staticTexts[label].frame
-                frames[name] = [frame.minX, frame.minY, frame.width, frame.height]
+                let element = app.staticTexts[label]
+                if element.exists {
+                    let frame = element.frame
+                    frames[name] = [frame.minX, frame.minY, frame.width, frame.height]
+                }
             }
             for (index, title) in titles.enumerated() {
                 let button = row(title, in: app)

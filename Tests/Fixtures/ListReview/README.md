@@ -55,9 +55,9 @@ exclusive and multiple selection, individual/global disabled coordinate taps,
 external changes, identity after caller reorder, read-only nonbutton semantics,
 minimum 44pt targets and narrow Dynamic Type height growth. Frame containment
 is asserted before specimen captures. All labels/state are fixture-owned.
-The 320pt long-text case scales the actual List to accessibility2, with its
-complete original strings and a compact caller-owned heading/footer. Showcase
-chrome stays at the standard size so the test measures List text reflow.
+The 320pt long-text case presents the actual List alone in a ScrollView at
+accessibility2, with its complete original strings and a compact caller-owned
+heading/footer. It omits showcase chrome so the test measures List text reflow.
 
 Each screenshot also attaches `-geometry.json` telemetry with the SwiftUI
 text frames, the observed heading accessibility frame and viewport size.
