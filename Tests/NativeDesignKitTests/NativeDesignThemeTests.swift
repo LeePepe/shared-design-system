@@ -1,0 +1,62 @@
+import DesignTokens
+import SwiftUI
+import XCTest
+@testable import NativeDesignKit
+
+final class NativeDesignThemeTests: XCTestCase {
+    func testAllProviderBrandsAndThemesResolveFreshSnapshots() throws {
+        for brand in DesignTokens.brandIDs {
+            for mode in [Theme.light, .dark, .light] {
+                let theme = try NativeDesignTheme(theme: mode, brand: brand)
+                XCTAssertEqual(theme.mode, mode)
+                XCTAssertEqual(theme.canvas, try NativeTokenColor.resolve("product.surface.canvas", theme: mode))
+                XCTAssertEqual(theme.surface, try NativeTokenColor.resolve("product.surface.raised", theme: mode))
+                XCTAssertEqual(theme.foreground, try NativeTokenColor.resolve("product.text.primary", theme: mode))
+                XCTAssertEqual(theme.secondaryForeground, try NativeTokenColor.resolve("product.text.secondary", theme: mode))
+                XCTAssertEqual(theme.accent, NativeTokenColor.color(from: try DesignTokens.brandColor(brand, role: .accent, theme: mode)))
+                XCTAssertEqual(theme.onAccent, NativeTokenColor.color(from: try DesignTokens.brandColor(brand, role: .onAccent, theme: mode)))
+                XCTAssertEqual(theme.critical, try NativeTokenColor.resolve("status.critical", theme: mode))
+                XCTAssertEqual(theme.onCritical, try NativeTokenColor.resolve("status.on-critical", theme: mode))
+            }
+        }
+    }
+
+    func testUnknownBrandPropagatesExactProviderError() {
+        for mode in Theme.allCases {
+            XCTAssertThrowsError(try NativeDesignTheme(theme: mode, brand: "__unknown_brand__")) {
+                XCTAssertEqual($0 as? TokenError, .unknownBrand("__unknown_brand__"))
+            }
+        }
+    }
+
+    func testEveryConstructionPerformsFreshRoleResolution() throws {
+        var requests: [String] = []
+        for mode in [Theme.light, .dark, .light] {
+            _ = try NativeDesignTheme(theme: mode, brand: "ocean", color: { id, theme in
+                XCTAssertEqual(theme, mode)
+                requests.append(id)
+                return try NativeTokenColor.resolve(id, theme: theme)
+            }, brandColor: { brand, role, theme in
+                XCTAssertEqual(theme, mode)
+                requests.append("\(brand).\(role.rawValue)")
+                return NativeTokenColor.color(from: try DesignTokens.brandColor(brand, role: role, theme: theme))
+            })
+        }
+        let roles = ["product.surface.canvas", "product.surface.raised", "product.text.primary", "product.text.secondary", "ocean.accent", "ocean.onAccent", "status.critical", "status.on-critical"]
+        XCTAssertEqual(requests, roles + roles + roles)
+    }
+
+    func testSemanticAndBrandResolverErrorsPropagateUnchanged() {
+        let expected = TokenError.unknownToken("injected-exact-error")
+        XCTAssertThrowsError(try NativeDesignTheme(theme: .dark, brand: "ocean", color: { _, _ in
+            throw expected
+        }, brandColor: { _, _, _ in XCTFail("Resolution must stop at first failure"); throw expected })) {
+            XCTAssertEqual($0 as? TokenError, expected)
+        }
+        XCTAssertThrowsError(try NativeDesignTheme(theme: .light, brand: "ocean", color: NativeTokenColor.resolve, brandColor: { _, _, _ in
+            throw expected
+        })) {
+            XCTAssertEqual($0 as? TokenError, expected)
+        }
+    }
+}

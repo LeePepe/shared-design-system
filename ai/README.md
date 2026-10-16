@@ -8,6 +8,7 @@ package; do not substitute documentation from `main`.
 | --- | --- |
 | Integrate or remove the library | [INTEGRATION.md](INTEGRATION.md) |
 | Use the public API or investigate a lookup error | [USAGE.md](USAGE.md) |
+| Evaluate unreleased Strata components | [COMPONENTS.md](COMPONENTS.md) |
 | Run an ordinary external consumer | [EXAMPLES.md](EXAMPLES.md) |
 | Check platforms and dependency compatibility | [COMPATIBILITY.md](COMPATIBILITY.md) |
 | Replace local color bridges or roll back | [MIGRATION.md](MIGRATION.md) |
