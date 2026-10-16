@@ -19,6 +19,7 @@ public struct NativeSlider<Label: View, MinimumValueLabel: View, MaximumValueLab
     private let minimumValueLabel: MinimumValueLabel
     private let maximumValueLabel: MaximumValueLabel
     @Environment(\.isEnabled) private var isEnabled
+    @State private var nativeControlHeight: CGFloat = 0
 
     /// The caller keeps the bound value finite and within `range`.
     /// Configuration errors do not change the binding or invoke editing effects.
@@ -50,15 +51,7 @@ public struct NativeSlider<Label: View, MinimumValueLabel: View, MaximumValueLab
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityHidden(true)
 
-            Slider(value: $value, in: range, step: step, onEditingChanged: onEditingChanged) {
-                label
-            }
-            .labelsHidden()
-            .controlSize(.large)
-            .frame(minWidth: 44, minHeight: 44)
-            .contentShape(Rectangle())
-            .tint(theme.accent)
-            .accentColor(theme.accent)
+            nativeControl
 
             HStack(alignment: .top, spacing: 12) {
                 minimumValueLabel
@@ -73,6 +66,42 @@ public struct NativeSlider<Label: View, MinimumValueLabel: View, MaximumValueLab
         }
         .foregroundStyle(isEnabled ? theme.foreground : theme.secondaryForeground)
         .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
+    }
+
+    // A frame/contentShape alone leaves the native track's touch region at its
+    // intrinsic height. Scale that real control uniformly, fitting its width
+    // before the transform, so native input and accessibility geometry agree.
+    private var nativeControl: some View {
+        let scale = nativeControlHeight > 0 ? max(1, 44 / nativeControlHeight) : 1
+        let height = max(44, nativeControlHeight)
+        return GeometryReader { available in
+            Slider(value: $value, in: range, step: step, onEditingChanged: onEditingChanged) {
+                label
+            }
+            .labelsHidden()
+            .controlSize(.large)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(width: available.size.width / scale)
+            .background {
+                GeometryReader { intrinsic in
+                    Color.clear.preference(key: NativeSliderIntrinsicHeight.self, value: intrinsic.size.height)
+                }
+            }
+            .scaleEffect(scale)
+            .frame(width: available.size.width, height: height)
+            .tint(theme.accent)
+            .accentColor(theme.accent)
+        }
+        .frame(minWidth: 44)
+        .frame(height: height)
+        .onPreferenceChange(NativeSliderIntrinsicHeight.self) { nativeControlHeight = $0 }
+    }
+}
+
+private enum NativeSliderIntrinsicHeight: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
 
