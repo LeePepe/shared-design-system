@@ -28,7 +28,12 @@ final class NativeTextEditorRenderingTests: XCTestCase {
             Text("Surrounding native host: \(surrounding == .dark ? "dark" : "light")")
             NativeTextEditor(text: .constant("Readable native editor\nExplicit \(theme) theme"),
                 theme: explicitTheme, metrics: metrics, accessibilityLabel: Text("Notes"),
-                forceLegacyBackground: true) { Text(verbatim: "Explicit \(theme) editor") }
+                forceLegacyBackground: true) {
+                    // The generic caller label supplies its themed surface. The editor's
+                    // own opaque native background must follow that theme independently.
+                    Text(verbatim: "Explicit \(theme) editor")
+                        .padding(4).background(explicitTheme.surfaceRaised)
+                }
                 .frame(height: 180)
         }.padding(20).frame(width: 420, height: 300, alignment: .topLeading)
             .background(.background).environment(\.colorScheme, surrounding))
