@@ -1,0 +1,47 @@
+name: RadioGroupReview
+options:
+  bundleIdPrefix: org.nativedesignkit.fixtures
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+packages:
+  NativeDesignKit:
+    path: ../../..
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    GENERATE_INFOPLIST_FILE: YES
+    CODE_SIGNING_ALLOWED: NO
+targets:
+  RadioGroupReview:
+    type: application
+    platform: iOS
+    sources: [App]
+    dependencies:
+      - package: NativeDesignKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.RadioGroupReview
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+  RadioGroupReviewUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: RadioGroupReview
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.RadioGroupReviewUITests
+        TEST_TARGET_NAME: RadioGroupReview
+schemes:
+  RadioGroupReview:
+    build:
+      targets:
+        RadioGroupReview: all
+        RadioGroupReviewUITests: [test]
+    test:
+      gatherCoverageData: false
+      targets: [RadioGroupReviewUITests]
