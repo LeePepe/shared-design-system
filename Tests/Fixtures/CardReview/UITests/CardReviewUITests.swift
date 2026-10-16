@@ -139,40 +139,53 @@ final class CardReviewUITests: XCTestCase {
         let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
         // Scope language to this Settings process; never change the simulator locale.
         settings.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
-        settings.launch()
-        let root = settings.navigationBars.matching(NSPredicate(format: "identifier IN %@", ["Settings", "设置"])).firstMatch
-        for _ in 0..<4 where !root.exists {
-            let back = settings.navigationBars.buttons.firstMatch
-            if !back.exists { break }
-            back.tap()
-        }
-        let accessibility = settings.staticTexts.matching(
-            NSPredicate(format: "label IN %@", ["Accessibility", "辅助功能"])).firstMatch
-        // Settings may remember a scroll position below the desired row.
-        for _ in 0..<8 where !accessibility.isHittable { settings.swipeDown() }
-        for _ in 0..<8 where !accessibility.isHittable { settings.swipeUp() }
-        guard accessibility.waitForExistence(timeout: 5) else {
-            XCTFail("Accessibility settings not found: \(settings.debugDescription)")
+        func openPreference() -> XCUIElement? {
+            // Reopen instead of resuming a Settings hierarchy from before the
+            // fixture app became active. Reacquire the live native control.
             settings.terminate()
-            return
+            settings.launch()
+            let root = settings.navigationBars.matching(NSPredicate(format: "identifier IN %@", ["Settings", "设置"])).firstMatch
+            for _ in 0..<4 where !root.exists {
+                let back = settings.navigationBars.buttons.firstMatch
+                if !back.exists { break }
+                back.tap()
+            }
+            let accessibility = settings.staticTexts.matching(
+                NSPredicate(format: "label IN %@", ["Accessibility", "辅助功能"])).firstMatch
+            // Settings may remember a scroll position below the desired row.
+            for _ in 0..<8 where !accessibility.isHittable { settings.swipeDown() }
+            for _ in 0..<8 where !accessibility.isHittable { settings.swipeUp() }
+            guard accessibility.waitForExistence(timeout: 5) else {
+                XCTFail("Accessibility settings not found: \(settings.debugDescription)")
+                return nil
+            }
+            accessibility.tap()
+            settings.staticTexts.matching(NSPredicate(format: "label IN %@", ["Display & Text Size", "显示与文字大小"])).firstMatch.tap()
+            let preference = settings.switches.matching(
+                NSPredicate(format: "identifier == %@ OR label IN %@", "REDUCE_TRANSPARENCY",
+                            ["Reduce Transparency", "降低透明度"])).firstMatch
+            for _ in 0..<4 where !preference.isHittable { settings.swipeUp() }
+            guard preference.waitForExistence(timeout: 5) else {
+                XCTFail("Reduce Transparency control not found: \(settings.debugDescription)")
+                return nil
+            }
+            return preference
         }
-        accessibility.tap()
-        settings.staticTexts.matching(NSPredicate(format: "label IN %@", ["Display & Text Size", "显示与文字大小"])).firstMatch.tap()
-        let preference = settings.switches.matching(
-            NSPredicate(format: "identifier == %@ OR label IN %@", "REDUCE_TRANSPARENCY",
-                        ["Reduce Transparency", "降低透明度"])).firstMatch
-        for _ in 0..<4 where !preference.isHittable { settings.swipeUp() }
-        XCTAssertTrue(preference.waitForExistence(timeout: 5))
-        guard let original = preference.value as? String, ["0", "1"].contains(original) else {
+        guard let preference = openPreference(),
+              let original = preference.value as? String, ["0", "1"].contains(original) else {
             XCTFail("Reduce Transparency did not expose a readable system preference")
             settings.terminate()
             return
         }
-        func setPreference(_ value: String) {
+        func setPreference(_ value: String, on preference: XCUIElement) {
             if (preference.value as? String) != value {
-                // The accessibility switch includes the row; hit its trailing
-                // native toggle rather than the middle of the label area.
-                preference.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+                let controls = ([preference] + preference.descendants(matching: .switch).allElementsBoundByIndex)
+                    .filter { $0.isHittable && $0.frame.width > 0 }
+                if let control = controls.min(by: { $0.frame.width < $1.frame.width }) {
+                    print("CARD_SYSTEM_CONTROL frame=\(control.frame) value=\(preference.value ?? "unreadable") target=\(value)")
+                    if control.frame.width <= 80 { control.tap() }
+                    else { control.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap() }
+                } else { XCTFail("Reduce Transparency has no hittable native toggle") }
             }
             let changed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value),
                                                     object: preference)
@@ -180,14 +193,20 @@ final class CardReviewUITests: XCTestCase {
             XCTAssertEqual(preference.value as? String, value)
         }
         defer {
-            settings.activate()
-            setPreference(original)
-            print("CARD_SYSTEM_TRANSPARENCY original=\(original) restored=\(preference.value ?? "unreadable")")
+            if let restoredPreference = openPreference() {
+                setPreference(original, on: restoredPreference)
+                print("CARD_SYSTEM_TRANSPARENCY original=\(original) restored=\(restoredPreference.value ?? "unreadable")")
+            }
             settings.terminate()
+            let restoredApp = launchSpecimen(preference: "system")
+            let expected = "System Reduce Transparency: \(original == "1" ? "on" : "off")"
+            XCTAssertEqual(restoredApp.staticTexts["system-transparency"].label, expected)
+            print("CARD_SYSTEM_RESTORED_ENV \(restoredApp.staticTexts["system-transparency"].label)")
+            restoredApp.terminate()
         }
         // Exercise a real change even when the original setting was already on.
-        if original == "1" { setPreference("0") }
-        setPreference("1")
+        if original == "1" { setPreference("0", on: preference) }
+        setPreference("1", on: preference)
         XCTAssertEqual(preference.value as? String, "1")
         let app = launchSpecimen(preference: "system")
         XCTAssertEqual(app.staticTexts["system-transparency"].label, "System Reduce Transparency: on")
