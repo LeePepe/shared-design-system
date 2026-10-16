@@ -70,7 +70,10 @@ text or long translations, as the fixture does for its section picker.
 
 NativeTextField uses the system rounded-border style and native editing/focus
 feedback. The native style owns its bezel insets; explicit `minimumHitSize` supplies
-the requested target without adding `metrics.padding` again. Its native appearance
+the requested target without adding `metrics.padding` again. Tapping anywhere inside
+that target focuses the native editor even when its visible bezel is smaller. The
+component's private focus activation preserves caller `.focused` behavior and native
+selection/editing; disabled fields reject activation. Its native appearance
 is tied locally to the required theme, including in an oppositely themed parent.
 It does not draw a custom focus ring or validation border. Callers provide persistent
 visible labels, accessibility labels/hints, helper/error text, `.focused`, and
