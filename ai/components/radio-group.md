@@ -24,6 +24,11 @@ NativeRadioGroup(theme: theme, selection: $density) {
 .disabled(!canEdit)
 ```
 
+On iOS, put this control directly in a native `List` or `Form` (a transparent
+`Group` is also suitable). The native inline style needs that row host. A
+standalone stack can fall back to a wheel picker and is outside this component's
+inline presentation contract. Do not wrap it in a single stacked list row.
+
 `Density`, its values, `density`, and `canEdit` belong to the caller. Supply
 localized labels and unique `.tag` values matching the binding's exact type.
 For optional selection, use optional tags. Dynamic options use caller-owned
@@ -33,7 +38,7 @@ keeps the selected value valid as its available options change.
 
 The control delegates binding updates, disabled input, focus, keyboard handling
 and accessibility semantics to native `Picker`. macOS uses `.radioGroup`.
-iOS uses `.inline`: a native vertical single-selection list with a checkmark,
+iOS uses `.inline` in that host: a native vertical single-selection list with a checkmark,
 not visual radio circles. Native selected semantics and the checkmark identify
 the selected row without relying on color. Caller `.disabled(...)` applies to
 the whole group, and caller option modifiers remain part of the options builder.

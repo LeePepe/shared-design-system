@@ -1,6 +1,6 @@
 import XCTest
 
-final class RadioGroupReviewUITests: XCTestCase {
+@MainActor final class RadioGroupReviewUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     func testNativeBindingSelectionDisabledAndExternalWrites() {
@@ -68,8 +68,8 @@ final class RadioGroupReviewUITests: XCTestCase {
         XCTAssertEqual(second.label, "Keep all detailed review notes visible")
         assertLayout([first, second], app: app)
         XCTAssertLessThanOrEqual(first.frame.maxY, second.frame.minY + 0.001)
-        XCTAssertLessThanOrEqual(first.frame.width, 288.001)
-        XCTAssertLessThanOrEqual(second.frame.width, 288.001)
+        XCTAssertLessThanOrEqual(first.frame.width, 320.001)
+        XCTAssertLessThanOrEqual(second.frame.width, 320.001)
         assertSelection(second, others: [first])
         capture("radio-group-accessibility-narrow", app: app)
         first.tap()
@@ -116,7 +116,7 @@ final class RadioGroupReviewUITests: XCTestCase {
     }
 
     private func assertLayout(_ elements: [XCUIElement], app: XCUIApplication) {
-        let viewport = app.scrollViews["review-scroll"].frame
+        let viewport = app.descendants(matching: .any).matching(identifier: "review-list").firstMatch.frame
         for element in elements {
             // Round only subpixel arithmetic noise; the target remains >=44 pt.
             XCTAssertGreaterThanOrEqual((element.frame.width * 1000).rounded() / 1000, 44)
@@ -139,7 +139,7 @@ final class RadioGroupReviewUITests: XCTestCase {
         app.launchEnvironment = ["NDK_SCENARIO": scenario, "NDK_BRAND": brand,
                                  "NDK_THEME": mode, "NDK_TEXT_SIZE": size]
         app.launch()
-        let ready = expectsError ? app.staticTexts["fixture-error"] : app.scrollViews["review-scroll"]
+        let ready = expectsError ? app.staticTexts["fixture-error"] : app.descendants(matching: .any).matching(identifier: "review-list").firstMatch
         XCTAssertTrue(ready.waitForExistence(timeout: 10), app.debugDescription)
         return app
     }

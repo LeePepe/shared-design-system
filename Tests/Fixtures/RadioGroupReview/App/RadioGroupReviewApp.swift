@@ -75,11 +75,14 @@ private struct ReviewBoard: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Native RadioGroup").font(.title.bold())
-                Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · iOS inline selection")
-                    .font(.subheadline).foregroundStyle(theme.secondaryForeground)
+        List {
+            Group {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Native RadioGroup").font(.title.bold())
+                    Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · iOS inline selection")
+                        .font(.subheadline).foregroundStyle(theme.secondaryForeground)
+                }
+                .padding(.vertical, 8)
                 if configuration.scenario == "long-label" {
                     longLabel
                 } else {
@@ -102,10 +105,12 @@ private struct ReviewBoard: View {
                     .font(.caption).foregroundStyle(theme.secondaryForeground)
                     .accessibilityIdentifier("review-end")
             }
-            .padding(16)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .listRowBackground(theme.canvas)
         }
-        .accessibilityIdentifier("review-scroll")
+        .listStyle(.plain)
+        .frame(width: configuration.scenario == "long-label" ? 320 : nil)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityIdentifier("review-list")
         .foregroundStyle(theme.foreground)
         .background(theme.canvas.ignoresSafeArea())
         .dynamicTypeSize(.large)
@@ -124,19 +129,25 @@ private struct ReviewBoard: View {
 
     private var controls: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Button("Toggle disabled") { disabled.toggle() }
+            Button { disabled.toggle() } label: {
+                Text("Toggle disabled").frame(minHeight: 44)
+            }
                 .accessibilityIdentifier("toggle-disabled")
-            Button("Select compact externally") { selection = Choice(id: "compact-id") }
+            Button { selection = Choice(id: "compact-id") } label: {
+                Text("Select compact externally").frame(minHeight: 44)
+            }
                 .accessibilityIdentifier("select-external")
-            Button("Reverse caller order") { reversed.toggle() }
+            Button { reversed.toggle() } label: {
+                Text("Reverse caller order").frame(minHeight: 44)
+            }
                 .accessibilityIdentifier("reverse-order")
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(.borderless)
         .tint(theme.accent)
     }
 
     private var longLabel: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        Group {
             Text("320 pt narrow layout").font(.headline)
             NativeRadioGroup(theme: theme, selection: trackedSelection) {
                 Text("Review preference")
@@ -149,9 +160,5 @@ private struct ReviewBoard: View {
             .environment(\.dynamicTypeSize, configuration.size)
             Text("Selected: \(selection.id)").accessibilityIdentifier("selection-state")
         }
-        .padding(16)
-        .frame(width: 320, alignment: .leading)
-        .background(theme.surface, in: RoundedRectangle(cornerRadius: 24))
-        .accessibilityIdentifier("narrow-board")
     }
 }

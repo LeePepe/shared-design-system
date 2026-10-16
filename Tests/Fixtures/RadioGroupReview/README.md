@@ -21,6 +21,13 @@ The app requires explicit `NDK_BRAND`, `NDK_THEME`, `NDK_SCENARIO`, and
 visible, with no fallback colors. State, option identity, ordering and display
 labels are synthetic caller-owned fixture content.
 
+The component is a direct child of a native `List`, including the 320 pt host.
+On iOS, `.inline` requires a native `List`/`Form` row host; the framework falls
+back to a wheel in a standalone stack. That diagnostic failure was corrected
+by using the documented native host, without replacing any behavioral check.
+The narrow native rows must fit the 320 pt viewport; their full native touch
+frame may include the list's row margins.
+
 | Test | Meaning |
 | --- | --- |
 | `testNativeBindingSelectionDisabledAndExternalWrites` | Actual native option taps write the exact Hashable tag once; only one option is selected; disabled coordinate taps cannot mutate state; external caller changes update selection. |
