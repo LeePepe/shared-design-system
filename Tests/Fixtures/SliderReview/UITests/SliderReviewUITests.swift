@@ -57,6 +57,18 @@ final class SliderReviewUITests: XCTestCase {
         XCTAssertTrue(app.scrollViews["review-scroll"].frame.contains(slider.frame))
     }
 
+    func testNativeTouchTargetIncludesTopAndBottomOf44PointFrame() {
+        let app = launch(scenario: "interaction")
+        let slider = app.sliders["adjustable"]
+        assertMinimumTarget(slider)
+        for edge in [0.02, 0.98] {
+            app.buttons["set-midpoint"].tap()
+            slider.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: edge))
+                .press(forDuration: 0.1, thenDragTo: slider.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: edge)))
+            XCTAssertGreaterThan(boundValue(app), 0, "The entire 44 pt frame must accept native adjustment, including its edges")
+        }
+    }
+
     func testLongLabelAndEndpointsGrowAtAccessibilitySizeWithinNarrowBoard() {
         var app = launch(scenario: "long-label")
         let standard = metrics(app)
@@ -71,12 +83,12 @@ final class SliderReviewUITests: XCTestCase {
         XCTAssertEqual(slider.label, "Lautstärke für alle verbundenen Geräte gemeinsam einstellen")
         assertMinimumTarget(slider)
         let viewport = app.scrollViews["review-scroll"].frame
-        for element in [slider, app.staticTexts["long-minimum"], app.staticTexts["long-maximum"], app.staticTexts["long-end"]] {
+        for element in [slider, app.staticTexts["Leise Wiedergabe"], app.staticTexts["Laute Wiedergabe"], app.staticTexts["long-end"]] {
             XCTAssertTrue(element.exists)
             XCTAssertTrue(viewport.contains(element.frame), "Long content must remain fully onscreen: \(element)")
         }
-        let minimum = app.staticTexts["long-minimum"].frame
-        let maximum = app.staticTexts["long-maximum"].frame
+        let minimum = app.staticTexts["Leise Wiedergabe"].frame
+        let maximum = app.staticTexts["Laute Wiedergabe"].frame
         XCTAssertLessThanOrEqual(slider.frame.maxY, minimum.minY + 0.001)
         XCTAssertLessThanOrEqual(minimum.maxX, maximum.minX)
         XCTAssertEqual(minimum.minY, maximum.minY, accuracy: 0.001)
