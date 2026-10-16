@@ -152,7 +152,8 @@ final class CardReviewUITests: XCTestCase {
         accessibility.tap()
         settings.staticTexts.matching(NSPredicate(format: "label IN %@", ["Display & Text Size", "显示与文字大小"])).firstMatch.tap()
         let preference = settings.switches.matching(
-            NSPredicate(format: "label IN %@", ["Reduce Transparency", "降低透明度"])).firstMatch
+            NSPredicate(format: "identifier == %@ OR label IN %@", "REDUCE_TRANSPARENCY",
+                        ["Reduce Transparency", "降低透明度"])).firstMatch
         for _ in 0..<4 where !preference.isHittable { settings.swipeUp() }
         XCTAssertTrue(preference.waitForExistence(timeout: 5))
         guard let original = preference.value as? String, ["0", "1"].contains(original) else {
@@ -160,19 +161,26 @@ final class CardReviewUITests: XCTestCase {
             settings.terminate()
             return
         }
+        func setPreference(_ value: String) {
+            if (preference.value as? String) != value {
+                // The accessibility switch includes the row; hit its trailing
+                // native toggle rather than the middle of the label area.
+                preference.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+            }
+            let changed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value),
+                                                    object: preference)
+            XCTAssertEqual(XCTWaiter.wait(for: [changed], timeout: 5), .completed)
+            XCTAssertEqual(preference.value as? String, value)
+        }
         defer {
             settings.activate()
-            if (preference.value as? String) != original { preference.tap() }
-            XCTAssertEqual(preference.value as? String, original)
+            setPreference(original)
             print("CARD_SYSTEM_TRANSPARENCY original=\(original) restored=\(preference.value ?? "unreadable")")
             settings.terminate()
         }
         // Exercise a real change even when the original setting was already on.
-        if original == "1" {
-            preference.tap()
-            XCTAssertEqual(preference.value as? String, "0")
-        }
-        preference.tap()
+        if original == "1" { setPreference("0") }
+        setPreference("1")
         XCTAssertEqual(preference.value as? String, "1")
         let app = launchSpecimen(preference: "system")
         XCTAssertEqual(app.staticTexts["system-transparency"].label, "System Reduce Transparency: on")
@@ -252,6 +260,9 @@ final class CardReviewUITests: XCTestCase {
             XCTAssertFalse(app.buttons["card-disabled-action"].isEnabled)
             let name = "card-\(brand)-\(mode)-\(specimen)"
             print("CARD_UI_PIXEL \(name) x=\(frame.maxX - 8) y=\(frame.midY) width=\(app.frame.width) height=\(app.frame.height)")
+            let region = app.otherElements["review-region"].frame
+            XCTAssertTrue(region.contains(frame))
+            print("CARD_UI_OUTER_PIXEL \(name) x=\(region.maxX - 8) y=\(region.midY) width=\(app.frame.width) height=\(app.frame.height)")
             capture(name, app: app)
             app.terminate()
         }

@@ -154,37 +154,56 @@ def main():
             args.ui_log.read_text()
         )
     }
+    outer_samples = {
+        name: tuple(map(float, coordinates))
+        for name, *coordinates in re.findall(
+            r"CARD_UI_OUTER_PIXEL (card-[a-z-]+) x=([0-9.]+) y=([0-9.]+) width=([0-9.]+) height=([0-9.]+)",
+            args.ui_log.read_text()
+        )
+    }
     results = []
     failures = []
     for brand in ("ocean", "graphite"):
         for mode in ("light", "dark"):
             material_colors = {}
+            outer_colors = {}
             captures = {}
             for specimen in ("solid", "glass", "fallback"):
                 name = f"card-{brand}-{mode}-{specimen}"
                 captures[specimen] = PNG(args.screenshots / (name + ".png"))
                 material_colors[specimen] = captures[specimen].pixel(*samples[name])
+                outer_colors[specimen] = captures[specimen].pixel(*outer_samples[name])
             fallback_delta = max(abs(a - b) for a, b in zip(material_colors["solid"], material_colors["fallback"]))
-            glass_delta = max(abs(a - b) for a, b in zip(material_colors["solid"], material_colors["glass"]))
+            outer_fallback_delta = max(abs(a - b) for a, b in zip(outer_colors["solid"], outer_colors["fallback"]))
+            # Strata assigns the one material to the outer region. The inner
+            # Card stays dense; it must retain its same-role opaque fallback
+            # and actual primary/secondary contrast rather than another blur.
+            glass_delta = max(abs(a - b) for a, b in zip(outer_colors["solid"], outer_colors["glass"]))
+            inner_glass_delta = max(abs(a - b) for a, b in zip(material_colors["solid"], material_colors["glass"]))
             if fallback_delta > 2:
                 failures.append(f"{brand}/{mode}: fallback differs from the solid token surface: {material_colors}")
+            if outer_fallback_delta > 2:
+                failures.append(f"{brand}/{mode}: outer fallback differs from the solid token surface: {outer_colors}")
             if glass_delta <= 5:
-                failures.append(f"{brand}/{mode}: material does not differ over the token backdrop: {material_colors}")
+                failures.append(f"{brand}/{mode}: outer material does not differ over the token backdrop: {outer_colors}")
             text = text_contrast(captures["glass"], samples[f"card-{brand}-{mode}-glass"], mode, colors)
             for role in text:
                 if role["minimum_contrast"] < role["target"]:
                     failures.append(f"{brand}/{mode}/{role['role']}: {role['minimum_contrast']:.6f}:1 < 4.5:1")
             results.append(dict(brand=brand, mode=mode, rgb_bytes=material_colors,
-                                fallback_delta=fallback_delta, glass_delta=glass_delta, text_contrast=text,
+                                outer_rgb_bytes=outer_colors, fallback_delta=fallback_delta,
+                                outer_fallback_delta=outer_fallback_delta, glass_delta=glass_delta,
+                                inner_glass_delta=inner_glass_delta, text_contrast=text,
                                 png_sha256={key: value.sha256 for key, value in captures.items()}))
     report = dict(material_cases=4, contrast_cases=8, failures=failures, provider=provider,
                   sampling_source="NativeCardBehaviorFixture four-slot/large; offsets from CARD_UI_PIXEL runtime Card anchor",
+                  material_sampling_source="CARD_UI_OUTER_PIXEL runtime region anchor; one outer blur, dense inner Card",
                   sample_offsets_native_points=TEXT_SAMPLES, results=results)
     args.output.write_text(json.dumps(report, indent=2) + "\n")
     if failures:
         print("CARD_PIXEL_FAILED: " + "; ".join(failures))
         return 1
-    print("CARD_PIXEL_OK: 4 runtime material/fallback comparisons; 8 primary/auxiliary Glass contrast checks >= 4.5:1")
+    print("CARD_PIXEL_OK: 4 outer Glass differences >5; 8 inner/outer fallback comparisons; 8 inner primary/auxiliary contrast checks >= 4.5:1")
     return 0
 
 

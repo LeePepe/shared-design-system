@@ -32,7 +32,13 @@ The original behavior fixture retains caller action and disabled-descendant
 taps, no implicit card activation, long-text growth, ordered slots, horizontal
 bounds, accessibility3 scrolling, content-only/empty-slot equivalence and all
 16 legacy brand/mode/material/preference layouts. Its twelve visual captures
-retain the material/fallback and primary/secondary contrast checks. The checker
+retain the material/fallback and primary/secondary contrast checks. The original
+320pt Card and token-accent backdrop now sit in an explicit 32pt outer region:
+the strict Glass difference greater than five RGB levels is measured on that
+outer material, while both inner and outer opaque fallback equality and inner
+text contrast remain required. This follows the accepted one-outer-blur/dense-
+inner-plane rule; testing a second translucent inner plane would contradict it.
+The checker
 now requires the auxiliary glyph to match the secondary role, guarding against
 the former blanket primary-foreground workaround.
 

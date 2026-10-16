@@ -46,3 +46,11 @@ No behavior assertion, required gate or policy is removed. The legacy visual
 checks remain alongside the expanded Strata composition coverage; their
 sampling logic is updated only where source/layout or the exact provider pin
 requires it.
+
+The legacy behavior fixture keeps its 320pt Card and token-accent backdrop and
+places them in a caller-owned 32pt region. Its strict Glass difference greater
+than five RGB levels now probes the outer material; the dense inner Card retains
+the same-role solid/fallback equality, layout and primary/secondary contrast
+checks. The outer fallback must also match solid. This correction tests the
+accepted one-outer-blur composition without asking the inner reading plane to
+act as a second transparent shell.
