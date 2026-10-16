@@ -51,6 +51,9 @@ visible app viewport. The minimum-dimension assertion permits only 0.000001 pt
 of floating-point measurement noise: XCTest reported one 44 pt AX frame as
 43.99999999999994 pt during development. This is far below a display pixel and
 does not permit a visibly smaller target.
+The last displayed fixture text must also fit the ScrollView's visible frame
+before capture. The narrow board retains the complete long label and visible
+caller state/write count; its canvas fills the viewport.
 `testInvalidConfigurationShowsErrorWithoutFallbackSwitch`
 also checks that invalid explicit fixture inputs produce a visible error and
 no fallback switch. Theme resolution errors reach the fixture's visible error

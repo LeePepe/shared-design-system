@@ -76,12 +76,14 @@ final class SwitchReviewUITests: XCTestCase {
         let standard = standardApp.switches["switch.primary"]
         let standardFrame = standard.frame
         assertFullyVisible(standard, in: standardApp)
+        assertFixtureEndVisible(in: standardApp, narrow: true)
         XCTAssertLessThanOrEqual(standardFrame.width, 281)
         standardApp.terminate()
 
         let app = launch(narrow: true, accessibility: true)
         let control = app.switches["switch.primary"]
         assertFullyVisible(control, in: app)
+        assertFixtureEndVisible(in: app, narrow: true)
         XCTAssertGreaterThan(control.frame.height, standardFrame.height + 30)
         XCTAssertLessThanOrEqual(control.frame.width, 281)
         XCTAssertEqual(control.label, "Allow notifications about important updates and changes to your preferences")
@@ -102,12 +104,14 @@ final class SwitchReviewUITests: XCTestCase {
                 for identifier in ["switch.primary", "switch.selected", "switch.disabledOff", "switch.disabledOn"] {
                     assertFullyVisible(app.switches[identifier], in: app)
                 }
+                assertFixtureEndVisible(in: app, narrow: false)
                 attach("switch-\(brand)-\(mode)", app: app)
                 app.terminate()
 
                 let narrowApp = launch(brand: brand, mode: mode, narrow: true, accessibility: true)
                 let control = narrowApp.switches["switch.primary"]
                 assertFullyVisible(control, in: narrowApp)
+                assertFixtureEndVisible(in: narrowApp, narrow: true)
                 XCTAssertTrue(control.isHittable)
                 XCTAssertGreaterThan(control.frame.height, 100)
                 attach("switch-\(brand)-\(mode)-narrow-accessibility3", app: narrowApp)
@@ -140,6 +144,15 @@ final class SwitchReviewUITests: XCTestCase {
         XCTAssertEqual(control.value as? String, on ? "1" : "0", file: file, line: line)
         XCTAssertEqual(app.staticTexts["switch.state"].label, on ? "On" : "Off", file: file, line: line)
         XCTAssertEqual(app.staticTexts["switch.writes"].label, "Binding writes: \(writes)", file: file, line: line)
+    }
+
+    @MainActor
+    private func assertFixtureEndVisible(in app: XCUIApplication, narrow: Bool,
+                                         file: StaticString = #filePath, line: UInt = #line) {
+        let end = app.staticTexts[narrow ? "switch.writes" : "switch.footer"]
+        XCTAssertTrue(end.exists, file: file, line: line)
+        XCTAssertTrue(app.scrollViews.firstMatch.frame.contains(end.frame),
+                      "Fixture content must fit its visible scroll viewport before capture", file: file, line: line)
     }
 
     @MainActor

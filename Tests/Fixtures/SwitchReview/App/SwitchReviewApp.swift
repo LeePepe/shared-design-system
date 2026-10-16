@@ -104,13 +104,17 @@ private struct SwitchReviewContent: View {
                         .accessibilityIdentifier("switch.disabledOn")
                 }
 
-                Text(configuration.narrow ? "280 pt width · semantic body font" : "Native SwiftUI · caller-owned state")
-                    .font(.caption)
-                    .foregroundStyle(theme.secondaryForeground)
+                if !configuration.narrow {
+                    Text("Native SwiftUI · caller-owned state")
+                        .font(.caption)
+                        .foregroundStyle(theme.secondaryForeground)
+                        .accessibilityIdentifier("switch.footer")
+                }
             }
             .frame(width: configuration.narrow ? 280 : nil, alignment: .leading)
             .padding(24)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .foregroundStyle(theme.foreground)
         .background(theme.canvas)
         .environment(\.dynamicTypeSize, configuration.accessibilitySize ? .accessibility3 : .large)
