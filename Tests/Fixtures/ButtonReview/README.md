@@ -85,3 +85,22 @@ backgrounds to explicit solid. Measurements cover this specimen, not arbitrary
 consumer backdrops. Held-press evidence can additionally use a serial `simctl io
 screenshot` during the UI test's four-second native press; record that capture
 separately from XCTest attachments with the same exact source/provider SHAs.
+
+The macOS `ButtonReviewMac` scheme runs real pointer hover for all three variants
+and caller Command-S activation, including disabled/loading suppression. The
+new pointer check moved from iPhone after XCTest reported “Pointer events are
+not supported for this device”; it is retained in `ButtonPointerReviewUITests`
+on a platform that supports the input, with no skip or weaker assertion.
+
+```sh
+xcodegen generate --no-env --spec Tests/Fixtures/ButtonReview/project.yml
+xcodebuild test -project Tests/Fixtures/ButtonReview/ButtonReview.xcodeproj \
+  -scheme ButtonReviewMac -destination 'platform=macOS' \
+  -derivedDataPath <external-new-directory> -resultBundlePath <external-new>.xcresult \
+  CODE_SIGNING_ALLOWED=NO
+```
+
+Export macOS attachments using `xcrun xcresulttool export attachments`. A keyboard
+navigation screenshot is an observation; claim a visible focus ring only after
+inspecting that actual capture. Host automation permissions remain a separate
+runtime requirement and cannot be inferred from a package build.

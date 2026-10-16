@@ -36,6 +36,27 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.ButtonReviewUITests
         TEST_TARGET_NAME: ButtonReview
+  ButtonReviewMac:
+    type: application
+    platform: macOS
+    deploymentTarget: "12.0"
+    sources: [App, ../Shared/StrataSpecimen.swift]
+    dependencies:
+      - package: NativeDesignKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.ButtonReviewMac
+  ButtonPointerReviewUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    deploymentTarget: "12.0"
+    sources: [PointerTests]
+    dependencies:
+      - target: ButtonReviewMac
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.ButtonPointerReviewUITests
+        TEST_TARGET_NAME: ButtonReviewMac
 schemes:
   ButtonReview:
     build:
@@ -45,3 +66,11 @@ schemes:
     test:
       gatherCoverageData: false
       targets: [ButtonReviewUITests]
+  ButtonReviewMac:
+    build:
+      targets:
+        ButtonReviewMac: all
+        ButtonPointerReviewUITests: [test]
+    test:
+      gatherCoverageData: false
+      targets: [ButtonPointerReviewUITests]

@@ -2,17 +2,6 @@ import XCTest
 
 @MainActor
 final class ButtonReviewUITests: XCTestCase {
-    func testPointerHoverAndCallerKeyboardShortcut() {
-        let app = launch(scenario: "interaction")
-        let target = app.buttons["action-target"]
-        target.hover()
-        capture("button-pointer-hover", app: app)
-        app.typeKey("s", modifierFlags: .command)
-        XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")
-        app.typeKey(.tab, modifierFlags: [])
-        capture("button-keyboard-navigation", app: app)
-    }
-
     func testHeldPressDispatchesOnceOnRelease() {
         let app = launch(scenario: "interaction")
         let target = app.buttons["action-target"]
