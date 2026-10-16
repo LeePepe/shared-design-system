@@ -153,7 +153,10 @@ final class NativeFlowRenderingTests: XCTestCase {
         let deadline = Date().addingTimeInterval(5)
         var stablePasses = 0
         while Date() < deadline {
-            if predicate() && model.readings.count == model.items.count && model.containerSize.height > 0 {
+            let completeGeometry = model.containerSize.height > 0 &&
+                abs(model.containerSize.width - model.width) < 1 &&
+                model.orderedFrames.allSatisfy { $0.maxY <= model.containerSize.height + 1 }
+            if predicate() && model.readings.count == model.items.count && completeGeometry {
                 stablePasses += 1
                 if stablePasses == 3 { return }
             } else { stablePasses = 0 }
@@ -208,10 +211,17 @@ private struct FlowReading: Equatable {
     let count: Int
 }
 
+private struct FlowSnapshot: Equatable {
+    var children: [Int: FlowReading] = [:]
+    var containerSize: CGSize?
+}
+
 private struct FlowReadings: PreferenceKey {
-    static var defaultValue: [Int: FlowReading] { [:] }
-    static func reduce(value: inout [Int: FlowReading], nextValue: () -> [Int: FlowReading]) {
-        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
+    static var defaultValue: FlowSnapshot { FlowSnapshot() }
+    static func reduce(value: inout FlowSnapshot, nextValue: () -> FlowSnapshot) {
+        let next = nextValue()
+        value.children.merge(next.children, uniquingKeysWith: { _, new in new })
+        if let size = next.containerSize { value.containerSize = size }
     }
 }
 
@@ -247,9 +257,9 @@ private struct FlowRenderChild: View {
         Button(action: increment) { Text(item.label).font(.body).padding(4) }
             .buttonStyle(.plain)
             .background(GeometryReader { geometry in
-                Color.clear.preference(key: FlowReadings.self, value: [
+                Color.clear.preference(key: FlowReadings.self, value: FlowSnapshot(children: [
                     item.id: FlowReading(frame: geometry.frame(in: .named("flow")), identity: identity, count: count)
-                ])
+                ]))
             })
             .onAppear {
                 model.appearances[item.id, default: 0] += 1
@@ -271,9 +281,8 @@ private struct FlowRenderRoot: View {
         flow
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(GeometryReader { geometry in
-                Color.clear
-                    .onAppear { model.containerSize = geometry.size }
-                    .onChange(of: geometry.size) { model.containerSize = $0 }
+                Color.clear.preference(key: FlowReadings.self,
+                                       value: FlowSnapshot(containerSize: geometry.size))
             })
             .coordinateSpace(name: "flow")
             .frame(width: model.width, alignment: .leading)
@@ -281,8 +290,12 @@ private struct FlowRenderRoot: View {
             .environment(\.dynamicTypeSize, model.dynamicTypeSize)
             .environment(\.locale, Locale(identifier: model.direction == .rightToLeft ? "ar" : "de_DE"))
             .environment(\.colorScheme, .light)
-            .onPreferenceChange(FlowReadings.self) { model.readings = $0 }
+            .onPreferenceChange(FlowReadings.self) {
+                model.readings = $0.children
+                model.containerSize = $0.containerSize ?? .zero
+            }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .background(.background)
     }
 
     @ViewBuilder private var flow: some View {
@@ -344,8 +357,9 @@ private final class FlowRenderHost {
         return bitmap.representation(using: .png, properties: [:])
         #else
         let view = controller.view!
-        return UIGraphicsImageRenderer(bounds: view.bounds).pngData { _ in
-            view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+        view.layoutIfNeeded()
+        return UIGraphicsImageRenderer(bounds: view.bounds).pngData { context in
+            view.layer.render(in: context.cgContext)
         }
         #endif
     }

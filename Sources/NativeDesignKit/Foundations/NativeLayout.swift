@@ -117,16 +117,18 @@ public struct NativeFlowLayout: Layout {
     }
 }
 
-private struct FlowMeasurements<ID: Hashable>: PreferenceKey {
-    static var defaultValue: [ID: CGSize] { [:] }
-    static func reduce(value: inout [ID: CGSize], nextValue: () -> [ID: CGSize]) {
-        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
-    }
+private struct FlowMeasurement<ID: Hashable>: Equatable {
+    var sizes: [ID: CGSize] = [:]
+    var width: CGFloat?
 }
 
-private struct FlowHeight: PreferenceKey {
-    static var defaultValue: CGFloat { 0 }
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+private struct FlowMeasurements<ID: Hashable>: PreferenceKey {
+    static var defaultValue: FlowMeasurement<ID> { FlowMeasurement() }
+    static func reduce(value: inout FlowMeasurement<ID>, nextValue: () -> FlowMeasurement<ID>) {
+        let next = nextValue()
+        value.sizes.merge(next.sizes, uniquingKeysWith: { _, new in new })
+        if let width = next.width { value.width = width }
+    }
 }
 
 /// Full-range adapter, internal so current-runtime rendering tests can force the old-OS path.
@@ -137,34 +139,35 @@ struct NativeLegacyFlow<Item: Identifiable, Content: View>: View {
     let horizontalSpacing: CGFloat
     let verticalSpacing: CGFloat
     @ViewBuilder let content: (Item) -> Content
-    @State private var measurements: [Item.ID: CGSize] = [:]
-    @State private var height: CGFloat = 0
+    @State private var measurement = FlowMeasurement<Item.ID>()
 
     var body: some View {
-        GeometryReader { geometry in
-            let packing = NativeFlowPacking(
-                sizes: items.map { measurements[$0.id] ?? .zero }, width: geometry.size.width,
-                horizontalSpacing: horizontalSpacing, verticalSpacing: verticalSpacing)
-            let frames = Dictionary(uniqueKeysWithValues: zip(items.map(\.id), packing.frames))
-            ZStack(alignment: .topLeading) {
-                ForEach(items) { item in
-                    let frame = frames[item.id, default: .zero]
-                    content(item)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .background(GeometryReader { child in
-                            Color.clear.preference(key: FlowMeasurements<Item.ID>.self,
-                                                   value: [item.id: child.size])
-                        })
-                        // SwiftUI mirrors both leading alignment and offsets in RTL.
-                        .offset(x: frame.minX, y: frame.minY)
-                }
+        let packing = NativeFlowPacking(
+            sizes: items.map { measurement.sizes[$0.id] ?? .zero }, width: measurement.width ?? 0,
+            horizontalSpacing: horizontalSpacing, verticalSpacing: verticalSpacing)
+        let frames = Dictionary(uniqueKeysWithValues: zip(items.map(\.id), packing.frames))
+        ZStack(alignment: .topLeading) {
+            ForEach(items) { item in
+                let frame = frames[item.id, default: .zero]
+                content(item)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .background(GeometryReader { child in
+                        Color.clear.preference(key: FlowMeasurements<Item.ID>.self,
+                                               value: FlowMeasurement(sizes: [item.id: child.size]))
+                    })
+                    // SwiftUI mirrors both leading alignment and offsets in RTL.
+                    .offset(x: frame.minX, y: frame.minY)
             }
-            .frame(width: geometry.size.width, height: packing.size.height, alignment: .topLeading)
-            .preference(key: FlowHeight.self, value: packing.size.height)
         }
-        .frame(height: height)
-        .onPreferenceChange(FlowMeasurements<Item.ID>.self) { measurements = $0 }
-        .onPreferenceChange(FlowHeight.self) { height = $0 }
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        // Derive height directly from the same packing as placement. A second measured
+        // height/state pass can retain an old height when content changes rapidly.
+        .frame(height: packing.size.height, alignment: .topLeading)
+        .background(GeometryReader { geometry in
+            Color.clear.preference(key: FlowMeasurements<Item.ID>.self,
+                                   value: FlowMeasurement(width: geometry.size.width))
+        })
+        .onPreferenceChange(FlowMeasurements<Item.ID>.self) { measurement = $0 }
     }
 }
 
