@@ -121,9 +121,14 @@ final class ComponentReviewUITests: XCTestCase {
         XCTAssertFalse(app.textFields["review-field-disabled"].isEnabled)
         let context = app.textFields["review-field-context"]
         reveal(context, in: app)
-        activate(context)
         #if os(iOS)
+        // Hit within the caller's 44-point target, near its lower edge, including
+        // the padding outside a smaller native bezel. Center taps cannot prove this.
+        context.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .withOffset(CGVector(dx: 0, dy: 21)).tap()
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        #else
+        activate(context)
         #endif
         capture(app, "interaction-TextField-focused")
         let statusY = app.staticTexts["review-field-result"].frame.minY
