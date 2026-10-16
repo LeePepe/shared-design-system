@@ -5,6 +5,10 @@ public enum NativeSurfaceStyle: Sendable {
     case opaque
     case glass
     case interactiveGlass
+
+    func usesGlass(supported: Bool, reduceTransparency: Bool) -> Bool {
+        supported && !reduceTransparency && self != .opaque
+    }
 }
 
 private struct SurfaceModifier: ViewModifier {
@@ -15,7 +19,7 @@ private struct SurfaceModifier: ViewModifier {
 
     @ViewBuilder func body(content: Content) -> some View {
         let shape = RoundedRectangle(cornerRadius: metrics.cornerRadius, style: .continuous)
-        if #available(iOS 26, macOS 26, *), !reduceTransparency, style != .opaque {
+        if #available(iOS 26, macOS 26, *), style.usesGlass(supported: true, reduceTransparency: reduceTransparency) {
             if style == .interactiveGlass {
                 content.glassEffect(.regular.tint(theme.surfaceRaised).interactive(), in: shape)
             } else {

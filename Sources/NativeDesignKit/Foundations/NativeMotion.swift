@@ -94,34 +94,50 @@ public struct NativeStaggerSchedule: Sendable, Equatable {
 @MainActor public final class NativeMotionSequence: ObservableObject {
     @Published public private(set) var visibleCount = 0
     private var generation = UUID()
+    private var pending: Task<Void, Never>?
 
     public init() {}
 
-    public func cancel() { generation = UUID() }
+    public func cancel() {
+        generation = UUID()
+        pending?.cancel()
+        pending = nil
+    }
 
     public func replay(schedule: NativeStaggerSchedule, reduceMotion: Bool) async {
+        pending?.cancel()
         let run = UUID()
         generation = run
         visibleCount = 0
         guard !Task.isCancelled else { return }
         if reduceMotion || schedule.interval == 0 {
             visibleCount = schedule.count
+            pending = nil
             return
         }
-        for index in 0..<schedule.count {
-            if index > 0 {
-                do {
-                    var remaining = schedule.interval
-                    while remaining > 0 {
-                        let chunk = min(remaining, 3600)
-                        try await Task.sleep(nanoseconds: UInt64(chunk * 1_000_000_000))
-                        remaining -= chunk
-                    }
-                } catch { return }
+        let task = Task { [weak self] in
+            for index in 0..<schedule.count {
+                if index > 0 {
+                    do {
+                        var remaining = schedule.interval
+                        while remaining > 0 {
+                            let chunk = min(remaining, 3600)
+                            try await Task.sleep(nanoseconds: UInt64(chunk * 1_000_000_000))
+                            remaining -= chunk
+                        }
+                    } catch { return }
+                }
+                guard !Task.isCancelled, let self, self.generation == run else { return }
+                self.visibleCount = index + 1
             }
-            guard !Task.isCancelled && generation == run else { return }
-            visibleCount = index + 1
         }
+        pending = task
+        await withTaskCancellationHandler {
+            await task.value
+        } onCancel: {
+            task.cancel()
+        }
+        if generation == run { pending = nil }
     }
 }
 
