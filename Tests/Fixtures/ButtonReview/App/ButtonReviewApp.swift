@@ -1,4 +1,4 @@
-import NativeDesignKit
+@testable import NativeDesignKit
 import SwiftUI
 
 /// Synthetic review fixture only. Theme resolution failures are shown, never replaced.
@@ -70,6 +70,9 @@ private struct ButtonReviewBoard: View {
     @State private var actionCount = 0
     @State private var isLoading = false
     @State private var isDisabled = false
+    @State private var buttonBounds: CGRect = .zero
+    @State private var idleLabelBounds: CGRect = .zero
+    @State private var loadingLabelBounds: CGRect = .zero
     private var theme: NativeDesignTheme { configuration.theme }
 
     var body: some View {
@@ -138,16 +141,60 @@ private struct ButtonReviewBoard: View {
                 NativeButton(theme: theme, variant: .primary, isLoading: isLoading,
                              action: { actionCount += 1 }) {
                     Text("confirm_selection")
-                } loadingLabel: { Text("saving_selection") }
+                        .background {
+                            GeometryReader { proxy in
+                                Color.clear.preference(key: IdleLabelBounds.self,
+                                                       value: proxy.frame(in: .named("long-board")))
+                            }
+                        }
+                } loadingLabel: {
+                    Text("saving_selection")
+                        .background {
+                            GeometryReader { proxy in
+                                Color.clear.preference(key: LoadingLabelBounds.self,
+                                                       value: proxy.frame(in: .named("long-board")))
+                            }
+                        }
+                }
                 .environment(\.dynamicTypeSize, configuration.textSize)
                 .accessibilityIdentifier("long-target")
+                .background {
+                    GeometryReader { proxy in
+                        Color.clear.preference(key: ButtonBounds.self,
+                                               value: proxy.frame(in: .named("long-board")))
+                    }
+                }
                 Text("Deutsch · \(configuration.textSize == .accessibility2 ? "accessibility2" : "large")")
                     .font(.caption).foregroundStyle(theme.secondaryForeground)
+                Text("Text bounds: \(labelShapeSafety)").font(.caption)
+                    .accessibilityIdentifier("shape-safety")
+                    .accessibilityValue(Text(verbatim: shapeGeometryDescription))
             }
             .padding(24)
             .frame(width: 320, alignment: .leading)
+            .coordinateSpace(name: "long-board")
+            .onPreferenceChange(ButtonBounds.self) { buttonBounds = $0 }
+            .onPreferenceChange(IdleLabelBounds.self) { idleLabelBounds = $0 }
+            .onPreferenceChange(LoadingLabelBounds.self) { loadingLabelBounds = $0 }
             fixtureControls
         }
+    }
+
+    private var labelShapeSafety: String {
+        labelSafety(in: NativeButtonShape().path(in: buttonBounds))
+    }
+
+    private var shapeGeometryDescription: String {
+        "button=\(buttonBounds); label=\(isLoading ? loadingLabelBounds : idleLabelBounds); " +
+        "capsule-control=\(labelSafety(in: Capsule().path(in: buttonBounds)))"
+    }
+
+    private func labelSafety(in path: Path) -> String {
+        let label = isLoading ? loadingLabelBounds : idleLabelBounds
+        guard !label.isEmpty, !buttonBounds.isEmpty else { return "pending" }
+        let corners = [CGPoint(x: label.minX, y: label.minY), CGPoint(x: label.maxX, y: label.minY),
+                       CGPoint(x: label.minX, y: label.maxY), CGPoint(x: label.maxX, y: label.maxY)]
+        return corners.allSatisfy { path.contains($0) } ? "inside" : "outside"
     }
 
     private var fixtureControls: some View {
@@ -167,5 +214,29 @@ private struct ButtonReviewBoard: View {
         case "secondary": .secondary
         default: .ghost
         }
+    }
+}
+
+private struct ButtonBounds: PreferenceKey {
+    static let defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        let next = nextValue()
+        if !next.isEmpty { value = next }
+    }
+}
+
+private struct IdleLabelBounds: PreferenceKey {
+    static let defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        let next = nextValue()
+        if !next.isEmpty { value = next }
+    }
+}
+
+private struct LoadingLabelBounds: PreferenceKey {
+    static let defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        let next = nextValue()
+        if !next.isEmpty { value = next }
     }
 }

@@ -33,7 +33,11 @@ NativeButton(theme: theme, variant: .primary, isLoading: isSaving,
 .disabled(!canSave)
 ```
 
-Primary uses the exact provider accent/onAccent pair on a solid capsule.
+Primary uses the exact provider accent/onAccent pair on a solid rounded shape.
+At the normal 44 pt target height the shape is capsule-like. As multiline text
+grows, continuous corners stay bounded at 22 pt so the fill contains the label;
+the hit area, pressed cue and focus outline use the same shape. Semantic text
+grows and wraps without shrinking typography to preserve the silhouette.
 Secondary uses a neutral solid surface and foreground; Ghost omits a normal
 background and draws a token-colored pressed cue. No glass layer sits under
 main-action text. Pressed feedback has a clear outline, keyboard focus has an
@@ -53,8 +57,9 @@ labels. Caller actions remain caller owned. The standalone SwiftUI ButtonReview
 fixture uses XCTest UI automation and actual iOS runtime screenshots for both
 provider brands, both themes, three variants and normal/loading/disabled states,
 plus a 320 pt board with German localized labels at accessibility2. UI tests
-measure long-label growth, full text/viewport containment, a stable loading
-footprint and ≥44 pt targets. Actual enabled taps dispatch; disabled/loading
+measure long-label growth, full text/viewport containment, text bounds inside
+the actual fill path, a stable loading footprint and ≥44 pt targets.
+Actual enabled taps dispatch; disabled/loading
 coordinate taps do not. Run `python3 Tests/Fixtures/Support/run.py ButtonReview
 --results <external-new-path>.xcresult --screenshots <external-empty-directory>`
 from the checkout; full instructions and the moved-test mapping are in

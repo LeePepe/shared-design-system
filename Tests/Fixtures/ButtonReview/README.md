@@ -21,7 +21,7 @@ color extraction. The following hosting-based checks were moved, not waived.
 | Previous package check/helper | Replacement UI test | Preserved or stronger coverage |
 | --- | --- | --- |
 | `testLoadingPreservesMeasuredFootprintAndMinimumHitSize` | `testLoadingPreservesFootprintAndMinimumTarget` | Real app idle/loading frames remain equal within 0.5 pt; both dimensions ≥44 pt and the target is fully onscreen. |
-| `testLongLabelsGrowAtAccessibilitySizeWithinNarrowIOSHost` | `testLongLocalizedAccessibilityGrowthWithinNarrowBoard` | Real app German text grows by >20 pt at accessibility2, stays ≤272.5 pt wide inside a 320 pt board, exposes the complete active label, contains the text frame, stays onscreen and retains loading dimensions within 0.5 pt. |
+| `testLongLabelsGrowAtAccessibilitySizeWithinNarrowIOSHost` | `testLongLocalizedAccessibilityGrowthWithinNarrowBoard` | Real app German text grows by >20 pt at accessibility2, stays ≤272.5 pt wide inside a 320 pt board, exposes the complete active label, contains the text frame inside the production fill path, stays onscreen and retains loading dimensions within 0.5 pt. |
 | `testRealSwiftUIButtonScreenshots` | `testVisualMatrixOceanLight`, `testVisualMatrixOceanDark`, `testVisualMatrixGraphiteLight`, `testVisualMatrixGraphiteDark` | Always capture all four brand/theme boards; assert every variant/state exists, enabled state, ≥44 pt target and full viewport containment before capture. |
 | `testNarrowAccessibilitySizeScreenshot` | `testLongLocalizedAccessibilityGrowthWithinNarrowBoard` | `button-accessibility-narrow` is an actual iOS screenshot with measured accessibility text growth and full-label/frame assertions. |
 | `NativeSnapshot.capture` / `NSHostingView` / `NSWindow` / `UIHostingController` | `XCTAttachment(screenshot: app.screenshot())` + shared runner export | Runtime iOS screenshots with preserved `.xcresult` attachments and deterministic PNG names; no UIKit/AppKit hosting. |
@@ -44,3 +44,13 @@ Matrix target sizes are checked in physical screenshot pixels against the
 edge subtraction reporting 43.999969 pt for a rendered 44 pt target. The scale
 comes from the screenshot PNG width and the app frame; no UI framework import
 or lower target-size threshold is used.
+
+The narrow-board regression also measures the active SwiftUI `Text` and button
+bounds through `GeometryReader` preferences in the same coordinate space. The
+fixture uses test-only `@testable import NativeDesignKit` to check every text
+rectangle corner against the production `NativeButtonShape` fill path, for
+both idle and loading labels. This convex shape contains the entire text
+rectangle when it contains its corners. A capsule control must reject the idle
+text bounds, proving this case exercises the former shape-escape bug rather
+than just rectangular containment. The visible result accompanies the actual
+accessibility screenshot; no text is clipped or reduced to fit.

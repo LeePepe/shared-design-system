@@ -52,13 +52,13 @@ public struct NativeButton<Label: View, LoadingLabel: View>: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 10)
             .frame(minWidth: 44, minHeight: 44)
-            .contentShape(Capsule())
+            .contentShape(NativeButtonShape())
         }
         .buttonStyle(NativeActionButtonStyle(theme: theme, variant: variant, isLoading: isLoading, reduceMotion: reduceMotion))
         .focused($isFocused)
         .overlay {
             if isFocused {
-                Capsule().strokeBorder(theme.accent, lineWidth: 3).padding(-4)
+                NativeButtonShape().strokeBorder(theme.accent, lineWidth: 3).padding(-4)
                     .allowsHitTesting(false)
             }
         }
@@ -67,6 +67,23 @@ public struct NativeButton<Label: View, LoadingLabel: View>: View {
 
     private func activate() {
         NativeButtonActivation.perform(isEnabled: isEnabled, isLoading: isLoading, action: action)
+    }
+}
+
+/// Capsule-like at normal target height, with bounded corners as text grows.
+/// Keeping the radius bounded leaves multiline labels on their opaque fill.
+struct NativeButtonShape: InsettableShape {
+    private var insetAmount: CGFloat = 0
+
+    func path(in rect: CGRect) -> Path {
+        RoundedRectangle(cornerRadius: max(0, 22 - insetAmount), style: .continuous)
+            .path(in: rect.insetBy(dx: insetAmount, dy: insetAmount))
+    }
+
+    func inset(by amount: CGFloat) -> NativeButtonShape {
+        var shape = self
+        shape.insetAmount += amount
+        return shape
     }
 }
 
@@ -91,16 +108,16 @@ private struct NativeActionButtonStyle: ButtonStyle {
             .background {
                 switch variant {
                 case .primary:
-                    Capsule().fill(isEnabled || isLoading ? theme.accent : theme.surface)
+                    NativeButtonShape().fill(isEnabled || isLoading ? theme.accent : theme.surface)
                 case .secondary:
-                    Capsule().fill(theme.surface)
+                    NativeButtonShape().fill(theme.surface)
                 case .ghost:
-                    Capsule().strokeBorder(theme.secondaryForeground, lineWidth: configuration.isPressed ? 2 : 0)
+                    NativeButtonShape().strokeBorder(theme.secondaryForeground, lineWidth: configuration.isPressed ? 2 : 0)
                 }
             }
             .overlay {
                 if configuration.isPressed && variant != .ghost {
-                    Capsule().strokeBorder(foreground, lineWidth: 2)
+                    NativeButtonShape().strokeBorder(foreground, lineWidth: 2)
                 }
             }
             .scaleEffect(configuration.isPressed && !reduceMotion ? 0.98 : 1)

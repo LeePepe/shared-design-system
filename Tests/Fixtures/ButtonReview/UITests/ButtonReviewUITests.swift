@@ -50,11 +50,15 @@ final class ButtonReviewUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(accessible.width, 44)
         XCTAssertLessThanOrEqual(accessible.width, 272.5)
         assertFullLabel("Auswahl bestätigen und alle Änderungen speichern", inside: target, app: app)
+        XCTAssertTrue(String(describing: app.staticTexts["shape-safety"].value).contains("capsule-control=outside"),
+                      "The regression fixture must exercise text bounds that the former capsule could not contain.")
+        print("Idle shape geometry: \(app.staticTexts["shape-safety"].value ?? "missing")")
         capture("button-accessibility-narrow", app: app)
         app.buttons["toggle-loading"].tap()
         XCTAssertEqual(target.frame.width, accessible.width, accuracy: 0.5)
         XCTAssertEqual(target.frame.height, accessible.height, accuracy: 0.5)
         assertFullLabel("Auswahl vorbereiten und alle Änderungen speichern…", inside: target, app: app)
+        print("Loading shape geometry: \(app.staticTexts["shape-safety"].value ?? "missing")")
         print("iOS localized layout: standard=\(standard), accessibility2=\(accessible), loading=\(target.frame)")
     }
 
@@ -111,6 +115,9 @@ final class ButtonReviewUITests: XCTestCase {
                       "The full text frame must stay within the button.")
         XCTAssertTrue(app.scrollViews["review-scroll"].frame.contains(button.frame))
         XCTAssertTrue(button.isHittable)
+        XCTAssertEqual(app.staticTexts["shape-safety"].label, "Text bounds: inside",
+                       "Measured Text corners must be inside the production fill path, not only its rectangle. " +
+                       String(describing: app.staticTexts["shape-safety"].value))
     }
 
     private func capture(_ name: String, app: XCUIApplication) {
