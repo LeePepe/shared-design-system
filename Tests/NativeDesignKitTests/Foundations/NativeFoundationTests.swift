@@ -35,6 +35,16 @@ final class NativeFoundationTests: XCTestCase {
         XCTAssertEqual(NativeInterpolation.clampedProgress(.infinity), 1)
     }
 
+    func testGlassPolicyUsesOpaqueSurfaceForReducedTransparencyAndOldSystems() {
+        for style in [NativeSurfaceStyle.opaque, .glass, .interactiveGlass] {
+            XCTAssertFalse(style.usesGlass(supported: false, reduceTransparency: false))
+            XCTAssertFalse(style.usesGlass(supported: true, reduceTransparency: true))
+        }
+        XCTAssertFalse(NativeSurfaceStyle.opaque.usesGlass(supported: true, reduceTransparency: false))
+        XCTAssertTrue(NativeSurfaceStyle.glass.usesGlass(supported: true, reduceTransparency: false))
+        XCTAssertTrue(NativeSurfaceStyle.interactiveGlass.usesGlass(supported: true, reduceTransparency: false))
+    }
+
     func testReducedMotionSuppressesEveryAnimationFamily() {
         let curve = NativeMotionSpec.cubicBezier(duration: 1, x1: 0.2, y1: 0.7, x2: 0.2, y2: 1)
         let spring = NativeMotionSpec.spring(response: 0.5, dampingFraction: 0.8, blendDuration: 0)
@@ -75,7 +85,7 @@ final class NativeFoundationTests: XCTestCase {
 
     @MainActor func testExplicitCancellationAndTaskCancellationStopFurtherReveals() async {
         let sequence = NativeMotionSequence()
-        let task = Task { await sequence.replay(schedule: NativeStaggerSchedule(count: 10, interval: 0.02),
+        let task = Task { await sequence.replay(schedule: NativeStaggerSchedule(count: 10, interval: 3600),
                                                 reduceMotion: false) }
         for _ in 0..<100 where sequence.visibleCount == 0 { await Task.yield() }
         XCTAssertEqual(sequence.visibleCount, 1)
