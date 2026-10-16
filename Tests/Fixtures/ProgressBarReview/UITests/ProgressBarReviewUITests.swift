@@ -53,9 +53,11 @@ final class ProgressBarReviewUITests: XCTestCase {
     func testVisualMatrixGraphiteLight() { matrix(brand: "graphite", mode: "light") }
     func testVisualMatrixGraphiteDark() { matrix(brand: "graphite", mode: "dark") }
 
-    func testReduceMotionEnvironmentRequestRetainsReadableIndeterminateStatus() {
+    func testReduceMotionRequestReportsObservedSettingAndReadableIndeterminateStatus() {
         let app = launch(scenario: "matrix", motion: true)
-        XCTAssertEqual(app.staticTexts["motion-request"].label, "Reduce Motion requested in SwiftUI environment")
+        XCTAssertEqual(app.staticTexts["motion-request"].label, "Fixture request: Reduce Motion")
+        XCTAssertTrue(app.staticTexts["motion-observed"].exists)
+        print("Reduce Motion request evidence: \(app.staticTexts["motion-observed"].label)")
         let waiting = app.progressIndicators["matrix-indeterminate"]
         XCTAssertEqual(waiting.label, "Waiting")
         XCTAssertTrue(String(describing: waiting.value).contains("Waiting for the next update"), app.debugDescription)
@@ -100,7 +102,7 @@ final class ProgressBarReviewUITests: XCTestCase {
                         size: String = "large", motion: Bool = false, expectsError: Bool = false) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment = ["NDK_SCENARIO": scenario, "NDK_BRAND": brand, "NDK_THEME": mode,
-                                 "NDK_TEXT_SIZE": size, "NDK_REDUCE_MOTION": motion ? "true" : "false"]
+                                 "NDK_TEXT_SIZE": size, "NDK_REDUCE_MOTION_REQUEST": motion ? "true" : "false"]
         app.launch()
         let ready = expectsError ? app.staticTexts["fixture-error"] : app.scrollViews["review-scroll"]
         XCTAssertTrue(ready.waitForExistence(timeout: 10), app.debugDescription)

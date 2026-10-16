@@ -12,7 +12,6 @@ struct ProgressBarReviewApp: App {
             case .success(let configuration):
                 ProgressReviewBoard(configuration: configuration)
                     .preferredColorScheme(configuration.isDark ? .dark : .light)
-                    .environment(\.accessibilityReduceMotion, configuration.reduceMotion)
             case .failure(let error):
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Fixture configuration failed").font(.title)
@@ -31,7 +30,7 @@ private struct ReviewConfiguration {
     let mode: String
     let scenario: String
     let textSize: DynamicTypeSize
-    let reduceMotion: Bool
+    let requestsReducedMotion: Bool
     var isDark: Bool { mode == "dark" }
 
     init() throws {
@@ -58,10 +57,10 @@ private struct ReviewConfiguration {
         case "accessibility2": textSize = .accessibility2
         default: throw ConfigurationError.invalid("NDK_TEXT_SIZE")
         }
-        switch try required("NDK_REDUCE_MOTION") {
-        case "false": reduceMotion = false
-        case "true": reduceMotion = true
-        default: throw ConfigurationError.invalid("NDK_REDUCE_MOTION")
+        switch try required("NDK_REDUCE_MOTION_REQUEST") {
+        case "false": requestsReducedMotion = false
+        case "true": requestsReducedMotion = true
+        default: throw ConfigurationError.invalid("NDK_REDUCE_MOTION_REQUEST")
         }
     }
 }
@@ -105,8 +104,10 @@ private struct ProgressReviewBoard: View {
             sample("In progress", value: 50, current: "50 of 100 files · 50%", id: "matrix-mid")
             sample("Complete", value: 100, current: "100 of 100 files · 100%", id: "matrix-complete")
             sample("Waiting", value: nil, current: "Waiting for the next update…", id: "matrix-indeterminate")
-            Text(reduceMotion ? "Reduce Motion requested in SwiftUI environment" : "Standard motion environment")
+            Text(configuration.requestsReducedMotion ? "Fixture request: Reduce Motion" : "Fixture request: standard motion")
                 .font(.caption).accessibilityIdentifier("motion-request")
+            Text("Observed system Reduce Motion: \(reduceMotion ? "on" : "off")")
+                .font(.caption).accessibilityIdentifier("motion-observed")
             Text("Native animation behavior is platform-owned.").font(.caption)
         }
     }

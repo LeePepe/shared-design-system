@@ -19,8 +19,10 @@ commit. The runner records actual SHA, runtime and test results, then exports
 the exact XCTest screenshot attachments in `screenshots.json`. Screenshot
 matrix: ocean/graphite × light/dark, each showing zero/middle/complete/waiting;
 320 pt long German text at standard and accessibility2 sizes; an explicitly
-labeled SwiftUI Reduce Motion environment request. The latter does not assert
-system preference changes or native animation suppression.
+labeled fixture Reduce Motion request alongside the observed read-only SwiftUI
+system environment value. The request does not apply that setting. A run with
+system Reduce Motion enabled remains separate evidence; no system preference
+change or native animation suppression is claimed.
 
 Tests exercise caller state changes and native progress accessibility values,
 finite out-of-range normalization, stable state dimensions, real text growth,

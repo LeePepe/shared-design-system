@@ -63,8 +63,9 @@ construction. The standalone `ProgressBarReview` synthetic fixture covers native
 accessibility values, caller state changes, state footprint, long narrow text
 and accessibility typography. Screenshots come from real XCTest iOS SwiftUI
 runtime runs; their exact SHA/platform/test counts belong in the delivery
-evidence. A fixture environment request is not proof of the device's system
-Reduce Motion setting. No VoiceOver session, hardware, minimum-OS or macOS
+evidence. The fixture labels its Reduce Motion request and reports the observed
+read-only system environment separately; it does not change the preference.
+System Reduce Motion enabled remains separate evidence. No VoiceOver session, hardware, minimum-OS or macOS
 visual acceptance is inferred.
 
 Rollback removes these call sites before restoring a previously reviewed

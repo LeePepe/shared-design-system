@@ -43,6 +43,7 @@ public struct NativeProgressBar<Label: View, CurrentValueLabel: View>: View {
             .labelsHidden()
             .progressViewStyle(.linear)
             .tint(theme.accent)
+            .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
             .background(theme.surface, in: Capsule())
             .frame(minHeight: 8)
         }
