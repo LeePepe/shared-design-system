@@ -15,7 +15,7 @@ Plan: `docs/native-design-kit-v1-plan.md`
 - All replacement implementation remains within the existing `NativeDesignKit` layer. `DesignTokens` is an exact external dependency and has no task to modify it.
 - `Package.swift`, `Package.resolved`, production source, `ai/**`, changelog, scripts outside fixture support, workflows, policies, token sources, and repository settings are inspection-only for R101–R301.
 - Protected `docs/architecture/**` work is isolated in R201 and requires Owner review. No existing gate or red line may be removed or weakened.
-- Every evidence owner records exact commands, exit codes, test counts, destinations, skipped/cancelled checks, tested SHA, and local/remote/PR SHA equality. A skipped, cancelled, package-only, screenshot-only, or newer-runtime result is not success for the missing evidence it does not cover.
+- Every evidence owner records exact commands, exit codes, test counts, destinations, skipped/cancelled checks, and tested SHA. PR publications reconcile local/remote/PR-head SHA equality; post-merge R301 instead binds the R201 squash commit on `main`, records PR-head checks separately, and proves the R201-owned path is byte-identical across the squash boundary. A skipped, cancelled, package-only, screenshot-only, or newer-runtime result is not success for the missing evidence it does not cover.
 
 ## Graph
 
@@ -27,7 +27,7 @@ completed Strata graph + main@6d8dbe1 evidence
         → [explicit later authorization]
           → R101 accessibility + dual-platform component-fixture evidence
             → R201 protected aggregate fixture-gate declaration
-              → R301 read-only exact-SHA integration evidence
+              → R301 read-only post-merge exact-main integration evidence
 
 D-COMPONENTS Owner decision ──yes──→ fresh component spec/plan/tasks
 D-RELEASE Owner decision ─────yes──→ fresh release/contract plan
@@ -124,21 +124,30 @@ The graph is acyclic. P100 is the only active task in this planning revision. R1
 - **Completion evidence:** before/after gate inventory; command/exit/count table; exact SHA equality; Owner review of the protected path; independent publication permission.
 - **Excludes:** source/tests/fixture/scripts/workflow changes; policy weakening; repository settings; release or component work.
 
-## `R301` — Read-only exact-SHA Strata integration evidence
+## `R301` — Read-only post-merge exact-main Strata integration evidence
 
-- **Owner:** Team Lead-assigned read-only verifier after R201 and exact-head online CI conclude
+- **Owner:** Team Lead-assigned read-only verifier after R201 is squash-merged and the exact-main workflow concludes
 - **Kind:** conditional future acceptance gate; no implementation branch or PR
-- **Outcome:** On one clean pushed revision, reconcile the current Strata inventory, all replacement fixture evidence, local/full/external verification, exact-head online CI, effective server enforcement, and residual risks.
-- **Depends on:** merged R201; concluded online CI for the exact revision; every effectively required check passing
+- **Outcome:** On the exact R201 squash `mergeCommit.oid` on `main`, reconcile the current Strata inventory, all replacement fixture evidence, local/full/external verification, exact-main workflow/check runs, the separately recorded R201 PR checks, effective server enforcement, and residual risks.
+- **Depends on:** merged R201; the R201 merge commit is fetchable and retained by `origin/main`; a workflow/check run for that exact main SHA has concluded; every effectively required check applicable to delivery passed on the R201 PR head
 - **Covers:** final evidence for satisfied/partial original AC dispositions, especially `AC-BASE-01`, `AC-BOUNDARY-01`, `AC-A11Y-01`, `AC-PLATFORM-01`, `AC-FIXTURE-01`, and `AC-VERIFY-01`. It does not convert superseded Metric/Badge/Chart/State or old contract requirements into passes.
+- **Revision binding:** fetch `origin/main`, obtain R201 `headRefOid` and `mergeCommit.oid` from GitHub, and check out the merge commit detached in the clean registered workspace. Local HEAD must equal the merge commit. If `origin/main` has advanced, the evidence records its observed tip and proves the merge commit is its ancestor; a later tip never silently replaces the bound revision. The retained PR head and squash commit are expected to have different commit SHAs.
 - **Commands:**
 
   ```sh
+  git fetch origin main
+  git switch --detach <R201-main-merge-SHA>
+  test "$(git rev-parse HEAD)" = "<R201-main-merge-SHA>"
+  git merge-base --is-ancestor <R201-main-merge-SHA> origin/main
   scripts/verify --layer NativeDesignKit
   scripts/verify --all
   python3 Tests/Fixtures/Support/run-all.py --platform all --ci
   python3 scripts/ci/external-consumer.py --revision "$(git rev-parse HEAD)"
-  gh pr view <PR-number> --repo LeePepe/shared-design-system --json headRefOid,baseRefName,url,statusCheckRollup
+  gh pr view <R201-PR-number> --repo LeePepe/shared-design-system --json headRefOid,mergeCommit,mergedAt,baseRefName,url,statusCheckRollup
+  git diff --exit-code <R201-PR-head> <R201-main-merge-SHA> -- docs/architecture/native-design-kit/tech-context.md
+  git rev-parse <R201-PR-head>:docs/architecture/native-design-kit/tech-context.md <R201-main-merge-SHA>:docs/architecture/native-design-kit/tech-context.md
+  gh run list --repo LeePepe/shared-design-system --commit <R201-main-merge-SHA> --json databaseId,headSha,event,status,conclusion,url
+  gh api 'repos/LeePepe/shared-design-system/commits/<R201-main-merge-SHA>/check-runs'
   gh api --paginate 'repos/LeePepe/shared-design-system/rulesets?includes_parents=true'
   gh api 'repos/LeePepe/shared-design-system/rules/branches/main'
   gh api --include 'repos/LeePepe/shared-design-system/branches/main/protection/required_status_checks'
@@ -148,12 +157,14 @@ The graph is acyclic. P100 is the only active task in this planning revision. R1
   1. local command/exit/test-count/destination table and every skipped/cancelled lane;
   2. exact dependency, platform, source-boundary, released/unreleased contract, compatibility, and rollback audit;
   3. complete fixture matrix, exact-SHA manifest, artifact hashes, live VoiceOver record, and named independent review;
-  4. local HEAD = remote branch = PR head/main proof;
-  5. exact-head online check table with name, conclusion, URL/run ID, and observed SHA;
-  6. effective ruleset/branch-protection table with rule IDs, enforcement, and actually required contexts;
-  7. set comparison naming required checks, checks that ran, present-but-unenforced checks, skipped/cancelled checks, and any permission/API gap;
-  8. residual gaps, including any unavailable minimum-OS or keyboard evidence.
-- **Blocking rules:** workflow-file presence is not enforcement proof; package success is not fixture success; screenshots are not VoiceOver evidence; a newer OS is not minimum-OS evidence; unavailable server evidence is `unverified`. Any of these prevents the mapped partial AC from being closed.
+  4. local HEAD = R201 `mergeCommit.oid`; observed `origin/main` tip; equality or merge-commit ancestry proof;
+  5. R201-owned-path byte identity across the PR head and squash commit, proven by the path diff and both `docs/architecture/native-design-kit/tech-context.md` blob OIDs;
+  6. exact-main workflow/check table with name, conclusion, event, URL/run ID, and `headSha` equal to the merge commit;
+  7. separate R201 PR-head check table; PR results are never substituted for exact-main workflow evidence;
+  8. effective ruleset/branch-protection table with rule IDs, enforcement, and actually required contexts;
+  9. set comparison naming required checks, exact-main checks, PR-only checks, present-but-unenforced checks, skipped/cancelled checks, and any permission/API gap;
+  10. residual gaps, including any unavailable minimum-OS or keyboard evidence.
+- **Blocking rules:** PR-head and squash-commit SHA equality is neither required nor claimed. A nonempty R201-owned-path diff, missing exact-main workflow run, workflow-file-only assertion, package-only success, screenshot-only VoiceOver claim, newer-OS substitution, or unavailable server evidence is `unverified`. Any of these prevents the mapped partial AC from being closed.
 - **Invalidation:** any tracked correction creates a new candidate SHA and repeats all affected local, fixture, external, online, review, and SHA-reconciliation evidence. There is no docs-only exception.
 - **Excludes:** self-approval, source changes, merge, tag, publication, product adoption, settings changes, waivers, or claims for superseded outcomes.
 

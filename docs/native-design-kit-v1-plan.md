@@ -112,7 +112,7 @@ main@6d8dbe1 evidence
         → [separate Team Lead/Owner authorization]
           → R101 current-inventory accessibility + dual-platform fixture evidence
             → R201 protected aggregate fixture-gate declaration
-              → R301 read-only exact-SHA integration evidence
+              → R301 read-only post-merge exact-main integration evidence
 ```
 
 The graph is acyclic. `P100` is the current Planner-owned publication. `R101` and `R201` are fresh, conditional future implementation tasks, each one branch/worktree/PR. `R301` is read-only and owns final evidence, not a branch or PR. No R-node is dispatched by planning approval alone.
@@ -201,16 +201,30 @@ scripts/verify --layer NativeDesignKit
 scripts/verify --all
 ```
 
-### R301 exact-SHA integration evidence
+### R301 post-merge exact-main integration evidence
 
-R301 runs on one clean pushed candidate/main revision after R201 and concluded online CI:
+R301 runs after R201 is squash-merged. Its sole acceptance target is the exact
+R201 `mergeCommit.oid` on `main`, not the retained R201 PR head and not an
+unspecified later `main` tip. The verifier fetches that commit into the same
+registered, clean workspace, checks it out detached, and records whether the
+observed `origin/main` still equals it or has advanced while retaining it as an
+ancestor. R301 then runs local verification and reads the workflow/check runs
+whose `headSha` is exactly that merge commit:
 
 ```sh
+git fetch origin main
+git switch --detach <R201-main-merge-SHA>
+test "$(git rev-parse HEAD)" = "<R201-main-merge-SHA>"
+git merge-base --is-ancestor <R201-main-merge-SHA> origin/main
 scripts/verify --layer NativeDesignKit
 scripts/verify --all
 python3 Tests/Fixtures/Support/run-all.py --platform all --ci
 python3 scripts/ci/external-consumer.py --revision "$(git rev-parse HEAD)"
-gh pr view <PR-number> --repo LeePepe/shared-design-system --json headRefOid,baseRefName,url,statusCheckRollup
+gh pr view <R201-PR-number> --repo LeePepe/shared-design-system --json headRefOid,mergeCommit,mergedAt,baseRefName,url,statusCheckRollup
+git diff --exit-code <R201-PR-head> <R201-main-merge-SHA> -- docs/architecture/native-design-kit/tech-context.md
+git rev-parse <R201-PR-head>:docs/architecture/native-design-kit/tech-context.md <R201-main-merge-SHA>:docs/architecture/native-design-kit/tech-context.md
+gh run list --repo LeePepe/shared-design-system --commit <R201-main-merge-SHA> --json databaseId,headSha,event,status,conclusion,url
+gh api 'repos/LeePepe/shared-design-system/commits/<R201-main-merge-SHA>/check-runs'
 gh api --paginate 'repos/LeePepe/shared-design-system/rulesets?includes_parents=true'
 gh api 'repos/LeePepe/shared-design-system/rules/branches/main'
 gh api --include 'repos/LeePepe/shared-design-system/branches/main/protection/required_status_checks'
@@ -220,13 +234,26 @@ It separately reports:
 
 1. local commands, exit codes, counts, destinations, and skipped/cancelled work;
 2. iOS/macOS/minimum-OS/accessibility matrix and independent review;
-3. local HEAD = remote branch = PR head equality;
-4. exact-head online check names, conclusions, URLs/run IDs, and observed SHA;
-5. effective ruleset/branch-protection IDs, enforcement, and required contexts;
-6. set comparison of required checks, checks that ran, and checks that ran but were not enforced;
-7. exact dependency/platform/source/contract compatibility and remaining risks.
+3. local HEAD = R201 `mergeCommit.oid`, plus the observed `origin/main` tip and
+   equality-or-ancestry result;
+4. byte-identical R201-owned-path provenance between the retained PR head and
+   squash commit, using the path diff above and both blob OIDs;
+5. exact-main workflow/check names, conclusions, URLs/run IDs, event, and
+   `headSha` equal to the R201 merge commit;
+6. R201 PR-head checks in a separate table, never substituted for exact-main
+   workflow evidence and never claimed SHA-equal to the squash commit;
+7. effective ruleset/branch-protection IDs, enforcement, and required contexts;
+8. set comparison of required checks, exact-main checks, PR-only checks,
+   present-but-unenforced checks, and skipped/cancelled checks;
+9. exact dependency/platform/source/contract compatibility and remaining risks.
 
-Workflow files express intent but do not prove server enforcement. If an API or permission gap prevents effective enforcement evidence, R301 reports `unverified` and remains open. It never changes repository settings.
+Squash merge necessarily gives the main commit a different commit SHA from the
+R201 PR head; no equality across that boundary is expected or claimed. The
+owned-path content comparison is the provenance bridge. Workflow files express
+intent but do not prove either exact-main execution or server enforcement. If
+the exact-main run is absent, the owned-path content differs, or an API or
+permission gap prevents effective enforcement evidence, R301 reports
+`unverified` and remains open. It never changes repository settings.
 
 ## Contract, release, and product follow-ups
 
@@ -244,7 +271,7 @@ Likewise, `D-COMPONENTS` must precede any source work for old missing outcomes. 
 | Screenshots are misreported as VoiceOver proof | R101 requires a live label/value/order/state record and named independent review. |
 | Unreleased source is mistaken for a tagged contract | Released registry remains 0.1.0; D-RELEASE is mandatory before tagging components. |
 | Fixture work weakens existing gates or broadens source scope | R101 is test-only; R201 is one protected declaration; existing gate inventory must remain intact. |
-| CI presence is mistaken for enforcement | R301 reads exact-head check runs and effective rules separately and compares their sets. |
+| CI presence is mistaken for enforcement | R301 reads exact-main workflow/check runs, R201 PR checks, and effective rules separately and compares their sets. |
 | Evidence becomes stale after a correction | Any tracked correction produces a new candidate SHA and reruns all affected local, fixture, external, online, review, and SHA-reconciliation evidence. |
 
 ## Entry and exit gates
