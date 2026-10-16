@@ -33,6 +33,7 @@ struct FixtureResources {
     let motion: NativeMotionSpec
     let primary: Color
     let secondary: Color
+    let raised: Color
     let canvas: Color
     let accent: Color
     let gap: CGFloat
@@ -66,6 +67,7 @@ struct FixtureResources {
         motion = try provider.motion()
         primary = try NativeTokenColor.resolve("product.text.primary", theme: explicitTheme)
         secondary = try NativeTokenColor.resolve("product.text.secondary", theme: explicitTheme)
+        raised = try NativeTokenColor.resolve("product.surface.raised", theme: explicitTheme)
         canvas = try NativeTokenColor.resolve("product.surface.canvas", theme: explicitTheme)
         accent = try NativeTokenColor.resolve("status.info", theme: explicitTheme)
         gap = try provider.number("spacing.lg")

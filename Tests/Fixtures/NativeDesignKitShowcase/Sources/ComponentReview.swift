@@ -45,7 +45,7 @@ struct ReviewSection<Content: View>: View {
             Text(title).nativeTypography(r.caption).foregroundColor(r.secondary)
             content()
         }.padding(r.gap).frame(maxWidth: .infinity, alignment: .leading)
-            .background(r.theme.surfaceRaised)
+            .background(r.raised)
             .clipShape(RoundedRectangle(cornerRadius: r.reviewMetrics.cornerRadius))
     }
 }
