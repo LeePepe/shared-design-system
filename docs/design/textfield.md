@@ -139,7 +139,11 @@ Visible labels have IDs `review-field-empty-label`, `review-field-filled-label`,
 The context initially shows `Not submitted` and the helper “Enter a title, then
 press Return to submit.” Submitting an empty or whitespace-only value retains
 focus, keeps `Not submitted`, and shows “Title is empty. Enter a title, then press
-Return.” The caller keeps that error until a successful resubmission. Submitting
+Return.” The caller scrolls the complete title section above the software keyboard
+on submission, without animation or dismissing focus. Helper/error geometry stays
+fixed relative to the field; the viewport may move to expose the message. The UI
+test checks both that spacing and that the error is visible above the keyboard.
+The caller keeps that error until a successful resubmission. Submitting
 `Draft` produces exactly `Submitted: Draft` and restores the helper in the same
 reserved area. It accepts the original nonempty string without silently trimming
 or rewriting the user's input. No timer or task survives the view lifetime.

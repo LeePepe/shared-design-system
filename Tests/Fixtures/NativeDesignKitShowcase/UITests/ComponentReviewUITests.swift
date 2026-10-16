@@ -131,12 +131,19 @@ final class ComponentReviewUITests: XCTestCase {
         activate(context)
         #endif
         capture(app, "interaction-TextField-focused")
-        let statusY = app.staticTexts["review-field-result"].frame.minY
+        let statusOffset = app.staticTexts["review-field-result"].frame.minY - context.frame.maxY
         context.typeText("\n")
         XCTAssertTrue(app.staticTexts["review-field-context-error"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts["review-field-result"].label, "Not submitted")
-        XCTAssertEqual(app.staticTexts["review-field-result"].frame.minY, statusY, accuracy: 1,
+        XCTAssertEqual(app.staticTexts["review-field-result"].frame.minY - context.frame.maxY,
+                       statusOffset, accuracy: 1,
                        "The actual helper/error messages must reserve stable space")
+        let error = app.staticTexts["review-field-context-error"]
+        XCTAssertTrue(error.isHittable, "Validation must be visible while editing")
+        #if os(iOS)
+        XCTAssertLessThan(error.frame.maxY, app.keyboards.firstMatch.frame.minY,
+                          "The keyboard must not cover the cause and correction")
+        #endif
         capture(app, "interaction-TextField-error")
         context.typeText("Draft")
         XCTAssertEqual(context.value as? String, "Draft")

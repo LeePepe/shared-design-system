@@ -18,21 +18,27 @@ struct ComponentReview: View {
     let resources: FixtureResources
     let config: FixtureConfiguration
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: resources.gap) {
-                HStack {
-                    Text(config.page).nativeTypography(resources.heading)
-                    Spacer()
-                    Text(config.dark ? "Dark" : "Light").nativeTypography(resources.caption)
-                        .foregroundColor(resources.secondary)
-                }
-                .accessibilityIdentifier("component-heading")
-                if config.page == "Button" { ButtonReviewBoard(r: resources, config: config) }
-                if config.page == "Toggle" { ToggleReviewBoard(r: resources, config: config) }
-                if config.page == "TextField" { TextFieldReviewBoard(r: resources, config: config) }
-            }.padding(resources.padding).frame(maxWidth: .infinity, alignment: .leading)
-        }.background(resources.canvas).foregroundColor(resources.primary)
-            .nativeTypography(resources.reviewBody).accessibilityIdentifier("component-review")
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: resources.gap) {
+                    HStack {
+                        Text(config.page).nativeTypography(resources.heading)
+                        Spacer()
+                        Text(config.dark ? "Dark" : "Light").nativeTypography(resources.caption)
+                            .foregroundColor(resources.secondary)
+                    }
+                    .accessibilityIdentifier("component-heading")
+                    if config.page == "Button" { ButtonReviewBoard(r: resources, config: config) }
+                    if config.page == "Toggle" { ToggleReviewBoard(r: resources, config: config) }
+                    if config.page == "TextField" {
+                        TextFieldReviewBoard(r: resources, config: config) {
+                            proxy.scrollTo("review-title-context", anchor: .bottom)
+                        }
+                    }
+                }.padding(resources.padding).frame(maxWidth: .infinity, alignment: .leading)
+            }.background(resources.canvas).foregroundColor(resources.primary)
+                .nativeTypography(resources.reviewBody).accessibilityIdentifier("component-review")
+        }
     }
 }
 

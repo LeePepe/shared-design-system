@@ -4,6 +4,7 @@ import SwiftUI
 struct TextFieldReviewBoard: View {
     let r: FixtureResources
     let config: FixtureConfiguration
+    let revealTitle: () -> Void
     @State private var empty = ""
     @State private var filled = "Studio Notes"
     @State private var longName = "用于长文本输入和中文排版验证的文稿名称，可以移动光标继续编辑完整标题"
@@ -60,6 +61,7 @@ struct TextFieldReviewBoard: View {
                     .foregroundColor(r.secondary)
                     .accessibilityIdentifier("review-field-result")
             }
+            .id("review-title-context")
 
             ReviewSection(title: "Long text and growing labels", r: r) {
                 labeledField("文稿名称（保留完整标题，便于稍后识别和查找）", id: "long") {
@@ -110,6 +112,14 @@ struct TextFieldReviewBoard: View {
     }
 
     private func submitTitle() {
+        // Keep the cause and correction above the software keyboard without
+        // dismissing the native editor or animating a validation transition.
+        defer {
+            Task { @MainActor in
+                await Task.yield()
+                revealTitle()
+            }
+        }
         guard !documentTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             needsTitle = true
             result = "Not submitted"
