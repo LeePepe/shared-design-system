@@ -8,8 +8,9 @@ final class CardReviewUITests: XCTestCase {
         let disabled = app.buttons["card-disabled-action"]
         XCTAssertTrue(action.isEnabled)
         XCTAssertFalse(disabled.isEnabled)
-        XCTAssertGreaterThanOrEqual(action.frame.height, 44)
-        XCTAssertGreaterThanOrEqual(disabled.frame.height, 44)
+        // XCTest can report an exact 44pt SwiftUI frame as 43.999969pt.
+        XCTAssertGreaterThanOrEqual(action.frame.height, 44 - 0.001)
+        XCTAssertGreaterThanOrEqual(disabled.frame.height, 44 - 0.001)
         action.tap()
         XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")
         for _ in 0..<3 {
