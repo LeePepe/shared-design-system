@@ -27,6 +27,7 @@ public struct NativeRadioGroup<Selection: Hashable, Label: View, Options: View>:
             .tint(theme.accent)
             // Inline Picker's native checkmark reads the accent environment.
             .accentColor(theme.accent)
+            .environment(\.colorScheme, theme.mode == .dark ? .dark : .light)
             .frame(minHeight: 44, alignment: .leading)
     }
 

@@ -46,6 +46,10 @@ the whole group, and caller option modifiers remain part of the options builder.
 The explicit `NativeDesignTheme` provides foreground and accent colors. There
 is no ambient theme, palette, fallback, provider modification or glass layer.
 Theme construction and unchanged provider errors follow the foundation contract.
+The native Picker subtree receives the explicit `theme.mode` as its SwiftUI
+color scheme, including native disabled and selection chrome. The surrounding
+caller environment retains its own mode. The native checkmark receives the
+provider accent through both the tint and accent-color environments.
 Semantic body typography and vertically growing option content support long
 labels; option layout reserves at least 44 × 44 pt. No fixed group height or
 single-line limit is imposed. Native platform chrome remains system managed.
@@ -54,7 +58,10 @@ The isolated [review fixture](../../Tests/Fixtures/RadioGroupReview/README.md)
 checks actual iOS binding changes, exclusive selection, disabled coordinate
 taps, external state updates, stable tagged identity after caller reordering,
 row targets and long text at accessibility2 in a 320 pt
-board. Its screenshots cover ocean/graphite × light/dark and the narrow case.
+board. A caller-owned environment probe in the actual Picker label and options
+also checks both explicit modes under an intentionally opposing caller scheme,
+with real selection and disabled input. Screenshots cover ocean/graphite ×
+light/dark, the narrow case and both opposing-environment boundaries.
 Exact tested SHA and results belong to the external run manifest and PR.
 These checks do not claim live VoiceOver, native keyboard/focus interaction,
 macOS rendering, physical-device or minimum-OS acceptance.

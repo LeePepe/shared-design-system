@@ -3,5 +3,7 @@
   "radio-group-ocean-dark",
   "radio-group-graphite-light",
   "radio-group-graphite-dark",
-  "radio-group-accessibility-narrow"
+  "radio-group-accessibility-narrow",
+  "radio-group-explicit-light-opposing-dark",
+  "radio-group-explicit-dark-opposing-light"
 ]

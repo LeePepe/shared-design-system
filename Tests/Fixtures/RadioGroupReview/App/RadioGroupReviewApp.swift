@@ -11,7 +11,7 @@ struct RadioGroupReviewApp: App {
             switch configuration {
             case .success(let configuration):
                 ReviewBoard(configuration: configuration)
-                    .preferredColorScheme(configuration.mode == "dark" ? .dark : .light)
+                    .preferredColorScheme(configuration.hostMode == "dark" ? .dark : .light)
             case .failure(let error):
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Fixture configuration failed").font(.title)
@@ -27,6 +27,7 @@ private struct ReviewConfiguration {
     let theme: NativeDesignTheme
     let brand: String
     let mode: String
+    let hostMode: String
     let scenario: String
     let size: DynamicTypeSize
 
@@ -38,8 +39,12 @@ private struct ReviewConfiguration {
         }
         brand = try required("NDK_BRAND")
         mode = try required("NDK_THEME")
+        hostMode = try required("NDK_HOST_THEME")
+        guard ["light", "dark"].contains(hostMode) else {
+            throw ConfigurationError.invalid("NDK_HOST_THEME")
+        }
         scenario = try required("NDK_SCENARIO")
-        guard ["matrix", "interaction", "long-label"].contains(scenario) else {
+        guard ["matrix", "interaction", "long-label", "theme-boundary"].contains(scenario) else {
             throw ConfigurationError.invalid("NDK_SCENARIO")
         }
         switch mode {
@@ -85,6 +90,8 @@ private struct ReviewBoard: View {
                 .padding(.vertical, 8)
                 if configuration.scenario == "long-label" {
                     longLabel
+                } else if configuration.scenario == "theme-boundary" {
+                    themeBoundary
                 } else {
                     selectionGroup
                     Text("Selected: \(selection.id)").accessibilityIdentifier("selection-state")
@@ -127,6 +134,23 @@ private struct ReviewBoard: View {
         .disabled(disabled)
     }
 
+    private var themeBoundary: some View {
+        Group {
+            InheritedSchemeProbe(title: "Caller scheme", identifier: "caller-scheme")
+            NativeRadioGroup(theme: theme, selection: trackedSelection) {
+                InheritedSchemeProbe(title: "Picker label scheme", identifier: "picker-label-scheme")
+            } options: {
+                InheritedSchemeProbe(title: "First option scheme", identifier: "boundary-first")
+                    .tag(Choice(id: "compact-id"))
+                InheritedSchemeProbe(title: "Second option scheme", identifier: "boundary-second")
+                    .tag(Choice(id: "balanced-id"))
+            }
+            .disabled(disabled)
+            Text("Selected: \(selection.id)").accessibilityIdentifier("selection-state")
+            controls
+        }
+    }
+
     private var controls: some View {
         VStack(alignment: .leading, spacing: 12) {
             Button { disabled.toggle() } label: {
@@ -160,5 +184,17 @@ private struct ReviewBoard: View {
             .environment(\.dynamicTypeSize, configuration.size)
             Text("Selected: \(selection.id)").accessibilityIdentifier("selection-state")
         }
+    }
+}
+
+/// Caller-supplied view observes the real inherited SwiftUI environment.
+private struct InheritedSchemeProbe: View {
+    @Environment(\.colorScheme) private var colorScheme
+    let title: String
+    let identifier: String
+
+    var body: some View {
+        Text("\(title): \(colorScheme == .dark ? "dark" : "light")")
+            .accessibilityIdentifier(identifier)
     }
 }

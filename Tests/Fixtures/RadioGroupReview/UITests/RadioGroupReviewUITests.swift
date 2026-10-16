@@ -56,6 +56,36 @@ import XCTest
     func testVisualMatrixGraphiteLight() { matrix(brand: "graphite", mode: "light") }
     func testVisualMatrixGraphiteDark() { matrix(brand: "graphite", mode: "dark") }
 
+    func testExplicitThemeReachesNativePickerWhileCallerEnvironmentRemainsOpposing() {
+        for mode in ["light", "dark"] {
+            let opposing = mode == "light" ? "dark" : "light"
+            let app = launch(scenario: "theme-boundary", brand: "graphite", mode: mode, hostMode: opposing)
+            let first = option("boundary-first", app: app)
+            let second = option("boundary-second", app: app)
+            XCTAssertEqual(app.staticTexts["caller-scheme"].label, "Caller scheme: \(opposing)")
+            XCTAssertEqual(app.staticTexts["picker-label-scheme"].label, "Picker label scheme: \(mode)")
+            XCTAssertEqual(first.label, "First option scheme: \(mode)")
+            XCTAssertEqual(second.label, "Second option scheme: \(mode)")
+            assertLayout([first, second], app: app)
+            assertSelection(second, others: [first])
+            first.tap()
+            XCTAssertEqual(app.staticTexts["selection-state"].label, "Selected: compact-id")
+            assertSelection(first, others: [second])
+            capture("radio-group-explicit-\(mode)-opposing-\(opposing)", app: app)
+
+            app.buttons["toggle-disabled"].tap()
+            XCTAssertFalse(first.isEnabled)
+            XCTAssertFalse(second.isEnabled)
+            second.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            XCTAssertEqual(app.staticTexts["selection-state"].label, "Selected: compact-id")
+            assertSelection(first, others: [second])
+            XCTAssertEqual(first.label, "First option scheme: \(mode)")
+            XCTAssertEqual(second.label, "Second option scheme: \(mode)")
+            XCTAssertEqual(app.staticTexts["caller-scheme"].label, "Caller scheme: \(opposing)")
+            app.terminate()
+        }
+    }
+
     func testLongLabelsGrowWithoutClippingAtAccessibilitySizeInNarrowLayout() {
         var app = launch(scenario: "long-label")
         let standard = option("long-first", app: app).frame
@@ -134,10 +164,12 @@ import XCTest
     }
 
     private func launch(scenario: String, brand: String = "ocean", mode: String = "light",
-                        size: String = "large", expectsError: Bool = false) -> XCUIApplication {
+                        size: String = "large", hostMode: String? = nil,
+                        expectsError: Bool = false) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment = ["NDK_SCENARIO": scenario, "NDK_BRAND": brand,
-                                 "NDK_THEME": mode, "NDK_TEXT_SIZE": size]
+                                 "NDK_THEME": mode, "NDK_TEXT_SIZE": size,
+                                 "NDK_HOST_THEME": hostMode ?? mode]
         app.launch()
         let ready = expectsError ? app.staticTexts["fixture-error"] : app.descendants(matching: .any).matching(identifier: "review-list").firstMatch
         XCTAssertTrue(ready.waitForExistence(timeout: 10), app.debugDescription)
