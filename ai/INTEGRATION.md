@@ -43,3 +43,8 @@ To uninstall, remove the consumer adapter calls and the `NativeDesignKit`
 product/package dependency, then re-resolve and build/test the consumer. Keep
 the direct Tokens dependency if the consumer still uses it. No library-owned
 storage, tasks, registration or credentials need cleaning up.
+
+The unreleased Strata foundation checkout targets exact DesignTokens `0.2.0`;
+matching direct consumer dependencies must use that version after its separately
+authorized release. The released 0.1.0 instructions above describe provider0.1.1.
+Candidate-only mirrors are a test setup, not an installation route for products.

@@ -4,9 +4,13 @@ NativeDesignKit 0.1.0 is the first release (Git tag `v0.1.0`). [USAGE.md](USAGE.
 
 ## Fixed dependency
 
-The manifest consumes the public repository `https://github.com/LeePepe/shared-design-tokens.git` at exactly release `0.1.1` (tag `v0.1.1`, `exact: "0.1.1"`). Its SPM identity is `shared-design-tokens`; its exported product and module are `DesignTokens`. The dependency's package display name `DesignSystem` is not the product name. Both the library and test target declare the `DesignTokens` product dependency.
+The released 0.1.0 manifest consumes the public repository `https://github.com/LeePepe/shared-design-tokens.git` at exactly release `0.1.1` (tag `v0.1.1`, `exact: "0.1.1"`). Its SPM identity is `shared-design-tokens`; its exported product and module are `DesignTokens`. The dependency's package display name `DesignSystem` is not the product name. Both the library and test target declare the `DesignTokens` product dependency.
 
 This replaces the earlier candidate revision pin `1db868d` and the later `0.1.0` release pin; 0.1.1 carries the same runtime API and color data as both and adds only MIT license metadata and the LICENSE file. No dependency contents are vendored by this slice. Upgrades follow the Tokens `ai/MIGRATION.md` of the target version.
+
+The current unreleased foundation manifest targets exact `0.2.0`. Its frozen
+source candidate is under review; no remote v0.2.0 tag is available yet.
+Do not interpret local candidate mirror tests as released dependency evidence.
 
 ## Declared versus tested
 

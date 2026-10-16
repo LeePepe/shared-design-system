@@ -35,3 +35,8 @@ The fixture defaults to exact `0.1.0`; the Tokens pin remains exact `0.1.1`.
 Do not report a revision run as release-tag validation. Git/Xcode caches may
 be shared by the tools; source, build outputs and DerivedData for the consumer
 are per-run. The runner does not launch a simulator or a host app.
+
+The current fixture direct Tokens requirement is exact `0.2.0` for the unreleased
+Strata foundation candidate. Its remote external runner retains the old provider
+revision assertion until a separate checked dependency-contract update and
+authorized provider release. Candidate mirror runs do not pass that release gate.
