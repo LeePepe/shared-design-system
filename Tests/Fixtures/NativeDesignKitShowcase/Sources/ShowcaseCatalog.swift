@@ -293,7 +293,8 @@ struct Catalog: View {
             }
             panel("C08 / COMPOSITION", "Clear identity and status") {
                 NativeAvatar(theme: r.theme, diameter: r.avatar, accessibilityLabel: Text("Sample avatar, NK")) {
-                    Text("NK").nativeTypography(r.heading)
+                    // Initials are graphic content in a fixed-size avatar; the full identity is its AX label.
+                    Text("NK").font(.system(size: r.metrics.iconSize))
                 }
                 NativeIconLabel(theme: r.theme, metrics: r.metrics) { Image(systemName: "checkmark.seal") } label: {
                     Text("A generic icon and label")
