@@ -93,6 +93,45 @@ final class ListReviewUITests: XCTestCase {
     func testVisualPurpleDark() { matrix("purple", "dark") }
 
     func testActualSystemReduceTransparencyAndRestorePreference() throws {
+        let settings = transparencySettings()
+        let toggle = settings.switches["Reduce Transparency"]
+        for _ in 0..<5 where !toggle.isHittable { settings.swipeUp() }
+        XCTAssertTrue(toggle.waitForExistence(timeout: 5))
+        let original = try XCTUnwrap(toggle.value as? String)
+        XCTAssertTrue(["0", "1"].contains(original))
+        let originalEvidence = XCTAttachment(string: "Original Reduce Transparency: \(original); frame: \(toggle.frame)")
+        originalEvidence.name = "system-transparency-original"
+        originalEvidence.lifetime = .keepAlways
+        add(originalEvidence)
+        defer {
+            settings.terminate()
+            let restoredSettings = transparencySettings()
+            let restoredToggle = restoredSettings.switches["Reduce Transparency"]
+            setSwitch(restoredToggle, in: restoredSettings, to: original)
+            XCTAssertEqual(restoredToggle.value as? String, original, "Restore the original simulator preference.")
+            let restored = XCTAttachment(string: "Restored Reduce Transparency: \(restoredToggle.value as? String ?? "missing")")
+            restored.name = "system-transparency-restored"
+            restored.lifetime = .keepAlways
+            add(restored)
+            let restoredApp = launch(scenario: "system-fallback")
+            XCTAssertEqual(restoredApp.staticTexts["system-transparency"].label,
+                           original == "1" ? "System transparency: reduced" : "System transparency: full",
+                           "SwiftUI must observe the restored actual system preference.")
+            restoredApp.terminate()
+            restoredSettings.terminate()
+        }
+        setSwitch(toggle, in: settings, to: "1")
+        XCTAssertEqual(toggle.value as? String, "1")
+        let app = launch(scenario: "system-fallback")
+        XCTAssertEqual(app.staticTexts["system-transparency"].label, "System transparency: reduced")
+        for title in titles { minimumTarget(row(title, in: app)) }
+        capture("list-system-reduced-transparency", app)
+        row(titles[1], in: app).tap()
+        XCTAssertTrue(row(titles[1], in: app).isSelected)
+        app.terminate()
+    }
+
+    private func transparencySettings() -> XCUIApplication {
         let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
         settings.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         settings.launch()
@@ -107,53 +146,22 @@ final class ListReviewUITests: XCTestCase {
         XCTAssertTrue(accessibility.waitForExistence(timeout: 5))
         accessibility.tap()
         settings.staticTexts["Display & Text Size"].tap()
-        let toggle = settings.switches["Reduce Transparency"]
-        for _ in 0..<5 where !toggle.isHittable { settings.swipeUp() }
-        XCTAssertTrue(toggle.waitForExistence(timeout: 5))
-        let original = try XCTUnwrap(toggle.value as? String)
-        XCTAssertTrue(["0", "1"].contains(original))
-        let originalEvidence = XCTAttachment(string: "Original Reduce Transparency: \(original); frame: \(toggle.frame)")
-        originalEvidence.name = "system-transparency-original"
-        originalEvidence.lifetime = .keepAlways
-        add(originalEvidence)
-        defer {
-            settings.activate()
-            setSwitch(toggle, in: settings, to: original)
-            XCTAssertEqual(toggle.value as? String, original, "Restore the original simulator preference.")
-            let restored = XCTAttachment(string: "Restored Reduce Transparency: \(toggle.value as? String ?? "missing")")
-            restored.name = "system-transparency-restored"
-            restored.lifetime = .keepAlways
-            add(restored)
-            let restoredApp = launch(scenario: "system-fallback")
-            XCTAssertEqual(restoredApp.staticTexts["system-transparency"].label,
-                           original == "1" ? "System transparency: reduced" : "System transparency: full",
-                           "SwiftUI must observe the restored actual system preference.")
-            restoredApp.terminate()
-            settings.terminate()
-        }
-        setSwitch(toggle, in: settings, to: "1")
-        XCTAssertEqual(toggle.value as? String, "1")
-        let app = launch(scenario: "system-fallback")
-        XCTAssertEqual(app.staticTexts["system-transparency"].label, "System transparency: reduced")
-        for title in titles { minimumTarget(row(title, in: app)) }
-        capture("list-system-reduced-transparency", app)
-        row(titles[1], in: app).tap()
-        XCTAssertTrue(row(titles[1], in: app).isSelected)
-        app.terminate()
+        return settings
     }
 
     private func setSwitch(_ toggle: XCUIElement, in settings: XCUIApplication, to value: String) {
-        if toggle.value as? String != value {
+        for _ in 0..<3 where toggle.value as? String != value {
             let controls = settings.cells["REDUCE_TRANSPARENCY"].switches.allElementsBoundByIndex
             guard let control = controls.first(where: { $0.label.isEmpty && $0.frame.width < 100 }) else {
                 XCTFail("The actual trailing native switch control must exist: \(settings.debugDescription)")
                 return
             }
+            XCTAssertTrue(control.isHittable)
             control.tap()
+            let changed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: toggle)
+            if XCTWaiter.wait(for: [changed], timeout: 2) == .completed { break }
         }
-        let changed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: toggle)
-        XCTAssertEqual(XCTWaiter.wait(for: [changed], timeout: 5), .completed,
-                       "The actual Settings switch must reach \(value).")
+        XCTAssertEqual(toggle.value as? String, value, "The actual Settings switch must reach \(value).")
     }
 
     func testInvalidBrandDoesNotRenderFallbackList() {
