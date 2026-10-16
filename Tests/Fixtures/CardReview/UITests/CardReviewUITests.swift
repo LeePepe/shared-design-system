@@ -136,13 +136,20 @@ final class CardReviewUITests: XCTestCase {
         settings.staticTexts["Display & Text Size"].tap()
         let preference = settings.switches["Reduce Transparency"]
         XCTAssertTrue(preference.waitForExistence(timeout: 5))
-        let original = preference.value as? String
+        guard let original = preference.value as? String, ["0", "1"].contains(original) else {
+            XCTFail("Reduce Transparency did not expose a readable system preference")
+            settings.terminate()
+            return
+        }
         if original != "1" { preference.tap() }
         defer {
             settings.activate()
             if (preference.value as? String) != original { preference.tap() }
+            XCTAssertEqual(preference.value as? String, original)
+            print("CARD_SYSTEM_TRANSPARENCY original=\(original) restored=\(preference.value ?? "unreadable")")
             settings.terminate()
         }
+        XCTAssertEqual(preference.value as? String, "1")
         let app = launchSpecimen(preference: "system")
         XCTAssertEqual(app.staticTexts["system-transparency"].label, "System Reduce Transparency: on")
         recordSpecimenGeometry(app, name: "card-strata-blue-light-system-fallback")
