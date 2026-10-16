@@ -50,6 +50,8 @@ grows and wraps without shrinking typography to preserve the silhouette.
 Secondary uses the shared neutral dense surface with a restrained material edge
 when Glass is requested; it adds no second blur below a specimen shell. Ghost
 uses provider brand text with no idle fill and a subtle brand hover/pressed fill.
+Solid and reduced-transparency Secondary use the neutral inset role to retain
+their capsule against the card plane.
 Primary remains solid in both material choices and uses the provider's hover and
 active pairs. Press feedback includes an outline; keyboard focus uses a
 continuous accent outline. Reduce Motion removes scale and spinner rotation.

@@ -1,6 +1,6 @@
 import XCTest
 
-/// Real pointer/keyboard events run on macOS; iPhone has no pointer event support.
+/// Real pointer/keyboard events run on macOS or iPad; iPhone rejects pointer events.
 @MainActor
 final class ButtonPointerReviewUITests: XCTestCase {
     func testPointerHoverForEveryVariant() {

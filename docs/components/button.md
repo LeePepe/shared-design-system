@@ -7,7 +7,8 @@ Button stage in approved prototype revision
 
 Primary uses the provider's solid contrast pair, including hover and active
 roles. Secondary uses the shared dense neutral surface and its weak material
-edge; it introduces no nested blur. Ghost uses the explicit brand text role and
+edge; it introduces no nested blur. Solid/Reduce Transparency Secondary uses the neutral inset fill so its capsule
+stays distinct from the inner card plane. Ghost uses the explicit brand text role and
 a subtle fill for hover/press. Disabled controls retain readable neutral text;
 no whole-content opacity reduces contrast. Native SwiftUI Button owns activation
 and accessibility semantics, while the caller owns action, loading and labels.

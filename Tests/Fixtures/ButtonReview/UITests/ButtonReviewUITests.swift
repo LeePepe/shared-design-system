@@ -296,21 +296,25 @@ final class ButtonReviewUITests: XCTestCase {
         let toggle = settings.switches.matching(NSPredicate(format: "label IN %@", [name, translatedName])).firstMatch
         guard toggle.waitForExistence(timeout: 5) else { XCTFail("System setting unavailable: \(name)"); return }
         guard let original = toggle.value as? String else { XCTFail("System switch has no value"); return }
-        if (toggle.value as? String) != "1" {
-            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
-        }
-        let enabled = expectation(for: NSPredicate(format: "value == '1'"), evaluatedWith: toggle)
-        wait(for: [enabled], timeout: 5)
+        setSystemSwitch(toggle, value: "1")
         defer {
             settings.activate()
-            if (toggle.value as? String) != original {
-                toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
-            }
-            let restored = expectation(for: NSPredicate(format: "value == %@", original), evaluatedWith: toggle)
-            wait(for: [restored], timeout: 5)
+            setSystemSwitch(toggle, value: original)
             settings.terminate()
         }
         body()
+    }
+
+    private func setSystemSwitch(_ toggle: XCUIElement, value: String) {
+        // Settings may return from app activation before SpringBoard's transition
+        // accepts the first touch. Re-observe the real value before each retry.
+        for _ in 0..<3 {
+            if (toggle.value as? String) == value { return }
+            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+            let changed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: toggle)
+            if XCTWaiter.wait(for: [changed], timeout: 3) == .completed { return }
+        }
+        XCTAssertEqual(toggle.value as? String, value, "The actual system preference must be observed, including restoration.")
     }
 
     private func launch(scenario: String, brand: String = "strata-blue", mode: String = "light", surface: String = "glass",

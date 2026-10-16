@@ -11,7 +11,7 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    TARGETED_DEVICE_FAMILY: "1"
+    TARGETED_DEVICE_FAMILY: "1,2"
     GENERATE_INFOPLIST_FILE: YES
     CODE_SIGNING_ALLOWED: NO
 targets:
@@ -46,6 +46,16 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.ButtonReviewMac
+  ButtonPointerReviewIOSUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [PointerTests]
+    dependencies:
+      - target: ButtonReview
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.ButtonPointerReviewIOSUITests
+        TEST_TARGET_NAME: ButtonReview
   ButtonPointerReviewUITests:
     type: bundle.ui-testing
     platform: macOS
@@ -74,3 +84,11 @@ schemes:
     test:
       gatherCoverageData: false
       targets: [ButtonPointerReviewUITests]
+  ButtonReviewPointer:
+    build:
+      targets:
+        ButtonReview: all
+        ButtonPointerReviewIOSUITests: [test]
+    test:
+      gatherCoverageData: false
+      targets: [ButtonPointerReviewIOSUITests]

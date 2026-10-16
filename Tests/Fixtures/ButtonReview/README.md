@@ -97,10 +97,23 @@ xcodegen generate --no-env --spec Tests/Fixtures/ButtonReview/project.yml
 xcodebuild test -project Tests/Fixtures/ButtonReview/ButtonReview.xcodeproj \
   -scheme ButtonReviewMac -destination 'platform=macOS' \
   -derivedDataPath <external-new-directory> -resultBundlePath <external-new>.xcresult \
+  CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-
+```
+
+The ad-hoc identity signs only the local test app/runner, with no account or
+provisioning profile. This host may still reject native UI automation before
+any test method runs. The same pointer/keyboard suite is also available on an
+iPad simulator through `ButtonReviewPointer`; iPhone remains the20-specimen
+and behavior target.
+
+```sh
+xcodebuild test -project Tests/Fixtures/ButtonReview/ButtonReview.xcodeproj \
+  -scheme ButtonReviewPointer -destination 'platform=iOS Simulator,id=<iPad-UUID>' \
+  -derivedDataPath <external-new-directory> -resultBundlePath <external-new>.xcresult \
   CODE_SIGNING_ALLOWED=NO
 ```
 
-Export macOS attachments using `xcrun xcresulttool export attachments`. A keyboard
+Export macOS/iPad attachments using `xcrun xcresulttool export attachments`. A keyboard
 navigation screenshot is an observation; claim a visible focus ring only after
 inspecting that actual capture. Host automation permissions remain a separate
 runtime requirement and cannot be inferred from a package build.

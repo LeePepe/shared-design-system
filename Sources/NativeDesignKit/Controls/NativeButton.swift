@@ -140,6 +140,8 @@ private struct NativeActionButtonStyle: ButtonStyle {
     let isLoading: Bool
     let reduceMotion: Bool
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
+    @Environment(\.nativeReduceTransparencyOverride) private var reduceTransparencyOverride
     @State private var isHovered = false
 
     func makeBody(configuration: Configuration) -> some View {
@@ -155,8 +157,14 @@ private struct NativeActionButtonStyle: ButtonStyle {
                     if let fill = paint.fill { NativeButtonShape().fill(fill) }
                 case .secondary:
                     // The shared dense role supplies a restrained edge without another blur.
-                    Color.clear
-                        .nativeSurface(theme: theme, style: surface, cornerRadius: 22, role: .card)
+                    Group {
+                        if surface == .solid || (reduceTransparencyOverride ?? systemReduceTransparency) {
+                            NativeButtonShape().fill(theme.surface(.inset))
+                        } else {
+                            Color.clear
+                                .nativeSurface(theme: theme, style: surface, cornerRadius: 22, role: .card)
+                        }
+                    }
                         .overlay {
                             if let fill = paint.fill { NativeButtonShape().fill(fill) }
                         }
