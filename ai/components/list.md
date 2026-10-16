@@ -95,10 +95,10 @@ the primary or secondary slot. Caller content may override semantic styling.
 The [fixture](../../Tests/Fixtures/ListReview/README.md) contains actual SwiftUI
 selection, disabled/read-only/multiple, external-state, reorder and narrow-text
 checks. The twenty palette/mode/material captures, ten forced fallbacks and
-actual simulator Reduce Transparency check are specified there. The draft has
-not yet been compiled against its frozen dependency or run: only Swift syntax
-parsing has completed. Final verified SHA, dependency provenance and raw PNG
-paths belong in the PR/evidence receipt. No VoiceOver, keyboard, hover,
+actual simulator Reduce Transparency check are specified there. Runtime text
+bounds accompany captures for inspecting full-coverage text against actual
+composited surfaces. Verified SHA, dependency provenance and raw PNG paths
+belong in the PR/evidence receipt. No VoiceOver, keyboard, hover,
 minimum-OS or physical-device acceptance is inferred from source or screenshots.
 Rollback removes these additive call sites and restores a reviewed revision;
 there is no stored data to migrate.

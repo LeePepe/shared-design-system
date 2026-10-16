@@ -56,10 +56,16 @@ external changes, identity after caller reorder, read-only nonbutton semantics,
 minimum 44pt targets and narrow Dynamic Type height growth. Frame containment
 is asserted before specimen captures. All labels/state are fixture-owned.
 
-Draft validation: `swiftc -frontend -parse` passed for the component, package
-tests and fixture Swift sources. No type-check/build, package run, fixture run,
-PNG inspection, actual composite contrast or final visual acceptance is yet
-claimed. Those await exact frozen foundation/provider integration and the
-original worker's resume. Keyboard/focus/hover, VoiceOver, minimum OS and
-physical devices require their own runtime evidence; source affordances or
-static captures do not establish those results.
+Each screenshot also attaches `-geometry.json` telemetry with the SwiftUI
+text frames, the observed heading accessibility frame and viewport size.
+`verify-contrast.py` reads those attachments and the exact provider artifact,
+then inspects full-coverage glyph pixels and adjacent actual surface pixels.
+It also checks solid/forced-fallback image equality in the specimen area.
+The receipt records results and limitations; pixel antialiasing edges do not
+represent full-coverage text contrast.
+
+Run normal package verification as well as the UI fixture; the final evidence
+receipt names the tested source/dependency SHAs and actual outcomes. Candidate
+mirror success is not released remote dependency proof. Keyboard/focus/hover,
+VoiceOver, minimum OS and physical devices require their own runtime evidence;
+source affordances or static captures do not establish those results.

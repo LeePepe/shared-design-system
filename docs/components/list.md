@@ -26,9 +26,9 @@ The real [ListReview fixture](../../Tests/Fixtures/ListReview/README.md) checks
 native activation, disabled coordinate taps, stable identity after reorder,
 external binding state, multiple selection, static rows and 44pt targets.
 
-Draft status: Swift syntax parsed; full type checking, package verification,
-runtime interaction/captures, actual composite contrast and independent
-exact-SHA visual review remain pending frozen foundation/provider integration.
+Verification uses SwiftPM build/tests followed by the actual SwiftUI fixture.
+Text-frame telemetry is attached with raw screenshots to inspect primary,
+secondary, metadata and context contrast on their actual composites.
 Final evidence must name clean component head and dependency SHA, distinguish
 candidate mirrors from released resolution, and preserve raw PNG provenance.
 No gate/policy, shared foundation or existing component source is changed here.

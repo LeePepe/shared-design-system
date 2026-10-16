@@ -71,7 +71,7 @@ private struct DesignNote: Identifiable {
     let metadata: String
 
     static let samples = [
-        DesignNote(id: "surface", title: "表面与层次", detail: "用明度建立空间秩序", symbol: "square.3.layers", metadata: "04 项"),
+        DesignNote(id: "surface", title: "表面与层次", detail: "用明度建立空间秩序", symbol: "square.3.layers.3d", metadata: "04 项"),
         DesignNote(id: "color", title: "色彩与语义", detail: "品牌、状态与图表各司其职", symbol: "circle.lefthalf.filled", metadata: "05 色"),
         DesignNote(id: "type", title: "文字与节奏", detail: "让阅读轻松，让重点清晰", symbol: "textformat", metadata: "14 px")
     ]
@@ -84,6 +84,7 @@ private struct ListReviewBoard: View {
     @State private var isDisabled = false
     @State private var isReversed = false
     @State private var writes = 0
+    @State private var textFrames: [String: CGRect] = [:]
     @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
     private var theme: NativeDesignTheme { configuration.theme }
     private var isLong: Bool { configuration.scenario == "long-label" }
@@ -91,7 +92,7 @@ private struct ListReviewBoard: View {
         if isLong {
             return [DesignNote(id: "surface", title: "Surface hierarchy with a complete, caller-owned descriptive title",
                                detail: "Supporting information wraps naturally and remains readable at accessibility sizes.",
-                               symbol: "square.3.layers", metadata: "4 notes")]
+                               symbol: "square.3.layers.3d", metadata: "4 notes")]
         }
         return isReversed ? DesignNote.samples.reversed() : DesignNote.samples
     }
@@ -124,6 +125,8 @@ private struct ListReviewBoard: View {
             Text("悬停轻提亮；选中加深表面，并显示「✓ 已选」。")
                 .font(.caption).foregroundStyle(theme.secondaryForeground)
                 .accessibilityIdentifier("specimen-note")
+                .background(measure("note"))
+                .accessibilityValue(frameJSON)
             if ["interaction", "multiple", "read-only"].contains(configuration.scenario) {
                 behaviorControls
             }
@@ -135,6 +138,7 @@ private struct ListReviewBoard: View {
         .frame(width: isLong ? 320 : nil)
         .frame(maxWidth: .infinity, alignment: .top)
         .accessibilityIdentifier("review-scroll")
+        .onPreferenceChange(ListTextFrames.self) { textFrames = $0 }
         .dynamicTypeSize(configuration.size)
         .environment(\.nativeReduceTransparencyOverride, configuration.reduceTransparency ? true : nil)
     }
@@ -146,9 +150,9 @@ private struct ListReviewBoard: View {
             isRowEnabled: { configuration.scenario != "interaction" || $0.id != "type" }
         ) {
             HStack {
-                Text("设计笔记").accessibilityIdentifier("list-heading")
+                Text("设计笔记").accessibilityIdentifier("list-heading").background(measure("heading"))
                 Spacer(minLength: 8)
-                Text("示例列表").font(.caption).foregroundStyle(theme.secondaryForeground)
+                Text("示例列表").background(measure("badge")).font(.caption).foregroundStyle(theme.secondaryForeground)
                     .padding(.horizontal, 8).padding(.vertical, 4)
                     .background(theme.surface(.inset), in: Capsule())
             }
@@ -156,21 +160,36 @@ private struct ListReviewBoard: View {
             Image(systemName: note.symbol)
         } primary: { note in
             Text(note.title).accessibilityIdentifier("primary-\(note.id)")
+                .background(measure("primary-" + note.id))
         } secondary: { note in
             Text(note.detail).accessibilityIdentifier("secondary-\(note.id)")
+                .background(measure("secondary-" + note.id))
         } trailing: { note in
-            Text(note.metadata)
+            Text(note.metadata).background(measure("metadata-" + note.id))
         } footer: {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(alignment: .top) {
-                    Text("当前：\(currentTitle)").accessibilityIdentifier("selection-context")
+                    Text("当前：\(currentTitle)").accessibilityIdentifier("selection-context").background(measure("context"))
                     Spacer(minLength: 8)
-                    Text("点击切换")
+                    Text("点击切换").background(measure("instruction"))
                 }
-                Text("\(selectedCount) 项已选").accessibilityIdentifier("selected-count")
+                Text("\(selectedCount) 项已选").accessibilityIdentifier("selected-count").background(measure("count"))
             }
         }
         .disabled(isDisabled)
+    }
+
+    private var frameJSON: String {
+        let payload = textFrames.mapValues { [$0.minX, $0.minY, $0.width, $0.height] }
+        guard let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
+              let text = String(data: data, encoding: .utf8) else { return "{}" }
+        return text
+    }
+
+    private func measure(_ name: String) -> some View {
+        GeometryReader { proxy in
+            Color.clear.preference(key: ListTextFrames.self, value: [name: proxy.frame(in: .global)])
+        }
     }
 
     private var behaviorControls: some View {
@@ -185,5 +204,12 @@ private struct ListReviewBoard: View {
         }
         .font(.body)
         .buttonStyle(.bordered)
+    }
+}
+
+private struct ListTextFrames: PreferenceKey {
+    static let defaultValue: [String: CGRect] = [:]
+    static func reduce(value: inout [String: CGRect], nextValue: () -> [String: CGRect]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, next in next })
     }
 }

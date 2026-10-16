@@ -94,7 +94,14 @@ final class ListReviewUITests: XCTestCase {
 
     func testActualSystemReduceTransparencyAndRestorePreference() throws {
         let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
+        settings.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         settings.launch()
+        for _ in 0..<6 {
+            if settings.navigationBars["Settings"].exists { break }
+            let back = settings.navigationBars.buttons.firstMatch
+            guard back.exists else { break }
+            back.tap()
+        }
         let accessibility = settings.staticTexts["Accessibility"]
         for _ in 0..<8 where !accessibility.isHittable { settings.swipeUp() }
         XCTAssertTrue(accessibility.waitForExistence(timeout: 5))
@@ -165,6 +172,32 @@ final class ListReviewUITests: XCTestCase {
     }
 
     private func capture(_ name: String, _ app: XCUIApplication) {
+        if let raw = app.staticTexts["specimen-note"].value as? String,
+           let data = raw.data(using: .utf8),
+           var frames = (try? JSONSerialization.jsonObject(with: data)) as? [String: [Double]] {
+            XCTAssertFalse(frames.isEmpty, "Runtime text frames must accompany actual PNG contrast inspection.")
+            let heading = app.staticTexts["list-heading"].frame
+            frames["_headingAX"] = [heading.minX, heading.minY, heading.width, heading.height]
+            frames["_screen"] = [0, 0, app.frame.width, app.frame.height]
+            for (name, label) in [("_section", "03  List 列表"), ("_masthead", "Strata · 岩层")] {
+                let frame = app.staticTexts[label].frame
+                frames[name] = [frame.minX, frame.minY, frame.width, frame.height]
+            }
+            for (index, title) in titles.enumerated() {
+                let button = row(title, in: app)
+                if button.exists {
+                    let frame = button.frame
+                    frames["_row-\(index)"] = [frame.minX, frame.minY, frame.width, frame.height]
+                }
+            }
+            let telemetry = try! JSONSerialization.data(withJSONObject: frames, options: [.sortedKeys])
+            let geometry = XCTAttachment(data: telemetry, uniformTypeIdentifier: "public.json")
+            geometry.name = name + "-geometry"
+            geometry.lifetime = .keepAlways
+            add(geometry)
+        } else {
+            XCTFail("Missing runtime text geometry for " + name)
+        }
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = name
         attachment.lifetime = .keepAlways
