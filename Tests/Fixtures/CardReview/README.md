@@ -57,7 +57,9 @@ or foreground overrides.
 
 The specimen action is tapped and its caller-owned feedback is checked. A
 narrower long specimen and accessibility3 top/action/bottom segments verify
-natural growth without clipping. The system fallback test opens Settings,
+natural growth without clipping. A read-only preflight launches without an
+override and asserts the actual system Reduce Transparency preference is off
+before any Glass capture. The system fallback test opens Settings,
 records the current Reduce Transparency value, turns it on, launches without
 the internal override, confirms the actual SwiftUI environment value and
 captures the fallback, then restores the original setting. Run simulator work

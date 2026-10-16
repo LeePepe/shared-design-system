@@ -2,6 +2,13 @@ import XCTest
 
 @MainActor
 final class CardReviewUITests: XCTestCase {
+    func testActualSystemTransparencyIsOffBeforeCapture() {
+        let app = launchSpecimen(preference: "system")
+        XCTAssertEqual(app.staticTexts["system-transparency"].label, "System Reduce Transparency: off")
+        print("CARD_SYSTEM_PREFLIGHT actual=\(app.staticTexts["system-transparency"].label)")
+        app.terminate()
+    }
+
     func testCallerActionsAndDisabledDescendantRemainIndependent() {
         let app = launch()
         let action = app.buttons["card-action"]
