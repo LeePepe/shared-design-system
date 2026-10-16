@@ -65,7 +65,7 @@ public struct NativeButton<Label: View, LoadingLabel: View>: View {
                 .accessibilityHidden(!isLoading)
             }
             .font(.callout.weight(.semibold))
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 14)
             .padding(.vertical, 10)
             .frame(minWidth: 44, minHeight: 44)
             .contentShape(NativeButtonShape())

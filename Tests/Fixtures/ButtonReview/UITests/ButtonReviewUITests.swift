@@ -89,15 +89,41 @@ final class ButtonReviewUITests: XCTestCase {
     func testSpecimenPurpleDarkSolid() { specimen(brand: "strata-purple", mode: "dark", surface: "solid") }
 
     func testReduceMotionLoadingRetainsReadableStateAndFootprint() {
-        let app = launch(scenario: "interaction", reduceMotion: true)
-        let target = app.buttons["action-target"]
-        let idle = target.frame
-        app.buttons["toggle-loading"].tap()
-        XCTAssertTrue(target.label.contains("Saving all your changes…"))
-        XCTAssertFalse(target.isEnabled)
-        XCTAssertEqual(target.frame.width, idle.width, accuracy: 0.5)
-        XCTAssertEqual(target.frame.height, idle.height, accuracy: 0.5)
-        capture("button-reduce-motion-loading", app: app)
+        withSystemPreference(section: "Motion", name: "Reduce Motion") {
+            let app = launch(scenario: "interaction")
+            XCTAssertEqual(app.staticTexts["motion-preference"].label, "Motion: reduced")
+            let target = app.buttons["action-target"]
+            let idle = target.frame
+            app.buttons["toggle-loading"].tap()
+            XCTAssertTrue(target.label.contains("Saving all your changes…"))
+            XCTAssertFalse(target.isEnabled)
+            XCTAssertEqual(target.frame.width, idle.width, accuracy: 0.5)
+            XCTAssertEqual(target.frame.height, idle.height, accuracy: 0.5)
+            capture("button-reduce-motion-loading", app: app)
+            app.terminate()
+        }
+    }
+
+    func testRealReduceTransparencyFallbackRetainsThemeAndGeometry() {
+        var frames: [String: CGRect] = [:]
+        let baseline = launch(scenario: "specimen", brand: "strata-purple", mode: "dark")
+        for id in ["save", "secondary", "ghost", "disabled", "loading"] {
+            frames[id] = baseline.buttons["specimen-\(id)"].frame
+        }
+        baseline.terminate()
+        withSystemPreference(section: "Display & Text Size", name: "Reduce Transparency") {
+            let app = launch(scenario: "specimen", brand: "strata-purple", mode: "dark")
+            XCTAssertTrue(String(describing: app.scrollViews["review-scroll"].value).contains("reduce-transparency=true"))
+            for (id, frame) in frames {
+                let actual = app.buttons["specimen-\(id)"].frame
+                XCTAssertEqual(actual.minX, frame.minX, accuracy: 0.5)
+                XCTAssertEqual(actual.minY, frame.minY, accuracy: 0.5)
+                XCTAssertEqual(actual.width, frame.width, accuracy: 0.5)
+                XCTAssertEqual(actual.height, frame.height, accuracy: 0.5)
+            }
+            capture("button-strata-purple-dark-reduced-transparency", app: app)
+            app.terminate()
+        }
     }
 
     func testInvalidBrandShowsErrorWithoutFallback() {
@@ -115,14 +141,54 @@ final class ButtonReviewUITests: XCTestCase {
             XCTAssertEqual(target.isEnabled, id != "disabled" && id != "loading")
             assertMinimumTarget(target, scale: scale)
             XCTAssertTrue(app.scrollViews["review-scroll"].frame.contains(target.frame), id)
+            let expected = ["save": "Save", "secondary": "Secondary", "ghost": "Ghost",
+                            "disabled": "Disabled", "loading": "Loading"][id]!
+            XCTAssertEqual(target.label, expected)
+            let label = target.staticTexts[expected]
+            XCTAssertTrue(label.exists)
+            XCTAssertTrue(target.frame.insetBy(dx: -0.5, dy: -0.5).contains(label.frame))
         }
-        capture("button-\(brand)-\(mode)-\(surface)", app: app)
+        let name = "button-\(brand)-\(mode)-\(surface)"
+        recordCompositeGeometry(name: name, brand: brand, mode: mode, app: app)
+        capture(name, app: app)
         app.buttons["specimen-save"].tap()
         XCTAssertTrue(app.staticTexts["specimen-feedback"].label.contains("Example saved · 1"))
         for id in ["disabled", "loading"] {
             app.buttons["specimen-\(id)"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         }
         XCTAssertTrue(app.staticTexts["specimen-feedback"].label.contains("Example saved · 1"))
+    }
+
+    private func recordCompositeGeometry(name: String, brand: String, mode: String, app: XCUIApplication) {
+        func rectangle(_ frame: CGRect) -> [Double] {
+            [Double(frame.minX), Double(frame.minY), Double(frame.width), Double(frame.height)]
+        }
+        var samples: [[String: Any]] = []
+        for (id, label, token) in [
+            ("save", "Save", "brand.\(brand).on-accent"),
+            ("secondary", "Secondary", "product.strata.text.primary"),
+            ("ghost", "Ghost", "brand.\(brand).text"),
+            ("disabled", "Disabled", "product.strata.text.secondary"),
+            ("loading", "Loading", "brand.\(brand).on-accent")
+        ] {
+            let control = app.buttons["specimen-\(id)"]
+            samples.append(["role": id, "token": token, "text": rectangle(control.staticTexts[label].frame),
+                            "control": rectangle(control.frame)])
+        }
+        for (id, token) in [("specimen-state-label", "product.strata.text.secondary"),
+                            ("specimen-caption", "product.strata.text.secondary"),
+                            ("specimen-feedback", "product.strata.text.secondary")] {
+            samples.append(["role": id, "token": token, "text": rectangle(app.staticTexts[id].frame)])
+        }
+        for title in ["Strata · 岩层", "01  Button"] {
+            samples.append(["role": title, "token": "product.strata.text.primary",
+                            "text": rectangle(app.staticTexts[title].frame)])
+        }
+        let receipt: [String: Any] = ["name": name, "mode": mode, "viewport": rectangle(app.frame), "samples": samples]
+        do {
+            let data = try JSONSerialization.data(withJSONObject: receipt, options: [.sortedKeys])
+            print("BUTTON_COMPOSITE " + String(decoding: data, as: UTF8.self))
+        } catch { XCTFail("Could not serialize observed runtime text bounds: \(error)") }
     }
 
     private func matrix(brand: String, mode: String) {
@@ -179,12 +245,43 @@ final class ButtonReviewUITests: XCTestCase {
         add(attachment)
     }
 
+    /// Changes and restores the simulator's actual setting through its native UI.
+    private func withSystemPreference(section: String, name: String, body: () -> Void) {
+        let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
+        settings.launch()
+        let accessibility = settings.staticTexts["Accessibility"]
+        for _ in 0..<8 {
+            if accessibility.isHittable { break }
+            settings.swipeUp()
+        }
+        guard accessibility.isHittable else { XCTFail("Settings Accessibility entry unavailable"); return }
+        accessibility.tap()
+        let sectionEntry = settings.staticTexts[section]
+        for _ in 0..<5 {
+            if sectionEntry.isHittable { break }
+            settings.swipeUp()
+        }
+        guard sectionEntry.isHittable else { XCTFail("Settings section unavailable: \(section)"); return }
+        sectionEntry.tap()
+        let toggle = settings.switches[name]
+        guard toggle.waitForExistence(timeout: 5) else { XCTFail("System setting unavailable: \(name)"); return }
+        let original = String(describing: toggle.value)
+        if (toggle.value as? String) != "1" { toggle.tap() }
+        XCTAssertEqual(toggle.value as? String, "1")
+        defer {
+            settings.activate()
+            if String(describing: toggle.value) != original { toggle.tap() }
+            XCTAssertEqual(String(describing: toggle.value), original, "Restore the prior simulator preference.")
+            settings.terminate()
+        }
+        body()
+    }
+
     private func launch(scenario: String, brand: String = "strata-blue", mode: String = "light", surface: String = "glass",
-                        size: String = "large", language: String = "en", reduceMotion: Bool = false, expectsError: Bool = false) -> XCUIApplication {
+                        size: String = "large", language: String = "en", expectsError: Bool = false) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment = ["NDK_SCENARIO": scenario, "NDK_BRAND": brand, "NDK_THEME": mode,
-                                 "NDK_TEXT_SIZE": size, "NDK_LANGUAGE": language, "NDK_SURFACE": surface,
-                                 "NDK_REDUCE_MOTION": reduceMotion ? "1" : "0"]
+                                 "NDK_TEXT_SIZE": size, "NDK_LANGUAGE": language, "NDK_SURFACE": surface]
         app.launch()
         let ready = expectsError ? app.staticTexts["fixture-error"] : app.scrollViews["review-scroll"]
         XCTAssertTrue(ready.waitForExistence(timeout: 10), app.debugDescription)

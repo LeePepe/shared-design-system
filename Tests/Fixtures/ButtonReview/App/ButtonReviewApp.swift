@@ -11,7 +11,6 @@ struct ButtonReviewApp: App {
             switch configuration {
             case .success(let configuration):
                 ButtonReviewBoard(configuration: configuration)
-                    .environment(\.accessibilityReduceMotion, configuration.reduceMotion)
                     .preferredColorScheme(configuration.isDark ? .dark : .light)
                     .environment(\.locale, Locale(identifier: configuration.language))
             case .failure(let error):
@@ -32,7 +31,6 @@ private struct ReviewConfiguration {
     let mode: String
     let scenario: String
     let surface: NativeSurfaceStyle
-    let reduceMotion: Bool
     let textSize: DynamicTypeSize
     let language: String
     var isDark: Bool { mode == "dark" }
@@ -56,7 +54,6 @@ private struct ReviewConfiguration {
         case "solid": surface = .solid
         default: throw ConfigurationError.invalid("NDK_SURFACE")
         }
-        reduceMotion = environment["NDK_REDUCE_MOTION"] == "1"
         switch mode {
         case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
         case "dark": theme = try NativeDesignTheme(theme: .dark, brand: brand)
@@ -82,24 +79,32 @@ private struct ButtonReviewBoard: View {
     @State private var buttonBounds: CGRect = .zero
     @State private var idleLabelBounds: CGRect = .zero
     @State private var loadingLabelBounds: CGRect = .zero
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     private var theme: NativeDesignTheme { configuration.theme }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                switch configuration.scenario {
-                case "specimen": specimen
-                case "matrix": matrix
-                case "long-label": longLabel
-                default: interaction
+        Group {
+            if configuration.scenario == "specimen" {
+                specimen.accessibilityIdentifier("review-scroll")
+                    .accessibilityValue("reduce-transparency=\(reduceTransparency)")
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        switch configuration.scenario {
+                        case "matrix": matrix
+                        case "long-label": longLabel
+                        default: interaction
+                        }
+                    }
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                .accessibilityIdentifier("review-scroll")
+                .foregroundStyle(theme.foreground)
+                .background(theme.canvas.ignoresSafeArea())
             }
-            .padding(16)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .accessibilityIdentifier("review-scroll")
-        .foregroundStyle(theme.foreground)
-        .background(theme.canvas.ignoresSafeArea())
         .dynamicTypeSize(.large)
     }
 
@@ -121,6 +126,7 @@ private struct ButtonReviewBoard: View {
                     }
                     HStack(spacing: 8) {
                         Text("States").font(.caption).foregroundStyle(theme.secondaryForeground)
+                            .accessibilityIdentifier("specimen-state-label")
                         NativeButton(theme: theme, variant: .secondary, surface: configuration.surface,
                                      isLoading: false, action: { actionCount += 1 }) {
                             Text("Disabled")
@@ -135,6 +141,7 @@ private struct ButtonReviewBoard: View {
                     }
                     Text("44 pt targets · Adaptive capsules")
                         .font(.caption).foregroundStyle(theme.secondaryForeground)
+                        .accessibilityIdentifier("specimen-caption")
                 }
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -152,6 +159,7 @@ private struct ButtonReviewBoard: View {
                      isLoading: false, action: { actionCount += 1 }, label: content) {
             Text(variant == .primary ? "Save" : "Wait")
         }
+        .fixedSize(horizontal: true, vertical: false)
         .accessibilityIdentifier(id)
     }
 
@@ -259,6 +267,8 @@ private struct ButtonReviewBoard: View {
     private var fixtureControls: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(isLoading ? "Loading" : "Idle").accessibilityIdentifier("loading-state")
+            Text(reduceMotion ? "Motion: reduced" : "Motion: standard")
+                .accessibilityIdentifier("motion-preference")
             Button(isLoading ? "Stop loading" : "Start loading") { isLoading.toggle() }
                 .accessibilityIdentifier("toggle-loading")
             Button(isDisabled ? "Enable action" : "Disable action") { isDisabled.toggle() }

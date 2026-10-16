@@ -7,8 +7,9 @@ synthetic state, not a product screen or additional library product. See the
 The local package path is `../../..`. No dependency pin or platform floor changes.
 
 The UI tests provide all required `NDK_BRAND`, `NDK_THEME`, `NDK_SURFACE`,
-`NDK_SCENARIO`, `NDK_TEXT_SIZE` and `NDK_LANGUAGE` launch inputs. Optional
-`NDK_REDUCE_MOTION=1` stops nonessential animation without hiding loading text.
+`NDK_SCENARIO`, `NDK_TEXT_SIZE` and `NDK_LANGUAGE` launch inputs. The UI tests
+change and restore the simulator's actual Reduce Motion and Reduce Transparency
+preferences through Settings, and assert SwiftUI observed those preferences.
 `specimen` uses the shared `StrataSpecimen` shell and a dense inner stage,
 with five real Strata palettes × light/dark × Glass/solid (20 named captures).
 The compact normal row shows Primary, Secondary and Ghost, followed by
