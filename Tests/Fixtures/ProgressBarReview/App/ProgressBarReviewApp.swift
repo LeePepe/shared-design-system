@@ -70,6 +70,7 @@ private struct ProgressReviewBoard: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var state = 0
     @State private var bounds: [String: CGRect] = [:]
+    @State private var interactionBounds: CGRect = .zero
     private var theme: NativeDesignTheme { configuration.theme }
     private let longLabel = "Vorbereitung aller ausgewählten Dateien für die nächste Übertragung"
     private let longValue = "50 von 100 Dateien vorbereitet — bitte warten Sie auf die nächste Aktualisierung"
@@ -116,7 +117,16 @@ private struct ProgressReviewBoard: View {
         VStack(alignment: .leading, spacing: 20) {
             sample("Preparing files", value: interactionValue,
                    current: interactionText, id: "progress-target")
+                .background {
+                    GeometryReader { proxy in
+                        Color.clear.preference(key: InteractionBounds.self, value: proxy.frame(in: .local))
+                    }
+                }
+                .onPreferenceChange(InteractionBounds.self) { interactionBounds = $0 }
             Text("State: \(state)").accessibilityIdentifier("caller-state")
+            Text("Rendered progress size").font(.caption)
+                .accessibilityIdentifier("progress-footprint")
+                .accessibilityValue(Text(verbatim: "\(interactionBounds.width)|\(interactionBounds.height)"))
             Button("Next synthetic state") { state = (state + 1) % 6 }
                 .font(.body)
                 .padding(12)
@@ -166,6 +176,9 @@ private struct ProgressReviewBoard: View {
             Text(layoutIsSafe ? "Layout: inside" : "Layout: pending or outside")
                 .font(.caption).accessibilityIdentifier("layout-safety")
                 .accessibilityValue(Text(verbatim: geometryDescription))
+            Text("Rendered progress size").font(.caption)
+                .accessibilityIdentifier("long-footprint")
+                .accessibilityValue(Text(verbatim: "\(bounds["outer"]?.width ?? 0)|\(bounds["outer"]?.height ?? 0)"))
         }
         .padding(16)
         .frame(width: 320, alignment: .leading)
@@ -207,5 +220,12 @@ private struct ReviewBounds: PreferenceKey {
         value.merge(nextValue()) { old, new in
             old.width * old.height > new.width * new.height ? old : new
         }
+    }
+}
+
+private struct InteractionBounds: PreferenceKey {
+    static let defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        value = nextValue()
     }
 }

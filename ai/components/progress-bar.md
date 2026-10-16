@@ -54,7 +54,9 @@ An explicit SwiftUI accessibility representation uses an automatic native
 readable content. This preserves the native progress role/name when a platform's
 visual `.linear` style omits indeterminate semantics, without announcing a
 fabricated percentage. The visual linear track can be absent for nil progress
-on a platform; caller waiting text remains visible. This is a
+on a platform; a neutral token rail and caller waiting text remain visible.
+Native accessibility distinguishes determinate progress indicators from active
+indeterminate activity indicators. This is a
 read-only indicator: it adds no action, selection, binding or keyboard target.
 Caller changes to value/total rebuild native progress; no state is stored. The
 same label/current-value content reserves the same footprint across zero,

@@ -37,13 +37,13 @@ public struct NativeProgressBar<Label: View, CurrentValueLabel: View>: View {
             .progressViewStyle(.linear)
             .tint(theme.accent)
             .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
+            .frame(maxWidth: .infinity, minHeight: 8)
             .background(theme.surface, in: Capsule())
-            .frame(minHeight: 8)
         }
         .accessibilityRepresentation {
             // Native automatic progress preserves the indicator role and name
             // even where the platform's visual linear style omits nil progress.
-            VStack {
+            VStack(alignment: .leading) {
                 ProgressView(value: progress.value, total: progress.total) { label }
                     .progressViewStyle(.automatic)
                 currentValueLabel
