@@ -150,11 +150,13 @@ private struct AvatarReviewBoard: View {
                     }
                 }
                 .frame(width: 88, height: 88).background(theme.canvas)
+                .contentShape(Rectangle())
                 .accessibilityElement(children: .contain).accessibilityIdentifier("clipping-actual")
                 VStack {
                     Circle().fill(theme.accent).frame(width: 64, height: 64).accessibilityLabel("Circular reference")
                 }
                 .frame(width: 88, height: 88).background(theme.canvas)
+                .contentShape(Rectangle())
                 .accessibilityElement(children: .contain).accessibilityIdentifier("clipping-reference")
             }
             Text("Actual avatar / circular reference · same token color and background")

@@ -57,8 +57,8 @@ public struct NativeAvatar<Content: View>: View {
                     .accessibilityHidden(true)
             }
             .clipShape(Circle())
-            // A replacement representation keeps arbitrary caller content decorative
-            // and prevents oversized image bounds from expanding the accessible image.
+            .contentShape(Circle())
+            // Arbitrary caller content is decorative; only the caller label is exposed.
             .accessibilityRepresentation {
                 Circle()
                     .fill(theme.surface)
