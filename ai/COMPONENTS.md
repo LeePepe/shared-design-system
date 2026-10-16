@@ -10,8 +10,7 @@ The current rebuild replaces the old unmerged component implementations and
 old v1 component scope following the Owner's request. Only the
 `Foundations` / `Controls` / `Components` / `Patterns` internal source hierarchy
 is retained within the single `NativeDesignKit` layer. The historical v1
-specification, plan and tasks are superseded for this
-[rebuild](https://github.com/LeePepe/shared-design-system/blob/730e1700e7a5f22d99cb6509ca3381e009be8a61/docs/strata-component-rebuild.md). Component
+specification, plan and tasks are superseded for this rebuild. Component
 names are informed by the HeroUI catalogue; implementation is native SwiftUI
 and follows [Strata v0.2](https://github.com/LeePepe/shared-design-system/blob/48cea0a3f0920d5ebc7797a7d4d848dd060f0f42/docs/strata-theme-v0.2.md), without copying HeroUI
 implementation or introducing its runtime.
@@ -51,12 +50,12 @@ Component-specific contracts are added under `components/` by their PRs.
 | Component | Contract |
 | --- | --- |
 | Button | [NativeButton](components/button.md) |
-| Card | Planned separate component PR; unavailable in this candidate |
-| TextField | Planned separate component PR; unavailable in this candidate |
-| Switch | Planned separate component PR; unavailable in this candidate |
-| Checkbox | Planned separate component PR; unavailable in this candidate |
-| RadioGroup | Planned separate component PR; unavailable in this candidate |
-| Slider | Planned separate component PR; unavailable in this candidate |
-| ProgressBar | Planned separate component PR; unavailable in this candidate |
-| Avatar | Planned separate component PR; unavailable in this candidate |
-| Chip | Planned separate component PR; unavailable in this candidate |
+| Card | [NativeCard](components/card.md) |
+| TextField | [NativeTextField](components/textfield.md) |
+| Switch | [NativeSwitch](components/switch.md) |
+| Checkbox | [NativeCheckbox](components/checkbox.md) |
+| RadioGroup | [NativeRadioGroup](components/radio-group.md) |
+| Slider | [NativeSlider](components/slider.md) |
+| ProgressBar | [NativeProgressBar](components/progress-bar.md) |
+| Avatar | [NativeAvatar](components/avatar.md) |
+| Chip | [NativeChip](components/chip.md) |
