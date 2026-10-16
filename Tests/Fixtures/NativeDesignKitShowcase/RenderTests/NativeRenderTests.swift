@@ -25,9 +25,22 @@ final class NativeRenderTests: XCTestCase {
         }
     }
 
+    func testFocusedComponentMatrix() throws {
+        _ = NSApplication.shared
+        let output = ProcessInfo.processInfo.environment["NDK_EVIDENCE_DIR"].map { URL(fileURLWithPath: $0) }
+        for page in ["Button", "Toggle", "TextField"] {
+            for dark in [false, true] {
+                let config = FixtureConfiguration(dark: dark, accessible: false, rtl: false,
+                    narrow: true, page: page, allowsGlass: false)
+                try render(config: config, width: 480,
+                    name: "review-\(page)-\(dark ? "dark" : "light")", output: output)
+            }
+        }
+    }
+
     private func render(config: FixtureConfiguration, width: Double, name: String, output: URL?) throws {
         let resources = try FixtureResources(config: config, bundle: Bundle(for: Self.self))
-        let root = Catalog(resources: resources, config: config)
+        let root = ReviewOrCatalog(resources: resources, config: config)
             .preferredColorScheme(config.dark ? .dark : .light)
             .environment(\.controlActiveState, .key)
             .environment(\.dynamicTypeSize, config.accessible ? .accessibility3 : .large)

@@ -12,6 +12,7 @@
 		1ADAD4228966964513B985F6 /* styles.resolved.json in Resources */ = {isa = PBXBuildFile; fileRef = 02F2567C3CB54449C79F207C /* styles.resolved.json */; };
 		2CE938138D49AE21A5D040D9 /* FixtureStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F12084CF3F2735B17C89AB5 /* FixtureStyle.swift */; };
 		2E0A7596FABB48DE083FECAA /* TextFieldReviewBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52128B7D93974881739FD0FB /* TextFieldReviewBoard.swift */; };
+		3E2EA8A34734A1136C1ACA01 /* ComponentReviewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8D54CE6A46E50E24ECF90F /* ComponentReviewUITests.swift */; };
 		586D4A39282A6F72C029E65B /* ButtonReviewBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10E4A11875B0E523C5110CD /* ButtonReviewBoard.swift */; };
 		6BEEFA3F567EF3BC515ACF4E /* styles.resolved.json in Resources */ = {isa = PBXBuildFile; fileRef = 02F2567C3CB54449C79F207C /* styles.resolved.json */; };
 		6E4BCF5E9875645894E0F01E /* ShowcaseCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99AF79F6AE80DBED60B07CC0 /* ShowcaseCatalog.swift */; };
@@ -23,6 +24,7 @@
 		7EA5333BC5DA57FB406B3F64 /* NativeRenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCFE664CFB22C956C3D72614 /* NativeRenderTests.swift */; };
 		8456DF4C8CDF7A3A62547BBA /* ComponentReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E06A48FC050DF335B6A56EA /* ComponentReview.swift */; };
 		8F90F479661CB0B59D670CC1 /* ButtonReviewBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10E4A11875B0E523C5110CD /* ButtonReviewBoard.swift */; };
+		90B3E7DB6E1296002D8EBD40 /* ComponentReviewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8D54CE6A46E50E24ECF90F /* ComponentReviewUITests.swift */; };
 		92ED6C516D726AC393ED2F8E /* ShowcaseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B610A0AEFE45A1F15862E0 /* ShowcaseApp.swift */; };
 		9C2A2760A55302B065661672 /* DesignTokens in Frameworks */ = {isa = PBXBuildFile; productRef = 4B185CA3F7EFD76B59FF2AEE /* DesignTokens */; };
 		9C802D9343950B4C685AB4F7 /* ToggleReviewBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78A25CFF1D6FDE065CBEE255 /* ToggleReviewBoard.swift */; };
@@ -63,6 +65,7 @@
 		1F361ECCDE051DB3FEB7E35A /* ShowcaseUITests-iOS.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "ShowcaseUITests-iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		22DC645661A0BA96745B322C /* ShowcaseUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowcaseUITests.swift; sourceTree = "<group>"; };
 		3E06A48FC050DF335B6A56EA /* ComponentReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentReview.swift; sourceTree = "<group>"; };
+		4E8D54CE6A46E50E24ECF90F /* ComponentReviewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentReviewUITests.swift; sourceTree = "<group>"; };
 		52128B7D93974881739FD0FB /* TextFieldReviewBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldReviewBoard.swift; sourceTree = "<group>"; };
 		5F12084CF3F2735B17C89AB5 /* FixtureStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixtureStyle.swift; sourceTree = "<group>"; };
 		68B610A0AEFE45A1F15862E0 /* ShowcaseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowcaseApp.swift; sourceTree = "<group>"; };
@@ -149,6 +152,7 @@
 		BCEE01F95DAAF70F7C25164B /* UITests */ = {
 			isa = PBXGroup;
 			children = (
+				4E8D54CE6A46E50E24ECF90F /* ComponentReviewUITests.swift */,
 				22DC645661A0BA96745B322C /* ShowcaseUITests.swift */,
 			);
 			path = UITests;
@@ -350,6 +354,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				90B3E7DB6E1296002D8EBD40 /* ComponentReviewUITests.swift in Sources */,
 				F8564C29104C0C4DAEDB292B /* ShowcaseUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -372,6 +377,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3E2EA8A34734A1136C1ACA01 /* ComponentReviewUITests.swift in Sources */,
 				A8D77F643351A7F19F38CD13 /* ShowcaseUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
