@@ -158,6 +158,7 @@ No implementation may add a local token table, RGB/hex literal, fallback color, 
 
 ### Layout and typography
 
+- [Strata v0.2](strata-theme-v0.2.md) records the accepted visual direction and rounded Glass reference. It supplements visual review without changing this specification's API, exact dependency, platform floors, or task authorization. Web calibration values are not an implemented native token contract.
 - Components use SwiftUI semantic text styles and platform-native layout primitives so Dynamic Type can scale them.
 - Because the token dependency defines colors but not spacing, radius, or typography metrics, v1 uses small internal layout constants and system semantic typography. Those constants are implementation details, not new design tokens or public API.
 - The acceptance oracle is semantic hierarchy, readability, lack of clipping/overlap, and native interaction at the declared matrix; v1 has no pixel-match baseline.
