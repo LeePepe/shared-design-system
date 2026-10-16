@@ -6,6 +6,7 @@ Release unit: `NativeDesignKit` (SwiftPM), version **0.2.0** (unreleased candida
 | --- | --- |
 | Integrate or remove the library | [INTEGRATION.md](INTEGRATION.md) |
 | Use the public API or investigate a lookup error | [USAGE.md](USAGE.md) |
+| Adapt typography, surfaces, layout and motion | [FOUNDATIONS.md](FOUNDATIONS.md) |
 | Run an ordinary external consumer | [EXAMPLES.md](EXAMPLES.md) |
 | Check platforms and dependency compatibility | [COMPATIBILITY.md](COMPATIBILITY.md) |
 | Replace local color bridges or roll back | [MIGRATION.md](MIGRATION.md) |
