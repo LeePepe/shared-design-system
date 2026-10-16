@@ -145,8 +145,11 @@ final class SwitchReviewUITests: XCTestCase {
     @MainActor
     private func assertFullyVisible(_ control: XCUIElement, in app: XCUIApplication,
                                     file: StaticString = #filePath, line: UInt = #line) {
-        XCTAssertGreaterThanOrEqual(control.frame.width, 44, file: file, line: line)
-        XCTAssertGreaterThanOrEqual(control.frame.height, 44, file: file, line: line)
+        // Subtracting AX frame coordinates can report 44 as 43.99999999999994.
+        // A millionth of a point tolerates that arithmetic noise, not a smaller target.
+        let minimum = 44.0 - 0.000_001
+        XCTAssertGreaterThanOrEqual(control.frame.width, minimum, file: file, line: line)
+        XCTAssertGreaterThanOrEqual(control.frame.height, minimum, file: file, line: line)
         XCTAssertTrue(app.frame.contains(control.frame), "Complete switch row must be onscreen", file: file, line: line)
     }
 

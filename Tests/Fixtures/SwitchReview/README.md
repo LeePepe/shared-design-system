@@ -47,7 +47,11 @@ tests; no existing color-extraction or pure-policy test is removed or weakened.
 The App exposes state and write counts as ordinary SwiftUI Text, so assertions
 observe caller behavior rather than inspecting internal control objects.
 Every captured switch row must be at least 44 × 44 pt and entirely within the
-visible app viewport. `testInvalidConfigurationShowsErrorWithoutFallbackSwitch`
+visible app viewport. The minimum-dimension assertion permits only 0.000001 pt
+of floating-point measurement noise: XCTest reported one 44 pt AX frame as
+43.99999999999994 pt during development. This is far below a display pixel and
+does not permit a visibly smaller target.
+`testInvalidConfigurationShowsErrorWithoutFallbackSwitch`
 also checks that invalid explicit fixture inputs produce a visible error and
 no fallback switch. Theme resolution errors reach the fixture's visible error
 boundary without a fallback palette.
