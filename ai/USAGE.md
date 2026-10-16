@@ -59,3 +59,6 @@ This library provides SwiftUI presentation primitives and explicit theme resolut
 ## Foundation adaptations
 
 The additive [foundation API contract](FOUNDATIONS.md) covers explicit typography/metrics, native surfaces and Liquid Glass, layouts, focus, interpolation, replay/cancellation and accessibility motion policy.
+
+The unreleased controls are specified in [CONTROLS.md](CONTROLS.md), with a
+public-API graphical fixture at `Tests/Fixtures/NativeDesignKitShowcase/README.md`.

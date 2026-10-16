@@ -22,3 +22,6 @@ never silently read a floating remote copy.
 
 These documents describe APIs, not additional permissions. They do not authorize
 publishing packages, changing consumer policy or sending production data.
+
+The unreleased controls are specified in [CONTROLS.md](CONTROLS.md), with a
+public-API graphical fixture at `Tests/Fixtures/NativeDesignKitShowcase/README.md`.

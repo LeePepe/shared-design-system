@@ -1,0 +1,99 @@
+name: NativeDesignKitShowcase
+options:
+  bundleIdPrefix: org.nativedesignkit.fixture
+  deploymentTarget:
+    iOS: '15.0'
+    macOS: '12.0'
+packages:
+  NativeDesignKit:
+    path: ../../..
+  DesignTokens:
+    url: https://github.com/LeePepe/shared-design-tokens.git
+    exactVersion: 0.1.1
+settings:
+  base:
+    SWIFT_VERSION: '6.0'
+    CODE_SIGNING_ALLOWED: NO
+    GENERATE_INFOPLIST_FILE: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: NO
+targetTemplates:
+  Fixture:
+    type: application
+    sources:
+      - Sources
+      - path: StyleProvider/styles.resolved.json
+        buildPhase: resources
+    dependencies:
+      - package: NativeDesignKit
+      - package: DesignTokens
+    settings:
+      base:
+        INFOPLIST_KEY_CFBundleDisplayName: Native Design Kit
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+        INFOPLIST_KEY_NSPrincipalClass: NSApplication
+  FixtureTests:
+    type: bundle.ui-testing
+    sources: [UITests]
+    settings:
+      base:
+        TEST_TARGET_NAME: $(FIXTURE_APP)
+targets:
+  Showcase-iOS:
+    templates: [Fixture]
+    platform: iOS
+  Showcase-macOS:
+    templates: [Fixture]
+    platform: macOS
+  ShowcaseUITests-iOS:
+    templates: [FixtureTests]
+    platform: iOS
+    dependencies:
+      - target: Showcase-iOS
+    settings:
+      base:
+        FIXTURE_APP: Showcase-iOS
+  ShowcaseUITests-macOS:
+    templates: [FixtureTests]
+    platform: macOS
+    dependencies:
+      - target: Showcase-macOS
+    settings:
+      base:
+        FIXTURE_APP: Showcase-macOS
+  ShowcaseRenderTests-macOS:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Sources/FixtureStyle.swift
+      - Sources/ShowcaseCatalog.swift
+      - RenderTests
+      - path: StyleProvider/styles.resolved.json
+        buildPhase: resources
+    dependencies:
+      - package: NativeDesignKit
+      - package: DesignTokens
+schemes:
+  ShowcaseRender-macOS:
+    build:
+      targets:
+        ShowcaseRenderTests-macOS: all
+    test:
+      targets: [ShowcaseRenderTests-macOS]
+  Showcase-iOS:
+    build:
+      targets:
+        Showcase-iOS: all
+    test:
+      targets: [ShowcaseUITests-iOS]
+      gatherCoverageData: false
+  Showcase-macOS:
+    build:
+      targets:
+        Showcase-macOS: all
+    test:
+      targets: [ShowcaseUITests-macOS]
+      gatherCoverageData: false
