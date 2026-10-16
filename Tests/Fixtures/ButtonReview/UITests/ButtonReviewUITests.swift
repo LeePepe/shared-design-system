@@ -149,6 +149,8 @@ final class ButtonReviewUITests: XCTestCase {
 
     private func specimen(brand: String, mode: String, surface: String) {
         let app = launch(scenario: "specimen", brand: brand, mode: mode, surface: surface)
+        XCTAssertTrue(String(describing: app.scrollViews["review-scroll"].value).contains("reduce-transparency=false"),
+                      "The normal Glass/solid matrix must not run with a transparency fallback active.")
         let scale = screenshotScale(app)
         for id in ["save", "secondary", "ghost", "disabled", "loading"] {
             let target = app.buttons["specimen-\(id)"]
@@ -201,7 +203,8 @@ final class ButtonReviewUITests: XCTestCase {
             samples.append(["role": title, "token": "product.strata.text.primary",
                             "text": rectangle(app.staticTexts[title].frame)])
         }
-        let receipt: [String: Any] = ["name": name, "mode": mode, "viewport": rectangle(app.frame), "samples": samples]
+        let receipt: [String: Any] = ["name": name, "mode": mode, "viewport": rectangle(app.frame), "samples": samples,
+                                      "system_preference": String(describing: app.scrollViews["review-scroll"].value)]
         do {
             let data = try JSONSerialization.data(withJSONObject: receipt, options: [.sortedKeys])
             print("BUTTON_COMPOSITE " + String(decoding: data, as: UTF8.self))
