@@ -29,6 +29,7 @@ public struct NativeTextField<Label: View>: View {
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(theme.foreground)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityElement(children: .combine)
                 .accessibilityLabeledPair(role: .label, id: "input", in: accessibilityPair)
 
             TextField(
@@ -37,6 +38,7 @@ public struct NativeTextField<Label: View>: View {
             ) {
                 label
             }
+            .accessibilityLabeledPair(role: .content, id: "input", in: accessibilityPair)
             .textFieldStyle(.plain)
             .font(.body)
             .foregroundStyle(theme.foreground)
@@ -63,7 +65,6 @@ public struct NativeTextField<Label: View>: View {
             .simultaneousGesture(TapGesture().onEnded {
                 if isEnabled { isFocused = true }
             })
-            .accessibilityLabeledPair(role: .content, id: "input", in: accessibilityPair)
         }
         .accessibilityElement(children: .contain)
     }
