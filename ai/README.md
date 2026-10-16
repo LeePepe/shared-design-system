@@ -10,7 +10,7 @@ Release unit: `NativeDesignKit` (SwiftPM), version **0.2.0** (unreleased candida
 | Run an ordinary external consumer | [EXAMPLES.md](EXAMPLES.md) |
 | Check platforms and dependency compatibility | [COMPATIBILITY.md](COMPATIBILITY.md) |
 | Replace local color bridges or roll back | [MIGRATION.md](MIGRATION.md) |
-| Discover the contract mechanically | [registry.json](registry.json), [schema](registry.schema.json) |
+| Discover color bridge and Theme/Card mechanically | [registry.json](registry.json), [schema](registry.schema.json) |
 | Review changes | [CHANGELOG.md](../CHANGELOG.md) |
 
 The `ai/` directory ships in the source archive and SwiftPM checkout. It is not

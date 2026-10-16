@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.2.0
 
+- Added explicit foundation inputs for scalable typography, control/surface metrics, token-backed surfaces and accessibility-aware Glass, adaptive/equal grids, wrapping flow, keyboard dismissal, motion, transitions, interpolation and cancellable stagger replay.
+- Fixed legacy flow measurement to wrap natural-width children and oversized localized labels, retain child identity across resize/reorder and render each interactive child once; corrected double RTL mirroring in flow placement. Added current-runtime forced-legacy rendering tests.
+- Documented foundations separately from the existing color bridge/Theme/Card machine registry; retained the original token/error contracts and exact provider pin.
+
 - Added explicit throwing `NativeDesignTheme(theme:)` seam resolving semantic tokens once for explicit theme without caching or defaulting.
 - Added generic `NativeCard` container providing raised-surface and primary-foreground styling for caller-owned SwiftUI content.
 - Preserved all `NativeTokenColor` 0.1.0 behavior, Swift 6, iOS 15, and macOS 12 platform floors, and exact `shared-design-tokens` 0.1.1 pin.

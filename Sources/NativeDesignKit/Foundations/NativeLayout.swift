@@ -37,7 +37,7 @@ public struct NativeAdaptiveGrid<Content: View>: View {
     }
 }
 
-/// Shared deterministic packing used by the modern Layout and legacy measured-row adapter.
+/// Shared deterministic packing used by the modern Layout and legacy measured adapter.
 struct NativeFlowPacking {
     let rows: [[Int]]
     let frames: [CGRect]
@@ -80,6 +80,7 @@ struct NativeFlowPacking {
 public struct NativeFlowLayout: Layout {
     public let horizontalSpacing: CGFloat
     public let verticalSpacing: CGFloat
+    /// Pass the SwiftUI environment direction; native layout placement mirrors it once.
     public let layoutDirection: LayoutDirection
 
     public init(horizontalSpacing: CGFloat, verticalSpacing: CGFloat, layoutDirection: LayoutDirection) {
@@ -108,31 +109,73 @@ public struct NativeFlowLayout: Layout {
     public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
         let packing = packing(proposal: ProposedViewSize(width: bounds.width, height: nil), subviews: subviews)
         for (index, frame) in packing.frames.enumerated() {
-            let x = layoutDirection == .rightToLeft ? bounds.width - frame.maxX : frame.minX
-            subviews[index].place(at: CGPoint(x: bounds.minX + x, y: bounds.minY + frame.minY),
+            // Layout coordinates are logical: SwiftUI mirrors placement in RTL.
+            subviews[index].place(at: CGPoint(x: bounds.minX + frame.minX, y: bounds.minY + frame.minY),
                                   anchor: .topLeading,
                                   proposal: ProposedViewSize(width: frame.width, height: frame.height))
         }
     }
 }
 
-private struct FlowMeasurements: PreferenceKey {
-    static var defaultValue: [Int: CGSize] { [:] }
-    static func reduce(value: inout [Int: CGSize], nextValue: () -> [Int: CGSize]) {
+private struct FlowMeasurements<ID: Hashable>: PreferenceKey {
+    static var defaultValue: [ID: CGSize] { [:] }
+    static func reduce(value: inout [ID: CGSize], nextValue: () -> [ID: CGSize]) {
         value.merge(nextValue(), uniquingKeysWith: { _, new in new })
     }
 }
 
-/// Data-based flow works on the full deployment range. On older systems it measures each
-/// actual child once in rows; it does not create hidden copies of interactive children.
+private struct FlowHeight: PreferenceKey {
+    static var defaultValue: CGFloat { 0 }
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+}
+
+/// Full-range adapter, internal so current-runtime rendering tests can force the old-OS path.
+/// Each child receives the whole container's width, rather than a share of an HStack.
+/// Text retains its ideal width when it fits and grows vertically when it must wrap.
+struct NativeLegacyFlow<Item: Identifiable, Content: View>: View {
+    let items: [Item]
+    let horizontalSpacing: CGFloat
+    let verticalSpacing: CGFloat
+    @ViewBuilder let content: (Item) -> Content
+    @State private var measurements: [Item.ID: CGSize] = [:]
+    @State private var height: CGFloat = 0
+
+    var body: some View {
+        GeometryReader { geometry in
+            let packing = NativeFlowPacking(
+                sizes: items.map { measurements[$0.id] ?? .zero }, width: geometry.size.width,
+                horizontalSpacing: horizontalSpacing, verticalSpacing: verticalSpacing)
+            let frames = Dictionary(uniqueKeysWithValues: zip(items.map(\.id), packing.frames))
+            ZStack(alignment: .topLeading) {
+                ForEach(items) { item in
+                    let frame = frames[item.id, default: .zero]
+                    content(item)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .background(GeometryReader { child in
+                            Color.clear.preference(key: FlowMeasurements<Item.ID>.self,
+                                                   value: [item.id: child.size])
+                        })
+                        // SwiftUI mirrors both leading alignment and offsets in RTL.
+                        .offset(x: frame.minX, y: frame.minY)
+                }
+            }
+            .frame(width: geometry.size.width, height: packing.size.height, alignment: .topLeading)
+            .preference(key: FlowHeight.self, value: packing.size.height)
+        }
+        .frame(height: height)
+        .onPreferenceChange(FlowMeasurements<Item.ID>.self) { measurements = $0 }
+        .onPreferenceChange(FlowHeight.self) { height = $0 }
+    }
+}
+
+/// Data-based flow works on the full deployment range. The legacy adapter measures and
+/// positions a single stable collection; it never duplicates interactive children for sizing.
 public struct NativeFlow<Item: Identifiable, Content: View>: View {
     private let items: [Item]
     private let horizontalSpacing: CGFloat
     private let verticalSpacing: CGFloat
     private let content: (Item) -> Content
     @Environment(\.layoutDirection) private var layoutDirection
-    @State private var measurements: [Int: CGSize] = [:]
-    @State private var availableWidth: CGFloat = 0
 
     public init(items: [Item], horizontalSpacing: CGFloat, verticalSpacing: CGFloat,
                 @ViewBuilder content: @escaping (Item) -> Content) {
@@ -151,42 +194,10 @@ public struct NativeFlow<Item: Identifiable, Content: View>: View {
                 ForEach(items) { content($0) }
             }
         } else {
-            legacyRows
+            NativeLegacyFlow(items: items, horizontalSpacing: horizontalSpacing,
+                             verticalSpacing: verticalSpacing, content: content)
         }
     }
-
-    private var legacyPacking: NativeFlowPacking {
-        NativeFlowPacking(sizes: items.indices.map { measurements[$0] ?? CGSize(width: availableWidth, height: 0) },
-                          width: availableWidth, horizontalSpacing: horizontalSpacing, verticalSpacing: verticalSpacing)
-    }
-
-    private var legacyRows: some View {
-        VStack(alignment: .leading, spacing: verticalSpacing) {
-            ForEach(Array(legacyPacking.rows.enumerated()), id: \.offset) { _, row in
-                HStack(alignment: .top, spacing: horizontalSpacing) {
-                    ForEach(row, id: \.self) { index in
-                        content(items[index])
-                            .fixedSize(horizontal: false, vertical: true)
-                            .background(GeometryReader { geometry in
-                                Color.clear.preference(key: FlowMeasurements.self, value: [index: geometry.size])
-                            })
-                    }
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(GeometryReader { geometry in
-            Color.clear.preference(key: FlowWidth.self, value: geometry.size.width)
-        })
-        .onPreferenceChange(FlowMeasurements.self) { measurements = $0 }
-        .onPreferenceChange(FlowWidth.self) { availableWidth = $0 }
-        .onChange(of: items.map(\.id)) { _ in measurements = [:] }
-    }
-}
-
-private struct FlowWidth: PreferenceKey {
-    static var defaultValue: CGFloat { 0 }
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
 }
 
 public enum NativeKeyboardDismissal: Sendable {

@@ -58,12 +58,17 @@ without adding a second gesture or accessibility element.
 - `NativeAdaptiveGrid(minimumWidth:spacing:content:)` uses native adaptive columns.
 - `NativeFlow(items:horizontalSpacing:verticalSpacing:content:)` wraps identifiable
   data in source order. On iOS 16/macOS 13 it uses the Layout protocol, measures
-  long items again at the available width, and explicitly places RTL rows.
-  On iOS 15/macOS 12 it uses measured native rows. Row changes can recreate child
-  view-local state on that legacy route; keep persistent state in caller bindings.
+  long items again at the available width, and uses SwiftUI's native RTL mirroring.
+  On iOS 15/macOS 12 it measures each actual child against the full container width
+  in one collection, then offsets children into rows. Oversized text wraps and grows
+  vertically. Both routes retain identifiable child parenting across resize and
+  reorder; use stable, unique IDs. No hidden copies of interactive content are made.
+  As with native layouts, children that explicitly refuse a width constraint remain
+  responsible for their own overflow (for example, horizontal `fixedSize()`).
 - `NativeFlowLayout(horizontalSpacing:verticalSpacing:layoutDirection:)` is also
   public on iOS 16/macOS 13 for direct ViewBuilder composition. Pass the environment
-  direction; the data-based NativeFlow reads it automatically.
+  direction to match the SwiftUI environment; the data-based NativeFlow reads it
+  automatically. Placement uses logical coordinates so the system mirrors once.
 - `View.nativeReadableWidth(_:alignment:)` constrains a centered/aligned reading
   column. `nativeGrowingText()` allows unlimited vertical growth.
 - `View.nativeKeyboardDismissal(_:)` accepts `.immediately`, `.interactively`, or
@@ -111,6 +116,20 @@ identity when it can change during playback:
 
 Animated content keeps stable accessibility labels/values from caller state;
 never expose each intermediate digit as separate accessibility elements. This
-implementation's unit tests exercise layout packing, endpoint behavior, replay,
-cancellation and complete reduced-motion states. They do not establish minimum-OS
-runtime, VoiceOver, pixel-regression, or external-consumer release acceptance.
+implementation's tests exercise layout packing, endpoint behavior, replay,
+cancellation and complete reduced-motion states. Hosting tests force the legacy
+flow on current macOS/iOS runtimes and assert natural-label wrapping, bounded
+localized long text, large type, RTL, row height and retained interactive child
+state through resize/reorder. Kept PNG attachments are rendered evidence, not
+baseline comparisons. These tests do not establish minimum-OS runtime, VoiceOver,
+pixel-regression, or external-consumer release acceptance.
+
+
+## Machine registry scope
+
+`registry.json`, its schema and the existing machine checker describe the original
+color bridge and staged Theme/Card capabilities. They do not enumerate or validate
+the additive foundation inventory. This document is the consumer contract for
+foundations; their SwiftPM and hosting tests provide the behavioral evidence.
+Registry expansion is a separate reviewed contract change, not a claim made by
+the existing checker passing.
