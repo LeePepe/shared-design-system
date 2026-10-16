@@ -248,22 +248,32 @@ final class ButtonReviewUITests: XCTestCase {
     /// Changes and restores the simulator's actual setting through its native UI.
     private func withSystemPreference(section: String, name: String, body: () -> Void) {
         let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
+        settings.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         settings.launch()
-        let accessibility = settings.staticTexts["Accessibility"]
+        for _ in 0..<5 {
+            let bar = settings.navigationBars.firstMatch
+            if ["Settings", "设置"].contains(bar.identifier) { break }
+            let back = bar.buttons.firstMatch
+            if !back.exists { break }
+            back.tap()
+        }
+        let accessibility = settings.staticTexts.matching(NSPredicate(format: "label IN %@", ["Accessibility", "辅助功能"])).firstMatch
         for _ in 0..<8 {
             if accessibility.isHittable { break }
             settings.swipeUp()
         }
         guard accessibility.isHittable else { XCTFail("Settings Accessibility entry unavailable"); return }
         accessibility.tap()
-        let sectionEntry = settings.staticTexts[section]
+        let translatedSection = section == "Motion" ? "动态效果" : "显示与文字大小"
+        let sectionEntry = settings.staticTexts.matching(NSPredicate(format: "label IN %@", [section, translatedSection])).firstMatch
         for _ in 0..<5 {
             if sectionEntry.isHittable { break }
             settings.swipeUp()
         }
         guard sectionEntry.isHittable else { XCTFail("Settings section unavailable: \(section)"); return }
         sectionEntry.tap()
-        let toggle = settings.switches[name]
+        let translatedName = name == "Reduce Motion" ? "减弱动态效果" : "降低透明度"
+        let toggle = settings.switches.matching(NSPredicate(format: "label IN %@", [name, translatedName])).firstMatch
         guard toggle.waitForExistence(timeout: 5) else { XCTFail("System setting unavailable: \(name)"); return }
         let original = String(describing: toggle.value)
         if (toggle.value as? String) != "1" { toggle.tap() }

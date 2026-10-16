@@ -157,7 +157,7 @@ private struct ButtonReviewBoard: View {
                                                @ViewBuilder content: () -> Content) -> some View {
         NativeButton(theme: theme, variant: variant, surface: configuration.surface,
                      isLoading: false, action: { actionCount += 1 }, label: content) {
-            Text(variant == .primary ? "Save" : "Wait")
+            Text("Wait")
         }
         .fixedSize(horizontal: true, vertical: false)
         .accessibilityIdentifier(id)
