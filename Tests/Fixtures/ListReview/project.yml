@@ -1,0 +1,49 @@
+name: ListReview
+options:
+  bundleIdPrefix: org.nativedesignkit.fixtures
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+packages:
+  NativeDesignKit:
+    path: ../../..
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    GENERATE_INFOPLIST_FILE: YES
+    CODE_SIGNING_ALLOWED: NO
+targets:
+  ListReview:
+    type: application
+    platform: iOS
+    sources:
+      - App
+      - ../Shared/StrataSpecimen.swift
+    dependencies:
+      - package: NativeDesignKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.ListReview
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+  ListReviewUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: ListReview
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.ListReviewUITests
+        TEST_TARGET_NAME: ListReview
+schemes:
+  ListReview:
+    build:
+      targets:
+        ListReview: all
+        ListReviewUITests: [test]
+    test:
+      gatherCoverageData: false
+      targets: [ListReviewUITests]
