@@ -108,3 +108,8 @@ The author runs SwiftPM build/tests. The lead owns the common Xcode fixture buil
 UI interaction tests and captures, and an independent reviewer opens the resulting
 screenshots. No visual acceptance, contrast measurement, VoiceOver navigation,
 minimum-OS runtime or live Glass acceptance is claimed by a compiler/test pass.
+
+The textless activity indicator caps its Dynamic Type at `.large` to keep native
+progress inside the explicit icon slot. The action label retains unrestricted
+Dynamic Type and its full accessible label/value. This is a layout decision, not
+a restriction on user-facing text.

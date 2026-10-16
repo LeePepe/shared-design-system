@@ -104,3 +104,8 @@ The finite machine registry catalogs only `NativeTokenColor`, `NativeDesignTheme
 and `NativeCard`. It does not enumerate Controls or Foundations. This document
 and `FOUNDATIONS.md` are the additive public API inventories for those families;
 the registry must not be used as an exhaustive symbol list.
+
+The textless activity indicator caps its Dynamic Type at `.large` to keep native
+progress inside the explicit icon slot. The action label retains unrestricted
+Dynamic Type and its full accessible label/value. This is a layout decision, not
+a restriction on user-facing text.

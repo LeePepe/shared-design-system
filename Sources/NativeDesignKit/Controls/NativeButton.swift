@@ -68,6 +68,9 @@ public struct NativeButton<Label: View>: View {
 
     private var indicator: some View {
         ProgressView().controlSize(.small)
+            // Decorative activity has no text; keep its native footprint within the
+            // caller icon slot while the action label follows full Dynamic Type.
+            .dynamicTypeSize(...DynamicTypeSize.large)
             .tint(presentation == .prominent ? labelColor : actionTint)
             .frame(width: metrics.iconSize, height: metrics.iconSize)
             .accessibilityHidden(true)
