@@ -9,9 +9,10 @@ label this forced fixture preference, and production still follows the system.
 From the repository root, run the shared fixture runner with new external paths:
 
 ```sh
+mkdir -p /tmp/card-review
 python3 Tests/Fixtures/Support/run.py CardReview \
   --results /tmp/card-review/results.xcresult \
-  --screenshots /tmp/card-review/screenshots
+  --screenshots /tmp/card-review/screenshots > /tmp/card-review/ui.log 2>&1
 python3 Tests/Fixtures/CardReview/verify-material.py \
   /tmp/card-review/screenshots /tmp/card-review/ui.log \
   --output /tmp/card-review/material.json
