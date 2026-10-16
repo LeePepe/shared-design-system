@@ -7,7 +7,7 @@ Existing Controls/Foundations owners retain their branches and prerequisite life
 ## Visual baseline
 
 - Use native SwiftUI control styles, system font roles and native interaction feedback.
-  Provider typography.body/headline/caption map onto Dynamic Type; no display hero.
+  Provider body/headline/caption roles map onto Dynamic Type; the macOS review body uses typography.footnote (13 pt) and iOS uses typography.body (17 pt), matching the platform defaults. No display hero.
 - Same group, same metrics and control size. iOS target comes from dimension.hit.minimum
   (44); macOS uses dimension.control.compact (28). Values are provider fixture inputs,
   not new library defaults. Native control bezel/padding remains system-owned.

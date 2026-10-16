@@ -54,6 +54,10 @@ final class ComponentReviewUITests: XCTestCase {
         reveal(copy, in: app)
         let idleFrame = copy.frame
         activate(copy)
+        XCTAssertFalse(copy.isEnabled)
+        XCTAssertEqual(copy.frame.size.width, idleFrame.size.width, accuracy: 0.5)
+        XCTAssertEqual(copy.frame.size.height, idleFrame.size.height, accuracy: 0.5)
+        capture(app, "interaction-Button-loading")
         XCTAssertEqual(app.staticTexts["review-count"].label, "Actions: 2")
         XCTAssertTrue(app.staticTexts["Copy saved"].waitForExistence(timeout: 6))
         XCTAssertEqual(app.staticTexts["review-count"].label, "Actions: 2")
@@ -96,6 +100,7 @@ final class ComponentReviewUITests: XCTestCase {
             #else
             app.scrollViews["component-review"].scroll(byDeltaX: 0, deltaY: -500)
             #endif
+            if page == "Button" { reveal(app.buttons["review-localized"], in: app) }
             capture(app, "review-\(page)-large-lower")
             app.terminate()
         }

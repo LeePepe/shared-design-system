@@ -15,7 +15,7 @@ accessibility hints and identifiers as ordinary modifiers.
 
 | Family | Public constructors and explicit inputs |
 | --- | --- |
-| C01 | `NativeButton(theme:metrics:presentation:isLoading:loadingLabel:action:label:)`; presentation `.prominent`, `.bordered`, `.plain`, `.glass` |
+| C01 | `NativeButton(theme:metrics:presentation:role:activityPresentation:isLoading:loadingLabel:action:label:)`; presentation `.prominent`, `.bordered`, `.plain`, `.glass` |
 | C02 | `NativeToggle(isOn:theme:metrics:label:)`; `NativeCheckbox(isOn:theme:metrics:checkedValue:uncheckedValue:label:)`; `NativeRadioGroup(selection:theme:metrics:label:content:)` |
 | C03 | `NativeTextField(_:text:theme:metrics:)`, `NativeSecureField(_:text:theme:metrics:)`, `NativeTextEditor(text:theme:metrics:accessibilityLabel:label:)`, `NativeSearchField(_:text:theme:metrics:clearLabel:)` |
 | C04 | `NativePicker(selection:theme:metrics:presentation:label:content:)`; presentation `.menu`, `.segmented`, `.inline` |
@@ -40,9 +40,15 @@ NativeAnimatedNumber(value: total, theme: theme, motion: motion,
 ```
 
 A button's label slot supports text, icon, and arbitrary labeled content. An
-icon-only caller supplies `.accessibilityLabel`. Loading preserves label layout,
-adds native progress, and disables repeat activation; `loadingLabel` is its
-accessible value. The caller owns the operation and returns loading to false.
+icon-only caller supplies `.accessibilityLabel`. Optional `role: ButtonRole? = nil`
+forwards native cancel/destructive semantics; destructive uses the explicit critical
+and on-critical theme pair. `activityPresentation: NativeButtonActivityPresentation =
+.adjacent` reserves symmetric indicator slots to center text and keep loading geometry
+stable. Select `.replacingLabel` for an icon-only label: progress replaces the symbol
+without changing its target. Native styles own bezel padding; `minimumHitSize` is
+inside the real label, while `metrics.padding` is not added a second time. Loading
+disables repeat activation; `loadingLabel` is its accessible value. Unavailable labels
+use the theme secondary-text token alongside native disabled appearance. The caller owns the operation and returns loading to false.
 Glass support is compiled with Swift 6.2+ toolchains and their Xcode 26+ SDKs.
 Those builds use the native Glass button style on iOS/macOS 26+ when Reduce
 Transparency is disabled. Older toolchains compile the native `.bordered`

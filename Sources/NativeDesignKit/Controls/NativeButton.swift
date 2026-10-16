@@ -1,5 +1,8 @@
 import SwiftUI
 
+/// Adjacent activity retains a text label; replacement keeps icon-only buttons centered.
+public enum NativeButtonActivityPresentation: Sendable { case adjacent, replacingLabel }
+
 public enum NativeButtonPresentation: Sendable, CaseIterable {
     case prominent, bordered, plain, glass
 }
@@ -12,20 +15,24 @@ public struct NativeButton<Label: View>: View {
     private let metrics: NativeControlMetrics
     private let presentation: NativeButtonPresentation
     private let role: ButtonRole?
+    private let activityPresentation: NativeButtonActivityPresentation
     private let isLoading: Bool
     private let loadingLabel: Text
     private let action: () -> Void
     private let label: Label
+    @Environment(\.isEnabled) private var isEnabled
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     public init(theme: NativeDesignTheme, metrics: NativeControlMetrics,
-                presentation: NativeButtonPresentation, role: ButtonRole? = nil, isLoading: Bool,
+                presentation: NativeButtonPresentation, role: ButtonRole? = nil,
+                activityPresentation: NativeButtonActivityPresentation = .adjacent, isLoading: Bool,
                 loadingLabel: Text, action: @escaping () -> Void,
                 @ViewBuilder label: () -> Label) {
         self.theme = theme
         self.metrics = metrics
         self.presentation = presentation
         self.role = role
+        self.activityPresentation = activityPresentation
         self.isLoading = isLoading
         self.loadingLabel = loadingLabel
         self.action = action
@@ -42,6 +49,7 @@ public struct NativeButton<Label: View>: View {
     }
 
     private var labelColor: Color {
+        if !isEnabled || isLoading { return theme.textSecondary }
         if presentation == .prominent {
             return role == .destructive ? theme.statusOnCritical : theme.statusOnInfo
         }
@@ -52,18 +60,32 @@ public struct NativeButton<Label: View>: View {
         Button(role: role, action: action) {
             // The native style owns bezel padding. Keep the requested target inside
             // the Button label so its entire area activates the native control.
+            activityLabel
+                .nativeMinimumHitTarget(metrics.minimumHitSize)
+                .foregroundColor(labelColor)
+        }
+    }
+
+    private var indicator: some View {
+        ProgressView().controlSize(.small)
+            .tint(presentation == .prominent ? labelColor : actionTint)
+            .frame(width: metrics.iconSize, height: metrics.iconSize)
+            .accessibilityHidden(true)
+    }
+
+    @ViewBuilder private var activityLabel: some View {
+        switch activityPresentation {
+        case .adjacent:
             HStack(spacing: metrics.spacing) {
+                Spacer(minLength: 0).frame(width: metrics.iconSize, height: metrics.iconSize)
+                    .accessibilityHidden(true)
                 label
-                ZStack {
-                    if isLoading {
-                        ProgressView().tint(presentation == .prominent ? labelColor : actionTint)
-                    }
-                }
-                .frame(width: metrics.iconSize, height: metrics.iconSize)
-                .accessibilityHidden(true)
+                ZStack { if isLoading { indicator } }
+                    .frame(width: metrics.iconSize, height: metrics.iconSize)
             }
-            .nativeMinimumHitTarget(metrics.minimumHitSize)
-            .foregroundColor(labelColor)
+        case .replacingLabel:
+            label.opacity(isLoading ? 0 : 1)
+                .overlay { if isLoading { indicator } }
         }
     }
 

@@ -30,7 +30,8 @@ press, pointer and keyboard-focus feedback. The native disabled environment bloc
 activation. The indicator slot keeps a fixed size supplied by the caller.
 
 **Team adaptation choices:** an omitted role means ordinary action semantics; it
-is the only new default and is not a theme or style fallback. Existing calls keep
+does not introduce a theme or token fallback. The activity presentation also defaults
+to adjacent progress. Existing calls keep
 compiling. A destructive role uses the supplied `statusCritical` tint and, for a
 prominent control, the matching `statusOnCritical` label. Other actions retain the
 supplied info/on-info pair. These are explicit repository token decisions, not a
@@ -47,9 +48,9 @@ same `r.reviewMetrics` throughout. It inherits body/headline/caption typography 
 provider spacing, and creates no local style or color table.
 
 Loading keeps the original action label visible beside native circular progress.
-A trailing indicator slot, sized by the explicit icon metric, is reserved in both
+The default adjacent activity presentation reserves matching leading and trailing slots, centering the resting label and retaining its position while loading. The trailing indicator slot, sized by the explicit icon metric, is reserved in both
 resting and loading states so the indicator cannot overlap or displace the label. The accessible button label remains the
-caller label; `loadingLabel` is the accessible value. Loading disables the real
+caller label; `loadingLabel` is the accessible value. Icon-only callers select `activityPresentation: .replacingLabel` to center their symbol and replace it with progress without changing geometry. Unavailable labels use the explicit secondary-text token in addition to native disabled semantics and native bezel changes. The native small progress size avoids the desktop regular spinner overflowing its slot. Loading disables the real
 button and prevents repeat activation. Native styles decide the disabled appearance.
 The library does not start, cancel or retry work.
 
@@ -62,7 +63,7 @@ The library does not start, cancel or retry work.
 | Focus-visible | SwiftUI owns native keyboard focus and its immediate focus ring. Caller owns shortcuts and app keyboard settings. No animated outline or replacement focus layer. | Navigate the live board with keyboard/Full Keyboard Access; capture independently. |
 | Active | SwiftUI owns native press/touch feedback and activation semantics. | Hold a real press, then release; check the action count. |
 | Disabled | Caller `.disabled(true)` and library loading use native disabled semantics, appearance and focus behavior. A web cursor rule has no native equivalent. | `review-disabled` must leave the count unchanged. |
-| Loading | Library preserves geometry, shows progress and disables activation. Caller owns the task, cancellation and status text. | Pinned `review-loading`, plus `review-start-loading` with a real 1.5-second cancellable `.task`. |
+| Loading | Library preserves geometry, shows progress and disables activation. Caller owns the task, cancellation and status text. | Pinned `review-loading`, plus `review-start-loading` with a real 3-second cancellable `.task`. |
 | Error | Caller owns the cause, recovery action and explanatory text. A generic button cannot diagnose an operation. Destructive is a role, not an error state. | Actual failure/retry belongs to the consumer; this synthetic save does not pretend to produce one. |
 | Success | Caller owns the observable effect/status; the button returns to resting state. No toast, celebration or custom success animation. | The live example changes its adjacent status to “Copy saved” and keeps the action count visible. |
 

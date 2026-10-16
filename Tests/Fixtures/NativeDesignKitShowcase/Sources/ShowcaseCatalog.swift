@@ -41,6 +41,7 @@ struct FixtureResources {
     let grid: CGFloat
     let title: NativeTypography
     let heading: NativeTypography
+    let reviewBody: NativeTypography
     let body: NativeTypography
     let caption: NativeTypography
     let number: NativeTypography
@@ -76,6 +77,11 @@ struct FixtureResources {
         title = try provider.typography("typography.large-title")
         heading = try provider.typography("typography.headline")
         body = try provider.typography("typography.body")
+        #if os(macOS)
+        reviewBody = try provider.typography("typography.footnote")
+        #else
+        reviewBody = try provider.typography("typography.body")
+        #endif
         caption = try provider.typography("typography.caption")
         number = try provider.typography("typography.number")
         ring = try provider.number("dimension.avatar.large")

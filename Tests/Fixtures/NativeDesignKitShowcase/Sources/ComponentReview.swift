@@ -32,7 +32,7 @@ struct ComponentReview: View {
                 if config.page == "TextField" { TextFieldReviewBoard(r: resources, config: config) }
             }.padding(resources.padding).frame(maxWidth: .infinity, alignment: .leading)
         }.background(resources.canvas).foregroundColor(resources.primary)
-            .nativeTypography(resources.body).accessibilityIdentifier("component-review")
+            .nativeTypography(resources.reviewBody).accessibilityIdentifier("component-review")
     }
 }
 

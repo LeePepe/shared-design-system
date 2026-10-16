@@ -16,7 +16,8 @@ struct ButtonReviewBoard: View {
                 NativeFlow(items: ButtonExample.allCases, horizontalSpacing: r.gap,
                            verticalSpacing: r.gap) { example in
                     NativeButton(theme: r.theme, metrics: r.reviewMetrics,
-                        presentation: example.presentation, isLoading: false,
+                        presentation: example.presentation,
+                        activityPresentation: example == .icon ? .replacingLabel : .adjacent, isLoading: false,
                         loadingLabel: Text("Saving"), action: recordAction) {
                         if example == .icon {
                             Image(systemName: "plus")
@@ -27,11 +28,12 @@ struct ButtonReviewBoard: View {
                     }
                     .accessibilityLabel(Text(example.title))
                     .accessibilityIdentifier(example.identifier)
+                    .modifier(ReviewDefaultAction(enabled: example == .prominent))
                     .help(example.title)
                 }
             }
 
-            ReviewSection(title: "Availability and progress", r: r) {
+            ReviewSection(title: "States", r: r) {
                 NativeButton(theme: r.theme, metrics: r.reviewMetrics, presentation: .bordered,
                     isLoading: false, loadingLabel: Text("Saving"), action: recordAction) {
                     Text("Save Changes").nativeGrowingText()
@@ -62,6 +64,7 @@ struct ButtonReviewBoard: View {
                     Text("Cancel").nativeGrowingText()
                 }
                 .accessibilityIdentifier("review-cancel")
+                .keyboardShortcut(.cancelAction)
                 NativeButton(theme: r.theme, metrics: r.reviewMetrics, presentation: .bordered,
                     role: .destructive, isLoading: false, loadingLabel: Text("Deleting"), action: {
                         count += 1
@@ -82,6 +85,7 @@ struct ButtonReviewBoard: View {
                     Text("The original remains available in the document list.")
                         .nativeGrowingText()
                 }
+                .padding(.bottom, r.reviewMetrics.minimumHitSize + r.padding)
                 .padding(r.padding)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(r.canvas)
@@ -111,7 +115,7 @@ struct ButtonReviewBoard: View {
         .task(id: isSaving) {
             guard isSaving else { return }
             do {
-                try await Task.sleep(nanoseconds: 1_500_000_000)
+                try await Task.sleep(nanoseconds: 3_000_000_000)
                 try Task.checkCancellation()
                 result = "Copy saved"
                 isSaving = false
@@ -169,5 +173,12 @@ private enum ButtonExample: String, CaseIterable, Identifiable {
         case .secondary: return .bordered
         case .plain, .icon: return .plain
         }
+    }
+}
+
+private struct ReviewDefaultAction: ViewModifier {
+    let enabled: Bool
+    @ViewBuilder func body(content: Content) -> some View {
+        if enabled { content.keyboardShortcut(.defaultAction) } else { content }
     }
 }
