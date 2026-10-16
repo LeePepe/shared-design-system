@@ -43,8 +43,10 @@ A button's label slot supports text, icon, and arbitrary labeled content. An
 icon-only caller supplies `.accessibilityLabel`. Loading preserves label layout,
 adds native progress, and disables repeat activation; `loadingLabel` is its
 accessible value. The caller owns the operation and returns loading to false.
-Glass uses the native Glass button style on iOS/macOS 26+, with a bordered native
-fallback on older systems and when Reduce Transparency is enabled.
+Glass support is compiled with Swift 6.2+ toolchains and their Xcode 26+ SDKs.
+Those builds use the native Glass button style on iOS/macOS 26+ when Reduce
+Transparency is disabled. Older toolchains compile the native `.bordered`
+fallback; older systems and Reduce Transparency use that same fallback.
 
 Checkbox is native macOS `ToggleStyle.checkbox`. SwiftUI has no iOS checkbox
 style: iOS uses a ToggleStyle backed by a native Button with a checkmark, caller

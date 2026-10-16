@@ -55,11 +55,15 @@ public struct NativeButton<Label: View>: View {
         case .bordered: button.buttonStyle(.bordered)
         case .plain: button.buttonStyle(.plain)
         case .glass:
+            #if compiler(>=6.2)
             if #available(iOS 26, macOS 26, *), !reduceTransparency {
                 button.buttonStyle(.glass)
             } else {
                 button.buttonStyle(.bordered)
             }
+            #else
+            button.buttonStyle(.bordered)
+            #endif
         }
     }
 }
