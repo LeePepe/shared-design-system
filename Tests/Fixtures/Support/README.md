@@ -31,7 +31,10 @@ accessibility preferences. Serialize simulator runs externally when sharing a
 host; it does not acquire a machine-specific lock itself.
 
 Xcode tests run with isolated DerivedData and `.xcresult`, UI parallelism off
-and simulator signing disabled. The runner preserves the test command's exit
+and simulator signing disabled. `-collect-test-diagnostics never` prevents
+verbose post-failure sysdiagnose collection; XCTest execution, assertions,
+result bundles, logs and screenshot export remain intact.
+The runner preserves the test command's exit
 code; export failures also fail an otherwise successful run. It exports failure
 attachments when available, as well as successful evidence.
 
@@ -65,6 +68,9 @@ attachments when available, as well as successful evidence.
 localized accessibility typography and the four brand/theme captures. Tests
 must not import UIKit/AppKit or use native hosting/window/screenshot helpers.
 Numeric color extraction remains confined to its preexisting package tests.
+For an internal SwiftUI geometry seam, its debug fixture uses `@testable import
+NativeDesignKit`; this does not add public API. UI automation still imports
+only XCTest.
 
 ## Attachment export
 

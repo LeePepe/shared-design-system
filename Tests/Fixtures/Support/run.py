@@ -108,6 +108,7 @@ def main():
                "-scheme", scheme, "-destination", "platform=iOS Simulator,id=" + device["udid"],
                "-derivedDataPath", derived, "-resultBundlePath", result,
                "-parallel-testing-enabled", "NO", "-maximum-concurrent-test-simulator-destinations", "1",
+               "-collect-test-diagnostics", "never",
                "-skipPackagePluginValidation", "CODE_SIGNING_ALLOWED=NO"]
     print(shlex.join(map(str, command)), flush=True)
     test_exit = subprocess.run(list(map(str, command)), cwd=REPO).returncode
