@@ -22,7 +22,7 @@ were diagnostics, not assertions or accepted evidence.
 | Previous Avatar check | Actual UI replacement | Preserved or stronger assertion |
 | --- | --- | --- |
 | `testHostedVisualBoundsAreStableAcrossThemesContentAndDisabledEnvironment` | Four `testVisualMatrix…` tests | Every 32/44/64 pt visual has its actual XCUI frame checked in both brands/themes, for initials, symbol, local fill/fit images, empty visual and disabled environment; full viewport containment. |
-| `testCallerFillIsClippedToCircleAndDoesNotPaintOutsideVisualBounds` | `testClippingMatchesCircularReferenceIncludingOutsideBounds` | Actual runtime screenshot crop of oversized 200×120 pt content in a 64 pt avatar centered on 88 pt canvas must equal a token-filled 64 pt circular reference on the same canvas, including corners and exterior pixels. |
+| `testCallerFillIsClippedToCircleAndDoesNotPaintOutsideVisualBounds` | `testClippingMatchesCircularReferenceIncludingOutsideBounds` | Decoded runtime pixels of oversized 200×120 pt content in a 64 pt avatar centered on 88 pt canvas match a token-filled 64 pt circular reference. Solid interior, corners and exterior match exactly; only the two-physical-pixel antialias rim permits a ≤3/255 channel difference. |
 | `testAccessibilityExposesOnlyTheCallerLabelAndImageTrait` (failed native-host AX traversal) | `testCallerLabelIsOneImageAndDecorativeDescendantsAreHidden` | Each of 18 visuals exposes exactly one image with the exact caller label, no descendants and no button role; redundant initials/symbol/image labels remain absent, including the empty visual. |
 | `testAccessibilityDynamicTypeRetainsFixedAvatarVisual` | `testNarrowTextGrowsWhileAllAvatarVisualBoundsStayFixed` | Actual iOS large/accessibility2/accessibility5 environments retain all three fixed visual sizes; adjacent full ordinary text grows at accessibility2 within a 280 pt board, stays separate from the avatar and remains onscreen. |
 | `testRealSwiftUIAvatarScreenshots` / `NativeSnapshot.capture` | Four `testVisualMatrix…` tests plus narrow/clipping tests | Six real app screenshots are kept in xcresult and exported unchanged by explicit manifest names; UIKit/AppKit hosting/windows are absent. |
@@ -33,8 +33,11 @@ the unwrapped avatar, native Button composition with a 44 pt target, real action
 dispatch, disabled coordinate taps blocked, and re-enabled dispatch.
 
 No assertions are waived or skipped and no gate/policy changes accompany this
-migration. Screenshot equality checks the full clipping image, stronger than
-the prior three color probes. A half-point XCUI frame tolerance accounts for
+migration. Pixel comparison checks the full clipping image, stronger than
+the prior three color probes. PNG decoding uses Foundation DEFLATE and the
+standard PNG scanline filters; XCTest is the UI test's only import. Actual and
+reference crops are retained in xcresult alongside the full screenshot. A
+half-point XCUI frame tolerance accounts for
 floating point edge subtraction, preserving exact nominal sizes.
 
 These tests establish iOS simulator runtime evidence, not VoiceOver speech,

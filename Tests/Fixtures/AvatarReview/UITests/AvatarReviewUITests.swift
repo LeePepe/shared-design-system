@@ -27,7 +27,7 @@ final class AvatarReviewUITests: XCTestCase {
         }
     }
 
-    func testClippingMatchesCircularReferenceIncludingOutsideBounds() {
+    func testClippingMatchesCircularReferenceIncludingOutsideBounds() throws {
         let app = launch(scenario: "clipping")
         let actual = app.otherElements["clipping-actual"]
         let reference = app.otherElements["clipping-reference"]
@@ -37,8 +37,44 @@ final class AvatarReviewUITests: XCTestCase {
             assertSize(target, diameter: 88)
             XCTAssertTrue(app.scrollViews["review-scroll"].frame.contains(target.frame))
         }
-        // Actual runtime crops include the circle, corners and exterior canvas.
-        XCTAssertEqual(actual.screenshot().pngRepresentation, reference.screenshot().pngRepresentation)
+        // Compare decoded runtime pixels, including corners and exterior canvas.
+        let actualShot = actual.screenshot()
+        let referenceShot = reference.screenshot()
+        let rendered = try ReviewRaster(png: actualShot.pngRepresentation)
+        let expected = try ReviewRaster(png: referenceShot.pngRepresentation)
+        XCTAssertEqual(rendered.width, expected.width)
+        XCTAssertEqual(rendered.height, expected.height)
+        guard rendered.width == expected.width, rendered.height == expected.height else { return }
+        let scale = CGFloat(rendered.width) / 88
+        let radius = 32 * scale
+        var unexpectedPixels = 0
+        var differentPixels = 0
+        var maximumDelta = 0
+        for y in 0..<rendered.height {
+            for x in 0..<rendered.width {
+                let offset = 4 * (y * rendered.width + x)
+                let delta = (0..<4).map { abs(Int(rendered.rgba[offset + $0]) - Int(expected.rgba[offset + $0])) }.max()!
+                maximumDelta = max(maximumDelta, delta)
+                if delta > 0 { differentPixels += 1 }
+                let dx = CGFloat(x) + 0.5 - CGFloat(rendered.width) / 2
+                let dy = CGFloat(y) + 0.5 - CGFloat(rendered.height) / 2
+                let edge = abs((dx * dx + dy * dy).squareRoot() - radius) <= 2
+                // Solid interior/exterior must match exactly. Only the two-pixel
+                // antialias rim permits a <=3/255 channel difference.
+                if delta > (edge ? 3 : 0) { unexpectedPixels += 1 }
+            }
+        }
+        XCTAssertEqual(unexpectedPixels, 0, "Unexpected clipping pixels; max channel delta=\(maximumDelta)")
+        let center = 4 * ((rendered.height / 2) * rendered.width + rendered.width / 2)
+        XCTAssertNotEqual(Array(rendered.rgba[center..<(center + 4)]), Array(rendered.rgba[0..<4]),
+                          "The fixture must exercise a filled circle against a different canvas.")
+        print("Avatar clipping raster: \(rendered.width)×\(rendered.height), differing=\(differentPixels), maxDelta=\(maximumDelta), unexpected=\(unexpectedPixels)")
+        for (name, shot) in [("actual", actualShot), ("reference", referenceShot)] {
+            let attachment = XCTAttachment(screenshot: shot)
+            attachment.name = "avatar-clipping-\(name)-crop"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
         capture("avatar-clipping", app: app)
     }
 
@@ -156,5 +192,85 @@ final class AvatarReviewUITests: XCTestCase {
         case "empty": "Empty visual"
         default: "Disabled env."
         }
+    }
+}
+
+/// XCTest PNG bytes decoded with Foundation only; no native UI/image framework.
+private struct ReviewRaster {
+    enum DecodeError: Error { case unsupportedPNG, malformedPNG }
+    let width: Int
+    let height: Int
+    let rgba: [UInt8]
+
+    init(png: Data) throws {
+        let bytes = [UInt8](png)
+        guard bytes.count >= 33, Array(bytes[0..<8]) == [137, 80, 78, 71, 13, 10, 26, 10] else {
+            throw DecodeError.malformedPNG
+        }
+        func word(_ offset: Int) -> Int {
+            bytes[offset..<(offset + 4)].reduce(0) { ($0 << 8) | Int($1) }
+        }
+        width = word(16)
+        height = word(20)
+        let channels: Int
+        switch bytes[25] {
+        case 2: channels = 3
+        case 6: channels = 4
+        default: throw DecodeError.unsupportedPNG
+        }
+        guard width > 0, height > 0, bytes[24] == 8,
+              bytes[26] == 0, bytes[27] == 0, bytes[28] == 0 else {
+            throw DecodeError.unsupportedPNG
+        }
+        var compressed = Data()
+        var offset = 8
+        while offset + 12 <= bytes.count {
+            let length = word(offset)
+            guard length <= bytes.count - offset - 12 else { throw DecodeError.malformedPNG }
+            let type = String(bytes: bytes[(offset + 4)..<(offset + 8)], encoding: .ascii)
+            if type == "IDAT" { compressed.append(contentsOf: bytes[(offset + 8)..<(offset + 8 + length)]) }
+            offset += 12 + length
+            if type == "IEND" { break }
+        }
+        let zlib = [UInt8](compressed)
+        guard zlib.count >= 6, zlib[0] & 15 == 8, zlib[1] & 32 == 0,
+              (Int(zlib[0]) * 256 + Int(zlib[1])) % 31 == 0 else { throw DecodeError.malformedPNG }
+        // Foundation's zlib algorithm consumes raw DEFLATE, without PNG's
+        // two-byte zlib header and four-byte Adler trailer.
+        let data = try (Data(zlib.dropFirst(2).dropLast(4)) as NSData).decompressed(using: .zlib)
+        let filtered = [UInt8](data as Data)
+        let stride = width * channels
+        guard filtered.count == (stride + 1) * height else { throw DecodeError.malformedPNG }
+        var decoded = [UInt8](repeating: 0, count: stride * height)
+        for y in 0..<height {
+            let filter = filtered[y * (stride + 1)]
+            guard filter <= 4 else { throw DecodeError.unsupportedPNG }
+            for x in 0..<stride {
+                let index = y * stride + x
+                let left = x >= channels ? decoded[index - channels] : 0
+                let up = y > 0 ? decoded[index - stride] : 0
+                let corner = y > 0 && x >= channels ? decoded[index - stride - channels] : 0
+                let predictor: UInt8
+                switch filter {
+                case 0: predictor = 0
+                case 1: predictor = left
+                case 2: predictor = up
+                case 3: predictor = UInt8((Int(left) + Int(up)) / 2)
+                default:
+                    let estimate = Int(left) + Int(up) - Int(corner)
+                    let distances = [abs(estimate - Int(left)), abs(estimate - Int(up)), abs(estimate - Int(corner))]
+                    predictor = distances[0] <= distances[1] && distances[0] <= distances[2]
+                        ? left : (distances[1] <= distances[2] ? up : corner)
+                }
+                decoded[index] = filtered[y * (stride + 1) + x + 1] &+ predictor
+            }
+        }
+        var pixels = [UInt8]()
+        pixels.reserveCapacity(width * height * 4)
+        for index in Swift.stride(from: 0, to: decoded.count, by: channels) {
+            pixels.append(contentsOf: decoded[index..<(index + 3)])
+            pixels.append(channels == 4 ? decoded[index + 3] : 255)
+        }
+        rgba = pixels
     }
 }
