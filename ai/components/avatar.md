@@ -48,10 +48,13 @@ func picture(_ image: Image, theme: NativeDesignTheme) -> some View {
 }
 ```
 
-Use `resizable().scaledToFill()` to fill the circle with intentional cropping,
-or `resizable().scaledToFit()` to retain the whole image with the token surface
-visible around it. An unresized image retains its intrinsic size and may be
-cropped. The component clips only its visual content to the circle. Place
+Use `resizable().scaledToFill()` to fill the circle with intentional cropping.
+`resizable().scaledToFit()` preserves the image's aspect ratio inside the square
+visual bounds, leaving the token surface visible where the image does not fill
+them. The circular mask still crops any corners outside the circle; add caller
+padding when the entire rectangular image must remain visible. An unresized
+image retains its intrinsic size and may be cropped. The component clips only
+its visual content to the circle. Place
 ordinary names, descriptions and long text beside the avatar, outside its
 builder. Supply concise visual initials yourself. The inherited font uses
 system semantic styles; a one-line visual may shrink to half size and remains
