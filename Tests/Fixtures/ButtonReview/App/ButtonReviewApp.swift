@@ -80,6 +80,9 @@ private struct ButtonReviewBoard: View {
     @State private var idleLabelBounds: CGRect = .zero
     @State private var loadingLabelBounds: CGRect = .zero
     @State private var specimenTextBounds: [String: CGRect] = [:]
+    @State private var pointerTarget = "none"
+    @State private var pointerEntries = 0
+    @State private var pointerVisits: Set<String> = []
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     private var theme: NativeDesignTheme { configuration.theme }
@@ -88,7 +91,7 @@ private struct ButtonReviewBoard: View {
         Group {
             if configuration.scenario == "specimen" {
                 specimen.accessibilityIdentifier("review-scroll")
-                    .accessibilityValue("reduce-transparency=\(reduceTransparency)")
+                    .accessibilityValue("reduce-transparency=\(reduceTransparency);pointer=\(pointerTarget);entries=\(pointerEntries);visited=\(pointerVisits.sorted().joined(separator: ","))")
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
@@ -151,6 +154,7 @@ private struct ButtonReviewBoard: View {
                     Text("44 pt targets · Adaptive capsules")
                         .font(.caption).foregroundStyle(theme.secondaryForeground)
                         .accessibilityIdentifier("specimen-caption")
+                        .onHover { if $0 { pointerVisits.insert("specimen-caption") } }
                 }
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -171,6 +175,13 @@ private struct ButtonReviewBoard: View {
         .fixedSize(horizontal: true, vertical: false)
         .accessibilityIdentifier(id)
         .accessibilityValue(textRectangle(for: id))
+        .onHover {
+            pointerTarget = $0 ? id : "none"
+            if $0 {
+                pointerEntries += 1
+                pointerVisits.insert(id)
+            }
+        }
     }
 
     private func specimenLabel(_ text: String, id: String) -> some View {

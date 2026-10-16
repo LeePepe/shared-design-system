@@ -1,6 +1,7 @@
 # Button review fixture
 
-An iOS-only SwiftUI app and XCTest UI automation target. This is test-only
+An iPhone/iPad SwiftUI app with XCTest UI automation and an optional macOS
+pointer/keyboard target. This is test-only
 synthetic state, not a product screen or additional library product. See the
 [shared runner instructions](../Support/README.md) for commands and reuse.
 `project.yml` is canonical; XcodeGen generates the shared `ButtonReview` scheme.
@@ -105,6 +106,14 @@ provisioning profile. This host may still reject native UI automation before
 any test method runs. The same pointer/keyboard suite is also available on an
 iPad simulator through `ButtonReviewPointer`; iPhone remains the20-specimen
 and behavior target.
+
+The pointer test requires a SwiftUI hover callback for each target, in addition
+to captured appearance. An accepted XCTest mouse event alone cannot establish
+hover behavior. A plain Text sentinel helps distinguish missing runtime pointer
+delivery from component behavior. The iPad focus test changes and restores the
+actual Full Keyboard Access preference, then requires observed native focus and
+Space activation. Report failures with their result bundle; do not substitute
+an idle screenshot for observed hover or focus.
 
 ```sh
 xcodebuild test -project Tests/Fixtures/ButtonReview/ButtonReview.xcodeproj \
