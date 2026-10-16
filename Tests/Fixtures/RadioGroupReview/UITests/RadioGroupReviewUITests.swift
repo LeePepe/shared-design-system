@@ -124,7 +124,13 @@ import XCTest
         assertSelection(enabled[1], others: [enabled[0], enabled[2]])
         assertSelection(disabled[1], others: [disabled[0]])
         XCTAssertTrue(app.frame.contains(app.staticTexts["review-end"].frame))
-        capture("radio-group-\(brand)-\(mode)", app: app)
+        let name = "radio-group-\(brand)-\(mode)"
+        func coordinates(_ frame: CGRect) -> String {
+            "[\(frame.minX),\(frame.minY),\(frame.width),\(frame.height)]"
+        }
+        // Pixel review uses this capture's real app/row frames, not screen guesses.
+        print("RADIO_GROUP_CHECKMARK {\"name\":\"\(name)\",\"app\":\(coordinates(app.frame)),\"selected\":\(coordinates(enabled[1].frame)),\"unselected\":\(coordinates(enabled[0].frame))}")
+        capture(name, app: app)
     }
 
     private func option(_ identifier: String, app: XCUIApplication) -> XCUIElement {
