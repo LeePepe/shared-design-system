@@ -74,6 +74,17 @@ run_suite() {
     -parallel-testing-enabled NO -test-timeouts-enabled YES \
     -default-test-execution-time-allowance 600 -maximum-test-execution-time-allowance 900 \
     CODE_SIGNING_ALLOWED=NO 2>&1 | tee "$output/$lane.log"
+  xcrun xcresulttool get test-results summary --path "$result" > "$output/$lane-summary.json"
+  python3 - "$output/$lane-summary.json" "$scheme" <<'PY'
+import json, sys
+summary = json.load(open(sys.argv[1]))
+minimum = 1 if sys.argv[2] == 'ShowcaseRender-macOS' else 4
+if (summary.get('result') != 'Passed' or summary.get('failedTests', 0) or
+        summary.get('skippedTests', 0) or summary.get('expectedFailures', 0) or
+        summary.get('passedTests', 0) < minimum):
+    raise SystemExit(f'Fixture requires at least {minimum} passing tests and no skips/failures: {summary}')
+print(f"Verified {summary['passedTests']} passing tests; no skips/failures.")
+PY
 }
 if [ "$mode" = macos ] || [ "$mode" = all ]; then
   run_suite Showcase-macOS "platform=macOS,arch=$(uname -m)" macos

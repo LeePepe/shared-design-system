@@ -39,7 +39,9 @@ generated project and shared schemes are committed alongside canonical YAML.
 
 `verify` is the fixture build/test entry point. `macos`, `ios` and `all` build
 and test the named app/UI-test schemes; errors, missing schemes/destinations and
-macOS UI-session failures return nonzero. `macos-render` builds/tests the separate
+macOS UI-session failures return nonzero. Result summaries must show all four UI
+tests (or the one render test) passing with no skips or expected failures.
+`macos-render` builds/tests the separate
 hostless render target and does not satisfy macOS UI interaction acceptance. No
 mode substitutes rendering for failed UI tests. Output includes the exact Git
 revision, dirty status, provider revision/hash, environment, resolved destination,
