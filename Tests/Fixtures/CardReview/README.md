@@ -1,12 +1,11 @@
 # Card native review fixture
 
-Synthetic SwiftUI integration fixture, with XCTest UI tests importing XCTest
-only. It has no product data or UIKit/AppKit host. The app's public-import entry
-constructs the explicit theme; only `NativeCardBehaviorFixture.swift` uses
-`@testable` for the internal nil-default Reduce Transparency input. Screenshots
-label this forced fixture preference, and production still follows the system.
+Synthetic SwiftUI app and XCTest UI automation, with no product data or native
+hosting bridge. The public-import entry constructs an explicit theme. Internal
+fixture files use `@testable` only for the shared composition/surface helper and
+nil-default Reduce Transparency input; production follows the system.
 
-From the repository root, run the shared fixture runner with new external paths:
+From the repository root, use fresh external result/build/screenshot paths:
 
 ```sh
 mkdir -p /tmp/card-review
@@ -15,37 +14,52 @@ python3 Tests/Fixtures/Support/run.py CardReview \
   --screenshots /tmp/card-review/screenshots > /tmp/card-review/ui.log 2>&1
 python3 Tests/Fixtures/CardReview/verify-material.py \
   /tmp/card-review/screenshots /tmp/card-review/ui.log \
-  --output /tmp/card-review/material.json
+  --output /tmp/card-review/legacy-material.json
+python3 Tests/Fixtures/CardReview/verify-strata.py \
+  /tmp/card-review/screenshots /tmp/card-review/ui.log \
+  --output /tmp/card-review/strata-composites.json
 ```
 
-Redirect the runner's complete output to the `ui.log` used by the material
-check. The second command decodes the original runtime PNGs using Python's
-standard library. It compares like-for-like composited pixels for solid and
-fallback and checks that normal Glass shows the token backdrop. It also checks
-normal-text contrast at 4.5:1 for primary and auxiliary content across all four
-Glass captures, matching full glyph pixels to the exact Tokens 0.1.1 checkout's
-`dist/resolved.json`, verified against `Package.resolved` and checkout revision.
-It commits no copy of the token colors.
+Keep the complete runner log for geometry anchors. Both checkers read actual
+XCTest PNGs and the manifest/lockfile's exact provider checkout. If resolution
+uses an isolated scratch directory, pass `--provider-checkout` explicitly.
+The default is `.build/checkouts/shared-design-tokens`. Reports record provider
+revision/version/data hash, PNG hashes, coordinates and observed bytes. A
+candidate mirror must be documented with both source SHAs and labeled local
+only; it does not establish release or remote-CI acceptance.
 
-The text sample points come from this unchanged four-slot/large fixture. Their
-native-point offsets are anchored to XCTest's reported `(Card.maxX - 8,
-Card.midY)`. On the 402×874 runtime, primary samples the full `d` glyph at
-`(298,276)` and auxiliary samples the full glyph at `(310,329)`. Each is compared
-with three adjacent untextured material points over the token accent strip,
-including `(328,336)` for auxiliary. The JSON records all exact coordinates,
-observed bytes, provider/PNG hashes and minimum measured ratios. A missing
-full-glyph token match fails, preventing antialiased edge pixels from being
-treated as foreground colors. The same checker rejects the original dev2
-graphite/dark capture at 4.330786:1; the specimen and backdrop are unchanged.
-This sampled evidence covers the review backdrop, not arbitrary caller imagery
+The original behavior fixture retains caller action and disabled-descendant
+taps, no implicit card activation, long-text growth, ordered slots, horizontal
+bounds, accessibility3 scrolling, content-only/empty-slot equivalence and all
+16 legacy brand/mode/material/preference layouts. Its twelve visual captures
+retain the material/fallback and primary/secondary contrast checks. The checker
+now requires the auxiliary glyph to match the secondary role, guarding against
+the former blanket primary-foreground workaround.
+
+A separate faithful specimen uses the actual NativeCard source in the shared
+32pt outer shell. Caller content supplies a token-colored icon plate, context
+pill, title/body, footer/detail action, and a second explicitly synthetic
+statistics card. The progress series and success badge use independent chart
+and status roles. Five true provider palettes × light/dark × Glass/solid/fallback
+produce thirty captures with matching geometry. The ordinary PNG checker scans
+full-glyph primary, auxiliary, action and status colors and measures contrast
+against dominant nearby background pixels from each actual composite. Its
+420 text-role checks require at least 4.5:1. It also compares Card/stat/region
+surface landmarks for solid/fallback equality and visible Glass distinction.
+These checks cover this restrained shared backdrop, not arbitrary caller imagery
 or foreground overrides.
 
-The canonical project is `project.yml`; XcodeGen output, DerivedData, xcresult
-bundles, PNGs and logs are generated evidence and stay out of git. The runner
-exports the exact attachment names listed in `screenshots.json`.
+The specimen action is tapped and its caller-owned feedback is checked. A
+narrower long specimen and accessibility3 top/action/bottom segments verify
+natural growth without clipping. The system fallback test opens Settings,
+records the current Reduce Transparency value, turns it on, launches without
+the internal override, confirms the actual SwiftUI environment value and
+captures the fallback, then restores the original setting. Run simulator work
+serially; do not run fixture suites or change simulator settings concurrently.
+The matrix's other fallback captures explicitly use the internal test input.
 
-Normal cards are wholly onscreen. Accessibility3 long text uses a scroll view;
-separate top/bottom screenshots are labeled segments of the same real layout.
-Tests check the complete card's growth and horizontal bounds, slot ordering,
-caller action/disabled behavior, content-only equivalence and all 16 theme /
-material / preference layouts. They make no VoiceOver or minimum-OS claim.
+The canonical project is `project.yml`; generated XcodeGen output, DerivedData,
+xcresult bundles, logs and PNGs remain outside git. Attachment names are declared
+in `screenshots.json`. Evidence must name a clean exact source SHA and provider
+SHA. Screenshots and UI tests make no VoiceOver, physical-device, minimum-OS or
+release-acceptance claim.

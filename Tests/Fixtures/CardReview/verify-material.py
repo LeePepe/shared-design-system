@@ -91,14 +91,15 @@ TEXT_SAMPLES = {
 }
 
 
-def provider_colors():
+def provider_colors(checkout=None):
     repo = Path(__file__).resolve().parents[3]
     pin = next(pin for pin in json.loads((repo / "Package.resolved").read_text())["pins"]
                if pin["identity"] == "shared-design-tokens")
-    checkout = repo / ".build/checkouts/shared-design-tokens"
+    checkout = checkout or repo / ".build/checkouts/shared-design-tokens"
     revision = subprocess.check_output(["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True).strip()
-    if pin["state"]["version"] != "0.1.1" or revision != pin["state"]["revision"]:
-        raise ValueError("Contrast colors must come from the exact pinned Tokens 0.1.1 checkout")
+    exact = re.search(r'exact:\s*"([^"]+)"', (repo / "Package.swift").read_text())
+    if not exact or pin["state"]["version"] != exact[1] or revision != pin["state"]["revision"]:
+        raise ValueError("Contrast colors must come from the exact manifest and lockfile's Tokens checkout")
     path = checkout / "dist/resolved.json"
     data = path.read_bytes()
     provider = json.loads(data)
@@ -126,6 +127,9 @@ def text_contrast(png, anchor, mode, colors):
                    if max(abs(a - b) for a, b in zip(rgb, glyph["rgb"])) <= 1]
         if len(matches) != 1:
             raise ValueError(f"{role}: sample is not a full glyph from a pinned provider text token: {glyph}")
+        expected = "product.text.primary" if role == "primary" else "product.text.secondary"
+        if matches != [expected]:
+            raise ValueError(f"{role}: expected distinct {expected}, observed {matches}")
         backgrounds = [sample(offset) for offset in points["backgrounds"]]
         for background in backgrounds:
             background["contrast"] = contrast(glyph["rgb"], background["rgb"])
@@ -140,8 +144,9 @@ def main():
     parser.add_argument("screenshots", type=Path)
     parser.add_argument("ui_log", type=Path)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--provider-checkout", type=Path)
     args = parser.parse_args()
-    colors, provider = provider_colors()
+    colors, provider = provider_colors(args.provider_checkout)
     samples = {
         name: tuple(map(float, coordinates))
         for name, *coordinates in re.findall(

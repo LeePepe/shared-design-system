@@ -20,7 +20,8 @@ struct NativeCardBehaviorFixture: View {
                     .frame(height: 40, alignment: .topLeading)
                 reviewedCard
                     .frame(width: 320)
-                    .environment(\.nativeReduceTransparencyOverride, configuration.reduceTransparency)
+                    .environment(\.nativeReduceTransparencyOverride,
+                                 configuration.systemTransparency ? nil : configuration.reduceTransparency)
                     .environment(\.dynamicTypeSize, configuration.textSize)
                     .background(alignment: .trailing) {
                         RoundedRectangle(cornerRadius: 20)

@@ -51,22 +51,24 @@ func makeCardExample() throws -> CardExample {
 
 The [public-import compile fixture](../../Tests/NativeDesignKitTests/Components/NativeCardPublicAPITests.swift)
 uses only public API. A consumer that names `Theme` also declares the direct
-`DesignTokens` product dependency at exact `0.1.1`; NativeDesignKit does not
+`DesignTokens` product dependency at exact `0.2.0`; NativeDesignKit does not
 re-export Tokens. Theme resolution errors propagate unchanged before rendering.
-Only provider brands `ocean` and `graphite` exist in that pin. Five-color Strata
-prototypes do not add brands to the provider.
+The candidate provider adds explicit `strata-blue`, `strata-green`,
+`strata-pink`, `strata-yellow` and `strata-purple` brands; `ocean` and `graphite`
+remain supported. The five families are independently resolved provider colors.
+Until the provider version is published, candidate-only local evidence does not
+establish remote dependency or release acceptance.
 
 The header uses `.headline` and a heading accessibility trait. Content uses
-`.body`; supporting content uses `.subheadline`. Solid cards use the secondary
-token foreground for supporting content. Requested Glass uses the primary token
-foreground for supporting content, including its Reduce Transparency fallback:
-the smaller semantic font retains hierarchy without relying on secondary text
-contrast over a translucent background. Actions inherit `.body` and the brand accent. Callers may override
-semantic fonts and provide their own token-derived foregrounds. There is no
-fixed text height, truncation limit, number formatting or localization policy.
-The stack reads header → content → supporting → actions and retains descendant
-controls, focus, gestures and accessibility. The card adds no tap or selection
-behavior and no implicit accessibility activation action.
+`.body`; supporting content uses `.subheadline` and `secondaryForeground` on
+both Glass and solid, including the system Reduce Transparency fallback. The
+dense `.card` reading role provides the background for that hierarchy. Actions
+inherit `.body` and the brand accent. Callers may override semantic fonts and
+provide their own token-derived foregrounds. There is no fixed text height,
+truncation limit, number formatting or localization policy. The stack reads
+header → content → supporting → actions and retains descendant controls, focus,
+gestures and accessibility. The card adds no tap or selection behavior and no
+implicit accessibility activation action.
 
 The card has a continuous 24pt corner radius, 16pt inset and 12pt slot spacing.
 Width follows its parent proposal; height grows with its content. Controls
@@ -74,14 +76,20 @@ inside `actions` remain caller-owned, including their style and hit area; give
 interactive labels at least a 44pt hit region. A
 vertical action composition is useful in narrow or accessibility-sized layouts.
 
-`surface: .solid` uses the resolved raised-surface token. `.glass` uses the
-shared native SwiftUI material surface with the explicitly selected theme.
-System Reduce Transparency selects the same theme's solid surface and preserves
-layout and content. It does not change brand or mode. Glass is appropriate for
-an outer floating surface; use solid cards for dense nested reading surfaces.
-The review fixture checks primary and supporting text against sampled actual
-Glass backgrounds at a minimum of 4.5:1 in both provider brands and modes. This
-evidence covers its unchanged neutral canvas and token-accent backdrop. Callers
-must evaluate other composited backdrops and any foreground overrides; an
-unrestricted material backdrop cannot provide a universal contrast guarantee.
-Choose a solid card for reading over imagery or other unverified backdrops.
+`surface: .solid` uses the explicit theme's opaque `.card` surface role.
+`.glass` uses the shared dense Card treatment. When nested under a glass region,
+it inherits the outer blur rather than creating another material layer; its
+inner edge is weaker than the outer shell. System Reduce Transparency selects
+the same theme's opaque Card role and removes material decoration while
+preserving layout and content. Material selection never changes brand or mode.
+The outer page/region composition belongs to the caller, not NativeCard.
+
+The review fixture retains behavior matrices and adds a separate composition
+with caller-owned icon plate, context pill, footer/action and an explicitly
+synthetic statistics card. Status and chart colors use their own provider
+roles; the active brand does not turn a progress series or success state into
+brand content. Actual runtime composite contrast checks cover the fixture's
+primary, supporting, brand-action and status text. Callers must evaluate other
+composited backdrops and foreground overrides. Use a solid card for reading
+over imagery or other unverified backdrops. Screenshots do not establish
+VoiceOver, minimum-OS or physical-device acceptance.

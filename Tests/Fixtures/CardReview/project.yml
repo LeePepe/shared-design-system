@@ -17,7 +17,9 @@ targets:
   CardReview:
     type: application
     platform: iOS
-    sources: [App]
+    sources:
+      - App
+      - ../Shared/StrataSpecimen.swift
     dependencies:
       - package: NativeDesignKit
     settings:
