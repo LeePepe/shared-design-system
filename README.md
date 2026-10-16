@@ -5,5 +5,6 @@ built on [`shared-design-tokens`](https://github.com/LeePepe/shared-design-token
 
 - Agents and contributors: start with [AGENTS.md](AGENTS.md).
 - Architecture: [layer map](docs/architecture/tech-context.md).
-- Visual theme: [Strata v0.2 rules](docs/strata-theme-v0.2.md) (accepted direction; native implementation pending).
+- Visual theme: [Strata v0.2 rules](docs/strata-theme-v0.2.md) (accepted theme baseline).
+- Unreleased components: [Strata component contracts](ai/COMPONENTS.md).
 - Consumers: read `ai/` from the exact release you pin.

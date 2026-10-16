@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Explicit `NativeDesignTheme` and native solid/Glass surface policy for the
+  [Strata rebuild](docs/strata-component-rebuild.md), preserving exact
+  DesignTokens 0.1.1 and the released color resolver.
+- Ten independently delivered SwiftUI components: Button, Card, TextField,
+  Switch, Checkbox, RadioGroup, Slider, ProgressBar, Avatar and Chip. See their
+  [consumer contracts](ai/COMPONENTS.md) for APIs and native platform adaptation.
+- Component-owned pure SwiftUI fixtures, XCTest UI interaction checks and actual
+  simulator screenshot evidence. Components remain unreleased; no new package
+  version, tag or product adoption is declared.
+
 ## 0.1.0 — first release (Git tag v0.1.0)
 
 - SwiftUI `NativeTokenColor.resolve(_:theme:)` bridge over exact DesignTokens

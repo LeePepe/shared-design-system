@@ -12,9 +12,10 @@ The historical [v1 specification](native-design-kit-v1-spec.md),
 are superseded for this rebuild and retained only for history.
 
 Each component has one writer, one worktree, one branch, one PR and its own
-consumer contract. The first Button PR supplies only the minimum common theme,
+consumer contract. The first Button PR supplied the minimum common theme,
 material and test-only SwiftUI fixture UI support that the other components
-need. Public API changes are recorded as unreleased; no version/tag is created.
+need. All ten components have separate implementation PRs and remain unreleased;
+no version or tag is created by this rebuild.
 
 The first batch contains ten components selected from the HeroUI component
 catalogue. That catalogue informs names and inventory only. Native behavior
@@ -25,18 +26,18 @@ instructions](../Tests/Fixtures/Support/README.md) let each component add its
 own fixture without editing shared support. No native hosting/window helpers
 are used. Screenshots alone do not claim VoiceOver or minimum-OS acceptance.
 
-| First-batch component | Delivery |
+| First-batch component | Consumer contract |
 | --- | --- |
-| Button | This foundation/Button candidate |
-| Card | Separate component PR |
-| TextField | Separate component PR |
-| Switch | Separate component PR |
-| Checkbox | Separate component PR |
-| RadioGroup | Separate component PR |
-| Slider | Separate component PR |
-| ProgressBar | Separate component PR |
-| Avatar | Separate component PR |
-| Chip | Separate component PR |
+| Button | [NativeButton](../ai/components/button.md) |
+| Card | [NativeCard](../ai/components/card.md) |
+| TextField | [NativeTextField](../ai/components/textfield.md) |
+| Switch | [NativeSwitch](../ai/components/switch.md) |
+| Checkbox | [NativeCheckbox](../ai/components/checkbox.md) |
+| RadioGroup | [NativeRadioGroup](../ai/components/radio-group.md) |
+| Slider | [NativeSlider](../ai/components/slider.md) |
+| ProgressBar | [NativeProgressBar](../ai/components/progress-bar.md) |
+| Avatar | [NativeAvatar](../ai/components/avatar.md) |
+| Chip | [NativeChip](../ai/components/chip.md) |
 
 Theme and brand are explicit. The exact provider supports ocean/graphite only;
 the broader five-color theme direction is a documented gap, never a local
