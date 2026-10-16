@@ -51,7 +51,8 @@ supports caller `.keyboardShortcut(...)`. The hit area is at least 44 × 44 pt;
 semantic font sizes, wrapping, and intrinsic height allow longer localized
 labels. Caller actions remain caller owned. macOS captures cover both provider
 brands, both themes, three variants and normal/loading/disabled states, plus a
-320 pt accessibility-size case. Screenshots do not prove VoiceOver, physical
+320 pt case requesting an accessibility Dynamic Type size. macOS does not
+establish iOS Dynamic Type scaling. Screenshots do not prove VoiceOver, physical
 device touch or minimum-OS behavior; those require separate consumer validation.
 
 Existing `NativeTokenColor` behavior, dependency and platform floors are

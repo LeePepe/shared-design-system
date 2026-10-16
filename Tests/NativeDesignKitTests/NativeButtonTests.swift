@@ -3,6 +3,10 @@ import SwiftUI
 import XCTest
 @testable import NativeDesignKit
 
+#if os(macOS)
+import AppKit
+#endif
+
 final class NativeButtonTests: XCTestCase {
     func testLoadingAndDisabledBlockEveryActionDispatch() {
         for enabled in [false, true] {
@@ -17,6 +21,25 @@ final class NativeButtonTests: XCTestCase {
     }
 
     #if os(macOS)
+    @MainActor
+    func testLoadingPreservesMeasuredFootprintAndMinimumHitSize() throws {
+        let theme = try NativeDesignTheme(theme: .light, brand: "ocean")
+        func measure(_ loading: Bool) -> NSSize {
+            let button = NativeButton(theme: theme, variant: .primary, isLoading: loading, action: {}) {
+                Text("Save")
+            } loadingLabel: { Text("Saving all your changes…") }
+            let view = NSHostingView(rootView: button)
+            view.layoutSubtreeIfNeeded()
+            return view.fittingSize
+        }
+        let idle = measure(false)
+        let loading = measure(true)
+        XCTAssertEqual(idle.width, loading.width, accuracy: 0.5)
+        XCTAssertEqual(idle.height, loading.height, accuracy: 0.5)
+        XCTAssertGreaterThanOrEqual(idle.width, 44)
+        XCTAssertGreaterThanOrEqual(idle.height, 44)
+    }
+
     @MainActor
     func testRealSwiftUIButtonScreenshots() throws {
         for brand in DesignTokens.brandIDs {

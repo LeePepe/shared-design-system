@@ -10,7 +10,7 @@ The current rebuild replaces the old unmerged component implementations and
 old v1 component scope following the Owner's request. Only the
 `Foundations` / `Controls` / `Primitives` source hierarchy is retained. Component
 names are informed by the HeroUI catalogue; implementation is native SwiftUI
-and follows [Strata v0.2](https://github.com/LeePepe/shared-design-system/blob/48cea0a/docs/strata-theme-v0.2.md), without copying HeroUI
+and follows [Strata v0.2](https://github.com/LeePepe/shared-design-system/blob/48cea0a3f0920d5ebc7797a7d4d848dd060f0f42/docs/strata-theme-v0.2.md), without copying HeroUI
 implementation or introducing its runtime.
 
 ## Explicit theme
