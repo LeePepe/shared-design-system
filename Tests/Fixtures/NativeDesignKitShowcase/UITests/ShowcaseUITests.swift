@@ -107,10 +107,10 @@ final class ShowcaseUITests: XCTestCase {
         let ring = app.descendants(matching: .any).matching(identifier: "ring-progress").firstMatch
         reveal(ring, in: app)
         XCTAssertTrue((ring.value as? String)?.contains("percent") == true)
-        let stepper = app.steppers["count-stepper"]
-        reveal(stepper, in: app)
         #if os(iOS)
-        activate(stepper.buttons["Increment"])
+        let increment = app.buttons["count-stepper-Increment"]
+        reveal(increment, in: app)
+        activate(increment)
         XCTAssertTrue(app.staticTexts["Count value: 3"].waitForExistence(timeout: 3))
         #endif
         let animate = app.buttons["animate-number"]
