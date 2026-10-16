@@ -70,7 +70,6 @@ private struct ProgressReviewBoard: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var state = 0
     @State private var bounds: [String: CGRect] = [:]
-    @State private var interactionBounds: CGRect = .zero
     private var theme: NativeDesignTheme { configuration.theme }
     private let longLabel = "Vorbereitung aller ausgewählten Dateien für die nächste Übertragung"
     private let longValue = "50 von 100 Dateien vorbereitet — bitte warten Sie auf die nächste Aktualisierung"
@@ -117,16 +116,13 @@ private struct ProgressReviewBoard: View {
         VStack(alignment: .leading, spacing: 20) {
             sample("Preparing files", value: interactionValue,
                    current: interactionText, id: "progress-target")
-                .background {
-                    GeometryReader { proxy in
-                        Color.clear.preference(key: InteractionBounds.self, value: proxy.frame(in: .local))
-                    }
-                }
-                .onPreferenceChange(InteractionBounds.self) { interactionBounds = $0 }
+                .background(measure("interaction"))
+                .coordinateSpace(name: "progress-measurement")
+                .onPreferenceChange(ReviewBounds.self) { bounds = $0 }
             Text("State: \(state)").accessibilityIdentifier("caller-state")
             Text("Rendered progress size").font(.caption)
                 .accessibilityIdentifier("progress-footprint")
-                .accessibilityValue(Text(verbatim: "\(interactionBounds.width)|\(interactionBounds.height)"))
+                .accessibilityValue(Text(verbatim: "\(bounds["interaction"]?.width ?? 0)|\(bounds["interaction"]?.height ?? 0)"))
             Button("Next synthetic state") { state = (state + 1) % 6 }
                 .font(.body)
                 .padding(12)
@@ -169,7 +165,7 @@ private struct ProgressReviewBoard: View {
             .dynamicTypeSize(configuration.textSize)
             .accessibilityIdentifier("long-progress")
             .background(measure("outer"))
-            .coordinateSpace(name: "long-progress")
+            .coordinateSpace(name: "progress-measurement")
             .onPreferenceChange(ReviewBounds.self) { bounds = $0 }
             Text("320 pt board · \(configuration.textSize == .large ? "large" : "accessibility2")")
                 .font(.caption).accessibilityIdentifier("text-request")
@@ -200,7 +196,7 @@ private struct ProgressReviewBoard: View {
     private func measure(_ id: String) -> some View {
         GeometryReader { proxy in
             Color.clear.preference(key: ReviewBounds.self,
-                                   value: [id: proxy.frame(in: .named("long-progress"))])
+                                   value: [id: proxy.frame(in: .named("progress-measurement"))])
         }
     }
 
@@ -223,9 +219,3 @@ private struct ReviewBounds: PreferenceKey {
     }
 }
 
-private struct InteractionBounds: PreferenceKey {
-    static let defaultValue: CGRect = .zero
-    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
-        value = nextValue()
-    }
-}
