@@ -34,7 +34,10 @@ struct NativeCardBehaviorFixture: View {
     }
 
     private var cardRegion: some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Reading surface")
+                .font(.headline)
+                .accessibilityIdentifier("review-region-title")
             reviewedCard
                 .frame(width: 320)
                 .environment(\.dynamicTypeSize, configuration.textSize)

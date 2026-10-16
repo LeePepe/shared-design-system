@@ -262,6 +262,7 @@ final class CardReviewUITests: XCTestCase {
             print("CARD_UI_PIXEL \(name) x=\(frame.maxX - 8) y=\(frame.midY) width=\(app.frame.width) height=\(app.frame.height)")
             let region = app.otherElements["review-region"].frame
             XCTAssertTrue(region.contains(frame))
+            XCTAssertLessThanOrEqual(app.staticTexts["review-region-title"].frame.maxY, frame.minY)
             print("CARD_UI_OUTER_PIXEL \(name) x=\(region.maxX - 8) y=\(region.midY) width=\(app.frame.width) height=\(app.frame.height)")
             capture(name, app: app)
             app.terminate()
