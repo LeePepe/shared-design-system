@@ -1,5 +1,9 @@
 # NativeDesignKit v1 specification
 
+> Superseded for the current [Strata component rebuild](strata-component-rebuild.md).
+> The original planning status and content below are retained as history, not
+> the active specification for this rebuild.
+
 Status: planning input v1
 
 Issue: MY-1569
