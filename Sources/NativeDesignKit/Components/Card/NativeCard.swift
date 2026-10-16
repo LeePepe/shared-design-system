@@ -41,7 +41,10 @@ public struct NativeCard<Header: View, Content: View, Supporting: View, Actions:
                 .foregroundStyle(theme.foreground)
             supporting
                 .font(.subheadline)
-                .foregroundStyle(theme.secondaryForeground)
+                // A translucent surface can brighten dark backdrops enough to
+                // lose secondary-text contrast. Keep hierarchy through type
+                // while using the existing primary token on requested Glass.
+                .foregroundStyle(surface == .glass ? theme.foreground : theme.secondaryForeground)
             actions
                 .font(.body)
                 .foregroundStyle(theme.accent)

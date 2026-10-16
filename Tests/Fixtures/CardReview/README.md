@@ -20,9 +20,25 @@ python3 Tests/Fixtures/CardReview/verify-material.py \
 
 Redirect the runner's complete output to the `ui.log` used by the material
 check. The second command decodes the original runtime PNGs using Python's
-standard library and samples coordinates reported by XCTest. It compares
-like-for-like composited pixels for solid and fallback and checks that normal
-Glass shows the token backdrop. It does not certify arbitrary backdrop contrast.
+standard library. It compares like-for-like composited pixels for solid and
+fallback and checks that normal Glass shows the token backdrop. It also checks
+normal-text contrast at 4.5:1 for primary and auxiliary content across all four
+Glass captures, matching full glyph pixels to the exact Tokens 0.1.1 checkout's
+`dist/resolved.json`, verified against `Package.resolved` and checkout revision.
+It commits no copy of the token colors.
+
+The text sample points come from this unchanged four-slot/large fixture. Their
+native-point offsets are anchored to XCTest's reported `(Card.maxX - 8,
+Card.midY)`. On the 402×874 runtime, primary samples the full `d` glyph at
+`(298,276)` and auxiliary samples the full glyph at `(310,329)`. Each is compared
+with three adjacent untextured material points over the token accent strip,
+including `(328,336)` for auxiliary. The JSON records all exact coordinates,
+observed bytes, provider/PNG hashes and minimum measured ratios. A missing
+full-glyph token match fails, preventing antialiased edge pixels from being
+treated as foreground colors. The same checker rejects the original dev2
+graphite/dark capture at 4.330786:1; the specimen and backdrop are unchanged.
+This sampled evidence covers the review backdrop, not arbitrary caller imagery
+or foreground overrides.
 
 The canonical project is `project.yml`; XcodeGen output, DerivedData, xcresult
 bundles, PNGs and logs are generated evidence and stay out of git. The runner

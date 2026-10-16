@@ -57,8 +57,11 @@ Only provider brands `ocean` and `graphite` exist in that pin. Five-color Strata
 prototypes do not add brands to the provider.
 
 The header uses `.headline` and a heading accessibility trait. Content uses
-`.body`; supporting content uses `.subheadline` and the secondary token
-foreground. Actions inherit `.body` and the brand accent. Callers may override
+`.body`; supporting content uses `.subheadline`. Solid cards use the secondary
+token foreground for supporting content. Requested Glass uses the primary token
+foreground for supporting content, including its Reduce Transparency fallback:
+the smaller semantic font retains hierarchy without relying on secondary text
+contrast over a translucent background. Actions inherit `.body` and the brand accent. Callers may override
 semantic fonts and provide their own token-derived foregrounds. There is no
 fixed text height, truncation limit, number formatting or localization policy.
 The stack reads header → content → supporting → actions and retains descendant
@@ -76,6 +79,9 @@ shared native SwiftUI material surface with the explicitly selected theme.
 System Reduce Transparency selects the same theme's solid surface and preserves
 layout and content. It does not change brand or mode. Glass is appropriate for
 an outer floating surface; use solid cards for dense nested reading surfaces.
-The caller owns the backdrop and must assess contrast against the actual
-composited background; a static card API does not constrain arbitrary imagery
-behind a material.
+The review fixture checks primary and supporting text against sampled actual
+Glass backgrounds at a minimum of 4.5:1 in both provider brands and modes. This
+evidence covers its unchanged neutral canvas and token-accent backdrop. Callers
+must evaluate other composited backdrops and any foreground overrides; an
+unrestricted material backdrop cannot provide a universal contrast guarantee.
+Choose a solid card for reading over imagery or other unverified backdrops.

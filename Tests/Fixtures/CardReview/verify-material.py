@@ -1,63 +1,138 @@
 #!/usr/bin/env python3
-"""Check real XCTest screenshot pixels for Card's material and solid fallback."""
+"""Check real XCTest PNG material, solid fallback and composited text contrast."""
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
 import struct
+import subprocess
 import zlib
 
 
-def pixel(path, point_x, point_y, point_width, point_height):
+class PNG:
+    """Minimal stdlib RGB/RGBA PNG reader; decode each required row only once."""
+
+    def __init__(self, path):
+        data = path.read_bytes()
+        if data[:8] != b"\x89PNG\r\n\x1a\n":
+            raise ValueError(f"Not PNG: {path}")
+        self.sha256 = hashlib.sha256(data).hexdigest()
+        chunks = []
+        offset = 8
+        while offset < len(data):
+            length = struct.unpack_from(">I", data, offset)[0]
+            kind = data[offset + 4:offset + 8]
+            payload = data[offset + 8:offset + 8 + length]
+            if kind == b"IHDR":
+                self.width, self.height, depth, color, compression, filtering, interlace = struct.unpack(">IIBBBBB", payload)
+                if depth != 8 or color not in (2, 6) or compression or filtering or interlace:
+                    raise ValueError("Expected noninterlaced 8-bit RGB/RGBA XCTest PNG")
+                self.channels = 3 if color == 2 else 4
+            if kind == b"IDAT":
+                chunks.append(payload)
+            offset += length + 12
+        self.raw = zlib.decompress(b"".join(chunks))
+        self.rows = []
+
+    def pixel(self, point_x, point_y, point_width, point_height):
+        x = round(point_x * self.width / point_width)
+        y = round(point_y * self.height / point_height)
+        if not (0 <= x < self.width and 0 <= y < self.height):
+            raise ValueError("Sample point lies outside the runtime screenshot")
+        stride = self.width * self.channels
+        while len(self.rows) <= y:
+            start = len(self.rows) * (stride + 1)
+            method = self.raw[start]
+            values = bytearray(self.raw[start + 1:start + stride + 1])
+            previous = self.rows[-1] if self.rows else bytearray(stride)
+            for i in range(stride):
+                left = values[i - self.channels] if i >= self.channels else 0
+                up = previous[i]
+                diagonal = previous[i - self.channels] if i >= self.channels else 0
+                if method == 0:
+                    predictor = 0
+                elif method == 1:
+                    predictor = left
+                elif method == 2:
+                    predictor = up
+                elif method == 3:
+                    predictor = (left + up) // 2
+                elif method == 4:
+                    estimate = left + up - diagonal
+                    distances = [abs(estimate - v) for v in (left, up, diagonal)]
+                    predictor = (left, up, diagonal)[distances.index(min(distances))]
+                else:
+                    raise ValueError(f"Unsupported PNG filter: {method}")
+                values[i] = (values[i] + predictor) % 256
+            self.rows.append(values)
+        return list(self.rows[y][x * self.channels:x * self.channels + 3])
+
+
+def contrast(foreground, background):
+    def luminance(rgb):
+        channels = [v / 255 for v in rgb]
+        linear = [v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4 for v in channels]
+        return sum(a * b for a, b in zip(linear, (0.2126, 0.7152, 0.0722)))
+    a, b = sorted((luminance(foreground), luminance(background)))
+    return (b + 0.05) / (a + 0.05)
+
+
+# NativeCardBehaviorFixture's unchanged four-slot, large-text specimen, measured
+# in native points on the 402x874 iPhone fixture. Offsets use CARD_UI_PIXEL's
+# runtime anchor (Card.maxX - 8, Card.midY), rather than PNG pixel dimensions.
+# Primary: fully covered last "d" in "caller-owned"; auxiliary: full glyph in
+# "meaning". Background points are adjacent untextured material, including the
+# right edge over the accent backdrop. These points also apply to the original
+# dev2 capture, so the regression checker can reject its actual low contrast.
+TEXT_SAMPLES = {
+    "primary": {"glyph": (-30, -60), "backgrounds": [(-28, -62), (-18, -62), (0, -60)]},
+    "auxiliary": {"glyph": (-18, -7), "backgrounds": [(-48, -7), (-28, -7), (0, 0)]},
+}
+
+
+def provider_colors():
+    repo = Path(__file__).resolve().parents[3]
+    pin = next(pin for pin in json.loads((repo / "Package.resolved").read_text())["pins"]
+               if pin["identity"] == "shared-design-tokens")
+    checkout = repo / ".build/checkouts/shared-design-tokens"
+    revision = subprocess.check_output(["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True).strip()
+    if pin["state"]["version"] != "0.1.1" or revision != pin["state"]["revision"]:
+        raise ValueError("Contrast colors must come from the exact pinned Tokens 0.1.1 checkout")
+    path = checkout / "dist/resolved.json"
     data = path.read_bytes()
-    if data[:8] != b"\x89PNG\r\n\x1a\n":
-        raise ValueError(f"Not PNG: {path}")
-    chunks = []
-    offset = 8
-    while offset < len(data):
-        length = struct.unpack_from(">I", data, offset)[0]
-        kind = data[offset + 4:offset + 8]
-        payload = data[offset + 8:offset + 8 + length]
-        if kind == b"IHDR":
-            width, height, depth, color, compression, filtering, interlace = struct.unpack(">IIBBBBB", payload)
-            if depth != 8 or color not in (2, 6) or compression or filtering or interlace:
-                raise ValueError("Expected noninterlaced 8-bit RGB/RGBA XCTest PNG")
-            channels = 3 if color == 2 else 4
-        if kind == b"IDAT":
-            chunks.append(payload)
-        offset += length + 12
-    raw = zlib.decompress(b"".join(chunks))
-    stride = width * channels
-    x = round(point_x * width / point_width)
-    y = round(point_y * height / point_height)
-    if not (0 <= x < width and 0 <= y < height):
-        raise ValueError("Sample point lies outside the runtime screenshot")
-    previous = bytearray(stride)
-    for row in range(y + 1):
-        start = row * (stride + 1)
-        method = raw[start]
-        values = bytearray(raw[start + 1:start + stride + 1])
-        for i in range(stride):
-            left = values[i - channels] if i >= channels else 0
-            up = previous[i]
-            diagonal = previous[i - channels] if i >= channels else 0
-            if method == 0:
-                predictor = 0
-            elif method == 1:
-                predictor = left
-            elif method == 2:
-                predictor = up
-            elif method == 3:
-                predictor = (left + up) // 2
-            elif method == 4:
-                estimate = left + up - diagonal
-                distances = [abs(estimate - v) for v in (left, up, diagonal)]
-                predictor = (left, up, diagonal)[distances.index(min(distances))]
-            else:
-                raise ValueError(f"Unsupported PNG filter: {method}")
-            values[i] = (values[i] + predictor) % 256
-        previous = values
-    return list(previous[x * channels:x * channels + 3])
+    provider = json.loads(data)
+    if provider["colorSpace"] != "srgb":
+        raise ValueError("Expected pinned provider's encoded sRGB bytes")
+    return provider["colors"], dict(path=str(path), version=pin["state"]["version"],
+                                   revision=revision, sha256=hashlib.sha256(data).hexdigest())
+
+
+def text_contrast(png, anchor, mode, colors):
+    x, y, width, height = anchor
+    candidates = {}
+    for token in ("product.text.primary", "product.text.secondary"):
+        rgba = colors[token][mode]
+        if rgba["a"] != 1:
+            raise ValueError("Full-glyph token matching requires opaque provider text colors")
+        candidates[token] = [rgba[c] for c in ("r", "g", "b")]
+    results = []
+    for role, points in TEXT_SAMPLES.items():
+        def sample(offset):
+            point = [x + offset[0], y + offset[1]]
+            return dict(native_point=point, rgb=png.pixel(*point, width, height))
+        glyph = sample(points["glyph"])
+        matches = [token for token, rgb in candidates.items()
+                   if max(abs(a - b) for a, b in zip(rgb, glyph["rgb"])) <= 1]
+        if len(matches) != 1:
+            raise ValueError(f"{role}: sample is not a full glyph from a pinned provider text token: {glyph}")
+        backgrounds = [sample(offset) for offset in points["backgrounds"]]
+        for background in backgrounds:
+            background["contrast"] = contrast(glyph["rgb"], background["rgb"])
+        results.append(dict(role=role, observed_token=matches[0], provider_rgb=candidates[matches[0]],
+                            glyph=glyph, backgrounds=backgrounds,
+                            minimum_contrast=min(v["contrast"] for v in backgrounds), target=4.5))
+    return results
 
 
 def main():
@@ -66,6 +141,7 @@ def main():
     parser.add_argument("ui_log", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    colors, provider = provider_colors()
     samples = {
         name: tuple(map(float, coordinates))
         for name, *coordinates in re.findall(
@@ -74,23 +150,38 @@ def main():
         )
     }
     results = []
+    failures = []
     for brand in ("ocean", "graphite"):
         for mode in ("light", "dark"):
-            colors = {}
+            material_colors = {}
+            captures = {}
             for specimen in ("solid", "glass", "fallback"):
                 name = f"card-{brand}-{mode}-{specimen}"
-                colors[specimen] = pixel(args.screenshots / (name + ".png"), *samples[name])
-            fallback_delta = max(abs(a - b) for a, b in zip(colors["solid"], colors["fallback"]))
-            glass_delta = max(abs(a - b) for a, b in zip(colors["solid"], colors["glass"]))
+                captures[specimen] = PNG(args.screenshots / (name + ".png"))
+                material_colors[specimen] = captures[specimen].pixel(*samples[name])
+            fallback_delta = max(abs(a - b) for a, b in zip(material_colors["solid"], material_colors["fallback"]))
+            glass_delta = max(abs(a - b) for a, b in zip(material_colors["solid"], material_colors["glass"]))
             if fallback_delta > 2:
-                raise ValueError(f"{brand}/{mode}: fallback differs from the solid token surface: {colors}")
+                failures.append(f"{brand}/{mode}: fallback differs from the solid token surface: {material_colors}")
             if glass_delta <= 5:
-                raise ValueError(f"{brand}/{mode}: material does not differ over the token backdrop: {colors}")
-            results.append(dict(brand=brand, mode=mode, rgb_bytes=colors,
-                                fallback_delta=fallback_delta, glass_delta=glass_delta))
-    args.output.write_text(json.dumps({"cases": 4, "failures": 0, "results": results}, indent=2) + "\n")
-    print("CARD_MATERIAL_OK: 4 runtime solid / Glass / fallback comparisons")
+                failures.append(f"{brand}/{mode}: material does not differ over the token backdrop: {material_colors}")
+            text = text_contrast(captures["glass"], samples[f"card-{brand}-{mode}-glass"], mode, colors)
+            for role in text:
+                if role["minimum_contrast"] < role["target"]:
+                    failures.append(f"{brand}/{mode}/{role['role']}: {role['minimum_contrast']:.6f}:1 < 4.5:1")
+            results.append(dict(brand=brand, mode=mode, rgb_bytes=material_colors,
+                                fallback_delta=fallback_delta, glass_delta=glass_delta, text_contrast=text,
+                                png_sha256={key: value.sha256 for key, value in captures.items()}))
+    report = dict(material_cases=4, contrast_cases=8, failures=failures, provider=provider,
+                  sampling_source="NativeCardBehaviorFixture four-slot/large; offsets from CARD_UI_PIXEL runtime Card anchor",
+                  sample_offsets_native_points=TEXT_SAMPLES, results=results)
+    args.output.write_text(json.dumps(report, indent=2) + "\n")
+    if failures:
+        print("CARD_PIXEL_FAILED: " + "; ".join(failures))
+        return 1
+    print("CARD_PIXEL_OK: 4 runtime material/fallback comparisons; 8 primary/auxiliary Glass contrast checks >= 4.5:1")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

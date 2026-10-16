@@ -20,6 +20,12 @@ The card does not create a new color/material authority or claim unsupported
 Strata colorways. Consumer-supplied controls retain their identity and actions;
 heading semantics apply only to the header slot.
 
+Supporting content retains `.subheadline` hierarchy. A requested Glass card uses
+the existing primary text token for that slot, including its solid accessibility
+fallback; an explicit solid card uses the secondary text token. The secondary
+dark token fell below 4.5:1 over the actual graphite Glass specimen. This policy
+repairs that specimen without changing its backdrop, material or geometry.
+
 ## Acceptance and evidence
 
 - Public-import compilation covers all four slots, the content-only initializer,
@@ -30,6 +36,13 @@ heading semantics apply only to the header slot.
   is explicitly labeled; it does not claim the host system setting was changed.
   `verify-material.py` compares the original XCTest PNG pixels: Glass differs
   over the token backdrop and its fallback matches the explicit solid surface.
+  It also matches full primary/supporting glyph pixels to colors read from the
+  exact pinned provider checkout, and requires at least 4.5:1 against three
+  nearby actual material pixels for each role in all four Glass combinations.
+  The original development graphite/dark auxiliary capture is rejected at
+  4.330786:1. Reports record provider revision/hash, PNG hashes and coordinates.
+  These samples establish contrast for the accepted fixture; arbitrary caller
+  backdrops and foreground overrides still need their own evaluation.
 - Layout checks compare fitting heights and ensure content can grow; no card
   gesture wraps or intercepts descendants. Real XCTest UI taps check a caller
   button's action and a disabled descendant's suppression. Real iOS frames
