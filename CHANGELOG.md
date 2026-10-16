@@ -2,6 +2,9 @@
 
 ## Unreleased — 0.2.0
 
+- Added C01–C08 explicit-theme native buttons, selection, text/search/editor, picker, slider/stepper, date, progress, badges/tags, avatar/icon-label and animated-number controls, with caller-owned state, style inputs and localized accessibility values.
+- Kept the legacy TextEditor native background aligned with its explicit theme inside an oppositely themed app; added forced-legacy native-host rendering coverage on macOS and iOS.
+- Added a portable dual-platform Controls showcase project, executable fixture verification, interaction assertions and real native screenshot attachments; golden-baseline and macOS desktop interaction acceptance remain separate.
 - Added explicit foundation inputs for scalable typography, control/surface metrics, token-backed surfaces and accessibility-aware Glass, adaptive/equal grids, wrapping flow, keyboard dismissal, motion, transitions, interpolation and cancellable stagger replay.
 - Fixed legacy flow measurement to wrap natural-width children and oversized localized labels, retain child identity across resize/reorder and render each interactive child once; corrected double RTL mirroring in flow placement. Added current-runtime forced-legacy rendering tests.
 - Documented foundations separately from the existing color bridge/Theme/Card machine registry; retained the original token/error contracts and exact provider pin.

@@ -57,8 +57,10 @@ text or long translations, as the fixture does for its section picker.
 Text and secure fields use native editing. Search adds a separately labeled
 clear Button. TextEditor shows a caller label and separate accessible label;
 its height remains caller-owned. iOS 15/macOS 12 keep the platform TextEditor
-background because the public hiding API starts at iOS 16/macOS 13. No
-production UIKit/AppKit appearance override is used.
+background because the public hiding API starts at iOS 16/macOS 13. A local
+SwiftUI color scheme ties that native background to the required explicit theme,
+including dark controls inside a light app and the inverse. This does not change
+the surrounding app's appearance. Production uses no UIKit/AppKit override.
 
 Slider requires a finite range and finite positive step; stepper requires a
 positive step. Native controls enforce range behavior. Progress requires a
@@ -89,3 +91,8 @@ regression comparisons. The sample documents a deterministic PNG comparison
 command, explicit thresholds/masks and OS/device-specific baseline review.
 Minimum-OS runtime, assistive-technology navigation and exact published style
 provider consumption require separate evidence.
+
+The finite machine registry catalogs only `NativeTokenColor`, `NativeDesignTheme`
+and `NativeCard`. It does not enumerate Controls or Foundations. This document
+and `FOUNDATIONS.md` are the additive public API inventories for those families;
+the registry must not be used as an exhaustive symbol list.

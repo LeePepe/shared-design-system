@@ -14,7 +14,7 @@ gate:
   test: scripts/ci/swift-package.sh test
   ios: scripts/ci/swift-package.sh ios
 red_lines:
-  - SwiftUI only; UIKit and AppKit appear only in tests for color extraction.
+  - SwiftUI-only production; UIKit and AppKit appear only in tests for color extraction and native-host rendering/snapshots.
   - Every color comes from DesignTokens; no local token table, fallback color or default theme.
   - Theme is explicit on every call; no environment detection or caching.
   - Token errors propagate unchanged.
@@ -28,8 +28,10 @@ name, declared platforms iOS 15 and macOS 12. It depends on the
 `DesignTokens` product of `shared-design-tokens`.
 
 - **Sources:** `Sources/NativeDesignKit/`. The public API is described in `ai/USAGE.md`.
-- **Tests:** `Tests/NativeDesignKitTests/`. They extract native sRGB through
-  AppKit on macOS and UIKit on iOS.
+- **Tests:** `Tests/NativeDesignKitTests/`. They extract native sRGB and host
+  SwiftUI for native rendering/snapshot assertions through AppKit on macOS and
+  UIKit on iOS. Fixture render tests may use test-only native hosting as well;
+  production and sample application sources remain SwiftUI-only.
 - **Gates:** `build` and `test` run on the macOS host. `ios` builds and tests
   the package scheme on the newest available iPhone simulator. All three run
   in CI through `scripts/verify --all`.

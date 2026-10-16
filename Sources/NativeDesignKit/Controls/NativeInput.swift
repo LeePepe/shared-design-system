@@ -41,11 +41,20 @@ public struct NativeTextEditor<Label: View>: View {
     private let metrics: NativeControlMetrics
     private let accessibilityLabel: Text
     private let label: Label
+    private let forceLegacyBackground: Bool
 
     public init(text: Binding<String>, theme: NativeDesignTheme, metrics: NativeControlMetrics,
                 accessibilityLabel: Text, @ViewBuilder label: () -> Label) {
+        self.init(text: text, theme: theme, metrics: metrics, accessibilityLabel: accessibilityLabel,
+                  forceLegacyBackground: false, label: label)
+    }
+
+    /// Internal native-host test seam: exercise the actual old-OS background path on current SDKs.
+    init(text: Binding<String>, theme: NativeDesignTheme, metrics: NativeControlMetrics,
+         accessibilityLabel: Text, forceLegacyBackground: Bool, @ViewBuilder label: () -> Label) {
         _text = text; self.theme = theme; self.metrics = metrics
         self.accessibilityLabel = accessibilityLabel; self.label = label()
+        self.forceLegacyBackground = forceLegacyBackground
     }
 
     public var body: some View {
@@ -56,12 +65,22 @@ public struct NativeTextEditor<Label: View>: View {
     }
 
     @ViewBuilder private var editor: some View {
-        if #available(iOS 16, macOS 13, *) {
+        if forceLegacyBackground {
+            legacyEditor
+        } else if #available(iOS 16, macOS 13, *) {
             TextEditor(text: $text).scrollContentBackground(.hidden)
                 .modifier(FieldChrome(theme: theme, metrics: metrics))
         } else {
-            TextEditor(text: $text).modifier(FieldChrome(theme: theme, metrics: metrics))
+            legacyEditor
         }
+    }
+
+    private var legacyEditor: some View {
+        TextEditor(text: $text)
+            .modifier(FieldChrome(theme: theme, metrics: metrics))
+            // The native background cannot be hidden on iOS 15/macOS 12. Its appearance
+            // must match our required text theme even when the surrounding app differs.
+            .colorScheme(theme.theme == .dark ? .dark : .light)
     }
 }
 

@@ -7,6 +7,7 @@ Release unit: `NativeDesignKit` (SwiftPM), version **0.2.0** (unreleased candida
 | Integrate or remove the library | [INTEGRATION.md](INTEGRATION.md) |
 | Use the public API or investigate a lookup error | [USAGE.md](USAGE.md) |
 | Adapt typography, surfaces, layout and motion | [FOUNDATIONS.md](FOUNDATIONS.md) |
+| Compose native controls with explicit themes and styles | [CONTROLS.md](CONTROLS.md) |
 | Run an ordinary external consumer | [EXAMPLES.md](EXAMPLES.md) |
 | Check platforms and dependency compatibility | [COMPATIBILITY.md](COMPATIBILITY.md) |
 | Replace local color bridges or roll back | [MIGRATION.md](MIGRATION.md) |
@@ -25,3 +26,5 @@ publishing packages, changing consumer policy or sending production data.
 
 The unreleased controls are specified in [CONTROLS.md](CONTROLS.md), with a
 public-API graphical fixture at `Tests/Fixtures/NativeDesignKitShowcase/README.md`.
+The finite machine registry covers only the original color bridge and Theme/Card;
+use the Controls and Foundations documents for their additive API inventories.

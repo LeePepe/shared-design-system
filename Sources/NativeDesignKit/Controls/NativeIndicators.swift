@@ -3,7 +3,7 @@ import SwiftUI
 public enum NativeProgressPresentation: Sendable { case linear, ring, indeterminate }
 
 /// `value == nil` is indeterminate. A determinate ring is clamped to 0...1 while its
-/// accessible value remains the native ProgressView's value/total. `diameter` and `lineWidth`
+/// accessible value remains the caller's localized `accessibilityValue`. `diameter` and `lineWidth`
 /// are caller style inputs, including for the ring's track.
 public struct NativeProgress<Label: View>: View {
     private let value: Double?
