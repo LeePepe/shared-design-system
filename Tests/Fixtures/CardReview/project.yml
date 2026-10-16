@@ -1,0 +1,47 @@
+name: CardReview
+options:
+  bundleIdPrefix: org.nativedesignkit.fixtures
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+packages:
+  NativeDesignKit:
+    path: ../../..
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    GENERATE_INFOPLIST_FILE: YES
+    CODE_SIGNING_ALLOWED: NO
+targets:
+  CardReview:
+    type: application
+    platform: iOS
+    sources: [App]
+    dependencies:
+      - package: NativeDesignKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.CardReview
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        ENABLE_TESTABILITY: YES
+  CardReviewUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: CardReview
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.CardReviewUITests
+        TEST_TARGET_NAME: CardReview
+schemes:
+  CardReview:
+    build:
+      targets:
+        CardReview: all
+        CardReviewUITests: [test]
+    test:
+      gatherCoverageData: false
+      targets: [CardReviewUITests]
