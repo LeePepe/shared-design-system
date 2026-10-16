@@ -44,18 +44,21 @@ the Toggle's on/off accessibility and keyboard semantics; caller
 No tap gesture substitutes for Toggle interaction, and no state, persistence
 or asynchronous work is owned by the component.
 
-Hosted tests exercise native control activation, binding and disabled state,
-native accessibility on/off values, keyboard focus acceptance and multiline
-measurement. The headless macOS host does not expose SwiftUI's virtual
-accessibility label tree, so spoken caller-label output and live keyboard
-activation require separate validation. macOS PNGs cover both
-brands and themes, on/off and disabled states, and narrow long labels. iOS
-hosting tests compare default and accessibility Dynamic Type layout. A macOS
-Dynamic Type environment alone does not prove macOS typography scaling.
-The macOS snapshot host renders native tracks in neutral colors; these PNGs
-do not visually establish brand accent rendering on active platform chrome.
-Screenshots do not establish VoiceOver speech, physical-device interaction or
-minimum-OS acceptance.
+The pure SwiftUI iOS review fixture is exercised through XCTest UI automation;
+its UI tests import XCTest only. Tests tap the actual switch, observe
+caller-visible state and binding-write counts, update state from a caller
+button, and coordinate-tap a disabled switch in both initial states. The
+native accessibility switch type, meaningful caller label and on/off values
+are asserted through the UI automation tree. Long labels are measured at
+standard and accessibility Dynamic Type sizes in a 280 pt layout, with an
+actual switch tap at the larger size. Actual iOS PNGs cover both brands and
+themes, normal and disabled on/off states, and narrow accessibility text.
+The fixture's README records the migration from the prohibited native-hosting
+tests. No AppKit or UIKit hosting/traversal remains in Switch tests.
+
+These tests do not establish VoiceOver speech, physical-device interaction,
+macOS keyboard focus, live external-keyboard activation or minimum-OS
+acceptance. Native semantics remain owned by SwiftUI Toggle.
 
 The exact DesignTokens 0.1.1 pin, iOS 15/macOS 12 floors, and released color
 bridge are unchanged. To roll back, remove these call sites and restore the
