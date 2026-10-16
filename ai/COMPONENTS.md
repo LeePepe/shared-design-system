@@ -44,3 +44,7 @@ never changes brand or light/dark mode. Main actions and reading content retain
 opaque semantic colors. No Liquid Glass or minimum-OS visual parity is claimed.
 
 Component-specific contracts are added under `components/` by their PRs.
+
+| Component | Contract |
+| --- | --- |
+| Button | [NativeButton](components/button.md) |
