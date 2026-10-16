@@ -27,7 +27,7 @@ public struct NativeRadioGroup<Selection: Hashable, Label: View, Options: View>:
             .frame(minHeight: 44, alignment: .leading)
     }
 
-    private var nativePicker: some View {
+    @ViewBuilder private var nativePicker: some View {
         let picker = Picker(selection: $selection) {
             Group { options }
                 .fixedSize(horizontal: false, vertical: true)

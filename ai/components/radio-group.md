@@ -48,7 +48,7 @@ single-line limit is imposed. Native platform chrome remains system managed.
 The isolated [review fixture](../../Tests/Fixtures/RadioGroupReview/README.md)
 checks actual iOS binding changes, exclusive selection, disabled coordinate
 taps, external state updates, stable tagged identity after caller reordering,
-row targets and localized-content-ready long text at accessibility2 in a 320 pt
+row targets and long text at accessibility2 in a 320 pt
 board. Its screenshots cover ocean/graphite × light/dark and the narrow case.
 Exact tested SHA and results belong to the external run manifest and PR.
 These checks do not claim live VoiceOver, native keyboard/focus interaction,

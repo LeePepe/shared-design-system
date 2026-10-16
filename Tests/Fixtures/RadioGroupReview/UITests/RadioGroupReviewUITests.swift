@@ -9,16 +9,23 @@ final class RadioGroupReviewUITests: XCTestCase {
         let compact = option("option-compact-id", app: app)
         let balanced = option("option-balanced-id", app: app)
         let detailed = option("option-detail-id", app: app)
+        let originalFrames = [compact.frame, balanced.frame, detailed.frame]
         assertSelection(balanced, others: [compact, detailed])
         compact.tap()
         XCTAssertEqual(app.staticTexts["selection-state"].label, "Selected: compact-id")
         XCTAssertEqual(app.staticTexts["write-count"].label, "Writes: 1")
         assertSelection(compact, others: [balanced, detailed])
+        for (element, frame) in zip([compact, balanced, detailed], originalFrames) {
+            assertSameFrame(element.frame, frame)
+        }
 
         app.buttons["toggle-disabled"].tap()
         XCTAssertFalse(detailed.isEnabled)
         detailed.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         XCTAssertEqual(app.staticTexts["selection-state"].label, "Selected: compact-id")
+        for (element, frame) in zip([compact, balanced, detailed], originalFrames) {
+            assertSameFrame(element.frame, frame)
+        }
         XCTAssertEqual(app.staticTexts["write-count"].label, "Writes: 1")
         app.buttons["toggle-disabled"].tap()
         detailed.tap()
@@ -99,6 +106,13 @@ final class RadioGroupReviewUITests: XCTestCase {
     private func assertSelection(_ selected: XCUIElement, others: [XCUIElement]) {
         XCTAssertTrue(selected.isSelected, "Native selected trait must expose the selection: \(selected.debugDescription)")
         others.forEach { XCTAssertFalse($0.isSelected) }
+    }
+
+    private func assertSameFrame(_ actual: CGRect, _ expected: CGRect) {
+        XCTAssertEqual(actual.minX, expected.minX, accuracy: 0.001)
+        XCTAssertEqual(actual.minY, expected.minY, accuracy: 0.001)
+        XCTAssertEqual(actual.width, expected.width, accuracy: 0.001)
+        XCTAssertEqual(actual.height, expected.height, accuracy: 0.001)
     }
 
     private func assertLayout(_ elements: [XCUIElement], app: XCUIApplication) {
