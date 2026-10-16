@@ -18,6 +18,59 @@ final class ComponentReviewUITests: XCTestCase {
         attachment.name = name; attachment.lifetime = .keepAlways; add(attachment)
     }
 
+    func activate(_ element: XCUIElement) {
+        #if os(macOS)
+        element.click()
+        #else
+        element.tap()
+        #endif
+    }
+
+    func reveal(_ element: XCUIElement, in app: XCUIApplication) {
+        let viewport = app.scrollViews["component-review"]
+        for _ in 0..<8 {
+            if element.isHittable { return }
+            #if os(macOS)
+            viewport.scroll(byDeltaX: 0, deltaY: -350)
+            #else
+            viewport.swipeUp()
+            #endif
+        }
+        XCTAssertTrue(element.isHittable)
+    }
+
+    func testButtonInteraction() {
+        let app = launch("Button")
+        let save = app.buttons["review-save"]
+        #if os(iOS)
+        save.press(forDuration: 0.5)
+        #else
+        save.click()
+        #endif
+        XCTAssertEqual(app.staticTexts["review-count"].label, "Actions: 1")
+        XCTAssertFalse(app.buttons["review-disabled"].isEnabled)
+        XCTAssertFalse(app.buttons["review-loading"].isEnabled)
+        let copy = app.buttons["review-start-loading"]
+        reveal(copy, in: app)
+        let idleFrame = copy.frame
+        activate(copy)
+        XCTAssertEqual(app.staticTexts["review-count"].label, "Actions: 2")
+        XCTAssertTrue(app.staticTexts["Copy saved"].waitForExistence(timeout: 6))
+        XCTAssertEqual(app.staticTexts["review-count"].label, "Actions: 2")
+        XCTAssertEqual(copy.frame.size.width, idleFrame.size.width, accuracy: 0.5)
+        XCTAssertEqual(copy.frame.size.height, idleFrame.size.height, accuracy: 0.5)
+        capture(app, "interaction-Button-saved")
+        let cancel = app.buttons["review-cancel"]
+        reveal(cancel, in: app); activate(cancel)
+        XCTAssertEqual(app.staticTexts["review-result"].label, "Changes cancelled")
+        let delete = app.buttons["review-delete"]
+        reveal(delete, in: app); activate(delete)
+        XCTAssertEqual(app.staticTexts["review-result"].label, "Sample copy deleted")
+        let glass = app.buttons["review-glass"]
+        reveal(glass, in: app)
+        capture(app, "interaction-Button-floating")
+    }
+
     func testComponentBoards() {
         for page in ["Button", "Toggle", "TextField"] {
             for dark in [false, true] {
