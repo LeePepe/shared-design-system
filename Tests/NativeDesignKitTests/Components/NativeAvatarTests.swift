@@ -214,6 +214,8 @@ final class NativeAvatarTests: XCTestCase {
         let children: [NSObject]
         if let elements = element.accessibilityElements {
             children = elements.compactMap { $0 as? NSObject }
+        } else if case let count = element.accessibilityElementCount(), count > 0 && count != NSNotFound {
+            children = (0..<count).compactMap { element.accessibilityElement(at: $0) as? NSObject }
         } else {
             children = (element as? UIView)?.subviews ?? []
         }
