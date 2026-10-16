@@ -4,6 +4,7 @@ import XCTest
 @testable import NativeDesignKit
 
 final class NativeChipTests: XCTestCase {
+    @MainActor
     func testPublicStaticAndRemovableConstructionForEveryToneAndTheme() throws {
         for brand in DesignTokens.brandIDs {
             for mode in Theme.allCases {
