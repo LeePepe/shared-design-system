@@ -35,6 +35,9 @@ final class NativeRenderTests: XCTestCase {
                 try render(config: config, width: 480,
                     name: "review-\(page)-\(dark ? "dark" : "light")", output: output)
             }
+            let config = FixtureConfiguration(dark: true, accessible: true, rtl: false,
+                narrow: true, page: page, allowsGlass: false)
+            try render(config: config, width: 480, name: "review-\(page)-large", output: output)
         }
     }
 
