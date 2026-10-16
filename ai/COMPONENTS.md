@@ -11,7 +11,7 @@ old v1 component scope following the Owner's request. Only the
 `Foundations` / `Controls` / `Components` / `Patterns` internal source hierarchy
 is retained within the single `NativeDesignKit` layer. The historical v1
 specification, plan and tasks are superseded for this
-[rebuild](https://github.com/LeePepe/shared-design-system/blob/2621ad2dbaadb1fb3e5cc4ab451f342bf7b70034/docs/strata-component-rebuild.md). Component
+[rebuild](https://github.com/LeePepe/shared-design-system/blob/730e1700e7a5f22d99cb6509ca3381e009be8a61/docs/strata-component-rebuild.md). Component
 names are informed by the HeroUI catalogue; implementation is native SwiftUI
 and follows [Strata v0.2](https://github.com/LeePepe/shared-design-system/blob/48cea0a3f0920d5ebc7797a7d4d848dd060f0f42/docs/strata-theme-v0.2.md), without copying HeroUI
 implementation or introducing its runtime.
