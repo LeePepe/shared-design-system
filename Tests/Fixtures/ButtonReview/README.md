@@ -68,3 +68,20 @@ The exact source/provider revisions, clean-tree receipt and external candidate
 mirror configuration belong with each result bundle; a local candidate mirror
 does not establish that the provider version is released or that remote gates
 passed. Run simulator work through the coordinator's serial lock.
+
+Runtime contrast verification (Python standard library only):
+
+```sh
+python3 Tests/Fixtures/ButtonReview/verify-composites.py \
+  <results>.run.json <runner-stdout>.log --output <external-report>.json
+```
+
+The checker requires a passing run from a clean current head, the exact provider
+revision, and measured SwiftUI Text bounds rather than inflated accessibility
+rectangles. It matches full glyph pixels to provider text roles, tests three
+nearby actual background samples at >=4.5:1 for all20 specimens and the real
+Reduce Transparency capture, compares layout across all21, and compares fallback
+backgrounds to explicit solid. Measurements cover this specimen, not arbitrary
+consumer backdrops. Held-press evidence can additionally use a serial `simctl io
+screenshot` during the UI test's four-second native press; record that capture
+separately from XCTest attachments with the same exact source/provider SHAs.

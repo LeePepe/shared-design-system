@@ -25,5 +25,9 @@
   "button-strata-purple-dark-glass",
   "button-strata-purple-dark-solid",
   "button-reduce-motion-loading",
-  "button-strata-purple-dark-reduced-transparency"
+  "button-strata-purple-dark-reduced-transparency",
+  "button-before-press",
+  "button-after-press",
+  "button-pointer-hover",
+  "button-keyboard-navigation"
 ]

@@ -219,6 +219,7 @@ private struct ButtonReviewBoard: View {
             } loadingLabel: { Text("Saving all your changes…") }
             .disabled(isDisabled)
             .accessibilityIdentifier("action-target")
+            .keyboardShortcut("s", modifiers: .command)
             Text("Actions: \(actionCount)").accessibilityIdentifier("action-count")
             fixtureControls
         }

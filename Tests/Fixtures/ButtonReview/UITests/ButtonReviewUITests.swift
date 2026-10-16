@@ -2,6 +2,31 @@ import XCTest
 
 @MainActor
 final class ButtonReviewUITests: XCTestCase {
+    func testPointerHoverAndCallerKeyboardShortcut() {
+        let app = launch(scenario: "interaction")
+        let target = app.buttons["action-target"]
+        target.hover()
+        capture("button-pointer-hover", app: app)
+        app.typeKey("s", modifierFlags: .command)
+        XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")
+        app.typeKey(.tab, modifierFlags: [])
+        capture("button-keyboard-navigation", app: app)
+    }
+
+    func testHeldPressDispatchesOnceOnRelease() {
+        let app = launch(scenario: "interaction")
+        let target = app.buttons["action-target"]
+        let frame = target.frame
+        print("BUTTON_HOLD_FRAME \(frame.minX),\(frame.minY),\(frame.width),\(frame.height)")
+        capture("button-before-press", app: app)
+        print("BUTTON_HOLD_READY")
+        target.press(forDuration: 4)
+        XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")
+        XCTAssertEqual(target.frame.width, frame.width, accuracy: 0.5)
+        XCTAssertEqual(target.frame.height, frame.height, accuracy: 0.5)
+        capture("button-after-press", app: app)
+    }
+
     func testActionDispatchAndDisabledLoadingCoordinateTaps() {
         let app = launch(scenario: "interaction")
         let target = app.buttons["action-target"]
@@ -165,12 +190,12 @@ final class ButtonReviewUITests: XCTestCase {
             [Double(frame.minX), Double(frame.minY), Double(frame.width), Double(frame.height)]
         }
         var samples: [[String: Any]] = []
-        for (id, label, token) in [
-            ("save", "Save", "brand.\(brand).on-accent"),
-            ("secondary", "Secondary", "product.strata.text.primary"),
-            ("ghost", "Ghost", "brand.\(brand).text"),
-            ("disabled", "Disabled", "product.strata.text.secondary"),
-            ("loading", "Loading", "brand.\(brand).on-accent")
+        for (id, token) in [
+            ("save", "brand.\(brand).on-accent"),
+            ("secondary", "product.strata.text.primary"),
+            ("ghost", "brand.\(brand).text"),
+            ("disabled", "product.strata.text.secondary"),
+            ("loading", "brand.\(brand).on-accent")
         ] {
             let control = app.buttons["specimen-\(id)"]
             let measured = (control.value as? String)?.split(separator: ",").compactMap { Double($0) } ?? []
@@ -278,7 +303,7 @@ final class ButtonReviewUITests: XCTestCase {
         let translatedName = name == "Reduce Motion" ? "减弱动态效果" : "降低透明度"
         let toggle = settings.switches.matching(NSPredicate(format: "label IN %@", [name, translatedName])).firstMatch
         guard toggle.waitForExistence(timeout: 5) else { XCTFail("System setting unavailable: \(name)"); return }
-        let original = String(describing: toggle.value)
+        guard let original = toggle.value as? String else { XCTFail("System switch has no value"); return }
         if (toggle.value as? String) != "1" {
             toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
         }
@@ -286,10 +311,11 @@ final class ButtonReviewUITests: XCTestCase {
         wait(for: [enabled], timeout: 5)
         defer {
             settings.activate()
-            if String(describing: toggle.value) != original {
+            if (toggle.value as? String) != original {
                 toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
             }
-            XCTAssertEqual(String(describing: toggle.value), original, "Restore the prior simulator preference.")
+            let restored = expectation(for: NSPredicate(format: "value == %@", original), evaluatedWith: toggle)
+            wait(for: [restored], timeout: 5)
             settings.terminate()
         }
         body()
