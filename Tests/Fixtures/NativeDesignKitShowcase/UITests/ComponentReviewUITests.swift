@@ -167,6 +167,8 @@ final class ComponentReviewUITests: XCTestCase {
             app.scrollViews["component-review"].scroll(byDeltaX: 0, deltaY: -500)
             #endif
             if page == "Button" { reveal(app.buttons["review-localized"], in: app) }
+            if page == "Toggle" { reveal(app.switches["review-toggle-long"], in: app) }
+            if page == "TextField" { reveal(app.textFields["review-field-long"], in: app) }
             capture(app, "review-\(page)-large-lower")
             app.terminate()
         }
