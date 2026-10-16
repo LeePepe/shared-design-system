@@ -54,9 +54,9 @@ public struct NativeSlider<Label: View, MinimumValueLabel: View, MaximumValueLab
                 label
             }
             .labelsHidden()
+            .controlSize(.large)
             .frame(minWidth: 44, minHeight: 44)
             .contentShape(Rectangle())
-            .accessibilityElement(children: .combine)
             .tint(theme.accent)
             .accentColor(theme.accent)
 
