@@ -6,6 +6,7 @@ public struct NativeTextField: View {
     private let theme: NativeDesignTheme
     private let metrics: NativeControlMetrics
     @Environment(\.isEnabled) private var isEnabled
+    @FocusState private var isEditing: Bool
 
     public init(_ title: LocalizedStringKey, text: Binding<String>, theme: NativeDesignTheme,
                 metrics: NativeControlMetrics) {
@@ -14,6 +15,7 @@ public struct NativeTextField: View {
 
     public var body: some View {
         TextField(title, text: $text)
+            .focused($isEditing)
             .textFieldStyle(.roundedBorder)
             // The native style owns bezel insets and keyboard-focus feedback.
             .nativeMinimumHitTarget(metrics.minimumHitSize)
@@ -22,6 +24,12 @@ public struct NativeTextField: View {
             // Keep native placeholder, selection and bezel appearance with the
             // explicit theme, including inside an oppositely themed parent.
             .colorScheme(theme.theme == .dark ? .dark : .light)
+            // Activate the entire supplied target without taking precedence over
+            // native caret placement, selection or the caller's focus binding.
+            .simultaneousGesture(TapGesture().onEnded {
+                guard isEnabled else { return }
+                isEditing = true
+            })
     }
 }
 

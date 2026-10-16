@@ -24,7 +24,6 @@ struct TextFieldReviewBoard: View {
                         .accessibilityLabel(Text("Name"))
                         .accessibilityIdentifier("review-field-empty")
                         .focused($focusedField, equals: .empty)
-                        .onTapGesture { focusedField = .empty }
                 }
                 Text("Use a short, recognizable name.")
                     .nativeTypography(r.caption).foregroundColor(r.secondary)
@@ -35,7 +34,6 @@ struct TextFieldReviewBoard: View {
                         .accessibilityLabel(Text("Display Name"))
                         .accessibilityIdentifier("review-field-filled")
                         .focused($focusedField, equals: .filled)
-                        .onTapGesture { focusedField = .filled }
                 }
                 labeledField("Unavailable Name", id: "disabled") {
                     NativeTextField("Unavailable name", text: .constant("Read Only"),
@@ -51,7 +49,6 @@ struct TextFieldReviewBoard: View {
                     NativeTextField("Example: Draft", text: $documentTitle,
                         theme: r.theme, metrics: r.reviewMetrics)
                         .focused($focusedField, equals: .context)
-                        .onTapGesture { focusedField = .context }
                         .submitLabel(.done)
                         .onSubmit(submitTitle)
                         .accessibilityLabel(Text("Title"))
@@ -71,7 +68,6 @@ struct TextFieldReviewBoard: View {
                         .accessibilityLabel(Text("文稿名称（保留完整标题，便于稍后识别和查找）"))
                         .accessibilityIdentifier("review-field-long")
                         .focused($focusedField, equals: .long)
-                        .onTapGesture { focusedField = .long }
                 }
                 Text("移动光标可编辑完整名称；输入框使用原生单行横向滚动。")
                     .nativeTypography(r.caption).foregroundColor(r.secondary)

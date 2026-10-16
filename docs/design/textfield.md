@@ -48,8 +48,8 @@ place. The rounded-border style supplies a system-defined border and native
 bezel insets. `.focused` binds the caller's focus state; `.onSubmit` receives
 hardware/software Return, and `.disabled` supplies native disabled semantics.
 The wrapper retains the existing initializer and single-line editing behavior.
-It adds no gestures, focus state, formatter, validation, submission callback or
-asynchronous work. The caller can continue applying ordinary SwiftUI modifiers.
+It adds no formatter, validation, submission callback or asynchronous work. The
+caller can continue applying ordinary SwiftUI modifiers, including `.focused`.
 
 **Team adaptations:** `NativeTextField` replaces its plain field plus custom
 `FieldChrome` with `.roundedBorder`. It uses the explicit theme's primary text,
@@ -63,13 +63,19 @@ there is no new local color table or fallback.
 The control uses `nativeMinimumHitTarget` to reserve the supplied minimum layout
 bounds and content shape. A content shape alone does not make the native field's
 extra surrounding space focusable: the macOS host experiment found a 24 pt native
-bezel inside a 44 pt frame. The board therefore supplies `.focused` and a caller
-tap action for each enabled field to focus that editor from the reserved bounds.
-The same caller-owned focus binding handles empty submission. This does not add
-an internal focus owner or an API parameter, and the native caret/ring still
-reflect actual editing focus. The host test clicks outside the native bezel and
-checks that this caller composition focuses the real editor. The library's
-minimum frame alone must not be presented as evidence of a larger editing target.
+bezel inside a 44 pt frame. The component therefore binds a private `FocusState`
+to its native field and uses a simultaneous tap gesture across the supplied
+target to request native editing focus. An enabled-state guard prevents disabled
+target activation. The gesture does not replace native selection/editing gestures
+or draw focus feedback. The board uses the component without a hit-target gesture.
+
+The private state is only the component's target-to-native-focus adapter. Caller
+`.focused` still sets, clears and observes actual native focus; it remains the
+owner of application focus policy, traversal and validation-related requests.
+Host tests prove both direct component activation at opposite corners outside the
+native bezel and interoperability with a caller focus binding. No explicit focus
+input, initializer change or migration is necessary. The board's caller focus
+binding handles empty submission through ordinary `.focused`.
 
 Native styles own bezel insets, border thickness and radius, so `metrics.padding`,
 `borderWidth` and `cornerRadius` do not add a second chrome layer. This is a
@@ -105,7 +111,7 @@ native styling alone does not establish those passes.
 | Default | Library renders a real native field with explicit theme and a string binding; caller supplies its value and label. | Empty and filled specimens. |
 | Hover | Native field/pointer system owns pointer feedback. No forced hover or color animation. | Move the pointer over the live macOS field. |
 | Focus-visible | Native field owns caret, selection and keyboard focus ring. Caller owns `.focused`, focus sequence and dismissal. | Click/tab into fields; inspect the actual native ring and edit. |
-| Active | Native editing owns insertion, selection, drag and input methods. A button-like pressed transform would disrupt editing. | Type, select and move the caret in the live field. |
+| Active | Library target taps request native editing focus through private `FocusState`; a simultaneous gesture preserves native insertion and selection. Caller `.focused` remains supported. No pressed transform applies. | Click the target outside the bezel, type, select and move the caret. |
 | Disabled | Caller supplies `.disabled`; native semantics block editing. Library uses explicit secondary text with native unavailable styling. | Disabled specimen and native-host assertion. |
 | Loading | No inherent loading state for a synchronous text binding. Caller owns any remote validation/task lifetime and adjacent progress, and decides whether editing stays available. | Not fabricated by this local title example. |
 | Error | Caller validates on submission and renders the cause plus correction as words and a symbol. Library retains the native focused field. | Submit an empty/whitespace-only Title, then correct and resubmit. |
@@ -143,10 +149,13 @@ or rewriting the user's input. No timer or task survives the view lifetime.
 `NativeTextFieldDesignTests` uses real SwiftUI native hosts to check that explicit
 light/dark themes reach the editor inside an oppositely themed host, the native
 bezel/focus capability remains, disabled reaches the native control, and native
-bezel sizing does not also consume metrics padding. The macOS-only fourth test
-checks caller focus composition by sending a real native-window click outside
-the bezel but inside the supplied target. These are native-host assertions, not
-visual acceptance or proof of keyboard navigation.
+bezel sizing does not also consume metrics padding. Four additional macOS-only
+interaction tests send native-window mouse/key events to verify direct library
+target activation outside the bezel, caller `.focused` set/clear/observation,
+disabled target/input/submission blocking, and native double-click word selection
+followed by typing and a single Return submission. The selection test observes
+the native editor's selected range and the caller string binding. These are real
+host interactions, not visual acceptance or proof of full keyboard navigation.
 
 The author runs SwiftPM build/tests and a host typecheck of the fixture sources.
 The lead owns fixture Xcode integration, simulator use, central UI interaction
@@ -155,7 +164,7 @@ remains a lead integration gate; it is not claimed by this author handoff.
 
 The independent reviewer must inspect before/after, iPhone and macOS light/dark,
 large-type growing labels and long Chinese input, plus real focus/edit/Return
-behavior. Native hit testing across the reserved target, focus-ring visibility,
+behavior. iOS hit testing across the reserved target, focus-ring visibility,
 helper/error layout stability, measured contrast, VoiceOver/Full Keyboard Access,
 Increase Contrast, input-method composition and minimum-OS runtime remain explicit
 integration/review checks. No screenshot is committed and no compiler/test pass

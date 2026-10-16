@@ -70,20 +70,92 @@ final class NativeTextFieldDesignTests: XCTestCase {
     }
 
     #if os(macOS)
-    func testCallerCanFocusNativeEditorFromMinimumTargetOutsideItsBezel() async throws {
+    func testMinimumTargetFocusesNativeEditorOutsideItsBezel() async throws {
         let theme = try NativeDesignTheme(theme: .light)
-        let field = CallerFocusedTextField(theme: theme, metrics: metrics(padding: 8))
+        let field = NativeTextField("Name", text: .constant("Draft"),
+            theme: theme, metrics: metrics(padding: 8)).frame(width: 320, height: 44)
         let host = TextFieldDesignHost(AnyView(field), surrounding: .light,
                                        height: 44)
         defer { host.close() }
         await host.settle()
         let nativeField = try XCTUnwrap(host.field)
         let bezel = nativeField.convert(nativeField.bounds, to: nil)
-        let targetEdge = NSPoint(x: bezel.midX, y: 2)
-        XCTAssertFalse(bezel.contains(targetEdge), "Exercise the target outside the visible bezel")
-        host.click(at: targetEdge)
+        for targetEdge in [NSPoint(x: 2, y: 2), NSPoint(x: 318, y: 42)] {
+            host.resignFocus()
+            await host.settle()
+            XCTAssertFalse(bezel.contains(targetEdge), "Exercise the target outside the visible bezel")
+            host.click(at: targetEdge)
+            await host.settle()
+            XCTAssertNotNil(nativeField.currentEditor(), "The complete target must focus the real editor")
+        }
+    }
+
+    func testDisabledMinimumTargetCannotFocusOrEdit() async throws {
+        let state = TextFieldDesignState()
+        let field = NativeTextField("Name", text: Binding(get: { state.text }, set: { state.text = $0 }),
+            theme: try NativeDesignTheme(theme: .light), metrics: metrics(padding: 8))
+            .onSubmit { state.submissions += 1 }
+            .disabled(true).frame(width: 320, height: 44)
+        let host = TextFieldDesignHost(AnyView(field), surrounding: .light, height: 44)
+        defer { host.close() }
         await host.settle()
-        XCTAssertNotNil(nativeField.currentEditor(), "The complete target must focus the real editor")
+        let nativeField = try XCTUnwrap(host.field)
+        for point in [NSPoint(x: 2, y: 2), NSPoint(x: 160, y: 22)] {
+            host.click(at: point)
+            host.pressKey("x", keyCode: 7)
+            host.pressKey("\r", keyCode: 36)
+            await host.settle()
+            XCTAssertNil(nativeField.currentEditor(), "Disabled target activation must not focus the field")
+            XCTAssertEqual(state.text, "Draft")
+            XCTAssertEqual(state.submissions, 0)
+        }
+    }
+
+    func testNativeWordSelectionEditingAndReturnSubmission() async throws {
+        let state = TextFieldDesignState()
+        let field = NativeTextField("Name", text: Binding(get: { state.text }, set: { state.text = $0 }),
+            theme: try NativeDesignTheme(theme: .light), metrics: metrics(padding: 8))
+            .onSubmit { state.submissions += 1 }.frame(width: 320, height: 44)
+        let host = TextFieldDesignHost(AnyView(field), surrounding: .light, height: 44)
+        defer { host.close() }
+        await host.settle()
+        let nativeField = try XCTUnwrap(host.field)
+        let bezel = nativeField.convert(nativeField.bounds, to: nil)
+        host.click(at: NSPoint(x: bezel.minX + 24, y: bezel.midY), clickCount: 2)
+        await host.settle()
+        let editor = try XCTUnwrap(nativeField.currentEditor())
+        XCTAssertGreaterThan(editor.selectedRange.length, 0, "Native double-click word selection must survive target activation")
+        host.pressKey("x", keyCode: 7)
+        await host.settle()
+        XCTAssertEqual(state.text, "x", "Typing must replace the native selection and update the caller binding")
+        XCTAssertEqual(editor.string, "x")
+        host.pressKey("\r", keyCode: 36)
+        await host.settle()
+        XCTAssertEqual(state.submissions, 1, "Native Return must reach the caller's onSubmit exactly once")
+    }
+
+    func testCallerFocusedModifierStillControlsAndObservesNativeFocus() async throws {
+        let state = TextFieldDesignState()
+        let field = CallerFocusedTextField(theme: try NativeDesignTheme(theme: .light),
+                                           metrics: metrics(padding: 8), state: state)
+        let host = TextFieldDesignHost(AnyView(field), surrounding: .light, height: 44)
+        defer { host.close() }
+        await host.settle()
+        let nativeField = try XCTUnwrap(host.field)
+        XCTAssertNil(nativeField.currentEditor(), "The component must not request initial focus")
+        XCTAssertFalse(state.observedFocus)
+        state.requestedFocus = true
+        await host.settle()
+        XCTAssertNotNil(nativeField.currentEditor(), "Caller .focused(true) must reach the native editor")
+        XCTAssertTrue(state.observedFocus)
+        state.requestedFocus = false
+        await host.settle()
+        XCTAssertNil(nativeField.currentEditor(), "Caller .focused(false) must dismiss native focus")
+        XCTAssertFalse(state.observedFocus)
+        host.click(at: NSPoint(x: 160, y: 2))
+        await host.settle()
+        XCTAssertNotNil(nativeField.currentEditor())
+        XCTAssertTrue(state.observedFocus, "Target activation must update the caller's focus binding")
     }
     #endif
 
@@ -93,16 +165,35 @@ final class NativeTextFieldDesignTests: XCTestCase {
     }
 }
 
+@MainActor
+private final class TextFieldDesignState: ObservableObject {
+    @Published var text = "Draft"
+    @Published var requestedFocus = false
+    var observedFocus = false
+    var submissions = 0
+}
+
 private struct CallerFocusedTextField: View {
     let theme: NativeDesignTheme
     let metrics: NativeControlMetrics
-    @State private var text = "Draft"
+    @ObservedObject var state: TextFieldDesignState
     @FocusState private var isFocused: Bool
 
     var body: some View {
-        NativeTextField("Name", text: $text, theme: theme, metrics: metrics)
+        if #available(iOS 17, macOS 14, *) {
+            field
+                .onChange(of: state.requestedFocus) { _, value in isFocused = value }
+                .onChange(of: isFocused) { _, value in state.observedFocus = value }
+        } else {
+            field
+                .onChange(of: state.requestedFocus) { isFocused = $0 }
+                .onChange(of: isFocused) { state.observedFocus = $0 }
+        }
+    }
+
+    private var field: some View {
+        NativeTextField("Name", text: $state.text, theme: theme, metrics: metrics)
             .focused($isFocused)
-            .onTapGesture { isFocused = true }
             .frame(width: 320, height: 44)
     }
 }
@@ -169,13 +260,28 @@ private final class TextFieldDesignHost {
     }
 
     #if os(macOS)
-    func click(at point: NSPoint) {
+    func resignFocus() {
+        window.makeFirstResponder(nil)
+    }
+
+    func click(at point: NSPoint, clickCount: Int = 1) {
         window.makeKeyAndOrderFront(nil)
         for type in [NSEvent.EventType.leftMouseDown, .leftMouseUp] {
             if let event = NSEvent.mouseEvent(with: type, location: point,
                 modifierFlags: [], timestamp: ProcessInfo.processInfo.systemUptime,
                 windowNumber: window.windowNumber, context: nil, eventNumber: 0,
-                clickCount: 1, pressure: 1) {
+                clickCount: clickCount, pressure: 1) {
+                window.sendEvent(event)
+            }
+        }
+    }
+
+    func pressKey(_ characters: String, keyCode: UInt16) {
+        for type in [NSEvent.EventType.keyDown, .keyUp] {
+            if let event = NSEvent.keyEvent(with: type, location: .zero,
+                modifierFlags: [], timestamp: ProcessInfo.processInfo.systemUptime,
+                windowNumber: window.windowNumber, context: nil, characters: characters,
+                charactersIgnoringModifiers: characters, isARepeat: false, keyCode: keyCode) {
                 window.sendEvent(event)
             }
         }
