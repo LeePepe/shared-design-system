@@ -111,13 +111,17 @@ struct StrataCardSpecimen: View {
 
     private var statisticsCard: some View {
         NativeCard(theme: theme, surface: configuration.surface) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text("Theme exploration")
-                    .font(.subheadline)
-                    .foregroundStyle(theme.secondaryForeground)
-                    .accessibilityIdentifier("specimen-stat-title")
-                Spacer(minLength: 0)
-                contextPill("Synthetic data", identifier: "specimen-data-context")
+            if isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    statisticTitle
+                    contextPill("Synthetic data", identifier: "specimen-data-context")
+                }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    statisticTitle
+                    Spacer(minLength: 0)
+                    contextPill("Synthetic data", identifier: "specimen-data-context")
+                }
             }
         } content: {
             VStack(alignment: .leading, spacing: 12) {
@@ -160,6 +164,13 @@ struct StrataCardSpecimen: View {
             .padding(.horizontal, 8).padding(.vertical, 4)
             .background(theme.successSurface, in: Capsule())
             .accessibilityIdentifier("specimen-status")
+    }
+
+    private var statisticTitle: some View {
+        Text("Theme exploration")
+            .font(.subheadline)
+            .foregroundStyle(theme.secondaryForeground)
+            .accessibilityIdentifier("specimen-stat-title")
     }
 
     private var itemCount: some View {

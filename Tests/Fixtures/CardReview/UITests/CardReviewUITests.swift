@@ -123,6 +123,8 @@ final class CardReviewUITests: XCTestCase {
             app.scrollViews["specimen-scroll"].swipeUp()
         }
         XCTAssertTrue(app.staticTexts["specimen-feedback"].isHittable)
+        XCTAssertLessThanOrEqual(app.staticTexts["specimen-stat-title"].frame.maxY,
+                                 app.staticTexts["specimen-data-context"].frame.minY + 0.5)
         capture("card-specimen-accessibility3-bottom", app: app)
     }
 
