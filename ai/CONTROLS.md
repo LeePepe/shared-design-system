@@ -54,6 +54,12 @@ Those builds use the native Glass button style on iOS/macOS 26+ when Reduce
 Transparency is disabled. Older toolchains compile the native `.bordered`
 fallback; older systems and Reduce Transparency use that same fallback.
 
+NativeToggle retains the native switch style. Its caller label contains the explicit
+minimum target and grows with localized text; disabled labels use secondary text
+while the native switch owns disabled appearance. It does not apply a second
+whole-control disabled opacity. Persistent labels, helper text and observable
+setting effects are caller composition; native on/off accessibility state remains.
+
 Checkbox is native macOS `ToggleStyle.checkbox`. SwiftUI has no iOS checkbox
 style: iOS uses a ToggleStyle backed by a native Button with a checkmark, caller
 localized checked/unchecked values and selected trait. Radio uses native
@@ -62,7 +68,16 @@ unique tags of the same type as their selection binding. Segmented pickers do
 not wrap long labels; the caller selects menu/inline presentation for large
 text or long translations, as the fixture does for its section picker.
 
-Text and secure fields use native editing. Search adds a separately labeled
+NativeTextField uses the system rounded-border style and native editing/focus
+feedback. The native style owns its bezel insets; explicit `minimumHitSize` supplies
+the requested target without adding `metrics.padding` again. Its native appearance
+is tied locally to the required theme, including in an oppositely themed parent.
+It does not draw a custom focus ring or validation border. Callers provide persistent
+visible labels, accessibility labels/hints, helper/error text, `.focused`, and
+`.onSubmit`; validation and its reserved message space stay with the caller. A
+single-line field scrolls long input horizontally; surrounding labels can grow.
+
+Secure fields retain native editing. Search adds a separately labeled
 clear Button. TextEditor shows a caller label and separate accessible label;
 its height remains caller-owned. iOS 15/macOS 12 keep the platform TextEditor
 background because the public hiding API starts at iOS 16/macOS 13. A local

@@ -2,6 +2,8 @@
 
 ## Unreleased — 0.2.0
 
+- Refined the Button, Toggle and TextField review slice with semantic button roles, centered stable activity layouts, native switch disabled feedback and native rounded-border text editing. Added focused state boards and real interaction/large-type capture paths; visual evidence and platform gaps are reported separately.
+
 - Added C01–C08 explicit-theme native buttons, selection, text/search/editor, picker, slider/stepper, date, progress, badges/tags, avatar/icon-label and animated-number controls, with caller-owned state, style inputs and localized accessibility values.
 - Kept the legacy TextEditor native background aligned with its explicit theme inside an oppositely themed app; added forced-legacy native-host rendering coverage on macOS and iOS.
 - Added a portable dual-platform Controls showcase project, executable fixture verification, interaction assertions and real native screenshot attachments; golden-baseline and macOS desktop interaction acceptance remain separate.
