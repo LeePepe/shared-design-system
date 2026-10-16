@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// A caller-owned single selection with native tagged option identity.
+/// On iOS, place directly in a List or Form for native inline option rows.
 public struct NativeRadioGroup<Selection: Hashable, Label: View, Options: View>: View {
     private let theme: NativeDesignTheme
     @Binding private var selection: Selection
@@ -24,6 +25,8 @@ public struct NativeRadioGroup<Selection: Hashable, Label: View, Options: View>:
             .font(.body)
             .foregroundStyle(theme.foreground)
             .tint(theme.accent)
+            // Inline Picker's native checkmark reads the accent environment.
+            .accentColor(theme.accent)
             .frame(minHeight: 44, alignment: .leading)
     }
 
