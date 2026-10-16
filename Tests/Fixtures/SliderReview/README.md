@@ -23,7 +23,9 @@ Native adjustment tests check caller-unit binding updates, step alignment,
 reachable endpoints for the tested divisible span, balanced begin/end editing
 callbacks, actual disabled drag suppression, native accessibility label/value,
 stable frames under value and disabled changes, and minimum 44 pt control
-targets (only subpixel AX rounding is tolerated). Narrow-layout checks compare
+targets (only subpixel AX rounding is tolerated). Actual drags at both vertical
+edges prove the native target responds beyond its original intrinsic height;
+padding an inert frame cannot pass this regression. Narrow-layout checks compare
 actual SwiftUI label/component geometry at large and accessibility2 sizes and
 assert all captured content remains within the viewport without overlap.
 

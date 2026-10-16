@@ -105,7 +105,7 @@ private struct SliderReviewBoard: View {
             ReviewSlider(theme: theme, id: "adjustable", title: "Synthetic amount", value: $amount,
                          range: -50...50, minimum: "−50 units", maximum: "50 units", onEditingChanged: editingChanged)
                 .disabled(isDisabled)
-            Text("Value: \(Int(amount)) units").accessibilityIdentifier("bound-value")
+            Text(verbatim: "Value: \(amount) units").accessibilityIdentifier("bound-value")
             Text("Starts: \(editingStarts); ends: \(editingEnds); editing: \(isEditing)")
                 .font(.caption).accessibilityIdentifier("editing-events")
             Button(isDisabled ? "Enable slider" : "Disable slider") { isDisabled.toggle() }
