@@ -36,7 +36,6 @@ public struct NativeTextField<Label: View>: View {
             ) {
                 label
             }
-            .labelsHidden()
             .textFieldStyle(.plain)
             .font(.body)
             .foregroundStyle(theme.foreground)
@@ -50,12 +49,6 @@ public struct NativeTextField<Label: View>: View {
             .background {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(theme.surface)
-                    // Only the background handles padding taps. The native editor
-                    // keeps its own caret, selection and contextual-menu gestures.
-                    .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .onTapGesture {
-                        if isEnabled { isFocused = true }
-                    }
             }
             .overlay {
                 if isFocused {
@@ -64,6 +57,11 @@ public struct NativeTextField<Label: View>: View {
                         .allowsHitTesting(false)
                 }
             }
+            // A simultaneous tap expands activation to the padded surface without
+            // replacing the editor's caret, selection or contextual-menu gestures.
+            .simultaneousGesture(TapGesture().onEnded {
+                if isEnabled { isFocused = true }
+            })
         }
     }
 }

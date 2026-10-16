@@ -37,7 +37,8 @@ straight edge of the visible padded surface and types into the real bound
 editor. The label and entire component are measured by SwiftUI in screen
 coordinates; their production 8 pt gap identifies the visible surface rather
 than assuming that AX's editor rectangle covers its padding. Editor selection
-gestures remain with the native field; only its background activates focus.
+gestures remain with the native field; a simultaneous tap activates focus
+without installing an exclusive gesture or covering the editor with an overlay.
 The minimum-target assertion rounds at 1/1000 pt solely for floating-point AX
 conversion noise, retaining the 44 pt intent.
 

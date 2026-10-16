@@ -35,7 +35,7 @@ duplicate announcements.
 
 The input remains a SwiftUI `TextField`: `.disabled`, `.onSubmit`, `.submitLabel`,
 native editing, selection and keyboard behavior remain available. The full
-padded input surface activates the editor when enabled; background activation
+padded input surface activates the editor when enabled; a simultaneous tap
 leaves the native caret and selection gestures with the editor. Add platform
 input configuration using ordinary SwiftUI modifiers. The component does not
 trim or rewrite input, invent a clear action, select a keyboard, manage focus
