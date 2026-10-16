@@ -34,10 +34,14 @@ accessibility because the same label belongs to the native text input, avoiding
 duplicate announcements.
 
 The input remains a SwiftUI `TextField`: `.disabled`, `.onSubmit`, `.submitLabel`,
-native editing, selection and keyboard behavior remain available. Add platform
+native editing, selection and keyboard behavior remain available. The full
+padded input surface activates the editor when enabled; background activation
+leaves the native caret and selection gestures with the editor. Add platform
 input configuration using ordinary SwiftUI modifiers. The component does not
 trim or rewrite input, invent a clear action, select a keyboard, manage focus
-for a form, or validate a value. Compose descriptive validation text and symbols
+for a form, or validate a value. Input remains single-line with native horizontal
+scrolling for long values; visible labels wrap and input height grows with
+semantic typography. Compose descriptive validation text and symbols
 outside the component and associate them with the input using the consumer's
 accessibility policy. Labels should remain meaningful when announced alone.
 
@@ -49,3 +53,8 @@ for token authority, the supported `ocean` / `graphite` brands and release statu
 This is additive unreleased API; the published `NativeTokenColor` API, token
 dependency and platform floors are unchanged. Rollback removes uses of this
 component before returning to a release that contains only the color bridge.
+
+The synthetic [runtime review fixture](../../Tests/Fixtures/TextFieldReview/README.md)
+records how prior hosting assertions move to actual SwiftUI/XCTest UI tests.
+Its simulator evidence does not claim VoiceOver, macOS keyboard interaction,
+physical-device or minimum-OS acceptance.

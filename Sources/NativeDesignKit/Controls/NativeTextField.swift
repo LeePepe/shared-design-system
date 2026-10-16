@@ -7,6 +7,7 @@ public struct NativeTextField<Label: View>: View {
     @Binding private var text: String
     private let prompt: Text?
     private let label: Label
+    @Environment(\.isEnabled) private var isEnabled
     @FocusState private var isFocused: Bool
 
     public init(
@@ -49,6 +50,12 @@ public struct NativeTextField<Label: View>: View {
             .background {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(theme.surface)
+                    // Only the background handles padding taps. The native editor
+                    // keeps its own caret, selection and contextual-menu gestures.
+                    .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .onTapGesture {
+                        if isEnabled { isFocused = true }
+                    }
             }
             .overlay {
                 if isFocused {
