@@ -22,7 +22,7 @@ Lookup errors propagate unchanged. An unknown ID throws `TokenError.unknownToken
 
 ## Scope
 
-This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The Tokens dependency is pinned at exactly `0.1.1`; the manifest reference does not vendor its contents.
+This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The released bridge uses Tokens `0.1.1`; the current unreleased checkout pins exactly `0.2.0`. The manifest reference does not vendor dependency contents.
 
 ## Strata foundation candidate (unreleased)
 

@@ -19,7 +19,7 @@ Do not interpret local candidate mirror tests as released dependency evidence.
 | Package | `NativeDesignKit` library product and module; Swift tools 6.0 | Evaluated and compiled in the scoped run below; Swift 6.0 itself **NOT TESTED** |
 | iOS | iOS 15 minimum; SwiftUI bridge with UIKit test extraction | Simulator build and tests run in CI (`ios` gate, newest available iPhone simulator); device and minimum-OS verification **NOT RUN** |
 | macOS | macOS 12 minimum; SwiftUI bridge with AppKit test extraction | AppKit path exercised in the scoped run below; macOS 12 **NOT TESTED** |
-| Tokens | Exact release `0.1.1`; top-level `Theme` and public RGBA facade | Resolved from the public tag by CI on every PR (`scripts/verify --all`) |
+| Tokens | Exact `0.2.0` candidate; top-level `Theme` and public RGBA facade | Resolved from the public tag by CI on every PR (`scripts/verify --all`) |
 | External consumer | Separate Swift package using public products only | [Fixture and runner](EXAMPLES.md); matching revision/version results belong in the PR/release notes, not inferred from `@testable` tests |
 
 Only iOS and macOS are declared here. The dependency's own platform declarations or historical test results do not establish NativeDesignKit coverage. No watchOS, other-platform, accessibility, visual, performance, or G1 pass is claimed.

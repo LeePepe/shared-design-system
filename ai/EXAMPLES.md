@@ -30,13 +30,13 @@ then runs `swift build`, `swift test` and an iOS-simulator compile with an
 isolated DerivedData directory. It never uses a local path dependency. Failure
 of any command, missing docs, or a resolution mismatch fails the run. Version
 mode also requires the resolved registry's release status to be `released`.
-The fixture defaults to exact `0.1.0`; the Tokens pin remains exact `0.1.1`.
+The fixture defaults to exact `0.1.0`; the Tokens pin remains exact `0.2.0`.
 
 Do not report a revision run as release-tag validation. Git/Xcode caches may
 be shared by the tools; source, build outputs and DerivedData for the consumer
 are per-run. The runner does not launch a simulator or a host app.
 
-The current fixture direct Tokens requirement is exact `0.2.0` for the unreleased
-Strata foundation candidate. Its remote external runner retains the old provider
-revision assertion until a separate checked dependency-contract update and
-authorized provider release. Candidate mirror runs do not pass that release gate.
+The exact 0.2.0 provider adoption is a candidate until its authorized immutable
+release is retrievable. The last released NativeDesignKit 0.1.0 retains its own
+0.1.1 provider contract. Isolated local Git mirrors are test-only evidence;
+remote dependency checks and release notes must name the final provider SHA.

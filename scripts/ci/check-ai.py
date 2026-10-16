@@ -74,7 +74,12 @@ def check(root):
             "public static func resolve(_ id: String, theme: Theme) throws -> SwiftUI.Color" in source,
             "AI_API", "public resolver no longer matches registry")
     manifest = (root / "Package.swift").read_text()
-    require('exact: "0.1.1"' in manifest, "AI_DEPENDENCY", "Tokens exact pin changed")
+    requirements = re.findall(
+        r'\.package\(\s*url:\s*"https://github\.com/LeePepe/shared-design-tokens\.git",\s*([^)]*)\)',
+        manifest)
+    require(len(requirements) == 1 and
+            re.fullmatch(r'exact:\s*"0\.2\.0"\s*,?\s*', requirements[0]) is not None,
+            "AI_DEPENDENCY", "DesignTokens must use the declared exact 0.2.0 requirement")
     for source_file in (ai / "examples").rglob("*.swift"):
         require("@testable" not in source_file.read_text(), "AI_EXAMPLE", "consumer uses test-only API")
     print("AI_OK: registry, release changelog, local links, public API and dependency contract")

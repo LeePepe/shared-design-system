@@ -80,6 +80,28 @@ class ContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "AI_PATH"):
             CHECK.check(self.root)
 
+    def test_dependency_rejects_range_branch_revision_and_wrong_version(self):
+        manifest = self.root / "Package.swift"
+        original = manifest.read_text()
+        for replacement in ['from: "0.2.0"', 'branch: "main"',
+                            'revision: "' + "a" * 40 + '"', 'exact: "0.1.1"']:
+            with self.subTest(requirement=replacement):
+                manifest.write_text(original.replace('exact: "0.2.0"', replacement))
+                with self.assertRaisesRegex(ValueError, "AI_DEPENDENCY"):
+                    CHECK.check(self.root)
+        manifest.write_text(original)
+
+    def test_dependency_rejects_duplicate_and_comment_decoy(self):
+        manifest = self.root / "Package.swift"
+        original = manifest.read_text()
+        for content in [original.replace('exact: "0.2.0"', 'branch: "main"') +
+                        '\n// exact: "0.2.0"\n',
+                        original.replace('exact: "0.2.0"', 'exact: "0.2.0", branch: "main"')]:
+            with self.subTest(content=content):
+                manifest.write_text(content)
+                with self.assertRaisesRegex(ValueError, "AI_DEPENDENCY"):
+                    CHECK.check(self.root)
+
     def test_consumer_test_only_import(self):
         (self.root / "ai/examples/consumer/Sources/SamplePalette/SamplePalette.swift").write_text("@testable import NativeDesignKit")
         with self.assertRaisesRegex(ValueError, "AI_EXAMPLE"):
