@@ -63,8 +63,9 @@ iOS simulator build and test), contract audit, workflow-lint and the PR-body che
   (tag `v0.2.0`: https://github.com/LeePepe/shared-design-tokens/tree/v0.2.0/ai/)
   SwiftPM `exact: "0.2.0"`, product `DesignTokens`.
 
-The declared provider 0.2.0 release is pending. Isolated local candidate mirrors
-do not prove remote release resolution. Last immutable provider release: `v0.1.1`.
+Public provider tag `v0.2.0` resolves to
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a`; `Package.resolved` records
+that exact release revision.
 
 ## Delivery
 

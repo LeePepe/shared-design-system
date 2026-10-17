@@ -22,15 +22,17 @@ Lookup errors propagate unchanged. An unknown ID throws `TokenError.unknownToken
 
 ## Scope
 
-This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The released bridge uses Tokens `0.1.1`; the current unreleased checkout pins exactly `0.2.0`. The manifest reference does not vendor dependency contents.
+This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. Released NativeDesignKit `0.1.0` pins Tokens at exactly `0.1.1`. The current unreleased checkout pins Tokens at exactly `0.2.0`; see [COMPATIBILITY.md](COMPATIBILITY.md) for its public revision. Neither manifest reference vendors the dependency.
 
 ## Strata foundation candidate (unreleased)
 
 `NativeDesignTheme(theme:brand:)` additionally resolves explicit provider brands
 `strata-blue`, `strata-green`, `strata-pink`, `strata-yellow`, `strata-purple` from
-the proposed DesignTokens 0.2.0 candidate. They do not alias ocean or graphite.
-Legacy brands keep their original lookup behavior. The dependency must be
-released and resolved remotely before this candidate is released to consumers.
+the public DesignTokens 0.2.0 release at
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a`. They do not alias ocean or graphite.
+Legacy brands keep their original lookup behavior. This native foundation is
+unreleased; the separately published provider does not establish a
+NativeDesignKit release.
 
 Additive immutable color properties are `brandSeed`, `brandSeedInk`, `brandText`,
 `accentHover`, `accentActive`, `accentSubtle`. `NativeSurfaceRole` has `region`,
