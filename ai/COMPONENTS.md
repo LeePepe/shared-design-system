@@ -54,6 +54,7 @@ Component-specific contracts are added under `components/` by their PRs.
 | --- | --- |
 | Button | [NativeButton](components/button.md) |
 | Card | [NativeCard](components/card.md) |
+| List | [NativeList](components/list.md) |
 | TextField | [NativeTextField](components/textfield.md) |
 | Switch | [NativeSwitch](components/switch.md) |
 | Checkbox | [NativeCheckbox](components/checkbox.md) |
