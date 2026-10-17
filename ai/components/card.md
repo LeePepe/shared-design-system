@@ -2,7 +2,7 @@
 
 Unreleased component contract. This Card is a fresh Strata implementation;
 its four-slot API supersedes the earlier `NativeCard<Content>` planning shape.
-It does not change the released 0.1.0 color resolver or declare a package release.
+It does not change the released 0.3.0 color resolver or declare a package release.
 
 `NativeCard<Header, Content, Supporting, Actions>` is a SwiftUI container for
 caller-owned views. Every type parameter conforms to `View`. The initializer

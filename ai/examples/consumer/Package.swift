@@ -6,7 +6,7 @@ let package = Package(
     platforms: [.iOS(.v15), .macOS(.v12)],
     products: [.library(name: "SamplePalette", targets: ["SamplePalette"])],
     dependencies: [
-        .package(url: "https://github.com/LeePepe/shared-design-system.git", exact: "0.1.0") // runner substitutes the requested revision/version
+        .package(url: "https://github.com/LeePepe/shared-design-system.git", exact: "0.3.0") // runner substitutes the requested revision/version
     ],
     targets: [
         .target(name: "SamplePalette", dependencies: [

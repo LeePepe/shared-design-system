@@ -1,7 +1,7 @@
 # NativeChip (unreleased)
 
 This additive API belongs to the Strata rebuild and is not in the released
-NativeDesignKit 0.1.0 color bridge. HeroUI supplies inventory only.
+NativeDesignKit 0.3.0 color bridge. HeroUI supplies inventory only.
 
 ```swift
 public enum NativeChipTone: Equatable, Sendable {

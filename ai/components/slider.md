@@ -1,7 +1,7 @@
 # NativeSlider (unreleased)
 
 Part of the [Strata rebuild](../COMPONENTS.md). This is an additive API under
-`Controls/Slider`, not a NativeDesignKit 0.1.0 release. HeroUI supplies the
+`Controls/Slider`, not a NativeDesignKit 0.3.0 release. HeroUI supplies the
 inventory name only; the interaction is SwiftUI `Slider`.
 
 ```swift

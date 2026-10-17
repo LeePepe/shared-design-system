@@ -1,7 +1,7 @@
 # NativeButton (unreleased)
 
 This API is part of the unreleased [Strata rebuild](../COMPONENTS.md), not
-NativeDesignKit 0.1.0. HeroUI informs the component inventory only; the
+NativeDesignKit 0.3.0. HeroUI informs the component inventory only; the
 implementation is native SwiftUI and copies no earlier unmerged component.
 
 ```swift

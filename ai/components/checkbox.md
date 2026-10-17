@@ -1,6 +1,6 @@
 # NativeCheckbox (unreleased)
 
-Part of the unreleased Strata rebuild. NativeDesignKit 0.1.0 contains only
+Part of the unreleased Strata rebuild. NativeDesignKit 0.3.0 contains only
 the color bridge; evaluate Checkbox at an explicitly reviewed revision.
 HeroUI supplies inventory only; this is a fresh native SwiftUI implementation.
 

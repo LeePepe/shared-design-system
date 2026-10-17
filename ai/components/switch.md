@@ -2,7 +2,7 @@
 
 `NativeSwitch` is part of the unreleased [Strata rebuild](../COMPONENTS.md).
 It is a SwiftUI `Toggle` using native switch styling, with caller-owned state
-and label content. It is unavailable in NativeDesignKit 0.1.0.
+and label content. It is unavailable in NativeDesignKit 0.3.0.
 
 ```swift
 import DesignTokens

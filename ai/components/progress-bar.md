@@ -2,7 +2,7 @@
 
 Native SwiftUI linear progress in the unreleased [Strata rebuild](../COMPONENTS.md).
 HeroUI informs inventory only; no implementation is copied. This API is absent
-from the color-only NativeDesignKit 0.1.0 release.
+from the color-only NativeDesignKit 0.3.0 release.
 
 ```swift
 public struct NativeProgressBar<Label: View, CurrentValueLabel: View>: View {

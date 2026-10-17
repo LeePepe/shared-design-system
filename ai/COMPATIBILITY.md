@@ -1,6 +1,11 @@
 # NativeDesignKit compatibility
 
-NativeDesignKit 0.1.0 is the first release (Git tag `v0.1.0`). [USAGE.md](USAGE.md) describes its interface and conversion semantics. The [contract entry](README.md) and [external fixture](EXAMPLES.md) travel with the release source revision; tag-time validation results are recorded in the GitHub release notes.
+NativeDesignKit 0.3.0 is the current release contract. [USAGE.md](USAGE.md)
+describes its interface and conversion semantics. The [contract entry](README.md)
+and [external fixture](EXAMPLES.md) travel with the release source revision;
+tag-time validation results are recorded in the GitHub release notes after a
+separately authorized tag exists. NativeDesignKit 0.1.0 remains the first
+historical release (Git tag `v0.1.0`).
 
 ## Local dependency
 
@@ -44,7 +49,9 @@ and Swift 6.0 still require their own evidence.
 
 Coverage metrics and full D1/6DQ remain unmeasured. The external runner isolates its source/build/DerivedData but does not prove crash/concurrency cleanup or all tool-cache isolation. Dependency/security scans, real UI demos and Owner style approval, consumer-specific migration/rollback and independent delivery review remain separate gates. The Owner has retained the initial bridge (#1), and the repository is MIT licensed.
 
-No deprecation is introduced. There is no previously published NativeDesignKit version to deprecate. A future removal must be documented with a from/to migration and reviewed consumer upgrade; no unsupported compatibility period is promised.
+No deprecation is introduced. A future removal must be documented with a
+from/to migration and reviewed consumer upgrade; no unsupported compatibility
+period is promised.
 
 ## Unreleased Strata foundation
 

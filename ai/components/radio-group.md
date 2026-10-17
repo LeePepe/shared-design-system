@@ -1,7 +1,7 @@
 # NativeRadioGroup (unreleased)
 
 Part of the [Strata rebuild](../COMPONENTS.md); absent from NativeDesignKit
-0.1.0. The HeroUI inventory supplies the name only. This is a fresh SwiftUI
+0.3.0. The HeroUI inventory supplies the name only. This is a fresh SwiftUI
 implementation with no copied component code or additional dependency.
 
 ```swift

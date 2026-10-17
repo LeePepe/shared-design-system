@@ -1,6 +1,6 @@
 # NativeList (unreleased)
 
-This additive SwiftUI component is absent from the NativeDesignKit 0.1.0
+This additive SwiftUI component is absent from the NativeDesignKit 0.3.0
 release. Evaluate the reviewed component revision together with its required
 Strata foundation revision and exact DesignTokens dependency. It introduces
 no released package version, business model, storage or navigation destination.
