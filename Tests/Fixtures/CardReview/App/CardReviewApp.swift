@@ -10,8 +10,14 @@ struct CardReviewApp: App {
         WindowGroup {
             switch configuration {
             case .success(let configuration):
-                NativeCardBehaviorFixture(configuration: configuration)
-                    .preferredColorScheme(configuration.mode == "dark" ? .dark : .light)
+                Group {
+                    if configuration.scenario == "specimen" || configuration.scenario == "specimen-long" {
+                        StrataCardSpecimen(configuration: configuration)
+                    } else {
+                        NativeCardBehaviorFixture(configuration: configuration)
+                    }
+                }
+                .preferredColorScheme(configuration.mode == "dark" ? .dark : .light)
             case .failure(let error):
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Fixture configuration failed").font(.title)
@@ -31,6 +37,7 @@ struct CardReviewConfiguration {
     let scenario: String
     let surface: NativeSurfaceStyle
     let reduceTransparency: Bool
+    let systemTransparency: Bool
     let textSize: DynamicTypeSize
 
     init() throws {
@@ -49,7 +56,7 @@ struct CardReviewConfiguration {
         default: throw ConfigurationError.invalid("NDK_THEME")
         }
         scenario = try required("NDK_SCENARIO")
-        guard ["four-slot", "long", "content-only", "empty-slots"].contains(scenario) else {
+        guard ["four-slot", "long", "content-only", "empty-slots", "specimen", "specimen-long"].contains(scenario) else {
             throw ConfigurationError.invalid("NDK_SCENARIO")
         }
         switch try required("NDK_SURFACE") {
@@ -58,8 +65,9 @@ struct CardReviewConfiguration {
         default: throw ConfigurationError.invalid("NDK_SURFACE")
         }
         switch try required("NDK_REDUCE_TRANSPARENCY") {
-        case "off": reduceTransparency = false
-        case "on": reduceTransparency = true
+        case "off": reduceTransparency = false; systemTransparency = false
+        case "on": reduceTransparency = true; systemTransparency = false
+        case "system": reduceTransparency = false; systemTransparency = true
         default: throw ConfigurationError.invalid("NDK_REDUCE_TRANSPARENCY")
         }
         switch try required("NDK_TEXT_SIZE") {

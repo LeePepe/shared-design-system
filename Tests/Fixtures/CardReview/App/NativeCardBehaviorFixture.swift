@@ -18,18 +18,7 @@ struct NativeCardBehaviorFixture: View {
                 Text(surfaceDescription)
                     .font(.subheadline)
                     .frame(height: 40, alignment: .topLeading)
-                reviewedCard
-                    .frame(width: 320)
-                    .environment(\.nativeReduceTransparencyOverride, configuration.reduceTransparency)
-                    .environment(\.dynamicTypeSize, configuration.textSize)
-                    .background(alignment: .trailing) {
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(theme.accent.opacity(0.35))
-                            .frame(width: 90)
-                            .padding(.vertical, 12)
-                    }
-                    .accessibilityElement(children: .contain)
-                    .accessibilityIdentifier("review-card")
+                cardRegion
                 Text("Actions: \(activations)").accessibilityIdentifier("action-count")
                 Text("Preference forced through an internal fixture input. Production follows the system.\(configuration.textSize == .accessibility3 ? " Dynamic Type: accessibility3." : "")")
                     .font(.footnote).foregroundStyle(theme.secondaryForeground)
@@ -42,6 +31,33 @@ struct NativeCardBehaviorFixture: View {
         .foregroundStyle(theme.foreground)
         .background(theme.canvas.ignoresSafeArea())
         .dynamicTypeSize(.large)
+    }
+
+    private var cardRegion: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Reading surface")
+                .font(.headline)
+                .accessibilityIdentifier("review-region-title")
+            reviewedCard
+                .frame(width: 320)
+                .environment(\.dynamicTypeSize, configuration.textSize)
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("review-card")
+        }
+        .padding(16)
+        .nativeSurface(theme: theme, style: configuration.surface, cornerRadius: 32, role: .region)
+        .environment(\.nativeReduceTransparencyOverride,
+                     configuration.systemTransparency ? nil : configuration.reduceTransparency)
+        .background(alignment: .trailing) {
+            // Preserve the original token-colored backdrop. The outer region
+            // supplies the one blur; Card remains the dense reading plane.
+            RoundedRectangle(cornerRadius: 20)
+                .fill(theme.accent.opacity(0.35))
+                .frame(width: 90)
+                .padding(.vertical, 12)
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("review-region")
     }
 
     @ViewBuilder

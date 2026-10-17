@@ -5,9 +5,9 @@ import XCTest
 
 final class NativeCardPublicAPITests: XCTestCase {
     @MainActor
-    func testPublicImportExampleSupportsBothBrandsAndExplicitSurfaces() throws {
+    func testPublicImportExampleSupportsLegacyAndStrataBrandsAndExplicitSurfaces() throws {
         for mode in Theme.allCases {
-            for brand in ["ocean", "graphite"] {
+            for brand in ["ocean", "graphite", "strata-blue", "strata-green", "strata-pink", "strata-yellow", "strata-purple"] {
                 let theme = try NativeDesignTheme(theme: mode, brand: brand)
                 for surface in [NativeSurfaceStyle.solid, .glass] {
                     let card = NativeCard(theme: theme, surface: surface) {
