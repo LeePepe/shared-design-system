@@ -3,8 +3,9 @@
 The component API in this checkout is **unreleased**. NativeDesignKit 0.1.0
 contains only `NativeTokenColor`; it does not contain these components. Evaluate
 this work using an explicitly reviewed immutable revision until a component
-release is published. The Strata foundation candidate targets exact DesignTokens 0.2.0; platform
-floors remain unchanged. Candidate-only and released-dependency evidence are separate.
+release is published. The unreleased Strata foundation consumes public exact DesignTokens 0.2.0 at
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a`; platform floors remain unchanged.
+The provider release does not release the native foundation or components.
 
 The current rebuild replaces the old unmerged component implementations and
 old v1 component scope following the Owner's request. Only the

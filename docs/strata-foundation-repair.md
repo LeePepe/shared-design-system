@@ -29,14 +29,17 @@ composition. Fixture targets include it explicitly and use DEBUG testability;
 it owns no business data or UIKit/AppKit hosting code. Component fixtures retain
 their interaction and accessibility evidence.
 
-## Candidate provenance
+## Public provider provenance
 
-Local candidate rendering can use an isolated bare Git mirror tagged v0.2.0 at
-the frozen provider candidate SHA, with task-scoped SwiftPM mirror/cache paths.
-That tag is never pushed and does not establish a provider release. Every run
-records native/provider SHA and candidate-only provenance. A final committed
-lockfile and remote required checks wait for a separately authorized immutable
-provider release; source or visual success alone does not satisfy that gate.
+The committed manifest and lock are inherited from the merged public-provider
+adoption: exact DesignTokens `0.2.0`, public tag `v0.2.0` at
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a`. Package-root and generated-workspace
+resolution must be unmirrored and prove the internal cache's public GitHub
+origin, exact revision and matching versioned documentation. Historical local
+candidate rendering remains preview evidence only; its synthetic tag is never
+published or substituted for this release. Every new native head needs its own
+verification, review and remote checks. This source-only foundation does not
+establish component visual/input acceptance or a NativeDesignKit release.
 
 Explicit legacy Card planes use 94% of the existing raised-surface provider
 color, with the same shared material edge/shadow roles. Tests composite against
