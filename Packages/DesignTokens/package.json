@@ -1,0 +1,62 @@
+{
+  "name": "@leepepe/design-tokens",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Platform-neutral pinned color and style data; no UI",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "dist",
+    "tokens",
+    "ai",
+    "docs",
+    "specs",
+    "examples/data",
+    "Sources",
+    "tests/DesignTokensTests",
+    "Package.swift",
+    "scripts/check-ai-contract.mjs",
+    "CHANGELOG.md",
+    "THIRD_PARTY_NOTICES.md",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./colors.css": "./dist/colors.css",
+    "./resolved.json": "./dist/resolved.json",
+    "./source.json": "./tokens/colors.json",
+    "./schema.json": "./tokens/schema.json",
+    "./styles": {
+      "types": "./dist/styles.d.ts",
+      "import": "./dist/styles.js"
+    },
+    "./styles.resolved.json": "./dist/styles.resolved.json",
+    "./styles.source.json": "./tokens/styles.json",
+    "./styles.schema.json": "./tokens/styles.schema.json"
+  },
+  "sideEffects": [
+    "./dist/colors.css"
+  ],
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "generate": "node scripts/generate.mjs",
+    "generate:check": "node scripts/generate.mjs --check",
+    "test:browser": "node --test tests/browser.test.mjs",
+    "test:consumer": "node scripts/test-consumer.mjs",
+    "test:pack": "node scripts/test-pack.mjs",
+    "check:ai": "node scripts/check-ai-contract.mjs --root . --expected-name @leepepe/design-tokens --expected-version 0.2.0",
+    "test:ai-checker": "node --test tests/ai-checker.test.mjs",
+    "test:contract": "node scripts/test-contract-pack.mjs",
+    "test:swift-consumer": "node scripts/test-swift-consumer.mjs"
+  },
+  "devDependencies": {
+    "ajv": "8.17.1",
+    "typescript": "5.9.3"
+  }
+}

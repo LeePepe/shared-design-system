@@ -7,3 +7,5 @@ Tests/Fixtures/**/*.xcodeproj/
 Tests/Fixtures/**/*.xcworkspace/
 Tests/Fixtures/**/DerivedData/
 Tests/Fixtures/**/*.xcresult/
+/Packages/DesignTokens/node_modules/
+/Packages/DesignTokens/*.tgz
