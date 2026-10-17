@@ -92,6 +92,22 @@ until its separately authorized archive step.
   therefore target activation alone cannot durably freeze provider authority.
   The target root `AGENTS.md`, `Package.swift`, and `README.md` likewise still declare
   the external provider dependency and must be reconciled at activation.
+- `EB-010`: Target CODEOWNERS protects native governance, Swift manifests, root
+  `ai/**`, and architecture/support paths with `@LeePepe`, but lacks relocated
+  equivalents for provider-protected Node manifests/locks, `tokens/**`, nested
+  `ai/**`, `docs/constitution.md`, `docs/architecture/**`, `scripts/verify`,
+  `scripts/ci/**`, and `THIRD_PARTY_NOTICES.md`. A mechanical import without a
+  target policy adaptation would silently remove effective Owner routing from
+  those important paths.
+- `EB-011`: Provider CI has an Ubuntu 24.04 Node/Chrome lane using
+  `setup-command: scripts/ci/setup.sh`,
+  `test-command: scripts/verify --layer Tokens`, and
+  `test-runs-on: ubuntu-24.04`. Target CI instead has its macOS
+  `scripts/verify --all` plus exact-public-SHA consumer command, contract audit,
+  and workflow lint at shared-ci
+  `6e354f476bc53d68f0f09fc231d5cd938466af9c`. The pinned reusable workflow
+  already supports the three provider lane inputs and runs setup before every
+  selected command lane; preserving both coverages needs no shared-ci change.
 
 ## Functional requirements and acceptance
 
@@ -189,6 +205,25 @@ until its separately authorized archive step.
   only then does the existing required CI companion command resolve that exact
   public SHA before delivery. No path/mirror substitute, hook bypass, required
   gate, assertion, policy, or effective protection is removed or weakened.
+  During S100, target `.github/CODEOWNERS` retains every baseline pattern and
+  Owner and adds relocated `@LeePepe` coverage for
+  `/Packages/DesignTokens/**/package.json`,
+  `/Packages/DesignTokens/**/package-lock.json`,
+  `/Packages/DesignTokens/tokens/**`, nested `/Packages/DesignTokens/ai/**`,
+  `/Packages/DesignTokens/docs/constitution.md`,
+  `/Packages/DesignTokens/docs/architecture/**`,
+  `/Packages/DesignTokens/scripts/verify`,
+  `/Packages/DesignTokens/scripts/ci/**`, and
+  `/Packages/DesignTokens/THIRD_PARTY_NOTICES.md`; a trusted resolver proves
+  representative imported paths and existing native paths resolve to the same
+  Owner. S100 also retains the target CI caller's events, permissions,
+  concurrency, macOS verify/public-consumer command, contract/workflow audits,
+  45-minute timeout, aggregate behavior, and exact shared-ci pin while adding
+  the real Ubuntu 24.04 `scripts/verify --layer Tokens` lane and a target-owned
+  setup wrapper that installs checksum-pinned Node 22.23.3 and the nested exact
+  npm lock. Only nested `node_modules` and tarball outputs are newly ignored;
+  generated data, `dist/**`, sources, manifests, and locks remain tracked and
+  verified. `.github/workflows/review.yml` remains outside S100.
 - `AC-CONSUMER-001`: An isolated Node consumer installs the actual packed nested
   DesignTokens artifact and exercises all declared public exports with matching
   shipped docs. An isolated Swift consumer resolves the public target repository
@@ -297,6 +332,17 @@ planning-only P001 PR passes required checks and delegated Owner approval,
 actually merges, and the merged four artifact blobs are read back byte-identical
 to the reviewed revision.
 
+S100 deliberately adapts target support policy without importing provider
+governance. CODEOWNERS retains every target baseline rule/Owner and adds only
+the relocated provider important-path equivalents. The target CI caller retains
+its native macOS/UI/public-consumer coverage and adds the provider's real Ubuntu
+24.04 Tokens lane using fields already supported by the exact shared-ci pin. A
+target `scripts/ci/setup.sh` enters the nested package and invokes the exact
+imported provider setup, preserving its Node 22.23.3 platform/hash matrix and
+locked `npm ci` flags; `.gitignore` adds only anchored nested `node_modules/`
+and `*.tgz` outputs. These protected changes receive the same S100 exact-head
+review, delegated Owner approval, required checks, and actual merge readback.
+
 After S100, the provider-quiescence prerequisite changes only provider
 `AGENTS.md`, `docs/constitution.md`, and `README.md`. It removes permission for
 future provider development and identifies the target as the future authority.
@@ -337,7 +383,10 @@ semantics are preserved.
   quiescence prerequisite; archiving/deleting/renaming/transferring either
   repository; or changing GitHub rulesets/settings.
 - Editing shared-ci source or pin, review rules/severities/timeouts, credentials,
-  `codex-review-gate`, or any caller field other than `max-diff-bytes`.
+  `codex-review-gate`, or any `.github/workflows/review.yml` caller field other
+  than P050's `max-diff-bytes`; removing or weakening any existing target CI
+  caller field. S100's additive setup/Linux Tokens inputs are the only authorized
+  `.github/workflows/ci.yml` adaptation.
 - Reconstructing provider Git history inside the target or importing colliding
   tags.
 - Changing Basalt Web authority, design values, component anatomy, state,

@@ -15,11 +15,12 @@ Dependency graph: `docs/design-tokens-consolidation-tasks.md`
 | issue | `MY-1890` / `01a14897-f934-7406-8e14-a240baa0a75d` |
 | target | `https://github.com/LeePepe/shared-design-system.git` |
 | exact target base | `ad63bf37d3045349c50e724e0573a75871ebc896` |
-| immutable predecessor planning revision | `18d3225b24c22523b4d7adc9c54ff28dec783be0` (its active review remains historical evidence; only this successor can gate implementation) |
+| immutable review history / successor parent | rounds 1–3 remain `NEEDS_WORK`: `18d3225b24c22523b4d7adc9c54ff28dec783be0`, `20e93ec93a8ab8ecdd20a64d65ceda5da226285e`, and parent `6f08e5bc0cc071883dc22c65072a0197db4cfdcb`; Owner decision `01a148cb-76ec-7bb0-90e9-9572b947a4a8` authorizes this one bounded post-budget successor and one exact-revision gate |
 | provider | `https://github.com/LeePepe/shared-design-tokens.git` |
 | exact provider import | `87bef8fbab5bf67a748815d7ed04d7ae199f760a` (`v0.2.0`) |
 | repository protocol | `shared-ci@6e354f476bc53d68f0f09fc231d5cd938466af9c` |
 | review-capacity evidence | external read-only `coordination/consolidation-provider-tree-root-read.json`: complete 92-blob / 591,678-byte tree; planned 84-file / 581,977-byte subset; exact source-path text patch 614,289 bytes / 17,393 additions plus 5,544 bytes for three 22-byte path-prefix occurrences per file = 619,833-byte relocated mechanical patch |
+| protection-parity evidence | external read-only `coordination/consolidation-codeowners-parity-root-evidence.json` and `coordination/consolidation-ci-parity-root-evidence.json` at the exact target/provider baselines; Owner directions `01a148c3-1ebf-73b1-bf26-0cd5693dfe58` and `01a148c5-b1c0-7039-b512-4dd52ef6045c` |
 | accepted native reference | Strata prototype `b4bff430517ed2e2944f814d8b5ab89a1866ee33`, digest `c41f53160d0eb7e6e39b2733a3a689119a4c0868101c2aa2381b0061f4c6b456` |
 | planning method | repository-native ADR/spec/plan/tasks; no Spec Kit installation |
 
@@ -81,9 +82,16 @@ context audit without hiding executable paths in support.
 5. **Preserve independent contracts.** Root `ai/` remains NativeDesignKit;
    nested `ai/` remains DesignTokens. Cross-links and checkers prove correct
    version/release-unit discovery rather than merging incompatible registries.
-6. **Adopt target governance.** Provider `.github`, hooks, root `AGENTS.md`, CI,
-   rulesets, and old shared-ci pin are provenance inputs, not imported active
-   governance. The target's normal hook/verify/CI/gates remain authoritative.
+6. **Adopt target governance and preserve provider coverage.** Provider
+   `.github`, hooks, root `AGENTS.md`, rulesets, and old shared-ci pin are
+   provenance inputs, not imported active governance. S100 minimally adapts the
+   target's authoritative CODEOWNERS and CI caller: every native rule/Owner and
+   native macOS/UI/public-consumer gate stays; relocated Node manifests/locks,
+   token data, nested AI contract, constitution, architecture, verification/CI
+   support, and notices gain the same Owner; and a real Ubuntu 24.04 Tokens lane
+   runs with nested locked-tool setup. The target pin, aggregate, review gates,
+   events, permissions, concurrency, timeouts, and fail-closed semantics remain
+   authoritative and unchanged.
 7. **Raise capacity before import.** A separate caller-only protected PR passes
    `max-diff-bytes: 1000000` to the existing pinned review. It must pass its own
    exact-head review, delegated Owner approval, required CI, and merge before
@@ -147,10 +155,31 @@ Tokens/DesignTokens gates pass inside the target without changing root product
 resolution.
 
 This slice may perform only mechanical path relocation and the minimum
-root-relative harness/context adaptations needed to run the imported package.
-The root NativeDesignKit manifest stays byte-identical, still resolving public
-exact provider `0.2.0`. Provider active governance files are excluded. Generated
-artifacts must match regeneration and the provenance manifest.
+root-relative harness/context/protection adaptations needed to run and protect
+the imported package. The root NativeDesignKit manifest stays byte-identical,
+still resolving public exact provider `0.2.0`. Provider active governance files
+are excluded. Generated artifacts must match regeneration and the provenance
+manifest.
+
+S100 owns four bounded target-support changes. `.github/CODEOWNERS` preserves
+every existing native pattern and `@LeePepe`, then adds all-depth
+`package.json`/`package-lock.json` coverage scoped to `Packages/DesignTokens/`
+and relocated exact coverage for nested `tokens/`,
+`ai/`, `docs/constitution.md`, `docs/architecture/`, `scripts/verify`,
+`scripts/ci/`, and `THIRD_PARTY_NOTICES.md` under `Packages/DesignTokens/`.
+`.github/workflows/ci.yml` preserves the exact shared-ci pin, macOS
+`scripts/verify --all` plus public-consumer command, aggregate, audits, events,
+permissions, concurrency, and 45-minute timeout, then adds
+`setup-command: scripts/ci/setup.sh`,
+`test-command: scripts/verify --layer Tokens`, and
+`test-runs-on: ubuntu-24.04`. The root setup wrapper enters
+`Packages/DesignTokens` and invokes the exact imported provider setup, preserving
+its checksum-pinned Node 22.23.3 platform matrix and locked `npm ci` flags.
+`.gitignore` adds only anchored nested `node_modules/` and `*.tgz` outputs;
+it never ignores generated data, `dist/**`, source, manifests, or locks. These
+are S100 protected-path changes, not part of P050 and not permission to alter
+review, shared-ci, rulesets/settings, identity, credentials, releases, or
+provider governance.
 
 ### `P175` — Provider authority quiescence prerequisite
 
@@ -221,6 +250,8 @@ full retirement.
 | data-only watchOS boundary | root package floor plus NativeDesignKit compile guard | DesignTokens-only watchOS build succeeds; selecting NativeDesignKit fails with the named unavailable diagnostic |
 | contracts match artifacts | root/nested registry/checkers and versioned-doc byte checks | both checker outputs pass from resolved consumer artifacts |
 | review admits the complete S100 diff | merged target caller input plus pinned reusable review byte check | P050 changes only `max-diff-bytes`; frozen S100 three-dot diff is complete and at most 1,000,000 bytes |
+| imported important paths keep Owner routing | target CODEOWNERS baseline-line preservation plus effective-pattern resolver | every native rule/Owner remains; representative nested package/lock, token, AI, constitution, architecture, verification/CI-support, and notice paths resolve to `@LeePepe`, as do representative existing native paths |
+| provider Linux Tokens coverage survives consolidation | additive target CI inputs, checksum-pinned nested setup, and fail-closed aggregate | Ubuntu 24.04 runs the real `scripts/verify --layer Tokens` Node/Chrome gate; macOS NativeDesignKit/UI/public-consumer, contract, workflow-lint, aggregate, and exact pin remain active on the same head |
 | gates fail closed without public-resolution cycles | pre-push `scripts/verify --all`/hook parity, then pushed-SHA CI companion, aggregate/current-head review | local gates pass before push; after push the exact public SHA resolves; cancel/skip/mismatch cannot report pass |
 | authority contracts match resolution | P175 three-blob receipt plus S200 root manifest/lock/`AGENTS.md`/README/context audit | provider ordinary delivery is frozen before S200; activated executable resolution and all target declarations name the same authority |
 | history/rollback truthful | immutable tag/readback table, provenance manifest, and external import receipt | provider mappings are in the manifest; receipt maps reviewed PR head and final merge/squash SHA to the unchanged manifest blob without self-reference; rollback commands are explicit |
@@ -248,7 +279,9 @@ Lead accepts the same revision.
 | SwiftPM tag collision or independent-version fiction | preserve old refs in original repositories; unified future target tag; no tag action in implementation |
 | Native v0.1.0 old URL becomes unavailable | old repository remains readable and tags immutable; archive-only retirement |
 | Search zero is misreported as no consumers | discovery report includes method and limitations; known self-reference remains listed |
-| Provider governance weakens target gates | do not import provider workflows/hooks/AGENTS/rulesets; target shared-ci pin and gates remain authoritative |
+| Provider governance weakens target gates | do not import provider workflows/hooks/AGENTS/rulesets; minimally translate CODEOWNERS and Linux Tokens coverage into the target caller while preserving every target rule, gate, pin, timeout, permission, event, and Owner |
+| Relocated important paths lose Owner review | T130 owns target CODEOWNERS, preserves its baseline lines, adds exact relocated patterns, and proves representative native/imported path resolution to the same Owner |
+| Node/Chrome coverage disappears or setup pollutes tracked data | T150 adds the real Ubuntu lane and checksum-pinned nested-lock setup; `.gitignore` permits only nested dependencies/tarballs and generation/pack checks reject omitted tracked outputs |
 | S100 exceeds complete-review capacity | merge P050 first; measure the frozen S100 three-dot diff; over 1,000,000 bytes blocks/replans without splitting or omission |
 | Import manifest requires its own commit hash | manifest records immutable provider/path/blob facts; later external receipt binds the target import SHA and manifest blob |
 | Public resolution is attempted before push | local hook proves local/generation/packed artifacts; required CI proves the exact fetchable pushed SHA before delivery |

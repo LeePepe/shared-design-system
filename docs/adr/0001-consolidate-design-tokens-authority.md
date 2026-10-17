@@ -26,6 +26,10 @@ the old repository.
   from target `main`, so S100 cannot bootstrap its own review capacity.
 - Split source moves or omit generated data to fit review capacity: rejected
   because it would evade complete review and break one observable import goal.
+- Import the provider's active `.github/**` governance wholesale, or keep the
+  target governance byte-identical and silently lose provider protections:
+  rejected. S100 instead retains every target ownership and CI rule while
+  translating only the provider coverage needed by the relocated release unit.
 - Nest the provider release unit and publish both Swift products from the root:
   selected because the npm artifact can still be packed from its own root while
   SwiftPM gets one package graph with a local `DesignTokens` target.
@@ -69,6 +73,25 @@ the old repository.
   versioned `ai/` contract, and independent Node/Swift-data gates. The root
   contract remains the NativeDesignKit entry and gains a deterministic pointer
   to the nested DesignTokens contract.
+- S100 makes two minimum target-governance adaptations. First, target
+  `.github/CODEOWNERS` retains every native rule and `@LeePepe` Owner and adds
+  relocated equivalents for provider-protected Node manifests/locks,
+  `tokens/**`, nested `ai/**`, `docs/constitution.md`, `docs/architecture/**`,
+  `scripts/verify`, `scripts/ci/**`, and `THIRD_PARTY_NOTICES.md`;
+  representative imported and native paths must resolve to that same Owner.
+  Second, target `.github/workflows/ci.yml` retains
+  its macOS NativeDesignKit/UI/public-consumer lane, aggregate, events,
+  permissions, concurrency, 45-minute timeout, exact shared-ci pin, and
+  fail-closed semantics while adding the provider's real Ubuntu 24.04
+  `scripts/verify --layer Tokens` lane. A target-owned setup wrapper installs
+  the nested exact lock using the provider's checksum-pinned Node 22.23.3 setup,
+  and `.gitignore` adds only nested `node_modules`/tarball outputs. No generated
+  source/output is ignored.
+- These S100 adaptations are protected support work in the S100 PR, with
+  exact-head review, delegated Owner approval, required CI, and merge readback.
+  They do not change `.github/workflows/review.yml`; P050 remains the preceding
+  one-field `max-diff-bytes` PR. They authorize no shared-ci, ruleset/settings,
+  identity, credential, release, or provider-governance mutation.
 - After this four-document planning revision passes exact-head review, required
   checks, delegated Owner approval, and its own merge/readback with byte-identical
   reviewed blobs, one separately reviewed governance PR changes only the target
