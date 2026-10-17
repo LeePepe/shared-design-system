@@ -15,8 +15,11 @@ ADR: `docs/adr/0001-consolidate-design-tokens-authority.md`
 - Each slice is one observable PR goal, one branch/worktree, one Fullstack
   writer, one frozen prepublication candidate, and one exact-head review/gate
   cycle. Tasks within a slice are layer-scoped rows, not separate writers or PRs.
-- S100 must merge before S200 starts. S300 begins only after both merge and the
-  exact target main revision is recorded. No stacked merge order is inferred.
+- P001 must pass delegated Owner approval and required checks, actually merge,
+  and read back the exact reviewed four artifact blobs before P050 starts.
+- P050 must actually merge before S100 starts or publishes. S100 must merge
+  before S200 starts. S300 begins only after both merge and the exact target
+  main revision is recorded. No stacked merge order is inferred.
 - Mechanical source relocation is isolated in S100. Public package resolution,
   manifest identity, and contract behavior change only in S200.
 - One writer owns every path in a slice. Parallel `[P]` rows are permitted only
@@ -37,7 +40,12 @@ ADR: `docs/adr/0001-consolidate-design-tokens-authority.md`
 ```text
 T001 planning artifacts
   -> exact-revision AI Reviewer PASS
-    -> Team Lead acceptance / planning publication
+    -> normal P001 PR + delegated Owner approval + required checks
+      -> actual merge + exact four-blob readback
+      -> P050 complete-review capacity
+        T050 -> exact-head review + delegated Owner approval + CI + actual merge
+          |
+          v
       -> S100 exact provider import
         T110 -> T120
           \      /
@@ -70,8 +78,28 @@ The graph is acyclic. `D400` is a decision boundary, not an implementation task.
 | paths | `docs/adr/0001-consolidate-design-tokens-authority.md`; `docs/design-tokens-consolidation-{spec,plan,tasks}.md` |
 | excludes | all source, tests, manifests, locks, contracts, gates, workflows, settings, releases, tags, old repo |
 | contract impact | planning and proposed architecture only; no runtime/public package change |
-| acceptance | all spec IDs are stable, mapped, and cover existing/compatibility/removed behavior; task graph is acyclic and schedulable |
-| verification | `git diff --check`; Markdown/reference/AC/task mapping checks; `scripts/verify`; exact four-path diff; blob SHA capture |
+| acceptance | all spec IDs are stable, mapped, and cover existing/compatibility/removed behavior; task graph is acyclic and schedulable; the normal planning-only PR passes delegated Owner approval and required checks, actually merges, and target main reads back the exact reviewed four blobs |
+| verification | `git diff --check`; Markdown/reference/AC/task mapping checks; `scripts/verify`; exact four-path diff; reviewed/local/PR/merged blob-SHA equality |
+| blocks | P050 and every S100/S200/S300 task |
+
+## `P050` — Complete-review capacity prerequisite
+
+Observable PR intent: **After this PR, the unchanged pinned Codex review admits
+the complete bounded S100 diff while preserving every fail-closed review
+semantic.**
+
+- [ ] T050 [US0] Raise only the native caller's complete-diff byte capacity and merge it before S100.
+
+| Field | `T050` |
+| --- | --- |
+| owner area | repository support / review governance |
+| context | target `AGENTS.md`, `.github/workflows/review.yml`, pinned `shared-ci@6e354f476bc53d68f0f09fc231d5cd938466af9c` reusable review, and external `coordination/consolidation-provider-tree-root-read.json` |
+| paths | `.github/workflows/review.yml` only: add `max-diff-bytes: 1000000` to `codex-review-target.with` |
+| excludes | shared-ci source or pin; `codex-bin`; `rules-file`; Owner identity/decision semantics; reusable 25-minute timeout; concurrency/permissions/events; critical/high/tool/setup/parse fail-closed behavior; complete-diff handling; `codex-review-gate` and its 2-minute timeout; rulesets/settings; credentials; releases; all source/tests/data/generated files |
+| contract impact | target complete-review capacity only; no truncation, severity, prompt, verdict, gate, package, runtime, or release change |
+| acceptance | Evidence is complete (`truncated=false`): the intended 84-file / 581,977-byte provider subset produces a 619,833-byte relocated mechanical patch, so 1,000,000 leaves 380,167 bytes for bounded S100 adaptations. The P050 PR itself receives ordinary exact-head review under the old 200,000-byte default, delegated Owner approval, required CI, and actual merge readback. Before S100 publication, its frozen complete three-dot diff must be at most 1,000,000 bytes; overflow blocks/replans without splitting, truncation, or generated-data omission. |
+| verification | exact one-field diff audit; workflow lint; contract audit; `scripts/verify`; exact-head AI review; protected-path Owner approval; required checks at PR head; merged-main caller blob/readback; negative evidence that every excluded caller/shared-ci/gate field is unchanged |
+| depends on | P001 actual merge plus byte-identical readback of all four reviewed planning blobs |
 | blocks | every S100/S200/S300 task |
 
 ## `S100` — Exact provider import and local gates
@@ -88,11 +116,11 @@ while NativeDesignKit still resolves the public external provider unchanged.**
 
 | Task | Owner layer/area | In-scope paths | Contract / task-local acceptance | Verification | Depends on |
 | --- | --- | --- | --- | --- | --- |
-| `T110` | Tokens | `Packages/DesignTokens/{tokens,dist,ai,docs,specs,examples/data,scripts,tests}` Node/data portions; `package.json`, lock, README/changelog/licenses/notices; import manifest | Provider `v0.2.0` public sources/exports/docs are copied or explicitly excluded with hashes. Only nested `tokens/colors.json` and `tokens/styles.json` are editable data. Generated outputs reproduce exactly. Old `.github`, hooks, root agent files, credentials, settings, and refs are excluded. | nested `npm ci`; provider Node/generate/pack/contract/AI/browser gates; provenance manifest verifier; deliberate generated-drift negative check | P001 accepted |
+| `T110` | Tokens | `Packages/DesignTokens/{tokens,dist,ai,docs,specs,examples/data,scripts,tests}` Node/data portions; `package.json`, lock, README/changelog/licenses/notices; import manifest | Provider `v0.2.0` public sources/exports/docs are copied or explicitly excluded with hashes. The manifest records immutable provider/path/blob/license/exclusion facts but never its containing target commit. Only nested `tokens/colors.json` and `tokens/styles.json` are editable data. Generated outputs reproduce exactly. Old `.github`, hooks, root agent files, credentials, settings, and refs are excluded. | nested `npm ci`; provider Node/generate/pack/contract/AI/browser gates; provenance manifest verifier; deliberate generated-drift negative check | P050 actual merge read back |
 | `T120` | DesignTokens | `Packages/DesignTokens/Sources/DesignTokens/**`, Swift tests/example, nested `Package.swift` | Product/module/signatures/errors/platforms match provider baseline; Foundation-only and no UI import; root `Package.swift` unchanged. S100 makes no public target-resolution claim. | nested `swift build`; `swift test`; disposable local-path consumer of the nested manifest; public-surface/blob comparison to provider `v0.2.0`; forbidden-import scan | `T110` generated data available |
 | `T130` | repository support | root `docs/architecture/tech-context.md`; new Tokens and DesignTokens leaf contexts; existing NativeDesignKit leaf context | Three-layer target model is declared but NativeDesignKit still uses the external provider until S200. Every path maps once; Tokens -> DesignTokens edge only; target governance/pin/gates retained. Existing CODEOWNERS already protects `docs/architecture/**`; no executable tree is hidden as support. | shared-ci context audit; workflow lint; layer listing/edge audit; existing CODEOWNERS effective-pattern inspection | `T110`, `T120` paths fixed |
 | `T140` | Tokens | nested `package*.json`, `ai/**`, contract checker/tests, Node/TypeScript/CSS examples and tarball harness | Real tarball packed from nested root preserves name/exports/license/private state and its own `ai/` bytes; path adaptation is recorded separately from imported byte identity. Root contract remains untouched until T240. No registry publication or old URL substitution. | real tarball install; JS/TS/CSS/JSON consumers; nested checker; source-vs-packed contract comparison | `T110`, `T130` |
-| `T150` | integration evidence | test/evidence only; no new production behavior | Root manifest/lock and Native source blobs match baseline; existing `scripts/verify --all` selects/runs new layers through declared gates; provider and target revisions/hashes recorded. | `git diff --check`; `scripts/verify --all`; root manifest/blob equality; imported source/hash mapping; clean SHA/review/check reconciliation | `T120`, `T130`, `T140` |
+| `T150` | integration evidence | test/evidence only; no new production behavior | Root manifest/lock and Native source blobs match baseline; `scripts/verify --all` selects/runs every local layer gate before push; the frozen complete three-dot diff is at most 1,000,000 bytes. After the immutable import SHA exists, an external PR/merge receipt binds that SHA to the provenance-manifest blob without editing the manifest. | `git diff --check`; `scripts/verify --all`; exact diff-byte measurement using review semantics; root manifest/blob equality; imported source/hash mapping; clean SHA/review/check reconciliation and later merge receipt | `T120`, `T130`, `T140` |
 
 S100 excludes root Swift activation, native contract/package-identity migration,
 component source, token/style value changes, publication, tags, and old-repository
@@ -110,18 +138,18 @@ using the local DesignTokens target and version-matched migration contracts.**
 - [ ] T220 [US2] Prove NativeDesignKit source/API/visual/error behavior remains unchanged through activation.
 - [ ] T230 [US2] Update the nested DesignTokens contract and public consumers for the new repository route.
 - [ ] T240 [US2] Update NativeDesignKit/root discovery, compatibility, migration, and rollback contracts.
-- [ ] T250 [US2] Make the normal verification entry prove all three layers and both public consumer routes.
-- [ ] T260 [US2] Freeze, independently review, publish, and reconcile the activation SHA.
+- [ ] T250 [US2] Make local verification prove every layer/artifact and prepare the unchanged CI companion to prove the later public SHA.
+- [ ] T260 [US2] Freeze, independently review, hook-verify, publish, then require exact-public-SHA CI before delivery.
 
 | Task | Owner layer/area | In-scope paths | Contract / task-local acceptance | Verification | Depends on |
 | --- | --- | --- | --- | --- | --- |
 | `T210` | repository support / Swift package integration | root `Package.swift`, `Package.resolved` as applicable, architecture dependency declarations | Root products/modules are exactly `DesignTokens` and `NativeDesignKit`; Native target depends on local DesignTokens; old provider URL/package is absent from active root resolution; package floors are iOS15/macOS12/watchOS8. | `swift package dump-package`; root resolve/build/test; manifest negative search; context audit | S100 merged |
 | `T215` | NativeDesignKit | one new platform-boundary source file plus an external negative compile fixture; no component implementation file | DesignTokens-only watchOS consumer builds. Selecting NativeDesignKit for watchOS fails with the documented stable unavailable diagnostic before component use. iOS/macOS API and behavior are unchanged; no watchOS component implementation is added. | watchOS DesignTokens-only compile; negative NativeDesignKit watchOS compile matching the diagnostic; iOS/macOS package build/tests | `T210` candidate |
 | `T220` | NativeDesignKit | Native tests/fixtures only when needed for migration regression; existing production source is inspection-only except the exact T215 platform guard | Native public API and accepted Button/Card/List blobs/semantics remain unchanged. Explicit themes, exact errors, five palettes, Solid/Glass/fallback stay. Deferred Button input assertions/history remain unchanged and are not rerun as claimed evidence. | baseline blob comparison; existing package tests; applicable actual fixture regression without unchanged pointer diagnosis; no removed/weakened test diff | `T215` |
-| `T230` | Tokens | `Packages/DesignTokens/ai/**`, nested compatibility/migration/changelog, contract checker/tests, and Node/package examples | Contract names the new target URL/revision route while preserving npm artifact identity/exports and documenting the unchanged public Swift interface. Old immutable versions remain documented. Swift target-revision resolution is owned by T250, not this contract task. | nested AI checker/tests; packed Node consumer; contract byte/version/surface checks | `T210` |
-| `T240` | NativeDesignKit contract | root `ai/**`, README/compatibility/migration/integration/examples/registry/checker tests as necessary | Root contract discovers both release units, explains local target dependency and consumer manifest migration, preserves Native release/unreleased split, rollback, accepted component evidence, and deferred Button truth. | root contract checker/tests; broken-pointer/version negative fixtures; public-import consumer compile | `T210`, `T220`, `T230` contract location fixed |
-| `T250` | repository support / integration | `scripts/ci/external-consumer.py`, its tests/fixtures, and the three leaf gate declarations | `scripts/verify` and the hook/workflow callers remain byte-identical; generic layer routing runs every local gate. The existing CI companion consumer command now imports both Swift products from the pushed target SHA. Missing/cancelled/skipped/mismatched resolution fails; no path/mirror fallback. Any need to change the normal entry or workflow is a contract blocker returned to Team Lead, not silent task expansion. | `scripts/verify`; `scripts/verify --all`; hook/caller byte comparison; workflow lint; contract audit; isolated root-revision Swift consumer importing both products; real nested npm tarball consumer | `T220`, `T230`, `T240` |
-| `T260` | integration evidence | no extra scope | One clean candidate has exact provider provenance, current local results, AI Reviewer pre-push PASS, pushed SHA equality, non-Draft PR, Owner review for protected paths, and real required gates. | captured local/remote/PR SHA equality; check rollup at head; diff path audit; reviewer verdict | `T250` |
+| `T230` | Tokens | `Packages/DesignTokens/ai/**`, nested compatibility/migration/changelog, contract checker/tests, and Node/package examples | Contract names the new target URL/revision route while preserving npm artifact identity/exports and documenting the unchanged public Swift interface. Old immutable versions remain documented. Swift target-revision resolution is owned by T260 after push, not this contract task. | nested AI checker/tests; packed Node consumer; contract byte/version/surface checks | `T210` |
+| `T240` | NativeDesignKit contract | root `ai/**`, README/compatibility/migration/integration/examples/registry/checker tests as necessary | Root contract discovers both release units, explains local target dependency and consumer manifest migration, preserves Native release/unreleased split, rollback, accepted component evidence, and deferred Button truth. | root contract checker/tests; broken-pointer/version negative fixtures; local-path consumer fixture compiling public imports without a public-resolution claim | `T210`, `T220`, `T230` contract location fixed |
+| `T250` | repository support / integration | `scripts/ci/external-consumer.py`, its tests/fixtures, and the three leaf gate declarations | `scripts/verify` and the hook/workflow callers remain byte-identical; generic layer routing runs every local gate, generation check, local-path Swift consumer, and real packed npm consumer before push. The existing CI companion is prepared to import both Swift products only after the pushed target SHA is fetchable. Missing/cancelled/skipped/mismatched resolution fails; no path/mirror fallback may count as public evidence. Any need to change the normal entry or workflow is a contract blocker returned to Team Lead, not silent task expansion. | pre-push `scripts/verify`; `scripts/verify --all`; hook/caller byte comparison; workflow lint; contract audit; local-path Swift consumer; real nested npm tarball consumer; post-push public route is deliberately not claimed here | `T220`, `T230`, `T240` |
+| `T260` | integration evidence | no extra tracked scope | One clean candidate has exact provider provenance, current local results, AI Reviewer pre-push PASS, then passes the normal hook-protected push. The pushed branch and PR `headRefOid` match; required CI's existing companion resolves that exact public SHA and imports both products before delivery. Protected-path Owner review and every real required gate bind the same head. | captured local/remote/PR SHA equality; exact-public-SHA consumer receipt from required CI; check rollup at head; diff path audit; reviewer verdict | `T250` |
 
 S200 excludes semantic data/value/schema changes, generated-value changes,
 component/API redesign, new platform components, provider release/tag, npm
@@ -161,6 +189,7 @@ retired. Old tags/commits remain accessible in every outcome.
 
 | Acceptance ID | Task(s) |
 | --- | --- |
+| `AC-REVIEW-001` | `T050`, `T150`, `T320` |
 | `AC-AUTH-001` | `T110`, `T130`, `T150`, `T320` |
 | `AC-AUTH-002` | `T240`, `T260`, `T330`, `D400` |
 | `AC-LAYER-001` | `T130`, `T210`, `T250`, `T320` |
@@ -174,8 +203,8 @@ retired. Old tags/commits remain accessible in every outcome.
 | `AC-WEB-001` | `T110`, `T140`, `T230`, `T310` |
 | `AC-CONTRACT-001` | `T140`, `T230`, `T240`, `T250` |
 | `AC-VERIFY-001` | `T130`, `T150`, `T250`, `T260`, `T320` |
-| `AC-CONSUMER-001` | `T140`, `T230`, `T250`, `T310` |
-| `AC-CONSUMER-002` | `T230`, `T250`, `T310` |
+| `AC-CONSUMER-001` | `T140`, `T230`, `T250`, `T260`, `T310` |
+| `AC-CONSUMER-002` | `T230`, `T250`, `T260`, `T310` |
 | `AC-EVIDENCE-001` | `T150`, `T260`, `T320` |
 | `AC-HISTORY-001` | `T110`, `T150`, `T320` |
 | `AC-HISTORY-002` | `T230`, `T240`, `T330`, `D400` |

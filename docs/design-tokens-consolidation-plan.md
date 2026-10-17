@@ -15,9 +15,11 @@ Dependency graph: `docs/design-tokens-consolidation-tasks.md`
 | issue | `MY-1890` / `01a14897-f934-7406-8e14-a240baa0a75d` |
 | target | `https://github.com/LeePepe/shared-design-system.git` |
 | exact target base | `ad63bf37d3045349c50e724e0573a75871ebc896` |
+| immutable predecessor planning revision | `18d3225b24c22523b4d7adc9c54ff28dec783be0` (its active review remains historical evidence; only this successor can gate implementation) |
 | provider | `https://github.com/LeePepe/shared-design-tokens.git` |
 | exact provider import | `87bef8fbab5bf67a748815d7ed04d7ae199f760a` (`v0.2.0`) |
 | repository protocol | `shared-ci@6e354f476bc53d68f0f09fc231d5cd938466af9c` |
+| review-capacity evidence | external read-only `coordination/consolidation-provider-tree-root-read.json`: complete 92-blob / 591,678-byte tree; planned 84-file / 581,977-byte subset; exact source-path text patch 614,289 bytes / 17,393 additions plus 5,544 bytes for three 22-byte path-prefix occurrences per file = 619,833-byte relocated mechanical patch |
 | accepted native reference | Strata prototype `b4bff430517ed2e2944f814d8b5ab89a1866ee33`, digest `c41f53160d0eb7e6e39b2733a3a689119a4c0868101c2aa2381b0061f4c6b456` |
 | planning method | repository-native ADR/spec/plan/tasks; no Spec Kit installation |
 
@@ -81,17 +83,26 @@ context audit without hiding executable paths in support.
 6. **Adopt target governance.** Provider `.github`, hooks, root `AGENTS.md`, CI,
    rulesets, and old shared-ci pin are provenance inputs, not imported active
    governance. The target's normal hook/verify/CI/gates remain authoritative.
-7. **Do not import colliding refs.** Provider source provenance is a manifest of
+7. **Raise capacity before import.** A separate caller-only protected PR passes
+   `max-diff-bytes: 1000000` to the existing pinned review. It must pass its own
+   exact-head review, delegated Owner approval, required CI, and merge before
+   S100. The value covers a measured 619,833-byte relocated mechanical baseline
+   with 380,167 bytes of adaptation headroom. The frozen S100 complete diff must
+   still fit; overflow blocks and replans. No review content, severity, pin,
+   trusted rules, timeout, gate, or fail-closed behavior changes.
+8. **Do not import colliding refs.** Provider source provenance is a manifest of
    exact revision, blob/hash mapping, licenses, and exclusions. Old commits/tags
-   stay immutable and reachable in the old repository.
-8. **Use a unified future Swift version.** The recommended first consolidated
+   stay immutable and reachable in the old repository. The manifest never embeds
+   its containing commit; an external immutable receipt later binds the target
+   import SHA to the manifest blob.
+9. **Use a unified future Swift version.** The recommended first consolidated
    release candidate is `v0.3.0`; choosing/tagging/releasing it is a later Root
    decision. Exact-revision consumers unblock implementation verification.
-9. **Retire safely.** The old repository remains historically readable after
+10. **Retire safely.** The old repository remains historically readable after
    authority transfers at S200. Recommended settings enforcement is a later
    notice + archive after target delivery, consumer migration evidence, and Root
    authorization; never delete/rename/transfer/rewrite/mirror.
-10. **Preserve current native truth.** Button/Card/List accepted bytes and
+11. **Preserve current native truth.** Button/Card/List accepted bytes and
     contracts are migration baselines. Button input deferrals remain failed and
     unknown; migration neither retries nor converts them to pass.
 
@@ -101,7 +112,21 @@ context audit without hiding executable paths in support.
 
 One docs-only goal: land the independently reviewed ADR/spec/plan/tasks before
 implementation. Only the four paths named by `T001` may change. Full target
-verification and Owner review apply because the ADR is protected architecture.
+verification and delegated Owner approval apply because the ADR is protected
+architecture. Its normal non-Draft PR, required checks, and actual merge must
+complete, and target main must read back the exact four reviewed blob identities,
+before P050 starts.
+
+### `P050` — Complete-review capacity prerequisite
+
+Observable goal: the existing target review admits the complete expected S100
+diff without changing review semantics. One small governance PR changes only
+`.github/workflows/review.yml` to add `max-diff-bytes: 1000000` to the existing
+reusable-review call. Its own diff fits the current 200,000-byte default and must
+receive exact-head independent review, delegated Owner approval, required CI,
+and actual merge readback before S100 begins. Shared-ci, the exact pin, rules,
+timeouts, Owner-decision handling, severity behavior, complete-diff admission,
+and `codex-review-gate` remain byte/semantically unchanged as applicable.
 
 ### `S100` — Exact provider import and local gates
 
@@ -161,14 +186,16 @@ full retirement.
 | stable public Swift products | root-package external consumer at pushed SHA | imports both products; lock resolves only target URL/SHA |
 | data-only watchOS boundary | root package floor plus NativeDesignKit compile guard | DesignTokens-only watchOS build succeeds; selecting NativeDesignKit fails with the named unavailable diagnostic |
 | contracts match artifacts | root/nested registry/checkers and versioned-doc byte checks | both checker outputs pass from resolved consumer artifacts |
-| gates fail closed | target `scripts/verify --all`, hook parity, CI aggregate/current-head review | command exits zero on candidate; negative fixture/cancel/skip cannot report pass |
-| history/rollback truthful | immutable tag/readback table and provenance manifest | old/new tag commits, source mappings, and rollback commands are explicit |
+| review admits the complete S100 diff | merged target caller input plus pinned reusable review byte check | P050 changes only `max-diff-bytes`; frozen S100 three-dot diff is complete and at most 1,000,000 bytes |
+| gates fail closed without public-resolution cycles | pre-push `scripts/verify --all`/hook parity, then pushed-SHA CI companion, aggregate/current-head review | local gates pass before push; after push the exact public SHA resolves; cancel/skip/mismatch cannot report pass |
+| history/rollback truthful | immutable tag/readback table, provenance manifest, and external import receipt | provider mappings are in the manifest; later receipt binds target import SHA without self-reference; rollback commands are explicit |
 | retirement does not strand old consumers | preserved old URL/tags plus discovery limitations and archive-only recommendation | Native v0.1.0 resolution and known-consumer table remain verifiable |
 
 ## Acceptance coverage
 
 | Acceptance | Primary tasks |
 | --- | --- |
+| `AC-REVIEW-001` | `T050`, `T150`, `T320` |
 | `AC-AUTH-001`, `AC-GEN-001`, `AC-HISTORY-001` | `T110`, `T120`, `T150`, `T310` |
 | `AC-AUTH-002` | `T240`, `T260`, `T330`, `D400` |
 | `AC-LAYER-001`, `AC-LAYER-002` | `T130`, `T210`, `T250` |
@@ -176,8 +203,8 @@ full retirement.
 | `AC-NATIVE-001..003` | `T220`, `T250`, `T320` |
 | `AC-WEB-001` | `T110`, `T140`, `T310` |
 | `AC-CONTRACT-001` | `T140`, `T230`, `T240`, `T250` |
-| `AC-VERIFY-001` | `T130`, `T150`, `T250`, `T320` |
-| `AC-CONSUMER-001..002` | `T140`, `T230`, `T250`, `T310` |
+| `AC-VERIFY-001` | `T130`, `T150`, `T250`, `T260`, `T320` |
+| `AC-CONSUMER-001..002` | `T140`, `T230`, `T250`, `T260`, `T310` |
 | `AC-EVIDENCE-001` | `T150`, `T260`, `T320` |
 | `AC-HISTORY-002`, `AC-COMPAT-001..002` | `T230`, `T240`, `T330` |
 | `AC-RETIRE-001..002`, `AC-ROLLBACK-001` | `T330`, `D400` |
@@ -197,6 +224,9 @@ Reviewer `PASS` and Team Lead accepts the same revision.
 | Native v0.1.0 old URL becomes unavailable | old repository remains readable and tags immutable; archive-only retirement |
 | Search zero is misreported as no consumers | discovery report includes method and limitations; known self-reference remains listed |
 | Provider governance weakens target gates | do not import provider workflows/hooks/AGENTS/rulesets; target shared-ci pin and gates remain authoritative |
+| S100 exceeds complete-review capacity | merge P050 first; measure the frozen S100 three-dot diff; over 1,000,000 bytes blocks/replans without splitting or omission |
+| Import manifest requires its own commit hash | manifest records immutable provider/path/blob facts; later external receipt binds the target import SHA and manifest blob |
+| Public resolution is attempted before push | local hook proves local/generation/packed artifacts; required CI proves the exact fetchable pushed SHA before delivery |
 | Mechanical import silently changes generated bytes | provider blob/hash mapping and generate-check at import head |
 | Activation changes component appearance/API | native component paths are inspection-only and baseline blob assertions fail on change |
 | Evidence goes stale | all reviews, consumers, and checks bind one SHA; any repair invalidates and reruns them |
@@ -204,9 +234,16 @@ Reviewer `PASS` and Team Lead accepts the same revision.
 ## Entry and exit gates
 
 P001 exits only when the four artifact blobs and commit are fixed and independent
-architecture/spec review returns `PASS`. S100 and S200 each require their own
-Fullstack implementation, exact-head independent pre-push review, normal
-non-Draft PR, required gates, and merge readback in dependency order. S300 exits
-only with a frozen merged target revision, both public consumer receipts, exact
-provenance, required-check evidence, and a retirement/rollback packet. D400 is
-never inferred from technical success.
+architecture/spec review returns `PASS`; its normal non-Draft PR then passes
+required checks and delegated Owner approval, actually merges, and target main
+reads back the exact four reviewed blobs. Only that merged P001 base admits
+P050. P050 then requires its own exact-head review, delegated Owner approval,
+normal non-Draft PR, required CI, and actual merge readback. Only that merged
+target base admits S100. S100 and S200 each
+require their own Fullstack implementation, exact-head independent pre-push
+review, normal non-Draft PR, required gates, and merge readback in dependency
+order. Local verification precedes push; public-SHA resolution runs only after
+the SHA is fetchable and blocks delivery. S300 exits only with a frozen merged
+target revision, both public consumer receipts, exact provenance, required-check
+evidence, and a retirement/rollback packet. D400 is never inferred from
+technical success.

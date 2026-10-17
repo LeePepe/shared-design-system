@@ -40,6 +40,7 @@ until its separately authorized archive step.
 | release unit | A separately described consumer artifact. DesignTokens has npm/data and Swift surfaces; NativeDesignKit has Swift surfaces. A single SwiftPM repository tag versions both root products after consolidation. |
 | historical provider | `LeePepe/shared-design-tokens`, including immutable tags and published source history. It remains readable but must cease being a writable development authority. |
 | activation | The change that makes the root Swift package's `NativeDesignKit` target depend on its local `DesignTokens` target instead of the old repository URL. |
+| review-capacity prerequisite | A separate, protected caller-only PR that raises the complete-diff byte ceiling without changing what is reviewed or how findings block. |
 
 ## Existing behaviour
 
@@ -70,6 +71,13 @@ until its separately authorized archive step.
 - `EB-007`: The target's normal local/CI entry is `scripts/verify`; required
   GitHub gates are fail-closed current-head checks. Provider and target
   repository governance files are not interchangeable.
+- `EB-008`: Target base `.github/workflows/review.yml` supplies no
+  `max-diff-bytes`, so pinned shared-ci applies its fail-closed 200,000-byte
+  complete-diff default. The complete provider tree evidence is untruncated at
+  92 blobs / 591,678 raw bytes; the intended 84-file S100 subset is 581,977 raw
+  bytes. Its exact source-path text patch is 614,289 bytes / 17,393 additions;
+  the three 22-byte relocated path-header occurrences per file add 5,544 bytes,
+  yielding 619,833 bytes before provenance, adaptations, or target contexts.
 
 ## Functional requirements and acceptance
 
@@ -132,17 +140,32 @@ until its separately authorized archive step.
 
 ### Contracts, verification, and consumers
 
+- `AC-REVIEW-001`: Before S100 is dispatched or published, one small protected
+  PR, based on the actual P001 merge whose four planning blobs match their
+  reviewed identities, changes only `.github/workflows/review.yml` to pass
+  `max-diff-bytes: 1000000` to the existing pinned reusable review. It receives
+  ordinary exact-head independent review, delegated Owner approval, required
+  CI, and an actual merge readback. The shared-ci source/SHA, trusted-base
+  `rules-file`, review prompt/verdict rules, critical/high blocking,
+  Owner-decision handling, complete untruncated diff, 25-minute reusable timeout,
+  2-minute `codex-review-gate`, and every other caller field remain unchanged.
+  Before S100 publication, its frozen complete three-dot diff is measured by the
+  review gate's byte semantics and must be at most 1,000,000 bytes; overflow
+  blocks and returns for replanning, never source splitting, truncation, or
+  generated-data omission.
 - `AC-CONTRACT-001`: Root `ai/` remains the NativeDesignKit contract entry and
   deterministically points to `Packages/DesignTokens/ai/` for the DesignTokens
   release unit. Each registry/checker validates its own manifest, version,
   surfaces, examples, compatibility, migration, and changelog paths; a missing,
   stale, or cross-wired contract fails.
-- `AC-VERIFY-001`: `.githooks/pre-push`, `scripts/verify`, and CI retain the
-  normal fail-closed entry. `scripts/verify --all` runs contract/workflow audits
-  and every Tokens/DesignTokens/NativeDesignKit layer gate; the existing CI
-  companion external-consumer command proves the pushed public revision. No
-  required gate, assertion, policy, or effective protection is removed or
-  weakened.
+- `AC-VERIFY-001`: `.githooks/pre-push` and `scripts/verify` retain the normal
+  fail-closed local entry. Before push, `scripts/verify --all` runs
+  contract/workflow audits, every Tokens/DesignTokens/NativeDesignKit local gate,
+  generation checks, and packed-artifact consumers without claiming public
+  resolution. The normal hook-protected push makes the candidate SHA fetchable;
+  only then does the existing required CI companion command resolve that exact
+  public SHA before delivery. No path/mirror substitute, hook bypass, required
+  gate, assertion, policy, or effective protection is removed or weakened.
 - `AC-CONSUMER-001`: An isolated Node consumer installs the actual packed nested
   DesignTokens artifact and exercises all declared public exports with matching
   shipped docs. An isolated Swift consumer resolves the public target repository
@@ -162,9 +185,11 @@ until its separately authorized archive step.
 
 - `AC-HISTORY-001`: An imported provenance manifest records the provider URL,
   exact `v0.2.0` commit, source path -> target path mapping, Git blob or SHA-256
-  identity, licenses/attribution, exclusions, and the target import commit. The
-  migration does not claim rewritten/copied files retain provider Git commit
-  identity.
+  identity, licenses/attribution, and exclusions. It does not self-reference the
+  commit that contains it. After the immutable target import SHA exists, the
+  external PR/merge receipt records that target commit and binds it to the
+  manifest blob; no later tracked manifest edit is needed. The migration does
+  not claim rewritten/copied files retain provider Git commit identity.
 - `AC-HISTORY-002`: Tag mapping is explicit and immutable:
   `shared-design-system/v0.1.0` remains NativeDesignKit history;
   `shared-design-tokens/v0.1.0`, `v0.1.1`, and `v0.2.0` remain provider history;
@@ -230,6 +255,13 @@ The root and nested AI-contract locations become an explicit two-release-unit
 discovery scheme. Version-matched docs remain mandatory; a root floating copy
 may not substitute for a resolved artifact's contract.
 
+The prerequisite caller change raises only complete-review capacity. It does not
+change any package, runtime, consumer, review rule, severity, timeout, shared-ci
+pin, required check, or repository setting. It starts only after the separate
+planning-only P001 PR passes required checks and delegated Owner approval,
+actually merges, and the merged four artifact blobs are read back byte-identical
+to the reviewed revision.
+
 ## Removed or superseded behaviour
 
 Removed released runtime behaviour: **none**.
@@ -246,6 +278,9 @@ ADR-0001 and `AC-COMPAT-001`:
 
 Removed, skipped, weakened, or relabelled tests/assertions/policies: **none**.
 Generated outputs may move mechanically but remain byte/provenance checked.
+The reusable review's 200,000-byte default is superseded only by the target
+caller's evidence-bound 1,000,000-byte input; complete-diff and fail-closed
+semantics are preserved.
 
 ## Non-goals
 
@@ -253,6 +288,8 @@ Generated outputs may move mechanically but remain byte/provenance checked.
   credentials.
 - Archiving/deleting/renaming/transferring either repository or changing GitHub
   rulesets/settings.
+- Editing shared-ci source or pin, review rules/severities/timeouts, credentials,
+  `codex-review-gate`, or any caller field other than `max-diff-bytes`.
 - Reconstructing provider Git history inside the target or importing colliding
   tags.
 - Changing Basalt Web authority, design values, component anatomy, state,
