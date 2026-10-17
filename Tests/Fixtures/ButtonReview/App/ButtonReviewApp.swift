@@ -8,17 +8,21 @@ struct ButtonReviewApp: App {
 
     var body: some Scene {
         WindowGroup {
-            switch configuration {
-            case .success(let configuration):
-                ButtonReviewBoard(configuration: configuration)
-                    .preferredColorScheme(configuration.isDark ? .dark : .light)
-                    .environment(\.locale, Locale(identifier: configuration.language))
-            case .failure(let error):
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Fixture configuration failed").font(.title)
-                    Text(String(describing: error)).accessibilityIdentifier("fixture-error")
+            if ProcessInfo.processInfo.arguments.contains("--button-flat-control-isolation") {
+                ButtonFlatControlIsolation()
+            } else {
+                switch configuration {
+                case .success(let configuration):
+                    ButtonReviewBoard(configuration: configuration)
+                        .preferredColorScheme(configuration.isDark ? .dark : .light)
+                        .environment(\.locale, Locale(identifier: configuration.language))
+                case .failure(let error):
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Fixture configuration failed").font(.title)
+                        Text(String(describing: error)).accessibilityIdentifier("fixture-error")
+                    }
+                    .padding()
                 }
-                .padding()
             }
         }
     }

@@ -139,3 +139,22 @@ shortcut alone does not establish focus navigation. The board never changes
 system preferences and supplies no synthetic hover/focus override. Preserve
 the XCTest synthesized-event attachments and observations when this test fails;
 those identify the event source and coordinates without guessing from idle PNGs.
+
+`ButtonFlatControlIsolationUITests/testFlatStandardHoverNativeTabFocusAndSpace`
+is a bounded diagnostic positive control launched with
+`--button-flat-control-isolation`. Its separate flat `VStack` contains one
+ordinary bordered SwiftUI Button and a Text sentinel, without ScrollView,
+NativeButton, FocusState, focus setters, TextField or shortcuts. It records
+free-movement hover entry/exit counts and monotonic callback timestamps, actual
+frames/hittability, label `isFocused` callbacks, separate AX `hasFocus`, native
+Tab/Space dispatch timing, action count, AX text attachments and runtime PNGs.
+The expected Tab target is recorded only by the test, never assigned as focus.
+FKA's pre-existing preference is an external prerequisite, not observed native
+focus; the serial experiment receipt must hash/read it before and after without
+changing it. The diagnostic sends three hover movements, one Tab and one Space;
+each state predicate waits at most two seconds, with a 180-second method limit.
+If a native key dispatch takes 20 seconds or more, it records a failure/capture
+and stops this experiment rather than repeating known quiescence stalls.
+Its failure leaves all original hover/focus/Space assertions required and does
+not establish whether the product or runtime is responsible. Run only this
+method for the isolation experiment; preserve cumulative prior failures.
