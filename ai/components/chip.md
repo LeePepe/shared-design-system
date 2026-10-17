@@ -1,7 +1,7 @@
 # NativeChip (unreleased)
 
 This additive API belongs to the Strata rebuild and is not in the released
-NativeDesignKit 0.1.0 color bridge. HeroUI supplies inventory only.
+NativeDesignKit 0.3.0 color bridge. HeroUI supplies inventory only.
 
 ```swift
 public enum NativeChipTone: Equatable, Sendable {
@@ -57,6 +57,8 @@ accessibility-size case. These establish evidence only for the tested simulator
 and exact SHA recorded by the runner; they do not establish minimum-OS,
 physical-device, macOS rendering or observed VoiceOver/keyboard operation.
 
-The released color resolver, exact Tokens 0.1.1 dependency, Swift 6 and declared
-iOS 15/macOS 12 floors remain unchanged. Roll back by removing Chip call sites
-and restoring the prior reviewed package revision; no persisted state migrates.
+NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;
+NativeDesignKit 0.1.0 historically used exact DesignTokens 0.1.1. This
+unreleased Chip preserves the color-resolver behavior, Swift 6 and declared
+iOS 15/macOS 12 floors. Roll back by removing Chip call sites and restoring the
+prior reviewed package revision; no persisted state migrates.

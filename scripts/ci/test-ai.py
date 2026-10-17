@@ -53,14 +53,17 @@ class ContractTests(unittest.TestCase):
             CHECK.check(self.root)
 
     def test_wrong_version(self):
-        self.mutate_registry(lambda r: r.update(version="0.2.0"))
-        with self.assertRaisesRegex(ValueError, "AI_VERSION"):
+        self.mutate_registry(lambda r: r.update(version="0.3.1"))
+        with self.assertRaisesRegex(ValueError, "AI_RELEASE"):
             CHECK.check(self.root)
 
     def test_released_requires_changelog_heading(self):
         self.mutate_registry(lambda r: r.update(releaseStatus="released"))
-        for content in ("# Changelog\n", "# Changelog\n\nRelease: ## 0.1.0\n",
-                        "# Changelog\n\n## 0.1.01\n"):
+        for content in (
+                "# Changelog\n",
+                "# Changelog\n\nRelease: ## 0.3.0\n",
+                "# Changelog\n\n## 0.3.00\n",
+                "# Changelog\n\n## 0.3.1\n"):
             with self.subTest(content=content):
                 (self.root / "CHANGELOG.md").write_text(content)
                 with self.assertRaisesRegex(ValueError, "AI_RELEASE"):
@@ -69,13 +72,13 @@ class ContractTests(unittest.TestCase):
     def test_released_rejects_unreleased_changelog_marker(self):
         self.mutate_registry(lambda r: r.update(releaseStatus="released"))
         (self.root / "CHANGELOG.md").write_text(
-            "# Changelog\n\n## 0.1.0 — first release\n\nUnreleased — 0.1.0\n")
+            "# Changelog\n\n## 0.3.0 — release\n\nUnreleased — 0.3.0\n")
         with self.assertRaisesRegex(ValueError, "AI_RELEASE"):
             CHECK.check(self.root)
 
     def test_unreleased_does_not_require_release_heading(self):
         self.mutate_registry(lambda r: r.update(releaseStatus="unreleased"))
-        (self.root / "CHANGELOG.md").write_text("# Changelog\n\n## Unreleased — 0.1.0\n")
+        (self.root / "CHANGELOG.md").write_text("# Changelog\n\n## Unreleased — 0.3.0\n")
         CHECK.check(self.root)
 
     def test_invalid_schema(self):
@@ -153,6 +156,34 @@ class ContractTests(unittest.TestCase):
                     CHECK.check(self.root)
                 path.write_text(original)
 
+    def test_release_status_prose_distinguishes_current_and_historical_routes(self):
+        changelog = (self.root / "CHANGELOG.md").read_text()
+        self.assertRegex(
+            changelog,
+            r"historical\s+NativeDesignKit 0\.1\.0 exact DesignTokens "
+            r"0\.1\.1 route")
+        self.assertIn(
+            "NativeDesignKit 0.3.0 uses the repository-local DesignTokens target",
+            changelog)
+        self.assertIn("the Strata foundation remains unreleased", changelog)
+        for relative in (
+                "ai/components/chip.md",
+                "ai/components/progress-bar.md",
+                "ai/components/radio-group.md",
+                "ai/components/slider.md",
+                "ai/components/switch.md"):
+            with self.subTest(relative=relative):
+                content = (self.root / relative).read_text()
+                self.assertRegex(
+                    content,
+                    r"NativeDesignKit 0\.3\.0 uses the repository-local\s+"
+                    r"DesignTokens target")
+                self.assertRegex(
+                    content,
+                    r"NativeDesignKit 0\.1\.0 historically used exact\s+"
+                    r"DesignTokens\s+0\.1\.1")
+                self.assertIn("unreleased", content.lower())
+
     def test_rejects_cross_wired_release_unit(self):
         self.mutate_registry(
             lambda r: r["releaseUnits"].update(designTokens="README.md"))
@@ -220,6 +251,26 @@ class ConsumerHarnessTests(unittest.TestCase):
         self.assertEqual(
             receipt["source"]["observed"][0]["location"],
             EXTERNAL.REPOSITORY_URL)
+
+    def test_version_contract_matches_requested_version(self):
+        registry = {
+            "library": "NativeDesignKit",
+            "version": "0.3.0",
+            "releaseStatus": "released",
+        }
+        EXTERNAL.validate_registry_contract(
+            registry, "version", "0.3.0")
+
+    def test_version_contract_rejects_requested_version_mismatch(self):
+        registry = {
+            "library": "NativeDesignKit",
+            "version": "0.3.0",
+            "releaseStatus": "released",
+        }
+        with self.assertRaisesRegex(
+                RuntimeError, "requested version 0.3.1"):
+            EXTERNAL.validate_registry_contract(
+                registry, "version", "0.3.1")
 
     def test_public_resolution_rejects_mirror_with_matching_revision(self):
         receipt = {

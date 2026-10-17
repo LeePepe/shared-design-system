@@ -222,6 +222,18 @@ def validate_effective_public_source(
     receipt["source"]["publiclyResolvable"] = True
 
 
+def validate_registry_contract(registry, kind, value):
+    if registry["library"] != "NativeDesignKit":
+        raise RuntimeError("resolved checkout AI contract mismatch")
+    if kind == "version":
+        if registry["version"] != value:
+            raise RuntimeError(
+                f"resolved registry version {registry['version']} does not "
+                f"match requested version {value}")
+        if registry["releaseStatus"] != "released":
+            raise RuntimeError("a release tag cannot ship an unreleased contract")
+
+
 def validate_success_receipt(receipt):
     required = {
         "repositoryURL", "source", "packageIdentities", "selectedProducts",
@@ -365,10 +377,7 @@ def main():
         write_receipt(receipt_path, receipt)
 
         registry = json.loads((checkout / "ai/registry.json").read_text())
-        if registry["library"] != "NativeDesignKit" or registry["version"] != "0.1.0":
-            raise RuntimeError("resolved checkout AI contract mismatch")
-        if args.version and registry["releaseStatus"] != "released":
-            raise RuntimeError("a release tag cannot ship an unreleased contract")
+        validate_registry_contract(registry, kind, value)
         token_registry = json.loads(
             (checkout / "Packages/DesignTokens/ai/registry.json").read_text())
         if (token_registry["package"]["name"] != "@leepepe/design-tokens" or

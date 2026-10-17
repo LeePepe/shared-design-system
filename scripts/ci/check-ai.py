@@ -46,7 +46,6 @@ def check(root):
     ai = root / "ai"
     registry = json.loads((ai / "registry.json").read_text())
     schema_check(registry, json.loads((ai / "registry.schema.json").read_text()))
-    require(registry["version"] == "0.1.0", "AI_VERSION", "contract version drift")
 
     def resolve(base, name):
         path = (base / name.split("#", 1)[0]).resolve()
@@ -60,10 +59,14 @@ def check(root):
         resolve(ai, name)
     if registry["releaseStatus"] == "released":
         changelog = (root / "CHANGELOG.md").read_text()
-        require(re.search(r"^## 0\.1\.0(?:[ \t]|$)", changelog, re.MULTILINE) is not None,
-                "AI_RELEASE", "released contract requires a 0.1.0 changelog heading")
-        require("Unreleased — 0.1.0" not in changelog,
-                "AI_RELEASE", "released contract contains an unreleased 0.1.0 changelog marker")
+        version = registry["version"]
+        heading = rf"^## {re.escape(version)}(?:[ \t]|$)"
+        require(re.search(heading, changelog, re.MULTILINE) is not None,
+                "AI_RELEASE",
+                f"released contract requires a {version} changelog heading")
+        require(f"Unreleased — {version}" not in changelog,
+                "AI_RELEASE",
+                f"released contract contains an unreleased {version} changelog marker")
     for capability in registry["capabilities"]:
         for field in ("source", "documentation", "example"):
             resolve(ai, capability[field])

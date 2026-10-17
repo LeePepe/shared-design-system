@@ -1,6 +1,6 @@
 # Unreleased Strata components
 
-The component API in this checkout is **unreleased**. NativeDesignKit 0.1.0
+The component API in this checkout is **unreleased**. NativeDesignKit 0.3.0
 contains only `NativeTokenColor`; it does not contain these components. Evaluate
 this work using an explicitly reviewed immutable revision until a component
 release is published. The unreleased Strata foundation consumes public exact DesignTokens 0.2.0 at

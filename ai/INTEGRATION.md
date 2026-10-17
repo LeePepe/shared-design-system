@@ -8,10 +8,10 @@ the distinction
 between declared and tested support in [COMPATIBILITY.md](COMPATIBILITY.md).
 There are no credentials, network calls, persistence or runtime permissions.
 
-Pin the NativeDesignKit 0.1.0 release with:
+Pin the NativeDesignKit 0.3.0 release with:
 
 ```swift
-.package(url: "https://github.com/LeePepe/shared-design-system.git", exact: "0.1.0")
+.package(url: "https://github.com/LeePepe/shared-design-system.git", exact: "0.3.0")
 ```
 
 Use a reviewed full 40-character commit SHA with `revision:` only when
@@ -26,9 +26,9 @@ package dependency:
 .product(name: "DesignTokens", package: "shared-design-system")
 ```
 
-The library does not re-export Tokens types. Historical NativeDesignKit 0.1.0
-retains its old exact provider route; adopting a consolidated revision uses the
-version-matched migration contract.
+The library does not re-export Tokens types. NativeDesignKit 0.3.0 uses the
+repository-local DesignTokens target. Historical NativeDesignKit 0.1.0 retains
+its old exact provider route.
 
 ## Minimal wiring
 

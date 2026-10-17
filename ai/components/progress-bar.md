@@ -2,7 +2,7 @@
 
 Native SwiftUI linear progress in the unreleased [Strata rebuild](../COMPONENTS.md).
 HeroUI informs inventory only; no implementation is copied. This API is absent
-from the color-only NativeDesignKit 0.1.0 release.
+from the color-only NativeDesignKit 0.3.0 release.
 
 ```swift
 public struct NativeProgressBar<Label: View, CurrentValueLabel: View>: View {
@@ -15,8 +15,11 @@ public struct NativeProgressBar<Label: View, CurrentValueLabel: View>: View {
 
 Every argument is required. Pass an explicitly resolved `NativeDesignTheme`
 with provider brand `ocean` or `graphite`; theme construction propagates token
-errors unchanged. The released color bridge, exact DesignTokens 0.1.1 pin,
-Swift 6 language mode and iOS 15/macOS 12 declarations remain unchanged.
+errors unchanged. The color-bridge behavior, Swift 6 language mode and
+iOS 15/macOS 12 declarations remain unchanged.
+NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;
+NativeDesignKit 0.1.0 historically used exact DesignTokens 0.1.1. This
+ProgressBar remains unreleased.
 
 `nil` means indeterminate; otherwise progress is determinate. `total` must be
 finite and strictly positive in both modes, and a non-nil value must be finite.

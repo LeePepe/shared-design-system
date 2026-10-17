@@ -1,7 +1,7 @@
 # NativeSlider (unreleased)
 
 Part of the [Strata rebuild](../COMPONENTS.md). This is an additive API under
-`Controls/Slider`, not a NativeDesignKit 0.1.0 release. HeroUI supplies the
+`Controls/Slider`, not a NativeDesignKit 0.3.0 release. HeroUI supplies the
 inventory name only; the interaction is SwiftUI `Slider`.
 
 ```swift
@@ -61,8 +61,10 @@ when their units require it. Keep sufficient width for meaningful adjustment.
 
 Token accent supplies tint, token foregrounds style the content, and explicit
 theme mode sets native chrome. There is no control glass, palette, provider,
-default theme or cache. The exact Tokens 0.1.1 dependency and Swift 6 / iOS 15 /
-macOS 12 declarations are unchanged.
+default theme or cache. NativeDesignKit 0.3.0 uses the repository-local
+DesignTokens target; NativeDesignKit 0.1.0 historically used exact DesignTokens
+0.1.1. This unreleased Slider preserves the Swift 6 / iOS 15 / macOS 12
+declarations.
 
 The component-owned `SliderReview` synthetic SwiftUI app uses XCTest UI
 automation for native binding updates, step alignment, editing callbacks,

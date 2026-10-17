@@ -2,7 +2,7 @@
   "$schema": "registry.schema.json",
   "schemaVersion": 1,
   "library": "NativeDesignKit",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "releaseStatus": "released",
   "releaseUnit": {"ecosystem": "swiftpm", "product": "NativeDesignKit", "module": "NativeDesignKit"},
   "releaseUnits": {

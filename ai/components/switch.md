@@ -2,7 +2,7 @@
 
 `NativeSwitch` is part of the unreleased [Strata rebuild](../COMPONENTS.md).
 It is a SwiftUI `Toggle` using native switch styling, with caller-owned state
-and label content. It is unavailable in NativeDesignKit 0.1.0.
+and label content. It is unavailable in NativeDesignKit 0.3.0.
 
 ```swift
 import DesignTokens
@@ -60,6 +60,8 @@ These tests do not establish VoiceOver speech, physical-device interaction,
 macOS keyboard focus, live external-keyboard activation or minimum-OS
 acceptance. Native semantics remain owned by SwiftUI Toggle.
 
-The exact DesignTokens 0.1.1 pin, iOS 15/macOS 12 floors, and released color
-bridge are unchanged. To roll back, remove these call sites and restore the
-previously reviewed package revision. There is no persisted state to migrate.
+NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;
+NativeDesignKit 0.1.0 historically used exact DesignTokens 0.1.1. This
+unreleased Switch preserves the iOS 15/macOS 12 floors and color-bridge
+behavior. To roll back, remove these call sites and restore the previously
+reviewed package revision. There is no persisted state to migrate.

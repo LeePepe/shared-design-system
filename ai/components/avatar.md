@@ -1,7 +1,7 @@
 # NativeAvatar (unreleased)
 
 Part of the unreleased [Strata rebuild](../COMPONENTS.md); absent from the
-NativeDesignKit 0.1.0 release. This is native SwiftUI with no networking,
+NativeDesignKit 0.3.0 release. This is native SwiftUI with no networking,
 identity model, initials derivation or image loader.
 
 ```swift
