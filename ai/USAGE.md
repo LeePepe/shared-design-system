@@ -23,8 +23,3 @@ Lookup errors propagate unchanged. An unknown ID throws `TokenError.unknownToken
 ## Scope
 
 This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The Tokens dependency is pinned at exactly `0.2.0`; the manifest reference does not vendor its contents.
-
-The exact 0.2.0 provider adoption is a candidate until its authorized immutable
-release is retrievable. The last released NativeDesignKit 0.1.0 retains its own
-0.1.1 provider contract. Isolated local Git mirrors are test-only evidence;
-remote dependency checks and release notes must name the final provider SHA.

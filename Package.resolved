@@ -6,7 +6,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/LeePepe/shared-design-tokens.git",
       "state" : {
-        "revision" : "0c38a28e56c5326a0ed9141db2a03d446e27acb3",
+        "revision" : "87bef8fbab5bf67a748815d7ed04d7ae199f760a",
         "version" : "0.2.0"
       }
     }

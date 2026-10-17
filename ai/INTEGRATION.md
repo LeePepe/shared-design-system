@@ -17,9 +17,10 @@ evaluating unreleased future revisions, not as the release dependency.
 
 The executable fixture in [EXAMPLES.md](EXAMPLES.md) shows a complete manifest.
 Consumers that name `Theme` or `TokenError` also declare the `DesignTokens`
-product from `shared-design-tokens`. The released NativeDesignKit0.1.0 uses
-exact Tokens0.1.1. This unreleased checkout and its revision-mode fixture target
-exact Tokens0.2.0, pending its immutable release. Use the contract matching the
+product from `shared-design-tokens`. The released NativeDesignKit 0.1.0 uses
+exact Tokens 0.1.1. This unreleased checkout and its revision-mode fixture use
+public exact Tokens 0.2.0 at revision
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a`. Use the contract matching the
 selected native revision and keep both provider version and revision consistent
 with that checkout's `Package.resolved`. The library does not re-export Tokens
 types.
@@ -46,8 +47,3 @@ To uninstall, remove the consumer adapter calls and the `NativeDesignKit`
 product/package dependency, then re-resolve and build/test the consumer. Keep
 the direct Tokens dependency if the consumer still uses it. No library-owned
 storage, tasks, registration or credentials need cleaning up.
-
-The exact 0.2.0 provider adoption is a candidate until its authorized immutable
-release is retrievable. The last released NativeDesignKit 0.1.0 retains its own
-0.1.1 provider contract. Isolated local Git mirrors are test-only evidence;
-remote dependency checks and release notes must name the final provider SHA.
