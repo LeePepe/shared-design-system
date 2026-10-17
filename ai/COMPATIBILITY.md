@@ -35,3 +35,13 @@ Historical exact-tag validation for NativeDesignKit `v0.1.0` uses that tag's own
 Coverage metrics and full D1/6DQ remain unmeasured. The external runner isolates its source/build/DerivedData but does not prove crash/concurrency cleanup or all tool-cache isolation. Dependency/security scans, real UI demos and Owner style approval, consumer-specific migration/rollback and independent delivery review remain separate gates. The Owner has retained the initial bridge (#1), and the repository is MIT licensed.
 
 No deprecation is introduced. There is no previously published NativeDesignKit version to deprecate. A future removal must be documented with a from/to migration and reviewed consumer upgrade; no unsupported compatibility period is promised.
+
+## Unreleased Strata foundation
+
+This checkout adds neutral surface roles and brand-state properties backed by
+the public exact DesignTokens 0.2.0 dependency above. Existing source signatures,
+legacy brand values, iOS 15/macOS 12 declarations and explicit-theme behavior
+remain. Outer material and dense inner reading planes share a single inherited
+blur; Solid and Reduce Transparency preserve the same-theme opaque roles.
+Fresh verification must identify both native and public provider revisions;
+historical preview-mirror results do not establish current-head acceptance.
