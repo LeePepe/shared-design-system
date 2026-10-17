@@ -9,7 +9,7 @@ support:
     reason: imported provider documentation, provenance, specifications and nested repository verification support
 red_lines:
   - Dependencies point only in the direction listed in the table below.
-  - Color values come only from shared-design-tokens at an exact version; no local token tables.
+  - Color values come only from the nested DesignTokens authorities; no duplicate token tables.
 ---
 
 # shared-design-system tech context
@@ -18,9 +18,8 @@ red_lines:
 |---|---|---|---|
 | Tokens | Nested color/style sources, generators, JS/TS/CSS/JSON artifacts, AI contract and Node tests | `docs/architecture/tokens/tech-context.md` | (none) |
 | DesignTokens | Nested UI-free Swift data target, XCTest and disposable local-path consumer | `docs/architecture/design-tokens/tech-context.md` | Tokens |
-| NativeDesignKit | SwiftUI design-system library (iOS, macOS): explicit-theme bridges over DesignTokens, tests, shipped `ai/` contract | `docs/architecture/native-design-kit/tech-context.md` | (none) |
+| NativeDesignKit | SwiftUI design-system library (iOS, macOS): explicit-theme bridges over DesignTokens, tests, shipped `ai/` contract | `docs/architecture/native-design-kit/tech-context.md` | DesignTokens |
 
-External dependency: `DesignTokens` from `LeePepe/shared-design-tokens`, pinned
-by exact version in `Package.swift` and declared in `AGENTS.md` → Dependencies.
-NativeDesignKit continues to use that external provider until S200; its local
-`depends_on` remains empty during this import-only slice.
+The root package publishes both products. `NativeDesignKit` uses the local
+`DesignTokens` target; consumers pin one exact `shared-design-system` revision.
+The old provider repository remains immutable compatibility history only.

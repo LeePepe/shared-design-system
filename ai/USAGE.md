@@ -22,17 +22,18 @@ Lookup errors propagate unchanged. An unknown ID throws `TokenError.unknownToken
 
 ## Scope
 
-This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. Released NativeDesignKit `0.1.0` pins Tokens at exactly `0.1.1`. The current unreleased checkout pins Tokens at exactly `0.2.0`; see [COMPATIBILITY.md](COMPATIBILITY.md) for its public revision. Neither manifest reference vendors the dependency.
+This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The current consolidated SwiftPM route selects the stable `NativeDesignKit` and `DesignTokens` products from one exact `shared-design-system` revision or version; the root `NativeDesignKit` target depends on the repository-local `DesignTokens` target. Released NativeDesignKit `0.1.0` historically pinned Tokens at exactly `0.1.1`, while the imported provider DesignTokens `0.2.0` release remains immutable compatibility history. Neither route vendors dependency contents.
 
 ## Strata foundation candidate (unreleased)
 
 `NativeDesignTheme(theme:brand:)` additionally resolves explicit provider brands
-`strata-blue`, `strata-green`, `strata-pink`, `strata-yellow`, `strata-purple` from
-the public DesignTokens 0.2.0 release at
-`87bef8fbab5bf67a748815d7ed04d7ae199f760a`. They do not alias ocean or graphite.
-Legacy brands keep their original lookup behavior. This native foundation is
-unreleased; the separately published provider does not establish a
-NativeDesignKit release.
+`strata-blue`, `strata-green`, `strata-pink`, `strata-yellow`, `strata-purple`.
+The data originated in the historical provider DesignTokens 0.2.0 release at
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a`; the current consolidated package
+uses the same 0.2.0 sources through its local `DesignTokens` target. They do not
+alias ocean or graphite. Legacy brands keep their original lookup behavior.
+This native foundation is unreleased; the historical provider release does not
+establish a NativeDesignKit release.
 
 Additive immutable color properties are `brandSeed`, `brandSeedInk`, `brandText`,
 `accentHover`, `accentActive`, `accentSubtle`. `NativeSurfaceRole` has `region`,

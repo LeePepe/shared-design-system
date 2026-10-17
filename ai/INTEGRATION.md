@@ -2,7 +2,9 @@
 
 ## Prerequisites and dependency resolution
 
-The package declares Swift tools 6.0, iOS 15 and macOS 12. See the distinction
+The package declares Swift tools 6.0, iOS 15, macOS 12 and a watchOS 8 floor for
+the data-only DesignTokens product. NativeDesignKit remains iOS/macOS-only. See
+the distinction
 between declared and tested support in [COMPATIBILITY.md](COMPATIBILITY.md).
 There are no credentials, network calls, persistence or runtime permissions.
 
@@ -16,14 +18,17 @@ Use a reviewed full 40-character commit SHA with `revision:` only when
 evaluating unreleased future revisions, not as the release dependency.
 
 The executable fixture in [EXAMPLES.md](EXAMPLES.md) shows a complete manifest.
-Consumers that name `Theme` or `TokenError` also declare the `DesignTokens`
-product from `shared-design-tokens`. The released NativeDesignKit 0.1.0 uses
-exact Tokens 0.1.1. This unreleased checkout and its revision-mode fixture use
-public exact Tokens 0.2.0 at revision
-`87bef8fbab5bf67a748815d7ed04d7ae199f760a`. Use the contract matching the
-selected native revision and keep both provider version and revision consistent
-with that checkout's `Package.resolved`. The library does not re-export Tokens
-types.
+Consumers that name `Theme` or `TokenError` declare both products from the same
+package dependency:
+
+```swift
+.product(name: "NativeDesignKit", package: "shared-design-system"),
+.product(name: "DesignTokens", package: "shared-design-system")
+```
+
+The library does not re-export Tokens types. Historical NativeDesignKit 0.1.0
+retains its old exact provider route; adopting a consolidated revision uses the
+version-matched migration contract.
 
 ## Minimal wiring
 
@@ -44,6 +49,6 @@ errors. iOS build evidence and a visual demo are separate checks; compiling a
 color bridge is not visual, accessibility or minimum-OS acceptance.
 
 To uninstall, remove the consumer adapter calls and the `NativeDesignKit`
-product/package dependency, then re-resolve and build/test the consumer. Keep
-the direct Tokens dependency if the consumer still uses it. No library-owned
+product dependency, then re-resolve and build/test the consumer. Keep the same
+package dependency while the consumer still uses `DesignTokens`. No library-owned
 storage, tasks, registration or credentials need cleaning up.

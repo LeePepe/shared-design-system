@@ -1,9 +1,9 @@
 # AGENTS.md — shared-design-system
 
-Shared SwiftUI design-system library (`NativeDesignKit`) for iOS and macOS,
-built on the color data from `shared-design-tokens`. Every agent that edits
-this repository follows the protocol below. Tool-specific files (CLAUDE.md
-etc.) only point here.
+Shared Apple/SPM design system with the UI-free `DesignTokens` product and the
+SwiftUI `NativeDesignKit` product for iOS and macOS. Every agent that edits this
+repository follows the protocol below. Tool-specific files (CLAUDE.md etc.) only
+point here.
 
 ## Read first
 
@@ -47,7 +47,7 @@ iOS simulator build and test), contract audit, workflow-lint and the PR-body che
 
 - SwiftUI library only. UIKit/AppKit only in tests. No business data, screens
   or product integration; consumer adoption happens in each product repository.
-- Color values come only from `DesignTokens` at an exact version. No local
+- Color values come only from the local `DesignTokens` target. No duplicate
   token tables, fallback colors or default theme; theme is explicit on every call.
 - Token errors propagate unchanged.
 - Releases are immutable semver tags with release notes and external-consumer
@@ -59,20 +59,19 @@ iOS simulator build and test), contract audit, workflow-lint and the PR-body che
 ## Dependencies
 
 - `shared-ci` `6e354f476bc53d68f0f09fc231d5cd938466af9c` — https://github.com/LeePepe/shared-ci/blob/6e354f476bc53d68f0f09fc231d5cd938466af9c/ai/
-- `shared-design-tokens` `0.2.0` — `LeePepe/shared-design-tokens@0.2.0/ai/`
-  (tag `v0.2.0`: https://github.com/LeePepe/shared-design-tokens/tree/v0.2.0/ai/)
-  SwiftPM `exact: "0.2.0"`, product `DesignTokens`.
+- `NativeDesignKit` depends on the repository-local `DesignTokens` target.
+- The root package publishes both stable products from one exact
+  `shared-design-system` revision. The nested npm artifact remains
+  `@leepepe/design-tokens` 0.2.0 and is not registry-published.
+- Historical provider tags remain immutable and readable; they are compatibility
+  history, not the active development or root-package dependency route.
 
-Public provider tag `v0.2.0` resolves to
-`87bef8fbab5bf67a748815d7ed04d7ae199f760a`; `Package.resolved` records
-that exact release revision.
-
-Prospective S200 exception: only the already Owner-approved S200/PR #37 feature
-PR may atomically replace that external exact dependency and obsolete lock
-resolution with the repository-local `DesignTokens` target, while updating the
-root manifest and authoritative architecture/contracts to the same truth. This
-does not activate S200 and is not a general dependency-policy exception; every
-other dependency change remains subject to the existing exact-pin rule.
+S200/PR #37 uses its Owner-approved exception to atomically replace the external
+exact dependency and obsolete lock resolution with the repository-local
+`DesignTokens` target while updating the root manifest and authoritative
+architecture/contracts to the same truth. This scoped transition is not a
+general dependency-policy exception; every other dependency change remains
+subject to the existing exact-pin rule.
 
 ## Delivery
 

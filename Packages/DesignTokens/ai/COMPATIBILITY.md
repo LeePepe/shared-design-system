@@ -1,6 +1,10 @@
 # Compatibility
 
-This contract is for version `0.2.0` (immutable Git tag `v0.2.0` after release verification), registry schema `1.0.0`, token schema `1.0.0`. npm and Swift share the tag: npm consumers install the tarball built from it, Swift consumers pin `exact: "0.2.0"`. Package, token-schema and registry-schema versions are distinct.
+This contract preserves DesignTokens API/data version `0.2.0`, registry schema
+`1.0.0` and token schema `1.0.0`. The npm artifact identity and exports are
+unchanged. New Swift consumers use the stable `DesignTokens` product from an
+exact `shared-design-system` revision; historical provider tags remain
+resolvable from the old repository.
 
 The authoritative [platform and toolchain matrix](../docs/compatibility.md#matrix) separates declared floors from actual local verification. 0.2.0 preserves existing color values and lookup APIs while adding styles and five Strata families. The checker uses Ajv only as a development dependency, not runtime.
 
@@ -13,3 +17,7 @@ legacy brands/series and data-only platform floors. Source style/color schemas
 remain 1.0.0. The last earlier immutable release v0.1.1 has neither addition.
 Source candidate tests and local mirror resolution remain distinct from verified
 remote tag/artifact consumption; consult release notes for final evidence.
+
+The route migration changes only the SwiftPM repository/package identity from
+`shared-design-tokens` to `shared-design-system`. Imports, product/module names,
+types, errors, values and iOS 15/macOS 12/watchOS 8 data floors are unchanged.

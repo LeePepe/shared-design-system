@@ -6,7 +6,7 @@ owns:
   - Sources/**
   - Tests/**
   - ai/**
-depends_on: []
+depends_on: [DesignTokens]
 gate:
   docs: python3 scripts/ci/check-ai.py
   docs_test: python3 scripts/ci/test-ai.py
@@ -14,19 +14,21 @@ gate:
   build: scripts/ci/swift-package.sh build
   test: scripts/ci/swift-package.sh test
   ios: scripts/ci/swift-package.sh ios
+  watch_boundary: python3 Tests/Fixtures/PlatformBoundary/verify.py
 red_lines:
   - SwiftUI only; UIKit and AppKit appear only in tests for color extraction.
   - Every color comes from DesignTokens; no local token table, fallback color or default theme.
   - Theme is explicit on every call; no environment detection or caching.
   - Token errors propagate unchanged.
-  - The DesignTokens dependency is an exact version, never a branch or range.
+  - DesignTokens is the local root-package target; consumers pin the containing package at an exact revision or version.
 ---
 
 # NativeDesignKit
 
-SwiftPM package `NativeDesignKit`, one library product and module of the same
-name, declared platforms iOS 15 and macOS 12. It depends on the
-`DesignTokens` product of `shared-design-tokens`.
+SwiftPM product and module `NativeDesignKit`, declared for iOS 15 and macOS 12.
+It depends on the local `DesignTokens` target. The root package also declares
+watchOS 8 for the data-only product; a stable compile guard rejects
+NativeDesignKit on watchOS before component use.
 
 - **Sources:** `Sources/NativeDesignKit/`. The public API is described in `ai/USAGE.md`.
 - **Tests:** `Tests/NativeDesignKitTests/`. They extract native sRGB through

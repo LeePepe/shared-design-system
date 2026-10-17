@@ -23,7 +23,7 @@ For pushed PR/pre-release revisions, use revision mode instead:
 python3 scripts/ci/external-consumer.py --revision <full-40-character-commit-SHA>
 ```
 
-The runner copies the fixture to its own temporary directory, replaces only
+The runner copies the fixture to its own task-local evidence directory, replaces only
 the shared-design-system dependency requirement with the requested exact
 version or immutable SHA, resolves from the public repository, checks the
 actual resolved version or SHA and shipped `ai/` entry,
@@ -31,9 +31,8 @@ then runs `swift build`, `swift test` and an iOS-simulator compile with an
 isolated DerivedData directory. It never uses a local path dependency. Failure
 of any command, missing docs, or a resolution mismatch fails the run. Version
 mode also requires the resolved registry's release status to be `released`.
-The current runner replaces the fixture's native requirement with the requested
-immutable revision. Its direct Tokens requirement is the public exact `0.2.0`
-release; use revision mode for the unreleased native checkout. Historical native tag validation
+The current runner selects both `NativeDesignKit` and `DesignTokens` from the
+same immutable `shared-design-system` revision. Historical native tag validation
 uses the fixture and runner from that same tag.
 
 Do not report a revision run as release-tag validation. Git/Xcode caches may

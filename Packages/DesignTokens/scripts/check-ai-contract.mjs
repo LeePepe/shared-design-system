@@ -145,6 +145,16 @@ export function checkContract({root, expectedName, expectedVersion}) {
   }
   const manifest = read('Package.swift');
   if (manifest && !manifest.toString().includes(`.library(name: "${registry.package.swiftProduct}",`)) fail('AI_SWIFT_PRODUCT', 'Package.swift', 'Declared Swift product is missing.');
+  if (expectedName === '@leepepe/design-tokens') {
+    const readme = read('ai/README.md');
+    const integration = read('ai/INTEGRATION.md');
+    const route = `${readme ?? ''}\n${integration ?? ''}`;
+    if (!route.includes('https://github.com/LeePepe/shared-design-system.git') ||
+        !route.includes('package: "shared-design-system"') ||
+        route.includes('.package(url: "https://github.com/LeePepe/shared-design-tokens.git"')) {
+      fail('AI_SWIFT_ROUTE', 'ai/INTEGRATION.md', 'Swift consumers must use the consolidated exact-revision route.');
+    }
+  }
   return {ok: errors.length === 0, errors};
 }
 

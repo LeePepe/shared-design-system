@@ -1,5 +1,18 @@
 # Migration and rollback
 
+## Consolidated DesignTokens route
+
+For a consumer already using `DesignTokens` 0.2.0, preserve every source import
+and API call. Replace the `shared-design-tokens` URL/package identity with
+`shared-design-system` at a reviewed exact revision and select the stable
+`DesignTokens` product from that package. NativeDesignKit and DesignTokens then
+resolve from one package graph.
+
+Before an authorized consolidated release, rollback restores the recorded old
+URL, exact 0.2.0 requirement and lockfile together. Historical provider tags and
+NativeDesignKit 0.1.0 remain immutable. Re-run the same consumer behavior/error
+tests; never copy token values or use a local path/mirror as public evidence.
+
 ## Local bridge → NativeDesignKit 0.1.0
 
 There is no earlier NativeDesignKit release. The supported interface is a

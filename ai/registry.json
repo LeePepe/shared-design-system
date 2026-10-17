@@ -5,6 +5,10 @@
   "version": "0.1.0",
   "releaseStatus": "released",
   "releaseUnit": {"ecosystem": "swiftpm", "product": "NativeDesignKit", "module": "NativeDesignKit"},
+  "releaseUnits": {
+    "nativeDesignKit": "README.md",
+    "designTokens": "../Packages/DesignTokens/ai/README.md"
+  },
   "documents": {
     "entry": "README.md",
     "usage": "USAGE.md",

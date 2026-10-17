@@ -14,11 +14,11 @@ gate:
 red_lines:
   - The DesignTokens target imports Foundation only; UIKit, AppKit and SwiftUI are forbidden.
   - GeneratedColors.swift and GeneratedStyles.swift belong to Tokens and are never hand-edited.
-  - S100 does not activate this target in the root package or change NativeDesignKit resolution.
+  - The root target reuses these sources directly; no copied or fallback data is allowed.
 ---
 
 # DesignTokens
 
-UI-free Swift data product imported under `Packages/DesignTokens`. Its generated
-Swift data depends on Tokens; NativeDesignKit continues to resolve the external
-v0.2.0 provider until S200.
+UI-free Swift data product under `Packages/DesignTokens`. Its generated Swift
+data depends on Tokens; the root package publishes this target for iOS 15,
+macOS 12 and watchOS 8.
