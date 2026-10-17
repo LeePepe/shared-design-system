@@ -66,6 +66,8 @@ Exact tested SHA and results belong to the external run manifest and PR.
 These checks do not claim live VoiceOver, native keyboard/focus interaction,
 macOS rendering, physical-device or minimum-OS acceptance.
 
-Swift 6, iOS 15/macOS 12 declarations, exact DesignTokens 0.1.1 and the released
-color bridge remain unchanged. Roll back by removing these call sites and
-restoring a reviewed package revision; no data migration is needed.
+NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;
+NativeDesignKit 0.1.0 historically used exact DesignTokens 0.1.1. This
+unreleased RadioGroup preserves Swift 6, iOS 15/macOS 12 declarations and the
+color-bridge behavior. Roll back by removing these call sites and restoring a
+reviewed package revision; no data migration is needed.

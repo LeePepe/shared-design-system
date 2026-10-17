@@ -3,8 +3,10 @@
 ## Unreleased
 
 - Explicit `NativeDesignTheme` and native solid/Glass surface policy for the
-  [Strata rebuild](docs/strata-component-rebuild.md), preserving exact
-  DesignTokens 0.1.1 and the released color resolver.
+  [Strata rebuild](docs/strata-component-rebuild.md), preserving the historical
+  NativeDesignKit 0.1.0 exact DesignTokens 0.1.1 route and color-resolver
+  behavior. NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;
+  the Strata foundation remains unreleased.
 - Ten independently delivered SwiftUI components: Button, Card, TextField,
   Switch, Checkbox, RadioGroup, Slider, ProgressBar, Avatar and Chip. See their
   [consumer contracts](ai/COMPONENTS.md) for APIs and native platform adaptation.
