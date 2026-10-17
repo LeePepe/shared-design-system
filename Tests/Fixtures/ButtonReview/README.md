@@ -110,9 +110,11 @@ and behavior target.
 The pointer test requires a SwiftUI hover callback for each target, in addition
 to captured appearance. An accepted XCTest mouse event alone cannot establish
 hover behavior. A plain Text sentinel helps distinguish missing runtime pointer
-delivery from component behavior. The iPad focus test changes and restores the
-actual Full Keyboard Access preference, then requires observed native focus and
-Space activation. Report failures with their result bundle; do not substitute
+delivery from component behavior. The iPad focus test reads the actual Full
+Keyboard Access preference without changing it. That preference must already
+be enabled on the supplied iPad runtime, and a disabled preference fails the
+test. The original native focus and Space activation assertions still run and
+remain required. Report failures with their result bundle; do not substitute
 an idle screenshot for observed hover or focus.
 
 ```sh
@@ -126,3 +128,14 @@ Export macOS/iPad attachments using `xcrun xcresulttool export attachments`. A k
 navigation screenshot is an observation; claim a visible focus ring only after
 inspecting that actual capture. Host automation permissions remain a separate
 runtime requirement and cannot be inferred from a package build.
+
+`testStandardControlsDiagnoseNativeInputDelivery` adds an `input-diagnostics`
+board alongside the unchanged specimens. A standard bordered SwiftUI Button,
+plain Text hover sentinel, TextField and focusable key probe compare actual
+callbacks with NativeButton. It records both requested and observed focus,
+requires real focused Space activation on both controls, and compares element
+and coordinate hover with mouse-click delivery. Successful text entry or a
+shortcut alone does not establish focus navigation. The board never changes
+system preferences and supplies no synthetic hover/focus override. Preserve
+the XCTest synthesized-event attachments and observations when this test fails;
+those identify the event source and coordinates without guessing from idle PNGs.

@@ -40,3 +40,11 @@ Generated screenshots and result bundles live outside git. Screenshots do not
 establish VoiceOver, minimum-OS, physical-device or macOS pointer/keyboard
 acceptance. Remote gates and an independent exact-SHA visual review are
 separate from local candidate-provider verification.
+
+The pointer fixture also compares ordinary SwiftUI controls with NativeButton
+on a separate diagnostic board. It distinguishes accepted XCTest synthesis,
+actual hover callbacks, text-input delivery, observed native focus and focused
+Space activation. The keyboard lane requires a preconfigured runtime and reads
+its Full Keyboard Access preference without changing Settings. A diagnostic
+failure remains a failed input requirement; it does not justify changing the
+accepted Button appearance or substituting an unobserved interaction state.

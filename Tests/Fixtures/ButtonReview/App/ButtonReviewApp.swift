@@ -46,7 +46,7 @@ private struct ReviewConfiguration {
         brand = try required("NDK_BRAND")
         mode = try required("NDK_THEME")
         scenario = try required("NDK_SCENARIO")
-        guard ["specimen", "matrix", "interaction", "long-label"].contains(scenario) else {
+        guard ["specimen", "matrix", "interaction", "long-label", "input-diagnostics"].contains(scenario) else {
             throw ConfigurationError.invalid("NDK_SCENARIO")
         }
         switch try required("NDK_SURFACE") {
@@ -98,6 +98,7 @@ private struct ButtonReviewBoard: View {
                         switch configuration.scenario {
                         case "matrix": matrix
                         case "long-label": longLabel
+                        case "input-diagnostics": ButtonInputDiagnostics(theme: theme)
                         default: interaction
                         }
                     }
@@ -318,6 +319,71 @@ private struct ButtonReviewBoard: View {
         case "secondary": .secondary
         default: .ghost
         }
+    }
+}
+
+/// Standard SwiftUI controls isolate event delivery from the library's styling.
+/// This board requests view focus only; it never changes a system preference.
+private struct ButtonInputDiagnostics: View {
+    let theme: NativeDesignTheme
+    @State private var visits: Set<String> = []
+    @State private var currentHover = "none"
+    @State private var input = ""
+    @State private var standardActions = 0
+    @State private var nativeActions = 0
+    @State private var keys = ""
+    @State private var focusRequests = "none"
+    @FocusState private var focus: Target?
+    private enum Target: String { case standard, native, field, probe }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text("Pointer sentinel").padding(20)
+                .onHover { record("sentinel", inside: $0) }
+                .accessibilityIdentifier("input-sentinel")
+            Button("Standard action") { standardActions += 1 }
+                .buttonStyle(.bordered)
+                .focused($focus, equals: .standard)
+                .onHover { record("standard", inside: $0) }
+                .accessibilityIdentifier("input-standard")
+            NativeButton(theme: theme, variant: .primary, surface: .glass, isLoading: false,
+                         action: { nativeActions += 1 }) { Text("Native action") } loadingLabel: { Text("Working…") }
+                .focused($focus, equals: .native)
+                .onHover { record("native", inside: $0) }
+                .accessibilityIdentifier("input-native")
+            TextField("Keyboard event probe", text: $input)
+                .textFieldStyle(.roundedBorder)
+                .focused($focus, equals: .field)
+                .accessibilityIdentifier("input-field")
+            if #available(iOS 17.0, macOS 14.0, *) {
+                Text("Focusable key probe").padding(20)
+                    .focusable(interactions: .edit)
+                    .focused($focus, equals: .probe)
+                    .onKeyPress { press in
+                        keys += "[\(press.characters)]"
+                        return .ignored
+                    }
+                    .accessibilityIdentifier("input-key-probe")
+                Button("Focus key probe") { request(.probe) }
+                    .accessibilityIdentifier("input-focus-probe")
+            }
+            Button("Focus standard action") { request(.standard) }
+                .accessibilityIdentifier("input-focus-standard")
+            Button("Focus native action") { request(.native) }
+                .accessibilityIdentifier("input-focus-native")
+            Text("hover=\(currentHover);visited=\(visits.sorted().joined(separator: ","));focus=\(focus?.rawValue ?? "none");requested=\(focusRequests);standard=\(standardActions);native=\(nativeActions);keys=\(keys)")
+                .accessibilityIdentifier("input-observation")
+        }
+    }
+
+    private func record(_ target: String, inside: Bool) {
+        currentHover = inside ? target : "none"
+        if inside { visits.insert(target) }
+    }
+
+    private func request(_ target: Target) {
+        focusRequests = target.rawValue
+        focus = target
     }
 }
 

@@ -3,6 +3,57 @@ import XCTest
 /// Real pointer/keyboard events run on macOS or iPad; iPhone rejects pointer events.
 @MainActor
 final class ButtonPointerReviewUITests: XCTestCase {
+    func testStandardControlsDiagnoseNativeInputDelivery() {
+        let app = launch(scenario: "input-diagnostics")
+        let observation = app.staticTexts["input-observation"]
+        func report(_ step: String) {
+            print("BUTTON_INPUT \(step) \(observation.label)")
+        }
+        app.staticTexts["input-sentinel"].hover()
+        report("sentinel-element-hover")
+        app.buttons["input-standard"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).hover()
+        report("standard-coordinate-hover")
+        app.buttons["input-native"].hover()
+        report("native-element-hover")
+        capture("button-input-pointer-diagnostic", app: app)
+        app.buttons["input-standard"].click()
+        XCTAssertTrue(observation.label.contains("standard=1"), "The standard mouse click must dispatch once.")
+        app.staticTexts["input-sentinel"].hover()
+        report("sentinel-after-mouse-click")
+        if app.buttons["input-focus-probe"].exists {
+            app.buttons["input-focus-probe"].click()
+            app.typeKey("k", modifierFlags: [])
+            report("probe-before-text-field")
+            XCTAssertTrue(observation.label.contains("keys=[k]"), "The standard focusable view must receive the key independently of text input.")
+        }
+        for id in ["standard", "native"] {
+            app.buttons["input-focus-\(id)"].click()
+            report("requested-\(id)-focus")
+            #if os(iOS)
+            print("BUTTON_INPUT \(id) hasFocus=\(app.buttons["input-\(id)"].hasFocus)")
+            XCTAssertTrue(app.buttons["input-\(id)"].hasFocus, "Observe native focus on the \(id) control, not just a requested binding.")
+            #endif
+            app.typeKey(" ", modifierFlags: [])
+            report("\(id)-space")
+            XCTAssertTrue(observation.label.contains(id == "standard" ? "standard=2" : "native=1"), "Space must activate the focused \(id) control.")
+        }
+        app.textFields["input-field"].click()
+        app.typeKey("k", modifierFlags: [])
+        XCTAssertEqual(app.textFields["input-field"].value as? String, "k", "A standard field must receive the synthesized key.")
+        report("text-field-key")
+        app.typeKey(.tab, modifierFlags: [])
+        report("tab-from-text-field")
+        if app.buttons["input-focus-probe"].exists {
+            app.buttons["input-focus-probe"].click()
+            report("requested-probe-focus")
+            app.typeKey("k", modifierFlags: [])
+            app.typeKey(" ", modifierFlags: [])
+            report("probe-keys")
+        }
+        capture("button-input-keyboard-diagnostic", app: app)
+        XCTAssertTrue(observation.label.contains("visited=native,sentinel,standard"), "Standard controls and NativeButton must receive actual hover callbacks.")
+    }
+
     func testPointerHoverForEveryVariant() {
         let app = launch(scenario: "specimen")
         capture("button-pointer-idle", app: app)
@@ -68,10 +119,10 @@ final class ButtonPointerReviewUITests: XCTestCase {
             XCTFail(settings.debugDescription)
             return
         }
-        setSwitch(toggle, value: "1")
+        XCTAssertEqual(original, "1", "This input lane requires Full Keyboard Access to be enabled before the run; tests never change Settings.")
         defer {
             settings.activate()
-            setSwitch(toggle, value: original)
+            XCTAssertEqual(toggle.value as? String, original, "The native keyboard preference must remain unchanged.")
             settings.terminate()
         }
         let app = launch(scenario: "interaction")
@@ -86,18 +137,6 @@ final class ButtonPointerReviewUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")
     }
 
-    private func setSwitch(_ toggle: XCUIElement, value: String) {
-        for _ in 0..<3 {
-            if (toggle.value as? String) == value { return }
-            // iPad exposes the whole labelled row as a Switch. Its actual knob
-            // occupies the trailing 63 pt, so a percentage can miss it.
-            toggle.coordinate(withNormalizedOffset: CGVector(dx: 1, dy: 0.5))
-                .withOffset(CGVector(dx: -20, dy: 0)).tap()
-            let changed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: toggle)
-            if XCTWaiter.wait(for: [changed], timeout: 3) == .completed { return }
-        }
-        XCTAssertEqual(toggle.value as? String, value, "Restore the actual simulator keyboard preference.")
-    }
     #endif
 
     private func launch(scenario: String) -> XCUIApplication {
