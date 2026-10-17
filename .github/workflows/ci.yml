@@ -2,7 +2,8 @@
 # check fails unless every selected lane passed on the PR head SHA.
 # Codex review and its completion gate are in review.yml. Lanes:
 #   verify  macOS: scripts/verify --all (contract checks; NativeDesignKit host
-#           build/test and iOS simulator build/test)
+#           build/test, iOS simulator build/test, and nested DesignTokens)
+#   test    Linux: scripts/verify --layer Tokens (Node/Chrome token coverage)
 #   contract, workflow-lint: shared-ci audits at the pinned SHA
 name: ci
 
@@ -27,7 +28,10 @@ jobs:
     uses: LeePepe/shared-ci/.github/workflows/quality.yml@6e354f476bc53d68f0f09fc231d5cd938466af9c
     with:
       runs-on: macos-15
+      setup-command: scripts/ci/setup.sh
       verify-command: scripts/verify --all && python3 scripts/ci/external-consumer.py --revision "$(git rev-parse HEAD)"
+      test-command: scripts/verify --layer Tokens
+      test-runs-on: ubuntu-24.04
       contract-audit: true
       workflow-lint: true
       timeout-minutes: 45

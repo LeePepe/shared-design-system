@@ -10,5 +10,15 @@
 # Dependency manifests and lockfiles (pin upgrades)
 **/Package.swift                  @LeePepe
 **/Package.resolved               @LeePepe
+# Imported DesignTokens release unit
+/Packages/DesignTokens/**/package.json       @LeePepe
+/Packages/DesignTokens/**/package-lock.json  @LeePepe
+/Packages/DesignTokens/tokens/               @LeePepe
+/Packages/DesignTokens/ai/                   @LeePepe
+/Packages/DesignTokens/docs/constitution.md  @LeePepe
+/Packages/DesignTokens/docs/architecture/    @LeePepe
+/Packages/DesignTokens/scripts/verify        @LeePepe
+/Packages/DesignTokens/scripts/ci/           @LeePepe
+/Packages/DesignTokens/THIRD_PARTY_NOTICES.md @LeePepe
 # Shipped consumer contract
 /ai/                              @LeePepe

@@ -1,0 +1,335 @@
+{
+  "schemaVersion": "1.0.0",
+  "package": {
+    "name": "@leepepe/design-tokens",
+    "version": "0.2.0",
+    "swiftProduct": "DesignTokens"
+  },
+  "documents": {
+    "README": "ai/README.md",
+    "USAGE": "ai/USAGE.md",
+    "INTEGRATION": "ai/INTEGRATION.md",
+    "EXAMPLES": "ai/EXAMPLES.md",
+    "COMPATIBILITY": "ai/COMPATIBILITY.md",
+    "MIGRATION": "ai/MIGRATION.md"
+  },
+  "compatibility": "ai/COMPATIBILITY.md",
+  "changelog": "CHANGELOG.md",
+  "tokenSchema": {
+    "version": "1.0.0",
+    "source": "tokens/colors.json"
+  },
+  "examples": [
+    {
+      "id": "js-data",
+      "path": "examples/data/usage.mjs",
+      "language": "javascript",
+      "doc": "ai/EXAMPLES.md"
+    },
+    {
+      "id": "ts-data",
+      "path": "examples/data/usage.ts",
+      "language": "typescript",
+      "doc": "ai/EXAMPLES.md"
+    },
+    {
+      "id": "swift-data",
+      "path": "examples/data/swift/Sources/TokenExample/main.swift",
+      "language": "swift",
+      "doc": "ai/EXAMPLES.md"
+    },
+    {
+      "id": "swift-manifest",
+      "path": "examples/data/swift/Package.swift",
+      "language": "swift",
+      "doc": "ai/INTEGRATION.md#swift-revision"
+    },
+    {
+      "id": "migration",
+      "path": "examples/data/migration.mjs",
+      "language": "javascript",
+      "doc": "ai/MIGRATION.md"
+    },
+    {
+      "id": "legacy-synthetic",
+      "path": "examples/data/legacy-colors.json",
+      "language": "json",
+      "doc": "ai/MIGRATION.md"
+    }
+  ],
+  "surfaces": [
+    {
+      "path": "dist/index.js",
+      "format": "javascript",
+      "sha256": "9f1795076116c3ca7221186ed7ee3f16a60012eb533e65638488a1c22995b265",
+      "symbols": [
+        "brandColor",
+        "brandIDs",
+        "color",
+        "colorSpace",
+        "schemaVersion",
+        "seriesColor",
+        "seriesIDs",
+        "tokenIDs"
+      ],
+      "doc": "ai/USAGE.md#public-data-api"
+    },
+    {
+      "path": "dist/index.d.ts",
+      "format": "typescript",
+      "sha256": "2df4f1a41f68accc7a951a0c08cf800d11265046260c515d77c8bd877b7eb4fa",
+      "symbols": [
+        "BrandID",
+        "BrandRole",
+        "RGBA",
+        "SeriesID",
+        "Theme",
+        "TokenID",
+        "brandColor",
+        "brandIDs",
+        "color",
+        "colorSpace",
+        "schemaVersion",
+        "seriesColor",
+        "seriesIDs",
+        "tokenIDs"
+      ],
+      "doc": "ai/USAGE.md#public-data-api"
+    },
+    {
+      "path": "dist/colors.css",
+      "format": "asset",
+      "sha256": "9f3310e74704a076694f105bf621409e56328e9deeffebae84607b7fe9b1209b",
+      "symbols": [],
+      "doc": "ai/USAGE.md#public-data-api"
+    },
+    {
+      "path": "dist/resolved.json",
+      "format": "asset",
+      "sha256": "ddef0632c72c3afa3af3de63c027eb95fece9cebfe7672bf203ebf31dcd6128c",
+      "symbols": [],
+      "doc": "ai/USAGE.md#public-data-api"
+    },
+    {
+      "path": "tokens/colors.json",
+      "format": "asset",
+      "sha256": "16c410441df239fafa4a8354c12adf9017cd263dd2a1d6c702f411dbd4f76fd3",
+      "symbols": [],
+      "doc": "ai/USAGE.md#public-data-api"
+    },
+    {
+      "path": "tokens/schema.json",
+      "format": "asset",
+      "sha256": "c38fe99ce29d50e8babdbb5c484d3db10aef37e8395d9276a07983d27a8d6ba9",
+      "symbols": [],
+      "doc": "ai/USAGE.md#public-data-api"
+    },
+    {
+      "path": "Sources/DesignTokens/DesignTokens.swift",
+      "format": "swift",
+      "sha256": "60bc761b94d73f6afac7ea4179868a3ba51a1eab1739be38a78b66f84812bc66",
+      "symbols": [
+        "BrandRole",
+        "DesignTokens",
+        "RGBA",
+        "SeriesColor",
+        "Theme",
+        "TokenError",
+        "a",
+        "b",
+        "brandColor",
+        "brandIDs",
+        "color",
+        "colorSpace",
+        "contrast",
+        "g",
+        "id",
+        "ids",
+        "init",
+        "r",
+        "relativeLuminance",
+        "schemaVersion",
+        "seriesColor",
+        "seriesIDs"
+      ],
+      "doc": "ai/USAGE.md#public-data-api"
+    },
+    {
+      "path": "Sources/DesignTokens/GeneratedColors.swift",
+      "format": "asset",
+      "sha256": "5aa9b1dc1161a447b37051af0942a09bf6e36ec91e939a12f57e05872205abc7",
+      "symbols": [],
+      "doc": "ai/USAGE.md#public-data-api"
+    },
+    {
+      "path": "Package.swift",
+      "format": "asset",
+      "sha256": "a27b199b5f9b58ae2666d00daa4e64be3f603fb46bbb5ed5e81da9d621ed2b8f",
+      "symbols": [],
+      "doc": "ai/USAGE.md#public-data-api"
+    },
+    {
+      "path": "dist/styles.js",
+      "format": "javascript",
+      "sha256": "c488cdab627df644dde83e144d61124b99e0a1366268aba2a194c57a24745f40",
+      "symbols": [
+        "border",
+        "borderIDs",
+        "curve",
+        "curveIDs",
+        "dimension",
+        "dimensionIDs",
+        "duration",
+        "durationIDs",
+        "opacity",
+        "opacityIDs",
+        "radius",
+        "radiusIDs",
+        "shadow",
+        "shadowIDs",
+        "spacing",
+        "spacingIDs",
+        "spring",
+        "springIDs",
+        "stagger",
+        "staggerIDs",
+        "styleSchemaVersion",
+        "styleTokenIDs",
+        "styleUnits",
+        "typography",
+        "typographyIDs"
+      ],
+      "doc": "ai/USAGE.md#style-foundations-020"
+    },
+    {
+      "path": "dist/styles.d.ts",
+      "format": "typescript",
+      "sha256": "c7a6223d31d9ef8e80e38c4e4c5c17bbb8d054ef33b40c34d7ec5c2051da694f",
+      "symbols": [
+        "BorderID",
+        "CubicBezierToken",
+        "CurveID",
+        "DimensionID",
+        "DurationID",
+        "OpacityID",
+        "RadiusID",
+        "ShadowID",
+        "ShadowToken",
+        "SpacingID",
+        "SpringID",
+        "SpringToken",
+        "StaggerID",
+        "StyleTokenID",
+        "TypographyID",
+        "TypographyToken",
+        "border",
+        "borderIDs",
+        "curve",
+        "curveIDs",
+        "dimension",
+        "dimensionIDs",
+        "duration",
+        "durationIDs",
+        "opacity",
+        "opacityIDs",
+        "radius",
+        "radiusIDs",
+        "shadow",
+        "shadowIDs",
+        "spacing",
+        "spacingIDs",
+        "spring",
+        "springIDs",
+        "stagger",
+        "staggerIDs",
+        "styleSchemaVersion",
+        "styleTokenIDs",
+        "styleUnits",
+        "typography",
+        "typographyIDs"
+      ],
+      "doc": "ai/USAGE.md#style-foundations-020"
+    },
+    {
+      "path": "dist/styles.resolved.json",
+      "format": "asset",
+      "sha256": "772a99933fb7f2cee3fc19e2c72f2e7357464e6c3d9960d5b676a27f5f240eeb",
+      "symbols": [],
+      "doc": "ai/USAGE.md#style-foundations-020"
+    },
+    {
+      "path": "tokens/styles.json",
+      "format": "asset",
+      "sha256": "12f9cae1101b106f54026678a04aef57f2a3f7bc050c6e3b646910df7c8524df",
+      "symbols": [],
+      "doc": "ai/USAGE.md#style-foundations-020"
+    },
+    {
+      "path": "tokens/styles.schema.json",
+      "format": "asset",
+      "sha256": "45698b3f57418314bf10a8986ec5b88b69d30c5967e864db494ba3cb8a760d57",
+      "symbols": [],
+      "doc": "ai/USAGE.md#style-foundations-020"
+    },
+    {
+      "path": "Sources/DesignTokens/StyleTokens.swift",
+      "format": "swift",
+      "sha256": "829c29456bbd3bb73e5ad4f38824ede2593ea9ebfa2d42d8135625ed0587580e",
+      "symbols": [
+        "CubicBezierToken",
+        "ShadowToken",
+        "SpringToken",
+        "StyleTokenError",
+        "StyleTokens",
+        "TypographyToken",
+        "blendDuration",
+        "border",
+        "borderIDs",
+        "colorToken",
+        "curve",
+        "curveIDs",
+        "dampingFraction",
+        "dimension",
+        "dimensionIDs",
+        "duration",
+        "durationIDs",
+        "lineHeight",
+        "monospacedDigits",
+        "opacity",
+        "opacityIDs",
+        "radius",
+        "radiusIDs",
+        "relativeTo",
+        "response",
+        "schemaVersion",
+        "shadow",
+        "shadowIDs",
+        "size",
+        "spacing",
+        "spacingIDs",
+        "spring",
+        "springIDs",
+        "stagger",
+        "staggerIDs",
+        "tracking",
+        "typography",
+        "typographyIDs",
+        "weight",
+        "x",
+        "x1",
+        "x2",
+        "y",
+        "y1",
+        "y2"
+      ],
+      "doc": "ai/USAGE.md#style-foundations-020"
+    },
+    {
+      "path": "Sources/DesignTokens/GeneratedStyles.swift",
+      "format": "asset",
+      "sha256": "f7a9e4b7d4e04a77fd850470d6cbe20b946327416b7c59fb98083aa0bd99277c",
+      "symbols": [],
+      "doc": "ai/USAGE.md#style-foundations-020"
+    }
+  ]
+}
