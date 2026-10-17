@@ -23,6 +23,9 @@ Dependency graph: `docs/design-tokens-consolidation-tasks.md`
 | protection-parity evidence | external read-only `coordination/consolidation-codeowners-parity-root-evidence.json` and `coordination/consolidation-ci-parity-root-evidence.json` at the exact target/provider baselines; Owner directions `01a148c3-1ebf-73b1-bf26-0cd5693dfe58` and `01a148c5-b1c0-7039-b512-4dd52ef6045c` |
 | accepted native reference | Strata prototype `b4bff430517ed2e2944f814d8b5ab89a1866ee33`, digest `c41f53160d0eb7e6e39b2733a3a689119a4c0868101c2aa2381b0061f4c6b456` |
 | planning method | repository-native ADR/spec/plan/tasks; no Spec Kit installation |
+| accepted planning head | `f7893ebd5bc4d6e0b187b9052e85b493d401c0ee`; its plan/tasks blobs `e3479bc230f4ab0463fcc88eaca0beb5e6396c97` / `63310fc9568fea59360f31812c26306bc93289dc` remain byte-identical at S100 base `5eec04eac574e41586e0c42732faa623e64cf9f9` |
+| S200 gate-repair supplement | delegated Decision B `01a14980-d4e9-7a54-bd45-d90e6ae9cc53`; separate prerequisite implementation starts from exact S100 base `5eec04eac574e41586e0c42732faa623e64cf9f9`; preserved S200 candidate snapshot `CONSOLIDATION-S200-OWNER-RECOVERY-CANDIDATE-SNAPSHOT.json`, patch SHA-256 `e920b41948f327ce4073a81570aa3178ebe7b552721caa3698e8c0450b1d70e2` |
+| authorized later S200 receipt repairs | Root evidence note `01a1497b-6e88-70df-89b2-3421c4f25423`; exact configured evidence-path alignment plus truthful failed/passed receipt state after every local-success condition |
 
 ## Architecture
 
@@ -124,6 +127,13 @@ context audit without hiding executable paths in support.
 12. **Preserve current native truth.** Button/Card/List accepted bytes and
     contracts are migration baselines. Button input deferrals remain failed and
     unknown; migration neither retries nor converts them to pass.
+13. **Repair the native gate before activation.** Decision B requires one
+    separate `P190` prerequisite PR because the S100 helper assumes the raw
+    Swift package name is a test-capable Xcode scheme. P190 discovers schemes
+    from machine-readable Xcode metadata, verifies test capability and complete
+    declared-test-target coverage without depending on name or list order, and
+    fails closed unless exactly one usable scheme remains. It must merge and be
+    read back before the preserved S200 candidate is integrated or changed.
 
 ## PR slices and dependency order
 
@@ -202,6 +212,37 @@ pre-change blobs: if Root abandons activation before S200, an ordinary reviewed,
 Owner-approved, required-CI provider rollback PR restores only those blobs and
 merges before the inert S100 import is removed.
 
+### `P190` — Test-capable Swift package scheme prerequisite
+
+Observable goal: the native iOS leaf gate deterministically selects the one
+generated Swift package scheme whose test action covers every test target
+declared by the package, then runs the complete test set for both the real
+one-product S100 base and the accepted two-product topology.
+
+This is one ordinary protected gate-repair PR based on exact target revision
+`5eec04eac574e41586e0c42732faa623e64cf9f9`, in its own task, branch and
+worktree. The helper derives the expected test targets from
+`swift package dump-package`, obtains scheme candidates from machine-readable
+Xcode output, and uses machine-readable test enumeration for the selected
+simulator destination. Missing, malformed, empty, incomplete, ambiguous, or
+unusable metadata fails before the real test action; scheme spelling and list
+order are not selection rules. Exactly one candidate must enumerate every
+declared test target, and the final `xcodebuild test` runs that scheme without
+`only-testing`, skip, xfail, or product-scheme fallback.
+
+Focused negative fixtures cover missing/ambiguous/unusable/incomplete metadata.
+A real minimal two-product/two-test-target Swift fixture proves
+`NativeDesignKitTests` and `DesignTokensTests` both execute. The unchanged real
+one-product root remains the compatibility fixture and must pass its actual iOS
+gate and `scripts/verify --all`; simulated one-product metadata alone is not
+acceptance. Only `scripts/ci/swift-package.sh`, focused tests/fixtures, and the
+minimum NativeDesignKit leaf-gate declaration/prose are in scope. Root manifest,
+product/source/token/generated data, `scripts/verify`, hooks, workflows,
+settings, credentials and the registered S200 candidate are excluded. P190
+requires exact-candidate independent review, normal hooks, one non-Draft PR,
+delegated Owner approval, required CI, PR Manager merge, and merged-main blob
+readback before S200 resumes.
+
 ### `S200` — Activate the local Swift dependency and contracts
 
 Observable goal: an exact target revision publicly resolves stable
@@ -214,6 +255,18 @@ and necessary tests together. It must not change
 semantic token data, generated values, NativeDesignKit component source, visual
 behavior, platform floors, or gate strength. The old URL must be absent from the
 activated root package and its revision-mode consumer lock.
+
+S200 is blocked while P190 is unmerged. Its staged 36-path candidate and prior
+repair history remain preserved, unpublished and untouched. After P190 merge
+and exact helper/test/wiring readback, Team Lead may return only the original
+writer to the registered S200 worktree for the authorized bounded continuation:
+integrate the actual prerequisite base while retaining both products/test
+targets, then fix the two receipt defects in
+`01a1497b-6e88-70df-89b2-3421c4f25423`. The local-consumer harness must pass and
+inspect one fresh configured evidence path, and a receipt may become `passed`
+only after every required marker and success condition is validated; failures
+retain durable truthful evidence. This continuation does not reset review or
+repair counts and does not authorize another gate change.
 
 ### `S300` — Exact-head consolidation and retirement-readiness gate
 
@@ -247,6 +300,7 @@ full retirement.
 | stable native behavior | component source blob comparison plus package/runtime regression assertions | Button/Card/List source blobs match target baseline and existing tests remain present |
 | stable npm exports | real tarball install and checker from nested pack root | isolated JS/TS/CSS/JSON consumer receipt |
 | stable public Swift products | root-package external consumer at pushed SHA | imports both products; lock resolves only target URL/SHA |
+| actual test-capable Swift package scheme | `P190` manifest-derived expected test targets plus machine-readable Xcode scheme discovery/test enumeration, wired into the NativeDesignKit leaf gate | real one-product root iOS gate passes; the two-product fixture executes both `NativeDesignKitTests` and `DesignTokensTests`; missing, ambiguous, unusable, malformed, or incomplete metadata fails before test execution |
 | data-only watchOS boundary | root package floor plus NativeDesignKit compile guard | DesignTokens-only watchOS build succeeds; selecting NativeDesignKit fails with the named unavailable diagnostic |
 | contracts match artifacts | root/nested registry/checkers and versioned-doc byte checks | both checker outputs pass from resolved consumer artifacts |
 | review admits the complete S100 diff | merged target caller input plus pinned reusable review byte check | P050 changes only `max-diff-bytes`; frozen S100 three-dot diff is complete and at most 1,000,000 bytes |
@@ -285,6 +339,8 @@ Lead accepts the same revision.
 | S100 exceeds complete-review capacity | merge P050 first; measure the frozen S100 three-dot diff; over 1,000,000 bytes blocks/replans without splitting or omission |
 | Import manifest requires its own commit hash | manifest records immutable provider/path/blob facts; later external receipt binds the target import SHA and manifest blob |
 | Public resolution is attempted before push | local hook proves local/generation/packed artifacts; required CI proves the exact fetchable pushed SHA before delivery |
+| Raw package name resolves to a product scheme without a test action | P190 discovers candidates and requires exactly one candidate to enumerate the complete manifest-declared test-target set; it never selects by first entry, package/product spelling, or unchecked `-Package` suffix |
+| Preserved S200 evidence becomes stale while the prerequisite lands | candidate snapshot/hash and registered worktree stay untouched; only the original writer integrates the actual merged/read-back prerequisite before producing fresh S200 receipts and full verification |
 | Mechanical import silently changes generated bytes | provider blob/hash mapping and generate-check at import head |
 | Activation changes component appearance/API | native component paths are inspection-only and baseline blob assertions fail on change |
 | Evidence goes stale | all reviews, consumers, and checks bind one SHA; any repair invalidates and reruns them |
@@ -300,7 +356,12 @@ normal non-Draft PR, required CI, and actual merge readback. Only that merged
 target base admits S100. After S100 merge/readback, P175 requires its own exact
 provider base, three-path diff, exact-head review, CODEOWNERS/delegated Owner
 approval, required CI, PR Manager merge, and merged-main/three-blob readback.
-Only then may S200 start. S100 and S200 each
+Only then may P190 start from exact target base
+`5eec04eac574e41586e0c42732faa623e64cf9f9`. P190 requires its own exact-head
+review, delegated Owner approval, normal non-Draft PR, required CI, PR Manager
+merge, and merged-main helper/test/wiring readback. Only then may the preserved
+S200 candidate resume through its original writer and registered worktree. S100
+and S200 each
 require their own Fullstack implementation, exact-head independent pre-push
 review, normal non-Draft PR, required gates, and merge readback in dependency
 order. Local verification precedes push; public-SHA resolution runs only after

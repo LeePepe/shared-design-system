@@ -1,0 +1,23 @@
+// swift-tools-version: 6.0
+import PackageDescription
+
+let package = Package(
+    name: "SchemeSelectionFixture",
+    platforms: [.iOS(.v15), .macOS(.v12)],
+    products: [
+        .library(name: "NativeDesignKit", targets: ["NativeDesignKit"]),
+        .library(name: "DesignTokens", targets: ["DesignTokens"]),
+    ],
+    targets: [
+        .target(name: "NativeDesignKit"),
+        .target(name: "DesignTokens"),
+        .testTarget(
+            name: "NativeDesignKitTests",
+            dependencies: ["NativeDesignKit"]
+        ),
+        .testTarget(
+            name: "DesignTokensTests",
+            dependencies: ["DesignTokens"]
+        ),
+    ]
+)
