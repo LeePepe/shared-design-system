@@ -10,7 +10,7 @@ depends_on: [Tokens]
 gate:
   build: swift build --package-path Packages/DesignTokens
   test: swift test --package-path Packages/DesignTokens
-  consumer: npm --prefix Packages/DesignTokens run test:swift-consumer
+  consumer: npm --prefix Packages/DesignTokens run test:swift-local-consumer
 red_lines:
   - The DesignTokens target imports Foundation only; UIKit, AppKit and SwiftUI are forbidden.
   - GeneratedColors.swift and GeneratedStyles.swift belong to Tokens and are never hand-edited.

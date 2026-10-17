@@ -53,7 +53,9 @@
     "check:ai": "node scripts/check-ai-contract.mjs --root . --expected-name @leepepe/design-tokens --expected-version 0.2.0",
     "test:ai-checker": "node --test tests/ai-checker.test.mjs",
     "test:contract": "node scripts/test-contract-pack.mjs",
-    "test:swift-consumer": "node scripts/test-swift-consumer.mjs"
+    "test:swift-consumer": "node scripts/test-swift-consumer.mjs",
+    "test:swift-local-consumer": "node scripts/test-swift-local-consumer.mjs",
+    "check:authority": "node scripts/check-authority.mjs"
   },
   "devDependencies": {
     "ajv": "8.17.1",

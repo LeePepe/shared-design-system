@@ -23,6 +23,7 @@ gate:
   ai: npm --prefix Packages/DesignTokens run check:ai
   ai-checker: npm --prefix Packages/DesignTokens run test:ai-checker
   contract: npm --prefix Packages/DesignTokens run test:contract
+  authority: npm --prefix Packages/DesignTokens run check:authority
 red_lines:
   - Nested tokens/colors.json and tokens/styles.json are the only editable color and style authorities; generated files are never hand-edited.
   - Unknown IDs, missing modes, invalid colors or references and generation drift fail closed.

@@ -46,12 +46,12 @@ This manifest binds the S100 import to the public immutable provider release uni
 | `docs/verification.md` | `Packages/DesignTokens/docs/verification.md` | `06703a6e0a74322d3efba2c36967a154cb4e57b4` | `06703a6e0a74322d3efba2c36967a154cb4e57b4` | exact relocated copy |
 | `examples/data/legacy-colors.json` | `Packages/DesignTokens/examples/data/legacy-colors.json` | `a0a981edbcb132591664c04c642224cf7fa69754` | `a0a981edbcb132591664c04c642224cf7fa69754` | exact relocated copy |
 | `examples/data/migration.mjs` | `Packages/DesignTokens/examples/data/migration.mjs` | `c22d4cf1f2b517bee3f561b146aaf86ae0124c30` | `c22d4cf1f2b517bee3f561b146aaf86ae0124c30` | exact relocated copy |
-| `examples/data/swift/Package.swift` | `Packages/DesignTokens/examples/data/swift/Package.swift` | `03f2408c45959ec1909d8d2e0f1e8a58dae6f790` | `fa9a2e81ad95e6ddbed3b40e7537848c772706c7` | adapted: disposable consumer uses the nested local package path; public provider guidance is unchanged |
+| `examples/data/swift/Package.swift` | `Packages/DesignTokens/examples/data/swift/Package.swift` | `03f2408c45959ec1909d8d2e0f1e8a58dae6f790` | `03f2408c45959ec1909d8d2e0f1e8a58dae6f790` | exact relocated copy |
 | `examples/data/swift/Sources/TokenExample/main.swift` | `Packages/DesignTokens/examples/data/swift/Sources/TokenExample/main.swift` | `1feabe13d80f7eaf70318e13c3220a95f61bea87` | `1feabe13d80f7eaf70318e13c3220a95f61bea87` | exact relocated copy |
 | `examples/data/usage.mjs` | `Packages/DesignTokens/examples/data/usage.mjs` | `6b425d96970768032f0078250d00b6d647d07ccd` | `6b425d96970768032f0078250d00b6d647d07ccd` | exact relocated copy |
 | `examples/data/usage.ts` | `Packages/DesignTokens/examples/data/usage.ts` | `6042908afef1889e04dd08e4c1721671b37e3c6d` | `6042908afef1889e04dd08e4c1721671b37e3c6d` | exact relocated copy |
 | `package-lock.json` | `Packages/DesignTokens/package-lock.json` | `89a0387f92b021cd8dd48b9da512809764cf661d` | `89a0387f92b021cd8dd48b9da512809764cf661d` | exact relocated copy |
-| `package.json` | `Packages/DesignTokens/package.json` | `eda0adb83ac70fbb4044124cf803571ee0192efa` | `b891ef60e140abf89b148069e4a1fac5e8d002ab` | adapted: remove the deliberately excluded provider root-agent file from the packed file allowlist |
+| `package.json` | `Packages/DesignTokens/package.json` | `eda0adb83ac70fbb4044124cf803571ee0192efa` | `089ab96da40b332049a88f85af315cfc97fe1717` | adapted: remove the deliberately excluded provider root-agent file from the packed allowlist and add target-only verification commands |
 | `scripts/browser-css.mjs` | `Packages/DesignTokens/scripts/browser-css.mjs` | `4cf0a42b11158ca7be1725d4ab64dcccbd2b94eb` | `4cf0a42b11158ca7be1725d4ab64dcccbd2b94eb` | exact relocated copy |
 | `scripts/check-ai-contract.mjs` | `Packages/DesignTokens/scripts/check-ai-contract.mjs` | `48ecbc180da978f57de05750f00534201dd66a9c` | `48ecbc180da978f57de05750f00534201dd66a9c` | exact relocated copy |
 | `scripts/ci/setup.sh` | `Packages/DesignTokens/scripts/ci/setup.sh` | `4fb3f7d4da77e757c5ed9491db2f41fe1cf3da24` | `4fb3f7d4da77e757c5ed9491db2f41fe1cf3da24` | exact relocated copy |
@@ -62,7 +62,7 @@ This manifest binds the S100 import to the public immutable provider release uni
 | `scripts/test-consumer.mjs` | `Packages/DesignTokens/scripts/test-consumer.mjs` | `4780323436d20c679a29023164cd37f1fa38e3c7` | `4780323436d20c679a29023164cd37f1fa38e3c7` | exact relocated copy |
 | `scripts/test-contract-pack.mjs` | `Packages/DesignTokens/scripts/test-contract-pack.mjs` | `261ed8c27137eb1d5d7ea7fe71b9173efed65571` | `261ed8c27137eb1d5d7ea7fe71b9173efed65571` | exact relocated copy |
 | `scripts/test-pack.mjs` | `Packages/DesignTokens/scripts/test-pack.mjs` | `578a0e80f6c13be9756d1ce55c17b62d3d08c7e2` | `578a0e80f6c13be9756d1ce55c17b62d3d08c7e2` | exact relocated copy |
-| `scripts/test-swift-consumer.mjs` | `Packages/DesignTokens/scripts/test-swift-consumer.mjs` | `b7c13f4edb615f83672141f55058163fd53fb1f5` | `8fd7a24c069e52f43b80131649f96a3384f1e344` | adapted: validates the nested manifest and contract through a disposable local-path consumer |
+| `scripts/test-swift-consumer.mjs` | `Packages/DesignTokens/scripts/test-swift-consumer.mjs` | `b7c13f4edb615f83672141f55058163fd53fb1f5` | `b7c13f4edb615f83672141f55058163fd53fb1f5` | exact relocated copy |
 | `scripts/verify` | `Packages/DesignTokens/scripts/verify` | `f83271cb6c667eb147c3dd5083d5ea312f00a010` | `f83271cb6c667eb147c3dd5083d5ea312f00a010` | exact relocated copy |
 | `specs/001-shared-colors/plan.md` | `Packages/DesignTokens/specs/001-shared-colors/plan.md` | `682d301341b1f7d171fea8b7168dffcacb94bd15` | `682d301341b1f7d171fea8b7168dffcacb94bd15` | exact relocated copy |
 | `specs/001-shared-colors/spec.md` | `Packages/DesignTokens/specs/001-shared-colors/spec.md` | `ac191713669f5c6ba7254d4dff6ab799b965fea3` | `ac191713669f5c6ba7254d4dff6ab799b965fea3` | exact relocated copy |
@@ -120,11 +120,14 @@ This manifest binds the S100 import to the public immutable provider release uni
 | `docs/architecture/tokens/tech-context.md` | new | new target leaf mapping for nested Tokens-owned executable paths and gates |
 | `docs/architecture/design-tokens/tech-context.md` | new | new target leaf mapping for the nested UI-free Swift target and gates |
 | `scripts/ci/setup.sh` | new | new root wrapper that enters the nested root and invokes the exact imported provider setup |
+| `Packages/DesignTokens/scripts/test-swift-local-consumer.mjs` | new | target-only disposable local-path consumer; preserved provider exact-revision fixture and harness remain byte-identical |
+| `Packages/DesignTokens/scripts/check-authority.mjs` | new | fail-closed tracked-path checker for the sole editable semantic sources |
+| `Packages/DesignTokens/tests/authority.test.mjs` | new | positive inventory plus duplicate-source negative fixtures across root, source, fixture and sibling-package locations |
 
 ## Invariants
 
-- The 80 rows marked `exact relocated copy` have identical provider and imported target blob IDs.
-- The four adapted rows retain the v0.2.0 product/API/data contract and change only excluded-governance references or nested local-consumer path mechanics.
-- Generated authorities remain the ten outputs named by the accepted S100 plan; generated files are never hand-edited.
+- Exactly 79 rows are labeled `exact relocated copy`; together with three byte-identical `exact support copy` rows, 82 of 84 imported provider files preserve their source blob.
+- The two adapted provider rows retain the v0.2.0 product/API/data contract and change only excluded-governance references or target-only verification commands.
+- Generation remains limited to the ten outputs named by the accepted S100 plan; those artifacts are never editable authorities or hand-edited.
 - Provider `.github/**`, hook and root agent files remain excluded, and no provider setting, credential, ref, tag or history is imported.
 - PR-head and final-merge SHAs belong in the external post-merge receipt, not this tracked manifest.
