@@ -59,8 +59,13 @@ iOS simulator build and test), contract audit, workflow-lint and the PR-body che
 ## Dependencies
 
 - `shared-ci` `6e354f476bc53d68f0f09fc231d5cd938466af9c` — https://github.com/LeePepe/shared-ci/blob/6e354f476bc53d68f0f09fc231d5cd938466af9c/ai/
-- `shared-design-tokens` `0.1.1` — `LeePepe/shared-design-tokens@0.1.1/ai/`
-  (tag `v0.1.1`: https://github.com/LeePepe/shared-design-tokens/tree/v0.1.1/ai; SwiftPM `exact: "0.1.1"`, product `DesignTokens`)
+- `shared-design-tokens` `0.2.0` — `LeePepe/shared-design-tokens@0.2.0/ai/`
+  (tag `v0.2.0`: https://github.com/LeePepe/shared-design-tokens/tree/v0.2.0/ai/)
+  SwiftPM `exact: "0.2.0"`, product `DesignTokens`.
+
+Public provider tag `v0.2.0` resolves to
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a`; `Package.resolved` records
+that exact release revision.
 
 ## Delivery
 
