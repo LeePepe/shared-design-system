@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
-import {mkdtempSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
-import {tmpdir} from 'node:os';
+import {mkdtempSync, mkdirSync, writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const dir = mkdtempSync(join(process.env.TOKENS_EVIDENCE_DIR || tmpdir(), 'tokens-swift-local-'));
+const repositoryRoot = fileURLToPath(new URL('../../../', import.meta.url));
+const evidenceRoot = process.env.TOKENS_EVIDENCE_DIR || join(repositoryRoot, '.build', 'evidence');
+mkdirSync(evidenceRoot, {recursive: true});
+const dir = mkdtempSync(join(evidenceRoot, 'tokens-swift-local-'));
 const receipt = {packagePath: root, directory: dir, commands: []};
 console.log(`Local Swift evidence: ${dir}`);
 

@@ -23,11 +23,27 @@ Uninstall: first remove imports, scoped CSS references and dependent code, then 
 
 ## Swift revision
 
-Swift tools 6.0+; public product `DesignTokens`. Pin the release tag exactly, never a branch or range: `.package(url: "https://github.com/LeePepe/shared-design-tokens.git", exact: "0.2.0")`, with `.product(name: "DesignTokens", package: "shared-design-tokens")`. The release notes record the tag's commit SHA and the external-consumer evidence.
+Swift tools 6.0+; public product/module `DesignTokens`. Pin the consolidated
+repository at a reviewed full revision, never a branch or range:
 
-The runnable [external fixture manifest](../examples/data/swift/Package.swift) instead consumes a local Git URL with an exact revision. Its dependency identity `tokens-provider` belongs to the fixture's local bare mirror, not a renamed remote. From a clean, committed source checkout run `npm run test:swift-consumer -- <full-local-SHA>`. The harness retains its mirror, `Package.resolved`, actual dependency checkout and output receipt outside the source tree. It asserts resolution equals the requested SHA, compares registry/docs bytes to that Git revision and runs the external executable against the public product. No source-path dependency or copying of provider sources is used.
+```swift
+.package(
+    url: "https://github.com/LeePepe/shared-design-system.git",
+    revision: "<40-character SHA>"
+)
+.product(name: "DesignTokens", package: "shared-design-system")
+```
 
-Read the actual resolved checkout's `ai/README.md` and registry (under the consumer's `.build/checkouts`, as identified by its resolution receipt). Source docs are not App resources. Remove the product from target dependencies and the package from the consumer manifest to uninstall; resolve and build again. No platform deployment setting is changed by this provider phase.
+The root package also publishes `NativeDesignKit`, which depends on this local
+target. DesignTokens alone supports watchOS 8; NativeDesignKit is unavailable on
+watchOS. Before publication, the repository verifies the same public imports
+through a local-path consumer without claiming public resolution. Required CI
+after push owns exact-public-revision resolution.
+
+Read `Packages/DesignTokens/ai/README.md` from the actual resolved checkout.
+Remove the product and containing package dependency to uninstall, then resolve
+and build again. Historical consumers may stay on immutable old provider tags
+until they perform the manifest-only migration in [MIGRATION.md](MIGRATION.md).
 
 ## Contract failures
 

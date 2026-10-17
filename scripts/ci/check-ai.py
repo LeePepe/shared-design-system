@@ -56,6 +56,8 @@ def check(root):
 
     for name in registry["documents"].values():
         resolve(ai, name)
+    for name in registry["releaseUnits"].values():
+        resolve(ai, name)
     if registry["releaseStatus"] == "released":
         changelog = (root / "CHANGELOG.md").read_text()
         require(re.search(r"^## 0\.1\.0(?:[ \t]|$)", changelog, re.MULTILINE) is not None,
@@ -74,15 +76,36 @@ def check(root):
             "public static func resolve(_ id: String, theme: Theme) throws -> SwiftUI.Color" in source,
             "AI_API", "public resolver no longer matches registry")
     manifest = (root / "Package.swift").read_text()
-    requirements = re.findall(
-        r'\.package\(\s*url:\s*"https://github\.com/LeePepe/shared-design-tokens\.git",\s*([^)]*)\)',
-        manifest)
-    require(len(requirements) == 1 and
-            re.fullmatch(r'exact:\s*"0\.2\.0"\s*,?\s*', requirements[0]) is not None,
-            "AI_DEPENDENCY", "DesignTokens must use the declared exact 0.2.0 requirement")
+    require("shared-design-tokens" not in manifest and ".package(" not in manifest,
+            "AI_DEPENDENCY", "root package must not retain an external package edge")
+    require(manifest.count('.library(name: "DesignTokens"') == 1 and
+            manifest.count('.library(name: "NativeDesignKit"') == 1,
+            "AI_DEPENDENCY", "root package must publish both stable products exactly once")
+    require('name: "DesignTokens",\n            path: "Packages/DesignTokens/Sources/DesignTokens"' in manifest and
+            'name: "NativeDesignKit",\n            dependencies: ["DesignTokens"]' in manifest,
+            "AI_DEPENDENCY", "NativeDesignKit must depend on the local DesignTokens target")
+    require(".iOS(.v15)" in manifest and ".macOS(.v12)" in manifest and
+            ".watchOS(.v8)" in manifest,
+            "AI_PLATFORMS", "package floors must remain iOS 15, macOS 12 and watchOS 8")
+    require(not (root / "Package.resolved").exists(),
+            "AI_DEPENDENCY", "a dependency-free root package must not retain the provider lock")
+    nested_registry = json.loads(
+        (root / "Packages/DesignTokens/ai/registry.json").read_text())
+    require(nested_registry["package"]["name"] == "@leepepe/design-tokens" and
+            nested_registry["package"]["version"] == "0.2.0" and
+            nested_registry["package"]["swiftProduct"] == "DesignTokens",
+            "AI_DESIGN_TOKENS", "nested release-unit identity mismatch")
+    nested_readme = (root / "Packages/DesignTokens/ai/README.md").read_text()
+    require("shared-design-system.git" in nested_readme and
+            "shared-design-system" in nested_readme,
+            "AI_DESIGN_TOKENS", "nested contract does not name the consolidated route")
+    guard = (root / "Sources/NativeDesignKit/PlatformBoundary.swift").read_text()
+    require('#if os(watchOS)' in guard and
+            '#error("NativeDesignKit is unavailable on watchOS; depend on the DesignTokens product only.")' in guard,
+            "AI_PLATFORMS", "stable NativeDesignKit watchOS boundary is missing")
     for source_file in (ai / "examples").rglob("*.swift"):
         require("@testable" not in source_file.read_text(), "AI_EXAMPLE", "consumer uses test-only API")
-    print("AI_OK: registry, release changelog, local links, public API and dependency contract")
+    print("AI_OK: registries, links, public API, local dependency and platform boundary")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — consolidated Swift package route
+
+- Publish the unchanged `DesignTokens` product beside `NativeDesignKit` from
+  exact `shared-design-system` revisions; Swift imports and APIs are unchanged.
+- Preserve the private npm 0.2.0 artifact, exports, token/style data, generated
+  bytes and immutable historical provider tags.
+
 ## 0.2.0 — style foundations and five Strata palettes
 
 - Add five explicit Strata brands, six family-sensitive neutral surfaces, brand states and material RGBA roles from approved custom Strata v0.2.

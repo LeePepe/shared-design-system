@@ -1,5 +1,19 @@
 # Migration and rollback
 
+## Provider repository to consolidated repository
+
+Keep `import DesignTokens` and all public API usage unchanged. Replace the
+consumer manifest dependency on `shared-design-tokens` with an exact reviewed
+revision of `https://github.com/LeePepe/shared-design-system.git`, and replace
+the product package identity with `shared-design-system`. Resolve, confirm the
+lock contains only the target repository for this package, then run the same
+color/style/error tests.
+
+Before a consolidated release is authorized, rollback restores the recorded old
+URL and exact `0.2.0` pin together with its lockfile. Existing immutable old tags
+remain readable. Never rewrite a tag, copy generated values, use a mirror/path
+as public evidence, or publish the private npm artifact.
+
 ## Style adoption
 
 Existing color consumers need no code change. Native/web style adopters pin exact 0.2.0 after verifying its immutable release; v0.1.1 has no `StyleTokens` or `/styles`. Local candidate fixtures bind source/docs to a reviewed exact commit only. To roll back an adopting consumer, remove its style API usage and restore its previous exact provider pin and adapter together; never patch generated values or rewrite v0.1.1.

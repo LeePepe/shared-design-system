@@ -14,6 +14,7 @@ package; do not substitute documentation from `main`.
 | Replace local color bridges or roll back | [MIGRATION.md](MIGRATION.md) |
 | Discover the contract mechanically | [registry.json](registry.json), [schema](registry.schema.json) |
 | Review changes | [CHANGELOG.md](../CHANGELOG.md) |
+| Use DesignTokens directly | [DesignTokens contract](../Packages/DesignTokens/ai/README.md) |
 
 The `ai/` directory ships in the source archive and SwiftPM checkout. It is not
 an App resource. Find it in the checkout whose identity is

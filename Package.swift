@@ -3,29 +3,28 @@ import PackageDescription
 
 let package = Package(
     name: "NativeDesignKit",
-    platforms: [.iOS(.v15), .macOS(.v12)],
+    platforms: [.iOS(.v15), .macOS(.v12), .watchOS(.v8)],
     products: [
+        .library(name: "DesignTokens", targets: ["DesignTokens"]),
         .library(name: "NativeDesignKit", targets: ["NativeDesignKit"])
-    ],
-    dependencies: [
-        .package(
-            url: "https://github.com/LeePepe/shared-design-tokens.git",
-            exact: "0.2.0"
-        )
     ],
     targets: [
         .target(
+            name: "DesignTokens",
+            path: "Packages/DesignTokens/Sources/DesignTokens"
+        ),
+        .target(
             name: "NativeDesignKit",
-            dependencies: [
-                .product(name: "DesignTokens", package: "shared-design-tokens")
-            ]
+            dependencies: ["DesignTokens"]
         ),
         .testTarget(
             name: "NativeDesignKitTests",
-            dependencies: [
-                "NativeDesignKit",
-                .product(name: "DesignTokens", package: "shared-design-tokens")
-            ]
+            dependencies: ["NativeDesignKit", "DesignTokens"]
+        ),
+        .testTarget(
+            name: "DesignTokensTests",
+            dependencies: ["DesignTokens"],
+            path: "Packages/DesignTokens/tests/DesignTokensTests"
         )
     ]
 )

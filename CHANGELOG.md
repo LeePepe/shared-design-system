@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Publish stable `DesignTokens` and `NativeDesignKit` products from one package;
+  NativeDesignKit uses the local data target with unchanged APIs and behavior.
+- Preserve iOS 15/macOS 12 floors, add the DesignTokens-only watchOS 8 boundary,
+  and reject NativeDesignKit watchOS selection with a stable diagnostic.
+- Move new DesignTokens consumers to exact `shared-design-system` revisions
+  while preserving immutable historical provider routes and private npm identity.
 - Explicit `NativeDesignTheme` and native solid/Glass surface policy for the
   [Strata rebuild](docs/strata-component-rebuild.md), preserving exact
   DesignTokens 0.1.1 and the released color resolver.

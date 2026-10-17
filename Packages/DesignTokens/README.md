@@ -1,4 +1,4 @@
-# shared-design-tokens — color and style data
+# DesignTokens — color and style data
 
 Version `0.2.0` (immutable Git tag `v0.2.0` after release verification) of `@leepepe/design-tokens` / Swift `DesignTokens`. This version adds platform-neutral style data under [the additive specification](specs/002-style-foundations/spec.md); it supplies no UI components. `tokens/colors.json` is the editable source of truth; JSON Schema and deterministic generation produce JS/TS, scoped CSS, resolved JSON and Swift. Repository policy is owned by the containing repository's root agent contract.
 
@@ -48,7 +48,12 @@ Public exports: root ESM + `.d.ts`, `/colors.css`, `/resolved.json`, `/source.js
 
 ## Swift data consumer
 
-Pin `.package(url: "https://github.com/LeePepe/shared-design-tokens.git", exact: "0.2.0")` and consume `.product(name: "DesignTokens", package: "shared-design-tokens")`. CI also verifies an external package resolving a local Git mirror of the exact commit, not a source-path dependency; see [Swift integration](ai/INTEGRATION.md#swift-revision).
+Pin the containing package at a reviewed exact revision:
+`.package(url: "https://github.com/LeePepe/shared-design-system.git",
+revision: "<40-character SHA>")`, then consume
+`.product(name: "DesignTokens", package: "shared-design-system")`. The module and
+public API remain `DesignTokens`; only the repository/package identity changes.
+See [Swift integration](ai/INTEGRATION.md#swift-revision).
 
 ```swift
 import DesignTokens
@@ -63,7 +68,10 @@ let ratio = try color.contrast(with: DesignTokens.color("product.surface.canvas"
 
 `Theme`, `BrandRole`, `RGBA`, `SeriesColor`, `TokenError` and `DesignTokens` are public immutable/Sendable data APIs. `RGBA(red:green:blue:alpha:)` rejects out-of-range/nonfinite inputs; `relativeLuminance` implements WCAG sRGB math; `contrast(with:)` rejects translucent colors instead of guessing a compositing surface. No HSB API or placeholder non-AppKit values exist.
 
-Root `Package.swift` currently has only a `DesignTokens` library and its tests. Future `NativeDesignKit` belongs in an **independent Apple repository**, consuming DesignTokens via SPM; no UI target is added here. Declared floors: Swift tools 6.0, iOS15/macOS12/watchOS8. Those are data-target declarations, not consumer migrations or device-validation claims. See the compatibility matrix.
+The containing root `Package.swift` publishes both `DesignTokens` and
+`NativeDesignKit`; NativeDesignKit depends on this local target. DesignTokens is
+UI-free and supports iOS 15, macOS 12 and watchOS 8. NativeDesignKit remains an
+iOS/macOS component product and is unavailable on watchOS.
 
 ## Reproduce
 
@@ -77,8 +85,7 @@ npm run check:ai
 npm run test:contract
 swift build
 swift test
-# After gates and an ordinary local commit, verify its exact Git revision:
-npm run test:swift-consumer -- "$(git rev-parse HEAD)"
+# The containing repository's required CI verifies its pushed exact revision.
 ```
 
 Browser tests use Node standard library to launch an isolated, short-lived headless Chrome/Chromium, load the delivered CSS and compare computed sRGB RGBA for every token in both themes, inheritance, nesting and invalid boundaries. A duplicate wrong declaration proves the gate detects winning overrides. Set `CHROME_BIN` to an executable, or use standard Chrome/Chromium commands on PATH / the standard macOS application location (Windows installation paths are also searched, not locally verified). Missing browsers and invalid explicit overrides fail, never skip. `npm run test:browser` runs this suite alone; `test:pack` also checks the CSS exported by the actually installed tarball. No UI framework, server or screenshot test is used.
