@@ -2,30 +2,86 @@ import XCTest
 
 @MainActor
 final class ButtonReviewUITests: XCTestCase {
+    private enum Initializer: String {
+        case explicitSurface = "explicit-surface"
+        case originalSolid = "original-solid"
+    }
+
+    func testHeldPressDispatchesOnceOnRelease() {
+        heldPressDispatchesOnceOnRelease(initializer: .explicitSurface)
+    }
+
+    func testOriginalInitializerHeldPressDispatchesOnceOnRelease() {
+        heldPressDispatchesOnceOnRelease(initializer: .originalSolid)
+    }
+
+    private func heldPressDispatchesOnceOnRelease(initializer: Initializer) {
+        let app = launch(scenario: "interaction", initializer: initializer)
+        let target = app.buttons["action-target"]
+        let frame = target.frame
+        let marker = initializer == .originalSolid ? "BUTTON_ORIGINAL_HOLD" : "BUTTON_HOLD"
+        let prefix = initializer == .originalSolid ? "button-original" : "button"
+        print("\(marker)_FRAME \(frame.minX),\(frame.minY),\(frame.width),\(frame.height)")
+        capture("\(prefix)-before-press", app: app)
+        print("\(marker)_READY")
+        target.press(forDuration: 4)
+        XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")
+        XCTAssertEqual(target.frame.width, frame.width, accuracy: 0.5)
+        XCTAssertEqual(target.frame.height, frame.height, accuracy: 0.5)
+        capture("\(prefix)-after-press", app: app)
+    }
+
     func testActionDispatchAndDisabledLoadingCoordinateTaps() {
-        let app = launch(scenario: "interaction")
+        actionDispatchAndDisabledLoadingCoordinateTaps(initializer: .explicitSurface)
+    }
+
+    func testOriginalInitializerActionDispatchAndDisabledLoadingCoordinateTaps() {
+        actionDispatchAndDisabledLoadingCoordinateTaps(initializer: .originalSolid)
+    }
+
+    private func actionDispatchAndDisabledLoadingCoordinateTaps(initializer: Initializer) {
+        let app = launch(scenario: "interaction", initializer: initializer)
         let target = app.buttons["action-target"]
         XCTAssertTrue(target.isEnabled)
         target.tap()
         XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")
+        captureOriginalAction("enabled", initializer: initializer, app: app)
 
         app.buttons["toggle-disabled"].tap()
         XCTAssertFalse(target.isEnabled)
         for _ in 0..<3 { target.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() }
         XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")
+        captureOriginalAction("disabled", initializer: initializer, app: app)
 
         app.buttons["toggle-disabled"].tap()
         app.buttons["toggle-loading"].tap()
         XCTAssertFalse(target.isEnabled)
         for _ in 0..<3 { target.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() }
         XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 1")
+        captureOriginalAction("loading", initializer: initializer, app: app)
         app.buttons["toggle-loading"].tap()
         target.tap()
         XCTAssertEqual(app.staticTexts["action-count"].label, "Actions: 2")
+        captureOriginalAction("re-enabled", initializer: initializer, app: app)
+    }
+
+    private func captureOriginalAction(_ phase: String, initializer: Initializer, app: XCUIApplication) {
+        guard initializer == .originalSolid else { return }
+        let target = app.buttons["action-target"]
+        print("BUTTON_ORIGINAL_ACTION phase=\(phase);enabled=\(target.isEnabled);label=\(target.label);frame=\(target.frame);\(app.staticTexts["action-count"].label)")
+        capture("button-original-action-\(phase)", app: app)
     }
 
     func testLoadingPreservesFootprintAndMinimumTarget() {
-        let app = launch(scenario: "interaction")
+        loadingPreservesFootprintAndMinimumTarget(initializer: .explicitSurface)
+    }
+
+    func testOriginalInitializerLoadingPreservesFootprintAndMinimumTarget() {
+        loadingPreservesFootprintAndMinimumTarget(initializer: .originalSolid)
+    }
+
+    private func loadingPreservesFootprintAndMinimumTarget(initializer: Initializer) {
+        let app = launch(scenario: "interaction", initializer: initializer)
         let target = app.buttons["action-target"]
         let idle = target.frame
         XCTAssertGreaterThanOrEqual(idle.width, 44)
@@ -35,15 +91,23 @@ final class ButtonReviewUITests: XCTestCase {
         XCTAssertEqual(target.frame.width, idle.width, accuracy: 0.5)
         XCTAssertEqual(target.frame.height, idle.height, accuracy: 0.5)
         XCTAssertTrue(app.frame.contains(target.frame))
-        print("Button footprint: idle=\(idle), loading=\(target.frame)")
+        print("Button footprint: initializer=\(initializer.rawValue), idle=\(idle), loading=\(target.frame)")
     }
 
     func testLongLocalizedAccessibilityGrowthWithinNarrowBoard() {
-        var app = launch(scenario: "long-label", language: "de")
+        longLocalizedAccessibilityGrowthWithinNarrowBoard(initializer: .explicitSurface)
+    }
+
+    func testOriginalInitializerLongLocalizedAccessibilityGrowthWithinNarrowBoard() {
+        longLocalizedAccessibilityGrowthWithinNarrowBoard(initializer: .originalSolid)
+    }
+
+    private func longLocalizedAccessibilityGrowthWithinNarrowBoard(initializer: Initializer) {
+        var app = launch(scenario: "long-label", language: "de", initializer: initializer)
         let standard = app.buttons["long-target"].frame
         XCTAssertGreaterThanOrEqual(standard.height, 44)
         app.terminate()
-        app = launch(scenario: "long-label", size: "accessibility2", language: "de")
+        app = launch(scenario: "long-label", size: "accessibility2", language: "de", initializer: initializer)
         let target = app.buttons["long-target"]
         let accessible = target.frame
         XCTAssertGreaterThan(accessible.height, standard.height + 20)
@@ -53,13 +117,14 @@ final class ButtonReviewUITests: XCTestCase {
         XCTAssertTrue(String(describing: app.staticTexts["shape-safety"].value).contains("capsule-control=outside"),
                       "The regression fixture must exercise text bounds that the former capsule could not contain.")
         print("Idle shape geometry: \(app.staticTexts["shape-safety"].value ?? "missing")")
-        capture("button-accessibility-narrow", app: app)
+        capture(initializer == .originalSolid ? "button-original-accessibility-narrow" : "button-accessibility-narrow", app: app)
         app.buttons["toggle-loading"].tap()
         XCTAssertEqual(target.frame.width, accessible.width, accuracy: 0.5)
         XCTAssertEqual(target.frame.height, accessible.height, accuracy: 0.5)
         assertFullLabel("Auswahl vorbereiten und alle Änderungen speichern…", inside: target, app: app)
+        if initializer == .originalSolid { capture("button-original-accessibility-narrow-loading", app: app) }
         print("Loading shape geometry: \(app.staticTexts["shape-safety"].value ?? "missing")")
-        print("iOS localized layout: standard=\(standard), accessibility2=\(accessible), loading=\(target.frame)")
+        print("iOS localized layout: initializer=\(initializer.rawValue), standard=\(standard), accessibility2=\(accessible), loading=\(target.frame)")
     }
 
     func testVisualMatrixOceanLight() { matrix(brand: "ocean", mode: "light") }
@@ -67,15 +132,193 @@ final class ButtonReviewUITests: XCTestCase {
     func testVisualMatrixGraphiteLight() { matrix(brand: "graphite", mode: "light") }
     func testVisualMatrixGraphiteDark() { matrix(brand: "graphite", mode: "dark") }
 
+    func testOriginalInitializerMatrixMatchesExplicitSolidOceanLight() { compareOriginalMatrix(brand: "ocean", mode: "light") }
+    func testOriginalInitializerMatrixMatchesExplicitSolidOceanDark() { compareOriginalMatrix(brand: "ocean", mode: "dark") }
+    func testOriginalInitializerMatrixMatchesExplicitSolidGraphiteLight() { compareOriginalMatrix(brand: "graphite", mode: "light") }
+    func testOriginalInitializerMatrixMatchesExplicitSolidGraphiteDark() { compareOriginalMatrix(brand: "graphite", mode: "dark") }
+
+    func testSpecimenBlueLightGlass() { specimen(brand: "strata-blue", mode: "light", surface: "glass") }
+    func testSpecimenBlueLightSolid() { specimen(brand: "strata-blue", mode: "light", surface: "solid") }
+    func testSpecimenBlueDarkGlass() { specimen(brand: "strata-blue", mode: "dark", surface: "glass") }
+    func testSpecimenBlueDarkSolid() { specimen(brand: "strata-blue", mode: "dark", surface: "solid") }
+    func testSpecimenGreenLightGlass() { specimen(brand: "strata-green", mode: "light", surface: "glass") }
+    func testSpecimenGreenLightSolid() { specimen(brand: "strata-green", mode: "light", surface: "solid") }
+    func testSpecimenGreenDarkGlass() { specimen(brand: "strata-green", mode: "dark", surface: "glass") }
+    func testSpecimenGreenDarkSolid() { specimen(brand: "strata-green", mode: "dark", surface: "solid") }
+    func testSpecimenPinkLightGlass() { specimen(brand: "strata-pink", mode: "light", surface: "glass") }
+    func testSpecimenPinkLightSolid() { specimen(brand: "strata-pink", mode: "light", surface: "solid") }
+    func testSpecimenPinkDarkGlass() { specimen(brand: "strata-pink", mode: "dark", surface: "glass") }
+    func testSpecimenPinkDarkSolid() { specimen(brand: "strata-pink", mode: "dark", surface: "solid") }
+    func testSpecimenYellowLightGlass() { specimen(brand: "strata-yellow", mode: "light", surface: "glass") }
+    func testSpecimenYellowLightSolid() { specimen(brand: "strata-yellow", mode: "light", surface: "solid") }
+    func testSpecimenYellowDarkGlass() { specimen(brand: "strata-yellow", mode: "dark", surface: "glass") }
+    func testSpecimenYellowDarkSolid() { specimen(brand: "strata-yellow", mode: "dark", surface: "solid") }
+    func testSpecimenPurpleLightGlass() { specimen(brand: "strata-purple", mode: "light", surface: "glass") }
+    func testSpecimenPurpleLightSolid() { specimen(brand: "strata-purple", mode: "light", surface: "solid") }
+    func testSpecimenPurpleDarkGlass() { specimen(brand: "strata-purple", mode: "dark", surface: "glass") }
+    func testSpecimenPurpleDarkSolid() { specimen(brand: "strata-purple", mode: "dark", surface: "solid") }
+
+    func testReduceMotionLoadingRetainsReadableStateAndFootprint() {
+        let original = withSystemPreference(section: "Motion", name: "Reduce Motion") {
+            let app = launch(scenario: "interaction")
+            XCTAssertEqual(app.staticTexts["motion-preference"].label, "Motion: reduced")
+            let target = app.buttons["action-target"]
+            let idle = target.frame
+            app.buttons["toggle-loading"].tap()
+            XCTAssertTrue(target.label.contains("Saving all your changes…"))
+            XCTAssertFalse(target.isEnabled)
+            XCTAssertEqual(target.frame.width, idle.width, accuracy: 0.5)
+            XCTAssertEqual(target.frame.height, idle.height, accuracy: 0.5)
+            capture("button-reduce-motion-loading", app: app)
+            app.terminate()
+        }
+        guard let original else { return }
+        let restored = launch(scenario: "interaction")
+        XCTAssertEqual(restored.staticTexts["motion-preference"].label, original == "1" ? "Motion: reduced" : "Motion: standard")
+        print("BUTTON_SYSTEM_RESTORED_APP Reduce Motion original=\(original) observed=\(restored.staticTexts["motion-preference"].label)")
+        capture("button-system-reduce-motion-restored-app", app: restored)
+        restored.terminate()
+    }
+
+    func testForcedFallbackIsSeparateFromSystemPreference() {
+        let app = launch(scenario: "specimen", brand: "strata-purple", mode: "dark", forceReduced: true)
+        let value = String(describing: app.scrollViews["review-scroll"].value)
+        XCTAssertTrue(value.contains("reduce-transparency=false"), "Forced fallback must not change the actual system preference.")
+        XCTAssertTrue(value.contains("forced-reduced=true"), "The internal fixture-only override must be observed separately.")
+        recordCompositeGeometry(name: "button-strata-purple-dark-forced-fallback", brand: "strata-purple", mode: "dark", app: app)
+        capture("button-strata-purple-dark-forced-fallback", app: app)
+        app.terminate()
+    }
+
+    func testRealReduceTransparencyFallbackRetainsThemeAndGeometry() {
+        var frames: [String: CGRect] = [:]
+        let baseline = launch(scenario: "specimen", brand: "strata-purple", mode: "dark")
+        for id in ["save", "secondary", "ghost", "disabled", "loading"] {
+            frames[id] = baseline.buttons["specimen-\(id)"].frame
+        }
+        baseline.terminate()
+        let original = withSystemPreference(section: "Display & Text Size", name: "Reduce Transparency") {
+            let app = launch(scenario: "specimen", brand: "strata-purple", mode: "dark")
+            XCTAssertTrue(String(describing: app.scrollViews["review-scroll"].value).contains("reduce-transparency=true"))
+            for (id, frame) in frames {
+                let actual = app.buttons["specimen-\(id)"].frame
+                XCTAssertEqual(actual.minX, frame.minX, accuracy: 0.5)
+                XCTAssertEqual(actual.minY, frame.minY, accuracy: 0.5)
+                XCTAssertEqual(actual.width, frame.width, accuracy: 0.5)
+                XCTAssertEqual(actual.height, frame.height, accuracy: 0.5)
+            }
+            recordCompositeGeometry(name: "button-strata-purple-dark-reduced-transparency", brand: "strata-purple", mode: "dark", app: app)
+            capture("button-strata-purple-dark-reduced-transparency", app: app)
+            app.terminate()
+        }
+        guard let original else { return }
+        let restored = launch(scenario: "specimen", brand: "strata-purple", mode: "dark")
+        let observed = String(describing: restored.scrollViews["review-scroll"].value)
+        XCTAssertTrue(observed.contains("reduce-transparency=\(original == "1")"), "The app must observe the actual original system preference after restoration.")
+        XCTAssertTrue(observed.contains("forced-reduced=false"))
+        print("BUTTON_SYSTEM_RESTORED_APP Reduce Transparency original=\(original) observed=\(observed)")
+        capture("button-system-reduce-transparency-restored-app", app: restored)
+        restored.terminate()
+    }
+
     func testInvalidBrandShowsErrorWithoutFallback() {
         let app = launch(scenario: "matrix", brand: "__unknown_brand__", expectsError: true)
         XCTAssertTrue(app.staticTexts["fixture-error"].label.contains("__unknown_brand__"))
         XCTAssertFalse(app.buttons["matrix-primary-normal"].exists)
     }
 
-    private func matrix(brand: String, mode: String) {
-        let app = launch(scenario: "matrix", brand: brand, mode: mode)
+    private func specimen(brand: String, mode: String, surface: String) {
+        let app = launch(scenario: "specimen", brand: brand, mode: mode, surface: surface)
+        XCTAssertTrue(String(describing: app.scrollViews["review-scroll"].value).contains("reduce-transparency=false"),
+                      "The normal Glass/solid matrix must not run with a transparency fallback active.")
         let scale = screenshotScale(app)
+        for id in ["save", "secondary", "ghost", "disabled", "loading"] {
+            let target = app.buttons["specimen-\(id)"]
+            XCTAssertTrue(target.exists)
+            XCTAssertEqual(target.isEnabled, id != "disabled" && id != "loading")
+            assertMinimumTarget(target, scale: scale)
+            XCTAssertTrue(app.scrollViews["review-scroll"].frame.contains(target.frame), id)
+            let expected = ["save": "Save", "secondary": "Secondary", "ghost": "Ghost",
+                            "disabled": "Disabled", "loading": "Loading"][id]!
+            XCTAssertEqual(target.label, expected)
+            let label = target.staticTexts[expected]
+            XCTAssertTrue(label.exists)
+            XCTAssertTrue(target.frame.insetBy(dx: -0.5, dy: -0.5).contains(label.frame))
+        }
+        let name = "button-\(brand)-\(mode)-\(surface)"
+        recordCompositeGeometry(name: name, brand: brand, mode: mode, app: app)
+        capture(name, app: app)
+        app.buttons["specimen-save"].tap()
+        XCTAssertTrue(app.staticTexts["specimen-feedback"].label.contains("Example saved · 1"))
+        for id in ["disabled", "loading"] {
+            app.buttons["specimen-\(id)"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        }
+        XCTAssertTrue(app.staticTexts["specimen-feedback"].label.contains("Example saved · 1"))
+    }
+
+    private func recordCompositeGeometry(name: String, brand: String, mode: String, app: XCUIApplication) {
+        func rectangle(_ frame: CGRect) -> [Double] {
+            [Double(frame.minX), Double(frame.minY), Double(frame.width), Double(frame.height)]
+        }
+        var samples: [[String: Any]] = []
+        for (id, token) in [
+            ("save", "brand.\(brand).on-accent"),
+            ("secondary", "product.strata.text.primary"),
+            ("ghost", "brand.\(brand).text"),
+            ("disabled", "product.strata.text.secondary"),
+            ("loading", "brand.\(brand).on-accent")
+        ] {
+            let control = app.buttons["specimen-\(id)"]
+            let measured = (control.value as? String)?.split(separator: ",").compactMap { Double($0) } ?? []
+            XCTAssertEqual(measured.count, 4, "Require actual SwiftUI Text bounds for \(id)")
+            samples.append(["role": id, "token": token, "text": measured,
+                            "control": rectangle(control.frame)])
+        }
+        for (id, token) in [("specimen-state-label", "product.strata.text.secondary"),
+                            ("specimen-caption", "product.strata.text.secondary"),
+                            ("specimen-feedback", "product.strata.text.secondary")] {
+            samples.append(["role": id, "token": token, "text": rectangle(app.staticTexts[id].frame)])
+        }
+        for title in ["Strata · 岩层", "01  Button"] {
+            samples.append(["role": title, "token": "product.strata.text.primary",
+                            "text": rectangle(app.staticTexts[title].frame)])
+        }
+        let receipt: [String: Any] = ["name": name, "mode": mode, "viewport": rectangle(app.frame), "samples": samples,
+                                      "system_preference": String(describing: app.scrollViews["review-scroll"].value)]
+        do {
+            let data = try JSONSerialization.data(withJSONObject: receipt, options: [.sortedKeys])
+            print("BUTTON_COMPOSITE " + String(decoding: data, as: UTF8.self))
+        } catch { XCTFail("Could not serialize observed runtime text bounds: \(error)") }
+    }
+
+    private func compareOriginalMatrix(brand: String, mode: String) {
+        // Original call intentionally receives the fixture's Glass request. Its
+        // source branch omits surface and must still match explicit Solid.
+        let original = matrix(brand: brand, mode: mode, initializer: .originalSolid)
+        let solid = matrix(brand: brand, mode: mode, surface: "solid")
+        XCTAssertEqual(Set(original.keys), Set(solid.keys))
+        for (id, frame) in original {
+            guard let actual = solid[id] else { XCTFail("Missing Solid target: \(id)"); continue }
+            XCTAssertEqual(actual.minX, frame.minX, accuracy: 0.5)
+            XCTAssertEqual(actual.minY, frame.minY, accuracy: 0.5)
+            XCTAssertEqual(actual.width, frame.width, accuracy: 0.5)
+            XCTAssertEqual(actual.height, frame.height, accuracy: 0.5)
+        }
+    }
+
+    @discardableResult
+    private func matrix(brand: String, mode: String, surface: String = "glass",
+                        initializer: Initializer = .explicitSurface) -> [String: CGRect] {
+        let app = launch(scenario: "matrix", brand: brand, mode: mode, surface: surface, initializer: initializer)
+        let scale = screenshotScale(app)
+        var frames: [String: CGRect] = [:]
+        var controls: [[String: Any]] = []
+        let viewport = app.frame
+        func rectangle(_ frame: CGRect) -> [Double] {
+            [Double(frame.minX), Double(frame.minY), Double(frame.width), Double(frame.height)]
+        }
+        XCTAssertTrue(String(describing: app.scrollViews["review-scroll"].value).contains("reduce-transparency=false"),
+                      "The compatibility matrix must observe normal system transparency, so Solid/Glass remain distinguishable.")
         for variant in ["primary", "secondary", "ghost"] {
             for state in ["normal", "loading", "disabled"] {
                 let button = app.buttons["matrix-\(variant)-\(state)"]
@@ -84,10 +327,27 @@ final class ButtonReviewUITests: XCTestCase {
                 assertMinimumTarget(button, scale: scale)
                 XCTAssertTrue(app.scrollViews["review-scroll"].frame.contains(button.frame),
                               "Every matrix button must be fully onscreen before capture: \(variant)/\(state)")
+                let id = "matrix-\(variant)-\(state)"
+                frames[id] = button.frame
+                controls.append(["id": id, "variant": variant, "state": state,
+                                 "frame": rectangle(button.frame), "label": button.label,
+                                 "enabled": button.isEnabled, "hittable": button.isHittable])
             }
         }
         XCTAssertTrue(app.frame.contains(app.staticTexts["matrix-end"].frame))
-        capture("button-\(brand)-\(mode)", app: app)
+        let prefix = initializer == .originalSolid ? "button-original-solid" : surface == "solid" ? "button-explicit-solid" : "button"
+        let name = "\(prefix)-\(brand)-\(mode)"
+        let receipt: [String: Any] = ["name": name, "brand": brand, "mode": mode,
+                                      "initializer": initializer.rawValue, "requested_surface": surface,
+                                      "viewport": rectangle(viewport), "controls": controls,
+                                      "observed_route": String(describing: app.scrollViews["review-scroll"].value)]
+        do {
+            let data = try JSONSerialization.data(withJSONObject: receipt, options: [.sortedKeys])
+            print("BUTTON_COMPATIBILITY " + String(decoding: data, as: UTF8.self))
+        } catch { XCTFail("Could not serialize original/Solid runtime observations: \(error)") }
+        capture(name, app: app)
+        app.terminate()
+        return frames
     }
 
     private func screenshotScale(_ app: XCUIApplication) -> CGFloat {
@@ -127,14 +387,87 @@ final class ButtonReviewUITests: XCTestCase {
         add(attachment)
     }
 
-    private func launch(scenario: String, brand: String = "ocean", mode: String = "light",
-                        size: String = "large", language: String = "en", expectsError: Bool = false) -> XCUIApplication {
+    /// Changes and restores the simulator's actual setting through its native UI.
+    private func withSystemPreference(section: String, name: String, body: () -> Void) -> String? {
+        let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
+        settings.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        settings.launch()
+        for _ in 0..<5 {
+            let bar = settings.navigationBars.firstMatch
+            if ["Settings", "设置"].contains(bar.identifier) { break }
+            let back = bar.buttons.firstMatch
+            if !back.exists { break }
+            back.tap()
+        }
+        let accessibility = settings.staticTexts.matching(NSPredicate(format: "label IN %@", ["Accessibility", "辅助功能"])).firstMatch
+        for _ in 0..<8 {
+            if accessibility.isHittable { break }
+            settings.swipeUp()
+        }
+        guard accessibility.isHittable else { XCTFail("Settings Accessibility entry unavailable"); return nil }
+        accessibility.tap()
+        let translatedSection = section == "Motion" ? "动态效果" : "显示与文字大小"
+        let sectionEntry = settings.staticTexts.matching(NSPredicate(format: "label IN %@", [section, translatedSection])).firstMatch
+        for _ in 0..<5 {
+            if sectionEntry.isHittable { break }
+            settings.swipeUp()
+        }
+        guard sectionEntry.isHittable else { XCTFail("Settings section unavailable: \(section)"); return nil }
+        sectionEntry.tap()
+        let translatedName = name == "Reduce Motion" ? "减弱动态效果" : "降低透明度"
+        let toggle = settings.switches.matching(NSPredicate(format: "label IN %@", [name, translatedName])).firstMatch
+        guard toggle.waitForExistence(timeout: 5) else { XCTFail("System setting unavailable: \(name)"); return nil }
+        guard let original = toggle.value as? String else { XCTFail("System switch has no value"); return nil }
+        func observe(_ phase: String) {
+            let value = "name=\(name);phase=\(phase);original=\(original);actual=\(toggle.value ?? "missing")"
+            print("BUTTON_SYSTEM_PREFERENCE \(value)")
+            let attachment = XCTAttachment(string: value + "\n" + settings.debugDescription)
+            attachment.name = "button-system-\(name.lowercased().replacingOccurrences(of: " ", with: "-"))-\(phase)"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+        observe("original")
+        setSystemSwitch(toggle, value: "1")
+        XCTAssertEqual(toggle.value as? String, "1")
+        observe("reduced")
+        defer {
+            settings.activate()
+            setSystemSwitch(toggle, value: original)
+            XCTAssertEqual(toggle.value as? String, original)
+            observe("restored")
+            settings.terminate()
+        }
+        body()
+        return original
+    }
+
+    private func setSystemSwitch(_ toggle: XCUIElement, value: String) {
+        // Settings may return from app activation before SpringBoard's transition
+        // accepts the first touch. Re-observe the real value before each retry.
+        for _ in 0..<3 {
+            if (toggle.value as? String) == value { return }
+            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+            let changed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: toggle)
+            if XCTWaiter.wait(for: [changed], timeout: 3) == .completed { return }
+        }
+        XCTAssertEqual(toggle.value as? String, value, "The actual system preference must be observed, including restoration.")
+    }
+
+    private func launch(scenario: String, brand: String = "strata-blue", mode: String = "light", surface: String = "glass",
+                        size: String = "large", language: String = "en", expectsError: Bool = false,
+                        forceReduced: Bool = false, initializer: Initializer = .explicitSurface) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment = ["NDK_SCENARIO": scenario, "NDK_BRAND": brand, "NDK_THEME": mode,
-                                 "NDK_TEXT_SIZE": size, "NDK_LANGUAGE": language]
+                                 "NDK_TEXT_SIZE": size, "NDK_LANGUAGE": language, "NDK_SURFACE": surface,
+                                 "NDK_FORCE_REDUCED": String(forceReduced), "NDK_BUTTON_INITIALIZER": initializer.rawValue]
         app.launch()
         let ready = expectsError ? app.staticTexts["fixture-error"] : app.scrollViews["review-scroll"]
         XCTAssertTrue(ready.waitForExistence(timeout: 10), app.debugDescription)
+        if !expectsError && ["matrix", "interaction", "long-label"].contains(scenario) {
+            let observed = String(describing: ready.value)
+            XCTAssertTrue(observed.contains("initializer=\(initializer.rawValue);requested-surface=\(surface);"),
+                          "Require the requested initializer route in the running app: \(observed)")
+        }
         return app
     }
 }

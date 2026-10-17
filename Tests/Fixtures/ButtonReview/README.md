@@ -1,16 +1,63 @@
 # Button review fixture
 
-An iOS-only SwiftUI app and XCTest UI automation target. This is test-only
+An iPhone/iPad SwiftUI app with XCTest UI automation and an optional macOS
+pointer/keyboard target. This is test-only
 synthetic state, not a product screen or additional library product. See the
 [shared runner instructions](../Support/README.md) for commands and reuse.
 `project.yml` is canonical; XcodeGen generates the shared `ButtonReview` scheme.
 The local package path is `../../..`. No dependency pin or platform floor changes.
 
-The UI tests provide all required `NDK_BRAND`, `NDK_THEME`, `NDK_SCENARIO`,
-`NDK_TEXT_SIZE` and `NDK_LANGUAGE` launch inputs. Matrix captures show all three
+The UI tests provide all required `NDK_BRAND`, `NDK_THEME`, `NDK_SURFACE`,
+`NDK_SCENARIO`, `NDK_TEXT_SIZE` and `NDK_LANGUAGE` launch inputs. The UI tests
+change and restore the simulator's actual Reduce Motion and Reduce Transparency
+preferences through Settings, and assert SwiftUI observed those preferences.
+`specimen` uses the shared `StrataSpecimen` shell and a dense inner stage,
+with five real Strata palettes × light/dark × Glass/solid (20 named captures).
+The compact normal row shows Primary, Secondary and Ghost, followed by
+disabled/loading examples. `matrix` keeps the behavior-board content. Matrix captures show all three
 variants in normal/loading/disabled states for ocean/graphite × light/dark.
 The 320 pt board uses German localized labels and actual iOS accessibility2
 typography. XCTest captures the running app, not a hosted view bitmap.
+
+## Original initializer compatibility lane
+
+`NDK_BUTTON_INITIALIZER=original-solid` selects a separate SwiftUI branch that
+calls the original public initializer **without a `surface` argument** for
+`matrix`, `interaction` and `long-label`. `explicit-surface` is the default and
+continues to call the additive overload with the requested surface. Specimen and
+native-input routes are unchanged; selecting the original lane for either is a
+configuration error. The running behavior board exposes its selected initializer
+and requested surface in the `review-scroll` accessibility value.
+
+The eight `testOriginalInitializer…` tests add runtime coverage alongside the
+32 existing tests. They run the same strict action, held-press, stable-footprint,
+44 pt target and German accessibility2 narrow-label assertions through the
+original call site. The action captures include enabled dispatch, three disabled
+coordinate taps, three loading coordinate taps and successful re-enabled dispatch.
+The narrow captures show both complete localized active labels and their measured
+containment in the production fill path. Both overloads run the same assertions
+for these four behavior checks; no construction-only check substitutes for this
+lane.
+
+Four compatibility tests capture the original initializer and explicit Solid
+for ocean/graphite × light/dark, with all three variants × normal/loading/disabled.
+The original lane deliberately requests Glass in fixture configuration but never
+passes it to NativeButton. Tests compare all nine runtime frames within 0.5 pt,
+check targets and enabled states, and require actual system Reduce Transparency
+to be false. `BUTTON_COMPATIBILITY` log records bind each named XCTest PNG to its
+observed route, labels, states, frames and viewport. Delivery evidence must compare
+the actual original/Solid static control pixels and backgrounds, using existing
+explicit Glass matrix captures as the material discriminator for Secondary.
+Loading rotation is animated; its whole-image bytes are not an equality oracle.
+The full shared runner collects all 48 named XCTest captures, including the
+16 compatibility/action/narrow/press additions in `screenshots.json`.
+
+The previous `0db54cc` revision preserved test names and assertions while moving
+all runtime boards to the additive overload. That lost original-initializer
+coverage; its construction-only package check did not repair the loss. This lane
+addresses the independent review finding without changing production code or
+replacing the explicit-surface tests. A fresh clean-head run and independent
+review are required; historical screenshots and passes do not apply to this repair.
 
 ## Test migration / PR integrity record
 
@@ -54,3 +101,124 @@ rectangle when it contains its corners. A capsule control must reject the idle
 text bounds, proving this case exercises the former shape-escape bug rather
 than just rectangular containment. The visible result accompanies the actual
 accessibility screenshot; no text is clipped or reduced to fit.
+
+The XcodeGen app target explicitly includes `../Shared/StrataSpecimen.swift`.
+This shared test-only helper belongs to the foundation; ButtonReview supplies
+its own controls and stage. No RGB palette or glass recipe is duplicated here.
+The exact source/provider revisions, clean-tree receipt and external candidate
+mirror configuration belong with each result bundle; a local candidate mirror
+does not establish that the provider version is released or that remote gates
+passed. Run simulator work through the coordinator's serial lock.
+
+Runtime contrast verification (Python standard library only):
+
+```sh
+python3 Tests/Fixtures/ButtonReview/verify-composites.py \
+  <results>.run.json <runner-stdout>.log --output <external-report>.json
+```
+
+The checker requires a passing run from a clean current head, the exact provider
+revision, and measured SwiftUI Text bounds rather than inflated accessibility
+rectangles. It matches full glyph pixels to provider text roles, tests three
+nearby actual background samples at >=4.5:1 for all20 specimens and the real
+Reduce Transparency capture plus one explicit forced-fallback capture, compares
+layout across all22, and compares both fallback backgrounds to explicit solid.
+Measurements cover this specimen, not arbitrary
+consumer backdrops. Held-press evidence can additionally use a serial `simctl io
+screenshot` during the UI test's four-second native press; record that capture
+separately from XCTest attachments with the same exact source/provider SHAs.
+
+The macOS `ButtonReviewMac` scheme runs real pointer hover for all three variants
+and caller Command-S activation, including disabled/loading suppression. The
+new pointer check moved from iPhone after XCTest reported “Pointer events are
+not supported for this device”; it is retained in `ButtonPointerReviewUITests`
+on a platform that supports the input, with no skip or weaker assertion.
+
+```sh
+xcodegen generate --no-env --spec Tests/Fixtures/ButtonReview/project.yml
+xcodebuild test -project Tests/Fixtures/ButtonReview/ButtonReview.xcodeproj \
+  -scheme ButtonReviewMac -destination 'platform=macOS' \
+  -derivedDataPath <external-new-directory> -resultBundlePath <external-new>.xcresult \
+  CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-
+```
+
+The ad-hoc identity signs only the local test app/runner, with no account or
+provisioning profile. This host may still reject native UI automation before
+any test method runs. The same pointer/keyboard suite is also available on an
+iPad simulator through `ButtonReviewPointer`; iPhone remains the20-specimen
+and behavior target.
+
+The pointer test requires a SwiftUI hover callback for each target, in addition
+to captured appearance. An accepted XCTest mouse event alone cannot establish
+hover behavior. A plain Text sentinel helps distinguish missing runtime pointer
+delivery from component behavior. The iPad focus test reads the actual Full
+Keyboard Access preference without changing it. That preference must already
+be enabled on the supplied iPad runtime, and a disabled preference fails the
+test. The original native focus and Space activation assertions still run and
+remain required. Report failures with their result bundle; do not substitute
+an idle screenshot for observed hover or focus.
+
+```sh
+xcodebuild test -project Tests/Fixtures/ButtonReview/ButtonReview.xcodeproj \
+  -scheme ButtonReviewPointer -destination 'platform=iOS Simulator,id=<iPad-UUID>' \
+  -derivedDataPath <external-new-directory> -resultBundlePath <external-new>.xcresult \
+  CODE_SIGNING_ALLOWED=NO
+```
+
+Export macOS/iPad attachments using `xcrun xcresulttool export attachments`. A keyboard
+navigation screenshot is an observation; claim a visible focus ring only after
+inspecting that actual capture. Host automation permissions remain a separate
+runtime requirement and cannot be inferred from a package build.
+
+`testStandardControlsDiagnoseNativeInputDelivery` adds an `input-diagnostics`
+board alongside the unchanged specimens. A standard bordered SwiftUI Button,
+plain Text hover sentinel, TextField and focusable key probe compare actual
+callbacks with NativeButton. It records both requested and observed focus,
+requires real focused Space activation on both controls, and compares element
+and coordinate hover with mouse-click delivery. Successful text entry or a
+shortcut alone does not establish focus navigation. The board never changes
+system preferences and supplies no synthetic hover/focus override. Preserve
+the XCTest synthesized-event attachments and observations when this test fails;
+those identify the event source and coordinates without guessing from idle PNGs.
+
+`ButtonFlatControlIsolationUITests/testFlatStandardHoverNativeTabFocusAndSpace`
+is a bounded diagnostic positive control launched with
+`--button-flat-control-isolation`. Its separate flat `VStack` contains one
+ordinary bordered SwiftUI Button and a Text sentinel, without ScrollView,
+NativeButton, FocusState, focus setters, TextField or shortcuts. It records
+free-movement hover entry/exit counts and monotonic callback timestamps, actual
+frames/hittability, label `isFocused` callbacks, separate AX `hasFocus`, native
+Tab/Space dispatch timing, action count, AX text attachments and runtime PNGs.
+The expected Tab target is recorded only by the test, never assigned as focus.
+FKA's pre-existing preference is an external prerequisite, not observed native
+focus; the serial experiment receipt must hash/read it before and after without
+changing it. The diagnostic sends three hover movements, one Tab and one Space;
+each state predicate waits at most two seconds, with a 180-second method limit.
+If a native key dispatch takes 20 seconds or more, it records a failure/capture
+and stops this experiment rather than repeating known quiescence stalls.
+Its failure leaves all original hover/focus/Space assertions required and does
+not establish whether the product or runtime is responsible. Run only this
+method for the isolation experiment; preserve cumulative prior failures.
+
+## Public-base delivery and deferred native input
+
+Final delivery consumes public exact DesignTokens0.2.0 at
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a` with no local mirror. NativeDesignKit
+remains unreleased. Historical candidate packets remain scoped to their original
+source/provider revisions.
+
+The Owner on2026-10-17 explicitly temporarily deferred native hover, Tab focus
+and focused Space acceptance after the flat ordinary-control failure; root cause
+is UNKNOWN. Preserve the unchanged strict pointer/focus/Space suite and both07d
+and151851e failed results. Do not rerun unchanged input diagnosis or claim it
+passes. The normal `ButtonReview` app scheme runs the visual/layout/action and
+system-preference contract; the separate pointer scheme remains intact.
+
+One forced-fallback test uses only the foundation's existing internal
+`nativeReduceTransparencyOverride` seam through `NDK_FORCE_REDUCED=true` and
+asserts the actual system preference remainsfalse. It is separate from the real
+system Reduce Transparency test, and no override is applied in normal launches.
+The system tests attach original/reduced/restored actual Settings AX values,
+restore each exact original value, then relaunch the app and assert/capture that
+SwiftUI observes that original preference. No initial value is silently assumed
+by restoration. Normal Glass specimens still require actual transparencyfalse.
