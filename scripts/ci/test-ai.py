@@ -125,6 +125,34 @@ class ContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "AI_DESIGN_TOKENS"):
             CHECK.check(self.root)
 
+    def test_rejects_live_usage_route_drift(self):
+        for relative in ("ai/USAGE.md", "Packages/DesignTokens/ai/USAGE.md"):
+            with self.subTest(relative=relative):
+                path = self.root / relative
+                original = path.read_text()
+                path.write_text(original.replace(
+                    "exact `shared-design-system` revision or version",
+                    "independent repository"))
+                with self.assertRaisesRegex(ValueError, "AI_DESIGN_TOKENS"):
+                    CHECK.check(self.root)
+                path.write_text(original)
+
+    def test_rejects_contradictory_obsolete_usage_routes(self):
+        obsolete = {
+            "ai/USAGE.md":
+                "The current unreleased checkout pins Tokens at exactly `0.2.0`",
+            "Packages/DesignTokens/ai/USAGE.md":
+                "Planned elsewhere: independent Apple NativeDesignKit/SPM repository",
+        }
+        for relative, statement in obsolete.items():
+            with self.subTest(relative=relative):
+                path = self.root / relative
+                original = path.read_text()
+                path.write_text(original + "\n" + statement + "\n")
+                with self.assertRaisesRegex(ValueError, "AI_DESIGN_TOKENS"):
+                    CHECK.check(self.root)
+                path.write_text(original)
+
     def test_rejects_cross_wired_release_unit(self):
         self.mutate_registry(
             lambda r: r["releaseUnits"].update(designTokens="README.md"))
@@ -143,33 +171,165 @@ class ContractTests(unittest.TestCase):
 
 
 class ConsumerHarnessTests(unittest.TestCase):
+    @staticmethod
+    def resolved_pin(kind="remoteSourceControl",
+                     location=EXTERNAL.REPOSITORY_URL,
+                     state=None):
+        return [{
+            "schemaVersion": 3,
+            "identity": "shared-design-system",
+            "kind": kind,
+            "kindField": "kind",
+            "location": location,
+            "locationField": "location",
+            "state": state or {"revision": "a" * 40},
+        }]
+
     def test_public_resolution_failure_remains_false(self):
         receipt = {
             "source": {"publiclyResolvable": False},
             "packageIdentities": [],
+            "status": "running",
         }
         with self.assertRaisesRegex(RuntimeError, "immutable dependency"):
             EXTERNAL.validate_public_resolution(
                 receipt,
-                {"shared-design-system": {"revision": "b" * 40}},
+                self.resolved_pin(state={"revision": "b" * 40}),
                 "revision",
                 "a" * 40)
         self.assertFalse(receipt["source"]["publiclyResolvable"])
         self.assertEqual(receipt["packageIdentities"], [])
+        self.assertEqual(receipt["status"], "failed")
 
     def test_public_resolution_success_becomes_true(self):
         receipt = {
             "source": {"publiclyResolvable": False},
             "packageIdentities": [],
+            "status": "running",
         }
         EXTERNAL.validate_public_resolution(
             receipt,
-            {"shared-design-system": {"version": "1.2.3"}},
+            self.resolved_pin(state={"version": "1.2.3"}),
             "version",
             "1.2.3")
+        EXTERNAL.validate_effective_public_source(
+            receipt, 1, "not found\n", EXTERNAL.REPOSITORY_URL + "\n")
         self.assertTrue(receipt["source"]["publiclyResolvable"])
         self.assertEqual(
             receipt["packageIdentities"], ["shared-design-system"])
+        self.assertEqual(
+            receipt["source"]["observed"][0]["location"],
+            EXTERNAL.REPOSITORY_URL)
+
+    def test_public_resolution_rejects_mirror_with_matching_revision(self):
+        receipt = {
+            "source": {"publiclyResolvable": False},
+            "packageIdentities": [],
+            "status": "running",
+        }
+        with self.assertRaisesRegex(RuntimeError, "canonical public repository"):
+            EXTERNAL.validate_public_resolution(
+                receipt,
+                self.resolved_pin(location=(
+                    "https://mirror.example/shared-design-system.git")),
+                "revision",
+                "a" * 40)
+        self.assertEqual(receipt["status"], "failed")
+        self.assertFalse(receipt["source"]["publiclyResolvable"])
+        self.assertEqual(
+            receipt["source"]["observed"][0]["location"],
+            "https://mirror.example/shared-design-system.git")
+        self.assertIsNone(
+            receipt["source"]["observed"][0]["canonicalRepositoryURL"])
+
+    def test_public_resolution_rejects_local_source_with_matching_revision(self):
+        receipt = {
+            "source": {"publiclyResolvable": False},
+            "packageIdentities": [],
+            "status": "running",
+        }
+        with self.assertRaisesRegex(RuntimeError, "remote source-control"):
+            EXTERNAL.validate_public_resolution(
+                receipt,
+                self.resolved_pin(
+                    kind="localSourceControl",
+                    location="/workspace/shared-design-system"),
+                "revision",
+                "a" * 40)
+        self.assertEqual(receipt["status"], "failed")
+        self.assertFalse(receipt["source"]["publiclyResolvable"])
+        self.assertEqual(
+            receipt["source"]["observed"][0]["kind"], "localSourceControl")
+
+    def test_public_resolution_rejects_effective_remote_mirror(self):
+        receipt = {
+            "source": {"publiclyResolvable": False},
+            "packageIdentities": [],
+            "status": "running",
+        }
+        EXTERNAL.validate_public_resolution(
+            receipt, self.resolved_pin(), "revision", "a" * 40)
+        with self.assertRaisesRegex(RuntimeError, "mirror substitution"):
+            EXTERNAL.validate_effective_public_source(
+                receipt, 0,
+                "https://mirror.example/shared-design-system.git\n",
+                "https://mirror.example/shared-design-system.git\n")
+        self.assertEqual(receipt["status"], "failed")
+        self.assertFalse(receipt["source"]["publiclyResolvable"])
+
+    def test_public_resolution_rejects_effective_filesystem_mirror(self):
+        receipt = {
+            "source": {"publiclyResolvable": False},
+            "packageIdentities": [],
+            "status": "running",
+        }
+        EXTERNAL.validate_public_resolution(
+            receipt, self.resolved_pin(), "revision", "a" * 40)
+        with self.assertRaisesRegex(RuntimeError, "mirror substitution"):
+            EXTERNAL.validate_effective_public_source(
+                receipt, 0, "/workspace/shared-design-system\n",
+                "/workspace/shared-design-system\n")
+        self.assertEqual(receipt["status"], "failed")
+        self.assertFalse(receipt["source"]["publiclyResolvable"])
+
+    def test_public_resolution_rejects_noncanonical_checkout_origin(self):
+        receipt = {
+            "source": {"publiclyResolvable": False},
+            "packageIdentities": [],
+            "status": "running",
+        }
+        EXTERNAL.validate_public_resolution(
+            receipt, self.resolved_pin(), "revision", "a" * 40)
+        with self.assertRaisesRegex(RuntimeError, "checkout origin"):
+            EXTERNAL.validate_effective_public_source(
+                receipt, 1, "not found\n",
+                "https://mirror.example/shared-design-system.git\n")
+        self.assertEqual(receipt["status"], "failed")
+        self.assertFalse(receipt["source"]["publiclyResolvable"])
+
+    def test_parse_resolved_retains_current_and_legacy_provenance(self):
+        current = EXTERNAL.parse_resolved_pins({
+            "version": 3,
+            "pins": [{
+                "identity": "shared-design-system",
+                "kind": "remoteSourceControl",
+                "location": EXTERNAL.REPOSITORY_URL,
+                "state": {"version": "1.2.3"},
+            }],
+        })
+        legacy = EXTERNAL.parse_resolved_pins({
+            "version": 1,
+            "object": {"pins": [{
+                "package": "shared-design-system",
+                "repositoryURL": EXTERNAL.REPOSITORY_URL,
+                "state": {"revision": "a" * 40},
+            }]},
+        })
+        self.assertEqual(current[0]["kindField"], "kind")
+        self.assertEqual(current[0]["locationField"], "location")
+        self.assertEqual(legacy[0]["kind"], "remoteSourceControl")
+        self.assertIsNone(legacy[0]["kindField"])
+        self.assertEqual(legacy[0]["locationField"], "repositoryURL")
 
     def test_tokens_local_consumer_has_no_native_dependency(self):
         harness = (
@@ -249,6 +409,21 @@ class ConsumerHarnessTests(unittest.TestCase):
                 "kind": "revision",
                 "value": "a" * 40,
                 "publiclyResolvable": True,
+                "effectiveMirrorQuery": {
+                    "exitStatus": 1,
+                    "output": "not found",
+                },
+                "checkoutOrigin": EXTERNAL.REPOSITORY_URL,
+                "observed": [{
+                    "schemaVersion": 3,
+                    "identity": "shared-design-system",
+                    "kind": "remoteSourceControl",
+                    "kindField": "kind",
+                    "location": EXTERNAL.REPOSITORY_URL,
+                    "locationField": "location",
+                    "canonicalRepositoryURL": EXTERNAL.REPOSITORY_URL,
+                    "state": {"revision": "a" * 40},
+                }],
             },
             "packageIdentities": ["shared-design-system"],
             "selectedProducts": EXTERNAL.PRODUCTS,

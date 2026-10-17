@@ -99,6 +99,39 @@ def check(root):
     require("shared-design-system.git" in nested_readme and
             "shared-design-system" in nested_readme,
             "AI_DESIGN_TOKENS", "nested contract does not name the consolidated route")
+    usage = (ai / "USAGE.md").read_text()
+    nested_usage = (root / "Packages/DesignTokens/ai/USAGE.md").read_text()
+    for document, content in (
+            ("ai/USAGE.md", usage),
+            ("Packages/DesignTokens/ai/USAGE.md", nested_usage)):
+        stable_products = (
+            "stable `NativeDesignKit` and `DesignTokens` products" in content or
+            "stable `DesignTokens` and `NativeDesignKit` products" in content)
+        require(stable_products and
+                "exact `shared-design-system` revision or version" in content and
+                "repository-local `DesignTokens` target" in content,
+                "AI_DESIGN_TOKENS",
+                f"{document} does not describe the consolidated live route")
+    require("NativeDesignKit `0.1.0` historically pinned Tokens at exactly `0.1.1`"
+            in usage and
+            "historical provider DesignTokens 0.2.0 release" in usage and
+            "provider DesignTokens `0.2.0` release remains immutable compatibility history"
+            in nested_usage,
+            "AI_DESIGN_TOKENS", "historical release facts were removed from usage")
+    obsolete_routes = {
+        "ai/USAGE.md": (
+            "The current unreleased checkout pins Tokens at exactly `0.2.0`",
+        ),
+        "Packages/DesignTokens/ai/USAGE.md": (
+            "Planned elsewhere: independent Apple NativeDesignKit/SPM repository",
+        ),
+    }
+    for document, content in (
+            ("ai/USAGE.md", usage),
+            ("Packages/DesignTokens/ai/USAGE.md", nested_usage)):
+        require(not any(route in content for route in obsolete_routes[document]),
+                "AI_DESIGN_TOKENS",
+                f"{document} retains an obsolete dependency route")
     guard = (root / "Sources/NativeDesignKit/PlatformBoundary.swift").read_text()
     require('#if os(watchOS)' in guard and
             '#error("NativeDesignKit is unavailable on watchOS; depend on the DesignTokens product only.")' in guard,

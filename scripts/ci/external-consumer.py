@@ -9,6 +9,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+from urllib.parse import urlsplit
 
 
 REPOSITORY_URL = "https://github.com/LeePepe/shared-design-system.git"
@@ -80,14 +81,116 @@ def contract_receipts(checkout):
     return contracts
 
 
+def parse_resolved_pins(resolved):
+    schema_version = resolved.get("version")
+    if schema_version == 1:
+        pins = resolved.get("object", {}).get("pins")
+    else:
+        pins = resolved.get("pins")
+    if not isinstance(pins, list):
+        raise RuntimeError("Package.resolved does not contain a pin list")
+
+    parsed = []
+    for pin in pins:
+        if not isinstance(pin, dict) or not isinstance(pin.get("state"), dict):
+            raise RuntimeError("Package.resolved contains a malformed pin")
+        if schema_version == 1:
+            identity = pin.get("package")
+            location = pin.get("repositoryURL")
+            kind = "remoteSourceControl" if location else None
+            kind_field = None
+            location_field = "repositoryURL"
+        else:
+            identity = pin.get("identity")
+            location = pin.get("location")
+            kind = pin.get("kind")
+            kind_field = "kind"
+            location_field = "location"
+        if not all(isinstance(item, str) and item
+                   for item in (identity, kind, location)):
+            raise RuntimeError("Package.resolved pin lacks source provenance")
+        parsed.append({
+            "schemaVersion": schema_version,
+            "identity": identity,
+            "kind": kind,
+            "kindField": kind_field,
+            "location": location,
+            "locationField": location_field,
+            "state": dict(pin["state"]),
+        })
+    return parsed
+
+
+def canonical_repository_url(location):
+    scp_match = re.fullmatch(
+        r"git@github\.com:LeePepe/shared-design-system(?:\.git)?/?",
+        location, re.IGNORECASE)
+    if scp_match:
+        return REPOSITORY_URL
+
+    parsed = urlsplit(location)
+    if parsed.scheme not in {"https", "ssh", "git"}:
+        return None
+    if parsed.hostname is None or parsed.hostname.lower() != "github.com":
+        return None
+    if parsed.port is not None or parsed.query or parsed.fragment:
+        return None
+    if parsed.username not in (None, "git") or parsed.password is not None:
+        return None
+    path = parsed.path.rstrip("/")
+    if path.lower() not in {
+            "/leepepe/shared-design-system",
+            "/leepepe/shared-design-system.git"}:
+        return None
+    return REPOSITORY_URL
+
+
 def validate_public_resolution(receipt, pins, kind, value):
-    if pins.get("shared-design-system", {}).get(kind) != value:
-        raise RuntimeError(
-            "resolved package does not match requested immutable dependency")
-    if set(pins) != {"shared-design-system"}:
-        raise RuntimeError(
-            "consumer resolution must contain only shared-design-system")
-    receipt["packageIdentities"] = sorted(pins)
+    observed = [dict(pin) for pin in pins]
+    for pin in observed:
+        pin["canonicalRepositoryURL"] = canonical_repository_url(
+            pin["location"])
+    receipt["source"]["observed"] = observed
+    try:
+        if len(pins) != 1 or pins[0]["identity"] != "shared-design-system":
+            raise RuntimeError(
+                "consumer resolution must contain only shared-design-system")
+        pin = pins[0]
+        if pin["state"].get(kind) != value:
+            raise RuntimeError(
+                "resolved package does not match requested immutable dependency")
+        if pin["kind"] != "remoteSourceControl":
+            raise RuntimeError(
+                "resolved package is not a remote source-control dependency")
+        if canonical_repository_url(pin["location"]) != REPOSITORY_URL:
+            raise RuntimeError(
+                "resolved package does not use the canonical public repository")
+    except Exception:
+        receipt["status"] = "failed"
+        raise
+    receipt["packageIdentities"] = ["shared-design-system"]
+
+
+def validate_effective_public_source(
+        receipt, mirror_exit_status, mirror_output, checkout_origin):
+    receipt["source"]["effectiveMirrorQuery"] = {
+        "exitStatus": mirror_exit_status,
+        "output": mirror_output.strip(),
+    }
+    receipt["source"]["checkoutOrigin"] = checkout_origin.strip()
+    try:
+        if mirror_exit_status == 0:
+            raise RuntimeError(
+                "SwiftPM mirror substitution is configured for the package")
+        if mirror_exit_status != 1 or mirror_output.strip() != "not found":
+            raise RuntimeError(
+                "SwiftPM mirror configuration could not be verified")
+        if canonical_repository_url(checkout_origin.strip()) != REPOSITORY_URL:
+            raise RuntimeError(
+                "resolved checkout origin is not the canonical public repository")
+    except Exception:
+        receipt["status"] = "failed"
+        raise
     receipt["source"]["publiclyResolvable"] = True
 
 
@@ -118,6 +221,20 @@ def validate_success_receipt(receipt):
         raise RuntimeError("external consumer tests failed")
     if not receipt["source"].get("publiclyResolvable"):
         raise RuntimeError("external receipt cannot claim a local source")
+    observed = receipt["source"].get("observed")
+    if (not isinstance(observed, list) or len(observed) != 1 or
+            observed[0].get("identity") != "shared-design-system" or
+            observed[0].get("kind") != "remoteSourceControl" or
+            observed[0].get("canonicalRepositoryURL") != REPOSITORY_URL):
+        raise RuntimeError("external receipt lacks canonical observed provenance")
+    mirror_query = receipt["source"].get("effectiveMirrorQuery")
+    if (not isinstance(mirror_query, dict) or
+            mirror_query.get("exitStatus") != 1 or
+            mirror_query.get("output") != "not found"):
+        raise RuntimeError("external receipt does not exclude SwiftPM mirrors")
+    if canonical_repository_url(
+            receipt["source"].get("checkoutOrigin", "")) != REPOSITORY_URL:
+        raise RuntimeError("external receipt lacks canonical checkout origin")
     if receipt["status"] != "passed":
         raise RuntimeError("external receipt status is not passed")
 
@@ -175,11 +292,29 @@ def main():
 
         run("swift", ["package", "resolve"], consumer, evidence, receipt)
         resolved = json.loads((consumer / "Package.resolved").read_text())
-        pins = {pin["identity"]: pin["state"] for pin in resolved["pins"]}
+        pins = parse_resolved_pins(resolved)
         validate_public_resolution(receipt, pins, kind, value)
-        write_receipt(receipt_path, receipt)
 
         checkout = consumer / ".build/checkouts/shared-design-system"
+        mirror = subprocess.run(
+            [
+                "swift", "package", "config", "get-mirror",
+                "--original", REPOSITORY_URL,
+            ],
+            cwd=consumer, text=True, stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT)
+        origin = subprocess.run(
+            ["git", "-C", str(checkout), "remote", "get-url", "origin"],
+            cwd=consumer, text=True, stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT)
+        if origin.returncode:
+            raise RuntimeError(
+                "resolved checkout origin could not be inspected: " +
+                origin.stdout.strip())
+        validate_effective_public_source(
+            receipt, mirror.returncode, mirror.stdout, origin.stdout)
+        write_receipt(receipt_path, receipt)
+
         registry = json.loads((checkout / "ai/registry.json").read_text())
         if registry["library"] != "NativeDesignKit" or registry["version"] != "0.1.0":
             raise RuntimeError("resolved checkout AI contract mismatch")
