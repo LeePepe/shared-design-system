@@ -29,6 +29,8 @@ external binding state, multiple selection, static rows and 44pt targets.
 Verification uses SwiftPM build/tests followed by the actual SwiftUI fixture.
 Text-frame telemetry is attached with raw screenshots to inspect primary,
 secondary, metadata and context contrast on their actual composites.
-Final evidence must name clean component head and dependency SHA, distinguish
-candidate mirrors from released resolution, and preserve raw PNG provenance.
+Final evidence must name the clean component head and public exact DesignTokens
+0.2.0 revision, confirm mirror-free resolution at both package and generated
+Xcode workspace, and preserve raw PNG provenance. Historical candidate previews
+do not establish current-head acceptance.
 No gate/policy, shared foundation or existing component source is changed here.

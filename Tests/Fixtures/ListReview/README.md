@@ -13,7 +13,7 @@ DEBUG `@testable` import accesses the shared surface/Reduce Transparency seams;
 UI automation imports only XCTest. No UIKit/AppKit hosting or image renderer
 is used. The canonical runner is [Support/run.py](../Support/run.py).
 
-From the repository root, with the required frozen foundation integrated:
+From the repository root, with the merged Strata foundation integrated:
 
 ```sh
 python3 /tmp/ndk-strata/ui-serial.py "$PWD" \
@@ -24,12 +24,12 @@ python3 /tmp/ndk-strata/ui-serial.py "$PWD" \
 ```
 
 Use fresh external output paths. Simulator operations must remain under the
-shared serial lock, including repository verification. Candidate-only package
-resolution requires the parent-supplied isolated SwiftPM/Xcode mirror setup;
-never commit mirror configuration or substitute a path dependency. Record the
-full native/provider SHAs, tested clean state, exact commands, mirror path and
-candidate-only status alongside exported raw PNGs. Released-dependency/remote
-checks remain separate from local candidate evidence.
+shared serial lock, including repository verification. Resolve the canonical
+public DesignTokens repository at exact `0.2.0`, revision
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a`, without package-root or generated
+Xcode-workspace mirrors or a path dependency. Record the full native/provider
+SHAs, tested clean state, exact commands and resolved package receipts alongside
+exported raw PNGs. Historical candidate-mirror captures remain separate evidence.
 
 The fixture requires explicit `NDK_BRAND`, `NDK_THEME` (`light`/`dark`),
 `NDK_SURFACE` (`glass`/`solid`), `NDK_SCENARIO`, `NDK_TEXT_SIZE`
@@ -70,7 +70,7 @@ The receipt records results and limitations; pixel antialiasing edges do not
 represent full-coverage text contrast.
 
 Run normal package verification as well as the UI fixture; the final evidence
-receipt names the tested source/dependency SHAs and actual outcomes. Candidate
-mirror success is not released remote dependency proof. Keyboard/focus/hover,
+receipt names the tested source/dependency SHAs and actual public-resolution
+outcomes. Keyboard/focus/hover,
 VoiceOver, minimum OS and physical devices require their own runtime evidence;
 source affordances or static captures do not establish those results.
