@@ -26,6 +26,8 @@ Dependency graph: `docs/design-tokens-consolidation-tasks.md`
 | accepted planning head | `f7893ebd5bc4d6e0b187b9052e85b493d401c0ee`; its plan/tasks blobs `e3479bc230f4ab0463fcc88eaca0beb5e6396c97` / `63310fc9568fea59360f31812c26306bc93289dc` remain byte-identical at S100 base `5eec04eac574e41586e0c42732faa623e64cf9f9` |
 | S200 gate-repair supplement | delegated Decision B `01a14980-d4e9-7a54-bd45-d90e6ae9cc53`; separate prerequisite implementation starts from exact S100 base `5eec04eac574e41586e0c42732faa623e64cf9f9`; preserved S200 candidate snapshot `CONSOLIDATION-S200-OWNER-RECOVERY-CANDIDATE-SNAPSHOT.json`, patch SHA-256 `e920b41948f327ce4073a81570aa3178ebe7b552721caa3698e8c0450b1d70e2` |
 | authorized later S200 receipt repairs | Root evidence note `01a1497b-6e88-70df-89b2-3421c4f25423`; exact configured evidence-path alignment plus truthful failed/passed receipt state after every local-success condition |
+| trusted-rule ordering supplement | exact public target base `bdd495d70b7dc936c8ebbabbeb266a015d1dfc6a` after P190 merge/readback; exact pre-P195 target `AGENTS.md` blob `22750bed4a6b480256f3cc76260daa471dcf78d5`; Team Lead verified delegated Owner decision `s37ownc1` in `01a14a25-2c35-72cf-a938-48d5e02ce7e7`; delegated GitHub decision record `6234668757` is unedited and repository-Owner-authored through the accepted delegation, not represented as manually posted by Owner; existing exact-head approval review `5558038551` covers preserved S200 PR #37 head `c1777c3d2a5a20354970686ad33af7c39b050c5f` |
+| current S200 public-consumer blocker | exact-head `quality / verify` job `39037863433/117411236482` passed `scripts/verify --all`, then `scripts/ci/external-consumer.py:188-190` failed closed because the resolved checkout origin was not the canonical public repository; this remains a T250/current-version defect owned by the original S200 writer after the trusted-rule prerequisite merges |
 
 ## Architecture
 
@@ -134,6 +136,17 @@ context audit without hiding executable paths in support.
     declared-test-target coverage without depending on name or list order, and
     fails closed unless exactly one usable scheme remains. It must merge and be
     read back before the preserved S200 candidate is integrated or changed.
+14. **Write the trusted prospective rule before resuming activation.** Decision
+    `s37ownc1` confirms the already accepted local dependency transition, but a
+    feature PR cannot make its own policy exception. One separate `P195` PR,
+    based on actual P190 target main, lands the exact reviewed plan/tasks and the
+    minimum prospective rule in `AGENTS.md`. The base continues to state and use
+    external exact DesignTokens `0.2.0`; the new rule permits only the accepted
+    S200 feature PR to atomically replace that edge and its obsolete lock with
+    the local target while updating the manifest and authoritative architecture/
+    contract truth. P195 must not copy PR #37's final-state tech-context or
+    README claims onto the still-external base. It must merge and be read back
+    before the original S200 writer integrates actual main and resumes PR #37.
 
 ## PR slices and dependency order
 
@@ -241,7 +254,42 @@ product/source/token/generated data, `scripts/verify`, hooks, workflows,
 settings, credentials and the registered S200 candidate are excluded. P190
 requires exact-candidate independent review, normal hooks, one non-Draft PR,
 delegated Owner approval, required CI, PR Manager merge, and merged-main blob
-readback before S200 resumes.
+readback before P195 starts.
+
+### `P195` — Prospective local-dependency trusted-rule prerequisite
+
+Observable goal: target `main` durably permits the already Owner-approved S200
+transition without claiming that the transition has already happened.
+
+This is one ordinary protected governance PR based on exact public target main
+`bdd495d70b7dc936c8ebbabbeb266a015d1dfc6a`, after actual P190 merge/readback.
+It carries the exact independently reviewed plan/tasks blobs from this
+supplement and makes the minimum consistent prospective change to `AGENTS.md`.
+The current base truth remains explicit: NativeDesignKit still resolves the
+external exact `shared-design-tokens` `0.2.0`, and its existing lock remains
+authoritative until S200 itself merges. The prospective rule identifies the
+accepted S200 transition narrowly: its feature PR may atomically replace that
+external edge and obsolete lock with the repository-local `DesignTokens` target
+only while updating the root manifest and authoritative architecture/contracts
+to the same truth. It is not a general dependency-policy exception.
+
+P195 cannot edit either manifest or lock, source, tests, token/generated values,
+README or tech-context final-state claims, gates/workflows, shared-ci, settings,
+credentials, releases/tags, or the preserved PR #37 branch/candidate. It requires
+exact-head independent review, CODEOWNERS/delegated Owner approval, normal hooks,
+required CI, PR Manager merge, and readback of the reviewed plan/tasks plus the
+trusted `AGENTS.md` blob. Only that actual merge/readback lets Team Lead return
+PR #37 to its original Fullstack writer.
+
+P195 also records exact pre-change target `AGENTS.md` blob
+`22750bed4a6b480256f3cc76260daa471dcf78d5`. If Root abandons activation after
+P195 but before S200, the required P175 provider restore merges and is read back
+first. A subsequent ordinary target PR then restores that exact `AGENTS.md` blob
+when no unrelated policy has landed; otherwise it removes only the P195
+exception and proves unrelated policy is preserved. Exact-head review,
+CODEOWNERS/delegated Owner approval, required CI, PR Manager merge, resulting-
+blob readback and proof that the exception is absent are required before S100
+target cleanup, or atomically with that cleanup in the same reviewed target PR.
 
 ### `S200` — Activate the local Swift dependency and contracts
 
@@ -256,17 +304,23 @@ semantic token data, generated values, NativeDesignKit component source, visual
 behavior, platform floors, or gate strength. The old URL must be absent from the
 activated root package and its revision-mode consumer lock.
 
-S200 is blocked while P190 is unmerged. Its staged 36-path candidate and prior
-repair history remain preserved, unpublished and untouched. After P190 merge
-and exact helper/test/wiring readback, Team Lead may return only the original
-writer to the registered S200 worktree for the authorized bounded continuation:
-integrate the actual prerequisite base while retaining both products/test
-targets, then fix the two receipt defects in
-`01a1497b-6e88-70df-89b2-3421c4f25423`. The local-consumer harness must pass and
-inspect one fresh configured evidence path, and a receipt may become `passed`
-only after every required marker and success condition is validated; failures
-retain durable truthful evidence. This continuation does not reset review or
-repair counts and does not authorize another gate change.
+S200 is blocked while P195 is unmerged. Its published PR #37 candidate at exact
+head `c1777c3d2a5a20354970686ad33af7c39b050c5f`, cumulative P190/S200 repair and
+review history, delegated Owner decision record, and exact-head approval remain
+preserved; P195 does not edit or resume that branch. After P195 merge and exact
+plan/tasks/`AGENTS.md` readback, Team Lead may return only the original writer to
+the registered S200 worktree for the authorized continuation: integrate actual
+target main normally without resetting history, retain the P190 helper/tests/
+wiring and both products/test targets, and repair the existing T250 public-
+consumer failure. The original writer must diagnose the observed runner checkout
+origin and add meaningful fail-closed regression coverage; canonical public
+origin remains mandatory, and no local or mirror fallback or provenance
+weakening is allowed. The earlier configured evidence-path and truthful receipt
+repairs from `01a1497b-6e88-70df-89b2-3421c4f25423` remain part of the preserved
+candidate. Any new head requires fresh complete local verification, exact-head
+independent review, publication reconciliation, public-SHA CI, and required
+approval/check evidence on the same PR. This continuation does not reset review
+or repair counts and does not authorize another gate change.
 
 ### `S300` — Exact-head consolidation and retirement-readiness gate
 
@@ -301,14 +355,15 @@ full retirement.
 | stable npm exports | real tarball install and checker from nested pack root | isolated JS/TS/CSS/JSON consumer receipt |
 | stable public Swift products | root-package external consumer at pushed SHA | imports both products; lock resolves only target URL/SHA |
 | actual test-capable Swift package scheme | `P190` manifest-derived expected test targets plus machine-readable Xcode scheme discovery/test enumeration, wired into the NativeDesignKit leaf gate | real one-product root iOS gate passes; the two-product fixture executes both `NativeDesignKitTests` and `DesignTokensTests`; missing, ambiguous, unusable, malformed, or incomplete metadata fails before test execution |
+| feature dependency transition is prospectively trusted | `P195` exact reviewed plan/tasks plus the minimum Owner-approved `AGENTS.md` rule on the still-external base | base continues to declare and resolve external exact `0.2.0`; the rule permits only atomic S200 manifest/local-edge/architecture-contract reconciliation; exact three-path diff, pre-P195 `AGENTS.md` blob record, contract audit, CODEOWNERS approval, CI, merge and blob readback bind one head |
 | data-only watchOS boundary | root package floor plus NativeDesignKit compile guard | DesignTokens-only watchOS build succeeds; selecting NativeDesignKit fails with the named unavailable diagnostic |
 | contracts match artifacts | root/nested registry/checkers and versioned-doc byte checks | both checker outputs pass from resolved consumer artifacts |
 | review admits the complete S100 diff | merged target caller input plus pinned reusable review byte check | P050 changes only `max-diff-bytes`; frozen S100 three-dot diff is complete and at most 1,000,000 bytes |
 | imported important paths keep Owner routing | target CODEOWNERS baseline-line preservation plus effective-pattern resolver | every native rule/Owner remains; representative nested package/lock, token, AI, constitution, architecture, verification/CI-support, and notice paths resolve to `@LeePepe`, as do representative existing native paths |
 | provider Linux Tokens coverage survives consolidation | additive target CI inputs, checksum-pinned nested setup, and fail-closed aggregate | Ubuntu 24.04 runs the real `scripts/verify --layer Tokens` Node/Chrome gate; macOS NativeDesignKit/UI/public-consumer, contract, workflow-lint, aggregate, and exact pin remain active on the same head |
-| gates fail closed without public-resolution cycles | pre-push `scripts/verify --all`/hook parity, then pushed-SHA CI companion, aggregate/current-head review | local gates pass before push; after push the exact public SHA resolves; cancel/skip/mismatch cannot report pass |
+| gates fail closed without public-resolution cycles | pre-push `scripts/verify --all`/hook parity, then pushed-SHA CI companion, aggregate/current-head review | local gates pass before push; after push the exact public SHA resolves from the canonical public origin; cancel/skip/mismatch, a noncanonical checkout origin, or any local/mirror fallback cannot report pass |
 | authority contracts match resolution | P175 three-blob receipt plus S200 root manifest/lock/`AGENTS.md`/README/context audit | provider ordinary delivery is frozen before S200; activated executable resolution and all target declarations name the same authority |
-| history/rollback truthful | immutable tag/readback table, provenance manifest, and external import receipt | provider mappings are in the manifest; receipt maps reviewed PR head and final merge/squash SHA to the unchanged manifest blob without self-reference; rollback commands are explicit |
+| history/rollback truthful | immutable tag/readback table, provenance manifest, P175/P195 receipts, and external import receipt | provider mappings are in the manifest; receipt maps reviewed PR head and final merge/squash SHA to the unchanged manifest blob without self-reference; P195 records the exact pre-rule target blob and any exercised abandonment rollback proves provider restore before target-policy restore, then S100 cleanup; rollback commands are explicit |
 | retirement does not strand old consumers | preserved old URL/tags plus discovery limitations and archive-only recommendation | Native v0.1.0 resolution and known-consumer table remain verifiable |
 
 ## Acceptance coverage
@@ -329,7 +384,7 @@ Lead accepts the same revision.
 | Root manifests/AI docs collide | nested provider release unit; root owns only integration and Native contract entry |
 | Two editable authorities exist during expand phase | staged import is provenance-locked/inert; activation makes target authoritative; old repo retirement is explicit |
 | Provider policy still permits ordinary delivery at S200 | P175 removes that permission in exactly three support files and must merge/read back before S200 starts |
-| Activation is abandoned after provider quiescence | P175 records the three pre-change blobs; Root-authorized ordinary rollback restores them with review/approval/CI/merge before S100 target cleanup |
+| Activation is abandoned after provider quiescence | P175 records the three pre-change provider blobs and P195 records pre-change target `AGENTS.md` blob `22750bed4a6b480256f3cc76260daa471dcf78d5`; Root-authorized ordinary rollback first restores and reads back the provider blobs, then an ordinary reviewed/Owner-approved/CI-gated target PR restores that exact policy blob or removes only the P195 exception while preserving unrelated later policy; its resulting blob and no-exception assertion are read back before S100 target cleanup or atomically with the cleanup |
 | SwiftPM tag collision or independent-version fiction | preserve old refs in original repositories; unified future target tag; no tag action in implementation |
 | Native v0.1.0 old URL becomes unavailable | old repository remains readable and tags immutable; archive-only retirement |
 | Search zero is misreported as no consumers | discovery report includes method and limitations; known self-reference remains listed |
@@ -340,7 +395,9 @@ Lead accepts the same revision.
 | Import manifest requires its own commit hash | manifest records immutable provider/path/blob facts; later external receipt binds the target import SHA and manifest blob |
 | Public resolution is attempted before push | local hook proves local/generation/packed artifacts; required CI proves the exact fetchable pushed SHA before delivery |
 | Raw package name resolves to a product scheme without a test action | P190 discovers candidates and requires exactly one candidate to enumerate the complete manifest-declared test-target set; it never selects by first entry, package/product spelling, or unchecked `-Package` suffix |
-| Preserved S200 evidence becomes stale while the prerequisite lands | candidate snapshot/hash and registered worktree stay untouched; only the original writer integrates the actual merged/read-back prerequisite before producing fresh S200 receipts and full verification |
+| A feature PR attempts to authorize its own dependency-policy exception | P195 lands the delegated-Owner-approved prospective rule on base first; the still-external base remains truthful and P195 contains no manifest, lock, README, or tech-context final-state change |
+| Preserved S200 evidence becomes stale while the prerequisite lands | PR #37 head, branch, prior P190/S200 repair/review history and approval evidence stay untouched; only the original writer integrates actual merged/read-back P195 main before producing a new reviewed head and fresh complete evidence |
+| Public consumer resolves through a runner rewrite or mirror | T250 records the observed noncanonical-origin failure, diagnoses the runner-resolved origin, and adds a fail-closed regression; canonical public origin is mandatory and no local/mirror fallback or provenance weakening can pass |
 | Mechanical import silently changes generated bytes | provider blob/hash mapping and generate-check at import head |
 | Activation changes component appearance/API | native component paths are inspection-only and baseline blob assertions fail on change |
 | Evidence goes stale | all reviews, consumers, and checks bind one SHA; any repair invalidates and reruns them |
@@ -359,13 +416,23 @@ approval, required CI, PR Manager merge, and merged-main/three-blob readback.
 Only then may P190 start from exact target base
 `5eec04eac574e41586e0c42732faa623e64cf9f9`. P190 requires its own exact-head
 review, delegated Owner approval, normal non-Draft PR, required CI, PR Manager
-merge, and merged-main helper/test/wiring readback. Only then may the preserved
-S200 candidate resume through its original writer and registered worktree. S100
-and S200 each
+merge, and merged-main helper/test/wiring readback. P195 then starts from the
+actual P190 merge/readback `bdd495d70b7dc936c8ebbabbeb266a015d1dfc6a` and
+requires exact reviewed plan/tasks, the minimum prospective `AGENTS.md` rule,
+the recorded pre-rule `AGENTS.md` blob, exact-head review, CODEOWNERS/delegated
+Owner approval, normal non-Draft PR, required CI, PR Manager merge, and three-
+blob readback. Only then may preserved S200 PR #37 resume through its original
+writer and registered worktree. If activation is abandoned instead, final
+rollback evidence must read back provider restore before target-policy restore/
+invalidation and then S100 cleanup, with the resulting target policy blob and
+absence of the P195 exception; PR #37 does not resume. S100 and S200 each
 require their own Fullstack implementation, exact-head independent pre-push
 review, normal non-Draft PR, required gates, and merge readback in dependency
 order. Local verification precedes push; public-SHA resolution runs only after
-the SHA is fetchable and blocks delivery. S300 exits only with a frozen merged
-target revision, both public consumer receipts, exact provenance, required-check
-evidence, the already-merged P175 receipt, and a retirement/rollback packet.
+the SHA is fetchable and blocks delivery. On the activation path, S300 exits only
+with a frozen merged target revision, both public consumer receipts, exact
+provenance, required-check evidence, the already-merged P175/P195 receipts, and a
+retirement/rollback packet. On the abandonment branch, T320 instead exits only
+after the ordered provider, target-policy and cleanup merge/blob readbacks are
+reconciled and the P195 exception is proven absent.
 D400 is never inferred from technical success.
