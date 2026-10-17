@@ -81,8 +81,9 @@ The checker requires a passing run from a clean current head, the exact provider
 revision, and measured SwiftUI Text bounds rather than inflated accessibility
 rectangles. It matches full glyph pixels to provider text roles, tests three
 nearby actual background samples at >=4.5:1 for all20 specimens and the real
-Reduce Transparency capture, compares layout across all21, and compares fallback
-backgrounds to explicit solid. Measurements cover this specimen, not arbitrary
+Reduce Transparency capture plus one explicit forced-fallback capture, compares
+layout across all22, and compares both fallback backgrounds to explicit solid.
+Measurements cover this specimen, not arbitrary
 consumer backdrops. Held-press evidence can additionally use a serial `simctl io
 screenshot` during the UI test's four-second native press; record that capture
 separately from XCTest attachments with the same exact source/provider SHAs.
@@ -158,3 +159,26 @@ and stops this experiment rather than repeating known quiescence stalls.
 Its failure leaves all original hover/focus/Space assertions required and does
 not establish whether the product or runtime is responsible. Run only this
 method for the isolation experiment; preserve cumulative prior failures.
+
+## Public-base delivery and deferred native input
+
+Final delivery consumes public exact DesignTokens0.2.0 at
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a` with no local mirror. NativeDesignKit
+remains unreleased. Historical candidate packets remain scoped to their original
+source/provider revisions.
+
+The Owner on2026-10-17 explicitly temporarily deferred native hover, Tab focus
+and focused Space acceptance after the flat ordinary-control failure; root cause
+is UNKNOWN. Preserve the unchanged strict pointer/focus/Space suite and both07d
+and151851e failed results. Do not rerun unchanged input diagnosis or claim it
+passes. The normal `ButtonReview` app scheme runs the visual/layout/action and
+system-preference contract; the separate pointer scheme remains intact.
+
+One forced-fallback test uses only the foundation's existing internal
+`nativeReduceTransparencyOverride` seam through `NDK_FORCE_REDUCED=true` and
+asserts the actual system preference remainsfalse. It is separate from the real
+system Reduce Transparency test, and no override is applied in normal launches.
+The system tests attach original/reduced/restored actual Settings AX values,
+restore each exact original value, then relaunch the app and assert/capture that
+SwiftUI observes that original preference. No initial value is silently assumed
+by restoration. Normal Glass specimens still require actual transparencyfalse.

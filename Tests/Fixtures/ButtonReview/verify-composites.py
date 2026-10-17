@@ -97,8 +97,9 @@ def main():
     receipts = [json.loads(v) for v in re.findall(r"BUTTON_COMPOSITE (\{[^\n]+\})", args.log.read_text())]
     expected = {f"button-strata-{b}-{m}-{s}" for b in ("blue", "green", "pink", "yellow", "purple")
                 for m in ("light", "dark") for s in ("glass", "solid")}
-    if len(receipts) != 21 or {r["name"] for r in receipts} != expected | {"button-strata-purple-dark-reduced-transparency"}:
-        raise ValueError("Require unique runtime geometry for all20 specimens and real transparency fallback")
+    fallbacks = {"button-strata-purple-dark-reduced-transparency", "button-strata-purple-dark-forced-fallback"}
+    if len(receipts) != 22 or {r["name"] for r in receipts} != expected | fallbacks:
+        raise ValueError("Require unique runtime geometry for all20 specimens, forced fallback and real transparency fallback")
     results, geometries = {}, []
     for receipt in receipts:
         name = receipt["name"]
@@ -142,18 +143,18 @@ def main():
             solid = results[f"button-strata-{brand}-{mode}-solid"]["samples"]
             if not any(a["backgrounds"] != b["backgrounds"] for a, b in zip(glass, solid)):
                 raise ValueError(f"No observed Glass/solid material difference: {brand}/{mode}")
-    fallback = results["button-strata-purple-dark-reduced-transparency"]["samples"]
     solid = results["button-strata-purple-dark-solid"]["samples"]
-    for a, b in zip(fallback, solid):
-        for bg_a, bg_b in zip(a["backgrounds"], b["backgrounds"]):
-            if max(abs(x - y) for x, y in zip(bg_a["rgb"], bg_b["rgb"])) > 1:
-                raise ValueError("Real Reduce Transparency background differs from explicit solid")
+    for name in fallbacks:
+        for a, b in zip(results[name]["samples"], solid):
+            for bg_a, bg_b in zip(a["backgrounds"], b["backgrounds"]):
+                if max(abs(x - y) for x, y in zip(bg_a["rgb"], bg_b["rgb"])) > 1:
+                    raise ValueError(f"{name} background differs from explicit solid")
     report = dict(source_sha=head, provider_sha=provider_sha, provider_version=pin["state"]["version"],
-                  provider_data_sha256=hashlib.sha256(provider_bytes).hexdigest(), candidate_only=True,
+                  provider_data_sha256=hashlib.sha256(provider_bytes).hexdigest(),
                   minimum_contrast=min(s["minimum_contrast"] for r in results.values() for s in r["samples"]),
-                  specimens=results, geometry_stable=True, real_fallback_matches_solid=True)
+                  specimens=results, geometry_stable=True, real_fallback_matches_solid=True, forced_fallback_matches_solid=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n")
-    print(f"PASS:21 actual composites, stable geometry, solid fallback; minimum contrast={report['minimum_contrast']:.3f}")
+    print(f"PASS:22 actual composites, stable geometry, forced/system solid fallback; minimum contrast={report['minimum_contrast']:.3f}")
 
 
 if __name__ == "__main__":

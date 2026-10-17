@@ -39,7 +39,7 @@ need the runtime evidence recorded against the exact PR head.
 Generated screenshots and result bundles live outside git. Screenshots do not
 establish VoiceOver, minimum-OS, physical-device or macOS pointer/keyboard
 acceptance. Remote gates and an independent exact-SHA visual review are
-separate from local candidate-provider verification.
+separate from local verification against public exact DesignTokens0.2.0.
 
 The pointer fixture also compares ordinary SwiftUI controls with NativeButton
 on a separate diagnostic board. It distinguishes accepted XCTest synthesis,
@@ -48,3 +48,12 @@ Space activation. The keyboard lane requires a preconfigured runtime and reads
 its Full Keyboard Access preference without changing Settings. A diagnostic
 failure remains a failed input requirement; it does not justify changing the
 accepted Button appearance or substituting an unobserved interaction state.
+
+The Owner explicitly temporarily deferred native hover/Tab/focused-Space
+acceptance on2026-10-17 after the ordinary flat SwiftUI positive control also
+failed. Root cause is UNKNOWN. Historical07d input results remain1PASS/3FAIL/0skip;
+the151851e flat experiment remains0PASS/1FAIL/0skip. All strict source assertions
+are preserved, with no unchanged input rerun, skip, xfail or claimed input PASS.
+Normal repository checks and final-head visual/system-preference evidence remain
+required. Public provider0.2.0 at87bef8fbab5bf67a748815d7ed04d7ae199f760a replaces
+the preview-only dependency for final delivery; NativeDesignKit remains unreleased.

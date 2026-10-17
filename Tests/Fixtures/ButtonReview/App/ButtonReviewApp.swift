@@ -16,6 +16,7 @@ struct ButtonReviewApp: App {
                     ButtonReviewBoard(configuration: configuration)
                         .preferredColorScheme(configuration.isDark ? .dark : .light)
                         .environment(\.locale, Locale(identifier: configuration.language))
+                        .environment(\.nativeReduceTransparencyOverride, configuration.forceReduced ? true : nil)
                 case .failure(let error):
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Fixture configuration failed").font(.title)
@@ -37,10 +38,15 @@ private struct ReviewConfiguration {
     let surface: NativeSurfaceStyle
     let textSize: DynamicTypeSize
     let language: String
+    let forceReduced: Bool
     var isDark: Bool { mode == "dark" }
 
     init() throws {
         let environment = ProcessInfo.processInfo.environment
+        guard [nil, "true", "false"].contains(environment["NDK_FORCE_REDUCED"]) else {
+            throw ConfigurationError.invalid("NDK_FORCE_REDUCED")
+        }
+        forceReduced = environment["NDK_FORCE_REDUCED"] == "true"
         func required(_ name: String) throws -> String {
             guard let value = environment[name], !value.isEmpty else {
                 throw ConfigurationError.missing(name)
@@ -89,13 +95,14 @@ private struct ButtonReviewBoard: View {
     @State private var pointerVisits: Set<String> = []
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.nativeReduceTransparencyOverride) private var reduceTransparencyOverride
     private var theme: NativeDesignTheme { configuration.theme }
 
     var body: some View {
         Group {
             if configuration.scenario == "specimen" {
                 specimen.accessibilityIdentifier("review-scroll")
-                    .accessibilityValue("reduce-transparency=\(reduceTransparency);pointer=\(pointerTarget);entries=\(pointerEntries);visited=\(pointerVisits.sorted().joined(separator: ","))")
+                    .accessibilityValue("reduce-transparency=\(reduceTransparency);pointer=\(pointerTarget);entries=\(pointerEntries);visited=\(pointerVisits.sorted().joined(separator: ","));forced-reduced=\(reduceTransparencyOverride == true)")
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {

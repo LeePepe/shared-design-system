@@ -86,8 +86,18 @@ and themes; this does not establish contrast on arbitrary Glass backgrounds.
 Screenshots do not prove VoiceOver, physical device touch, minimum-OS behavior
 or live keyboard/focus interaction; those require separate observed validation.
 
+Native hover, Tab focus and focused Space activation remain **unverified**.
+At `07d431356c8f6338ece001853b18cba8bc62a6a3`, the strict input suite produced
+1 pass / 3 failures / 0 skips. A separate flat ordinary SwiftUI control experiment
+at `151851eaed040510635423f0b4bee937dee9bb48` also failed: hover callbacks0,
+view/AX focusfalse and Space actions0. The cause is **UNKNOWN**. On2026-10-17
+the Owner explicitly temporarily deferred this native-input acceptance and
+continued component delivery; the strict tests and failed history are retained.
+Visual or package-test success does not establish these inputs.
+
 `NativeTokenColor` behavior and platform floors remain unchanged. This Button
-revision depends on the separately adopted Strata foundation and its exact
-provider version. Candidate-only mirror evidence is not released-dependency or
-remote-CI proof; the PR records exact provider/source SHAs and remaining gates. To roll back, remove this API's call sites and restore the previously
+revision uses the merged Strata foundation and public exact DesignTokens0.2.0
+at `87bef8fbab5bf67a748815d7ed04d7ae199f760a`. The provider release does not
+release NativeDesignKit or establish remote CI or native input acceptance;
+the PR records exact source/provider SHAs and remaining gates. To roll back, remove this API's call sites and restore the previously
 reviewed package revision. No persisted state or migration is involved.

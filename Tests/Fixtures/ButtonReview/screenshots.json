@@ -27,5 +27,8 @@
   "button-reduce-motion-loading",
   "button-strata-purple-dark-reduced-transparency",
   "button-before-press",
-  "button-after-press"
+  "button-after-press",
+  "button-strata-purple-dark-forced-fallback",
+  "button-system-reduce-motion-restored-app",
+  "button-system-reduce-transparency-restored-app"
 ]

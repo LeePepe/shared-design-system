@@ -103,7 +103,7 @@ final class ButtonReviewUITests: XCTestCase {
     func testSpecimenPurpleDarkSolid() { specimen(brand: "strata-purple", mode: "dark", surface: "solid") }
 
     func testReduceMotionLoadingRetainsReadableStateAndFootprint() {
-        withSystemPreference(section: "Motion", name: "Reduce Motion") {
+        let original = withSystemPreference(section: "Motion", name: "Reduce Motion") {
             let app = launch(scenario: "interaction")
             XCTAssertEqual(app.staticTexts["motion-preference"].label, "Motion: reduced")
             let target = app.buttons["action-target"]
@@ -116,6 +116,22 @@ final class ButtonReviewUITests: XCTestCase {
             capture("button-reduce-motion-loading", app: app)
             app.terminate()
         }
+        guard let original else { return }
+        let restored = launch(scenario: "interaction")
+        XCTAssertEqual(restored.staticTexts["motion-preference"].label, original == "1" ? "Motion: reduced" : "Motion: standard")
+        print("BUTTON_SYSTEM_RESTORED_APP Reduce Motion original=\(original) observed=\(restored.staticTexts["motion-preference"].label)")
+        capture("button-system-reduce-motion-restored-app", app: restored)
+        restored.terminate()
+    }
+
+    func testForcedFallbackIsSeparateFromSystemPreference() {
+        let app = launch(scenario: "specimen", brand: "strata-purple", mode: "dark", forceReduced: true)
+        let value = String(describing: app.scrollViews["review-scroll"].value)
+        XCTAssertTrue(value.contains("reduce-transparency=false"), "Forced fallback must not change the actual system preference.")
+        XCTAssertTrue(value.contains("forced-reduced=true"), "The internal fixture-only override must be observed separately.")
+        recordCompositeGeometry(name: "button-strata-purple-dark-forced-fallback", brand: "strata-purple", mode: "dark", app: app)
+        capture("button-strata-purple-dark-forced-fallback", app: app)
+        app.terminate()
     }
 
     func testRealReduceTransparencyFallbackRetainsThemeAndGeometry() {
@@ -125,7 +141,7 @@ final class ButtonReviewUITests: XCTestCase {
             frames[id] = baseline.buttons["specimen-\(id)"].frame
         }
         baseline.terminate()
-        withSystemPreference(section: "Display & Text Size", name: "Reduce Transparency") {
+        let original = withSystemPreference(section: "Display & Text Size", name: "Reduce Transparency") {
             let app = launch(scenario: "specimen", brand: "strata-purple", mode: "dark")
             XCTAssertTrue(String(describing: app.scrollViews["review-scroll"].value).contains("reduce-transparency=true"))
             for (id, frame) in frames {
@@ -139,6 +155,14 @@ final class ButtonReviewUITests: XCTestCase {
             capture("button-strata-purple-dark-reduced-transparency", app: app)
             app.terminate()
         }
+        guard let original else { return }
+        let restored = launch(scenario: "specimen", brand: "strata-purple", mode: "dark")
+        let observed = String(describing: restored.scrollViews["review-scroll"].value)
+        XCTAssertTrue(observed.contains("reduce-transparency=\(original == "1")"), "The app must observe the actual original system preference after restoration.")
+        XCTAssertTrue(observed.contains("forced-reduced=false"))
+        print("BUTTON_SYSTEM_RESTORED_APP Reduce Transparency original=\(original) observed=\(observed)")
+        capture("button-system-reduce-transparency-restored-app", app: restored)
+        restored.terminate()
     }
 
     func testInvalidBrandShowsErrorWithoutFallback() {
@@ -266,7 +290,7 @@ final class ButtonReviewUITests: XCTestCase {
     }
 
     /// Changes and restores the simulator's actual setting through its native UI.
-    private func withSystemPreference(section: String, name: String, body: () -> Void) {
+    private func withSystemPreference(section: String, name: String, body: () -> Void) -> String? {
         let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
         settings.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         settings.launch()
@@ -282,7 +306,7 @@ final class ButtonReviewUITests: XCTestCase {
             if accessibility.isHittable { break }
             settings.swipeUp()
         }
-        guard accessibility.isHittable else { XCTFail("Settings Accessibility entry unavailable"); return }
+        guard accessibility.isHittable else { XCTFail("Settings Accessibility entry unavailable"); return nil }
         accessibility.tap()
         let translatedSection = section == "Motion" ? "动态效果" : "显示与文字大小"
         let sectionEntry = settings.staticTexts.matching(NSPredicate(format: "label IN %@", [section, translatedSection])).firstMatch
@@ -290,19 +314,33 @@ final class ButtonReviewUITests: XCTestCase {
             if sectionEntry.isHittable { break }
             settings.swipeUp()
         }
-        guard sectionEntry.isHittable else { XCTFail("Settings section unavailable: \(section)"); return }
+        guard sectionEntry.isHittable else { XCTFail("Settings section unavailable: \(section)"); return nil }
         sectionEntry.tap()
         let translatedName = name == "Reduce Motion" ? "减弱动态效果" : "降低透明度"
         let toggle = settings.switches.matching(NSPredicate(format: "label IN %@", [name, translatedName])).firstMatch
-        guard toggle.waitForExistence(timeout: 5) else { XCTFail("System setting unavailable: \(name)"); return }
-        guard let original = toggle.value as? String else { XCTFail("System switch has no value"); return }
+        guard toggle.waitForExistence(timeout: 5) else { XCTFail("System setting unavailable: \(name)"); return nil }
+        guard let original = toggle.value as? String else { XCTFail("System switch has no value"); return nil }
+        func observe(_ phase: String) {
+            let value = "name=\(name);phase=\(phase);original=\(original);actual=\(toggle.value ?? "missing")"
+            print("BUTTON_SYSTEM_PREFERENCE \(value)")
+            let attachment = XCTAttachment(string: value + "\n" + settings.debugDescription)
+            attachment.name = "button-system-\(name.lowercased().replacingOccurrences(of: " ", with: "-"))-\(phase)"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+        observe("original")
         setSystemSwitch(toggle, value: "1")
+        XCTAssertEqual(toggle.value as? String, "1")
+        observe("reduced")
         defer {
             settings.activate()
             setSystemSwitch(toggle, value: original)
+            XCTAssertEqual(toggle.value as? String, original)
+            observe("restored")
             settings.terminate()
         }
         body()
+        return original
     }
 
     private func setSystemSwitch(_ toggle: XCUIElement, value: String) {
@@ -318,10 +356,12 @@ final class ButtonReviewUITests: XCTestCase {
     }
 
     private func launch(scenario: String, brand: String = "strata-blue", mode: String = "light", surface: String = "glass",
-                        size: String = "large", language: String = "en", expectsError: Bool = false) -> XCUIApplication {
+                        size: String = "large", language: String = "en", expectsError: Bool = false,
+                        forceReduced: Bool = false) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment = ["NDK_SCENARIO": scenario, "NDK_BRAND": brand, "NDK_THEME": mode,
-                                 "NDK_TEXT_SIZE": size, "NDK_LANGUAGE": language, "NDK_SURFACE": surface]
+                                 "NDK_TEXT_SIZE": size, "NDK_LANGUAGE": language, "NDK_SURFACE": surface,
+                                 "NDK_FORCE_REDUCED": String(forceReduced)]
         app.launch()
         let ready = expectsError ? app.staticTexts["fixture-error"] : app.scrollViews["review-scroll"]
         XCTAssertTrue(ready.waitForExistence(timeout: 10), app.debugDescription)
