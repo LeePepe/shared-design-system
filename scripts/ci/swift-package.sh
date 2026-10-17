@@ -92,21 +92,35 @@ PY
         index=0
         while IFS= read -r candidate; do
             enumeration="$metadata_dir/enumeration-$index.json"
+            enumeration_result="$metadata_dir/enumeration-$index.xcresult"
             if xcodebuild \
                 -scheme "$candidate" \
                 -destination "id=$device" \
                 -skipPackagePluginValidation \
+                -resultBundlePath "$enumeration_result" \
                 test \
                 -enumerate-tests \
                 -test-enumeration-format json \
                 -test-enumeration-style hierarchical \
                 -test-enumeration-output-path "$enumeration"
             then
-                if python3 - "$metadata_dir/expected-tests.json" "$enumeration" <<'PY'
+                test_results="$metadata_dir/test-results-$index.json"
+                if [ ! -f "$enumeration" ] && [ -d "$enumeration_result" ]; then
+                    if ! xcrun xcresulttool get test-results tests \
+                        --path "$enumeration_result" > "$test_results"
+                    then
+                        rm -f "$test_results"
+                    fi
+                fi
+                if python3 - \
+                    "$metadata_dir/expected-tests.json" \
+                    "$enumeration" \
+                    "$test_results" <<'PY'
 import json
+from pathlib import Path
 import sys
 
-expected_path, enumeration_path = sys.argv[1:]
+expected_path, enumeration_path, test_results_path = map(Path, sys.argv[1:])
 
 def contains_test(node):
     if node["kind"] == "test":
@@ -121,43 +135,69 @@ def covered_targets(node):
         covered.update(covered_targets(child))
     return covered
 
+def walk(value):
+    yield value
+    if isinstance(value, dict):
+        for child in value.values():
+            yield from walk(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from walk(child)
+
 try:
     with open(expected_path, encoding="utf-8") as stream:
         expected = set(json.load(stream))
-    with open(enumeration_path, encoding="utf-8") as stream:
-        enumeration = json.load(stream)
-    if not isinstance(enumeration, dict) or not enumeration:
-        raise ValueError("empty test enumeration")
-    if not isinstance(enumeration.get("errors"), list) or enumeration["errors"]:
-        raise ValueError("test enumeration reported errors")
-    values = enumeration.get("values")
-    if not isinstance(values, list) or not values:
-        raise ValueError("test enumeration has no values hierarchy")
-    def validate_node(node):
-        if not isinstance(node, dict):
-            raise ValueError("test enumeration node is not an object")
-        if not isinstance(node.get("kind"), str) or not node["kind"]:
-            raise ValueError("test enumeration node has no kind")
-        if not isinstance(node.get("name"), str) or not node["name"]:
-            raise ValueError("test enumeration node has no name")
-        if node["kind"] == "test":
-            if "children" in node and node["children"] != []:
-                raise ValueError("test enumeration test node has children")
-            node["children"] = []
-            return
-        if not isinstance(node.get("children"), list) or not node["children"]:
-            raise ValueError("test enumeration node has no children")
-        for child in node["children"]:
-            validate_node(child)
-    for plan in values:
-        validate_node(plan)
-        if plan["kind"] != "plan":
-            raise ValueError("test enumeration value is not a plan")
+    if enumeration_path.is_file():
+        with open(enumeration_path, encoding="utf-8") as stream:
+            enumeration = json.load(stream)
+        if not isinstance(enumeration, dict) or not enumeration:
+            raise ValueError("empty test enumeration")
+        if (not isinstance(enumeration.get("errors"), list) or
+                enumeration["errors"]):
+            raise ValueError("test enumeration reported errors")
+        values = enumeration.get("values")
+        if not isinstance(values, list) or not values:
+            raise ValueError("test enumeration has no values hierarchy")
+        def validate_node(node):
+            if not isinstance(node, dict):
+                raise ValueError("test enumeration node is not an object")
+            if not isinstance(node.get("kind"), str) or not node["kind"]:
+                raise ValueError("test enumeration node has no kind")
+            if not isinstance(node.get("name"), str) or not node["name"]:
+                raise ValueError("test enumeration node has no name")
+            if node["kind"] == "test":
+                if "children" in node and node["children"] != []:
+                    raise ValueError("test enumeration test node has children")
+                node["children"] = []
+                return
+            if not isinstance(node.get("children"), list) or not node["children"]:
+                raise ValueError("test enumeration node has no children")
+            for child in node["children"]:
+                validate_node(child)
+        for plan in values:
+            validate_node(plan)
+            if plan["kind"] != "plan":
+                raise ValueError("test enumeration value is not a plan")
+        covered = set()
+        for plan in values:
+            covered.update(covered_targets(plan))
+    elif test_results_path.is_file():
+        with open(test_results_path, encoding="utf-8") as stream:
+            results = json.load(stream)
+        covered = {
+            node["name"]
+            for node in walk(results)
+            if (
+                isinstance(node, dict)
+                and node.get("nodeType") == "Unit test bundle"
+                and isinstance(node.get("name"), str)
+                and node["name"]
+            )
+        }
+    else:
+        raise ValueError("no test enumeration or result evidence")
 except (OSError, TypeError, ValueError, json.JSONDecodeError):
     sys.exit(1)
-covered = set()
-for plan in values:
-    covered.update(covered_targets(plan))
 sys.exit(0 if expected.issubset(covered) else 1)
 PY
                 then

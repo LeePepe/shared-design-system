@@ -50,6 +50,14 @@ class SchemeSelectionTests(unittest.TestCase):
         self._write_stub("xcrun", """
             #!/usr/bin/env python3
             import json
+            from pathlib import Path
+            import sys
+            if "xcresulttool" in sys.argv:
+                result = Path(sys.argv[sys.argv.index("--path") + 1])
+                if (result / "fail-extraction").exists():
+                    raise SystemExit(1)
+                print((result / "tests.json").read_text())
+                raise SystemExit(0)
             print(json.dumps({"devices": {
                 "com.apple.CoreSimulator.SimRuntime.iOS-18-0": [{
                     "name": "iPhone 16", "udid": "FIXTURE-DEVICE"
@@ -72,6 +80,16 @@ class SchemeSelectionTests(unittest.TestCase):
             scheme = arguments[arguments.index("-scheme") + 1]
             if "-enumerate-tests" in arguments:
                 spec = json.loads(os.environ["P190_ENUMERATIONS"])[scheme]
+                if "result" in spec or "result_raw" in spec:
+                    result = Path(arguments[arguments.index(
+                        "-resultBundlePath") + 1])
+                    result.mkdir()
+                    content = spec.get("result_raw",
+                                       json.dumps(spec.get("result")))
+                    (result / "tests.json").write_text(
+                        content, encoding="utf-8")
+                    if spec.get("extraction_exit"):
+                        (result / "fail-extraction").touch()
                 if spec.get("exit"):
                     raise SystemExit(spec["exit"])
                 if "raw" in spec:
@@ -250,6 +268,141 @@ class SchemeSelectionTests(unittest.TestCase):
             json.dumps({"workspace": {"name": "Fixture",
                                       "schemes": ["Malformed"]}}),
             {"Malformed": {"output": metadata}},
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("found 0", result.stderr)
+        self.assert_no_final_test()
+
+    def test_missing_enumeration_uses_complete_result_bundle(self):
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture",
+                                      "schemes": ["Complete"]}}),
+            {
+                "Complete": {"result": {
+                    "testNodes": [{
+                        "nodeType": "Unit test bundle",
+                        "name": "NativeDesignKitTests",
+                    }, {
+                        "nodeType": "Unit test bundle",
+                        "name": "DesignTokensTests",
+                    }],
+                }},
+            },
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        final = [
+            command for command in self.invocations()
+            if "test" in command and "-enumerate-tests" not in command
+        ]
+        self.assertEqual(len(final), 1)
+        self.assertEqual(final[0][final[0].index("-scheme") + 1],
+                         "Complete")
+
+    def test_partial_result_bundle_fails_closed(self):
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture",
+                                      "schemes": ["Incomplete"]}}),
+            {
+                "Incomplete": {"result": {
+                    "testNodes": [{
+                        "nodeType": "Unit test bundle",
+                        "name": "NativeDesignKitTests",
+                    }, {
+                        "nodeType": "Test suite",
+                        "name": "DesignTokensTests",
+                    }, {
+                        "nodeType": "Unit test bundle",
+                        "name": "",
+                    }, {
+                        "nodeType": "Unit test bundle",
+                        "name": "DesignTokensTestsExtra",
+                    }],
+                }},
+            },
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("found 0", result.stderr)
+        self.assert_no_final_test()
+
+    def test_missing_result_bundle_fails_closed(self):
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture",
+                                      "schemes": ["Missing"]}}),
+            {"Missing": {}},
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("found 0", result.stderr)
+        self.assert_no_final_test()
+
+    def test_malformed_or_unextractable_result_bundle_fails_closed(self):
+        cases = [
+            {"result_raw": "{not json"},
+            {
+                "result": {
+                    "testNodes": [{
+                        "nodeType": "Unit test bundle",
+                        "name": "NativeDesignKitTests",
+                    }, {
+                        "nodeType": "Unit test bundle",
+                        "name": "DesignTokensTests",
+                    }],
+                },
+                "extraction_exit": 1,
+            },
+        ]
+        for spec in cases:
+            with self.subTest(spec=spec):
+                self.log.unlink(missing_ok=True)
+                result = self.run_helper(
+                    json.dumps({"workspace": {"name": "Fixture",
+                                              "schemes": ["Invalid"]}}),
+                    {"Invalid": spec},
+                )
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("found 0", result.stderr)
+                self.assert_no_final_test()
+
+    def test_failed_candidate_cannot_use_complete_result_bundle(self):
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture",
+                                      "schemes": ["Failed"]}}),
+            {
+                "Failed": {
+                    "exit": 1,
+                    "result": {
+                        "testNodes": [{
+                            "nodeType": "Unit test bundle",
+                            "name": "NativeDesignKitTests",
+                        }, {
+                            "nodeType": "Unit test bundle",
+                            "name": "DesignTokensTests",
+                        }],
+                    },
+                },
+            },
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("found 0", result.stderr)
+        self.assert_no_final_test()
+
+    def test_present_enumeration_remains_authoritative(self):
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture",
+                                      "schemes": ["Incomplete"]}}),
+            {
+                "Incomplete": {
+                    "output": enumeration("NativeDesignKitTests"),
+                    "result": {
+                        "testNodes": [{
+                            "nodeType": "Unit test bundle",
+                            "name": "NativeDesignKitTests",
+                        }, {
+                            "nodeType": "Unit test bundle",
+                            "name": "DesignTokensTests",
+                        }],
+                    },
+                },
+            },
         )
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("found 0", result.stderr)
