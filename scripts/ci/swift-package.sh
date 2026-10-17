@@ -109,28 +109,16 @@ import sys
 expected_path, enumeration_path = sys.argv[1:]
 
 def contains_test(node):
-    if isinstance(node, dict):
-        if node.get("kind") == "test":
-            return True
-        return any(contains_test(value) for value in node.values())
-    if isinstance(node, list):
-        return any(contains_test(value) for value in node)
-    return False
+    if node["kind"] == "test":
+        return True
+    return any(contains_test(child) for child in node["children"])
 
 def covered_targets(node):
     covered = set()
-    if isinstance(node, dict):
-        if (
-            node.get("kind") == "target"
-            and isinstance(node.get("name"), str)
-            and contains_test(node.get("children", []))
-        ):
-            covered.add(node["name"])
-        for value in node.values():
-            covered.update(covered_targets(value))
-    elif isinstance(node, list):
-        for value in node:
-            covered.update(covered_targets(value))
+    if node["kind"] == "target" and contains_test(node):
+        covered.add(node["name"])
+    for child in node["children"]:
+        covered.update(covered_targets(child))
     return covered
 
 try:
@@ -142,9 +130,35 @@ try:
         raise ValueError("empty test enumeration")
     if not isinstance(enumeration.get("errors"), list) or enumeration["errors"]:
         raise ValueError("test enumeration reported errors")
+    values = enumeration.get("values")
+    if not isinstance(values, list) or not values:
+        raise ValueError("test enumeration has no values hierarchy")
+    def validate_node(node):
+        if not isinstance(node, dict):
+            raise ValueError("test enumeration node is not an object")
+        if not isinstance(node.get("kind"), str) or not node["kind"]:
+            raise ValueError("test enumeration node has no kind")
+        if not isinstance(node.get("name"), str) or not node["name"]:
+            raise ValueError("test enumeration node has no name")
+        if node["kind"] == "test":
+            if "children" in node and node["children"] != []:
+                raise ValueError("test enumeration test node has children")
+            node["children"] = []
+            return
+        if not isinstance(node.get("children"), list) or not node["children"]:
+            raise ValueError("test enumeration node has no children")
+        for child in node["children"]:
+            validate_node(child)
+    for plan in values:
+        validate_node(plan)
+        if plan["kind"] != "plan":
+            raise ValueError("test enumeration value is not a plan")
 except (OSError, TypeError, ValueError, json.JSONDecodeError):
     sys.exit(1)
-sys.exit(0 if expected.issubset(covered_targets(enumeration)) else 1)
+covered = set()
+for plan in values:
+    covered.update(covered_targets(plan))
+sys.exit(0 if expected.issubset(covered) else 1)
 PY
                 then
                     printf '%s\n' "$candidate" >> "$metadata_dir/usable-schemes.txt"

@@ -228,6 +228,33 @@ class SchemeSelectionTests(unittest.TestCase):
         self.assertIn("found 0", result.stderr)
         self.assert_no_final_test()
 
+    def test_target_shaped_data_outside_values_fails_closed(self):
+        metadata = enumeration("NativeDesignKitTests")
+        metadata["unexpected"] = enumeration("DesignTokensTests")["values"]
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture",
+                                      "schemes": ["Malformed"]}}),
+            {"Malformed": {"output": metadata}},
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("found 0", result.stderr)
+        self.assert_no_final_test()
+
+    def test_malformed_children_hierarchy_fails_closed(self):
+        metadata = enumeration("NativeDesignKitTests", "DesignTokensTests")
+        metadata["values"][0]["children"][0]["children"] = {
+            "kind": "test",
+            "name": "forgedTest()",
+        }
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture",
+                                      "schemes": ["Malformed"]}}),
+            {"Malformed": {"output": metadata}},
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("found 0", result.stderr)
+        self.assert_no_final_test()
+
 
 def run_real_fixture():
     with tempfile.TemporaryDirectory(prefix="swift-package-integration-") as scratch:
