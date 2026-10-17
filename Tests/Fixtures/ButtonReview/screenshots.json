@@ -30,5 +30,21 @@
   "button-after-press",
   "button-strata-purple-dark-forced-fallback",
   "button-system-reduce-motion-restored-app",
-  "button-system-reduce-transparency-restored-app"
+  "button-system-reduce-transparency-restored-app",
+  "button-original-before-press",
+  "button-original-after-press",
+  "button-original-action-enabled",
+  "button-original-action-disabled",
+  "button-original-action-loading",
+  "button-original-action-re-enabled",
+  "button-original-accessibility-narrow",
+  "button-original-accessibility-narrow-loading",
+  "button-original-solid-ocean-light",
+  "button-explicit-solid-ocean-light",
+  "button-original-solid-ocean-dark",
+  "button-explicit-solid-ocean-dark",
+  "button-original-solid-graphite-light",
+  "button-explicit-solid-graphite-light",
+  "button-original-solid-graphite-dark",
+  "button-explicit-solid-graphite-dark"
 ]

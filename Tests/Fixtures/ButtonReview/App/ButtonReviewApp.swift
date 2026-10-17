@@ -36,6 +36,8 @@ private struct ReviewConfiguration {
     let mode: String
     let scenario: String
     let surface: NativeSurfaceStyle
+    let buttonInitializer: String
+    let requestedSurface: String
     let textSize: DynamicTypeSize
     let language: String
     let forceReduced: Bool
@@ -47,6 +49,10 @@ private struct ReviewConfiguration {
             throw ConfigurationError.invalid("NDK_FORCE_REDUCED")
         }
         forceReduced = environment["NDK_FORCE_REDUCED"] == "true"
+        buttonInitializer = environment["NDK_BUTTON_INITIALIZER"] ?? "explicit-surface"
+        guard ["explicit-surface", "original-solid"].contains(buttonInitializer) else {
+            throw ConfigurationError.invalid("NDK_BUTTON_INITIALIZER")
+        }
         func required(_ name: String) throws -> String {
             guard let value = environment[name], !value.isEmpty else {
                 throw ConfigurationError.missing(name)
@@ -59,10 +65,14 @@ private struct ReviewConfiguration {
         guard ["specimen", "matrix", "interaction", "long-label", "input-diagnostics"].contains(scenario) else {
             throw ConfigurationError.invalid("NDK_SCENARIO")
         }
-        switch try required("NDK_SURFACE") {
+        requestedSurface = try required("NDK_SURFACE")
+        switch requestedSurface {
         case "glass": surface = .glass
         case "solid": surface = .solid
         default: throw ConfigurationError.invalid("NDK_SURFACE")
+        }
+        guard buttonInitializer != "original-solid" || ["matrix", "interaction", "long-label"].contains(scenario) else {
+            throw ConfigurationError.invalid("NDK_BUTTON_INITIALIZER scenario")
         }
         switch mode {
         case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
@@ -117,6 +127,7 @@ private struct ButtonReviewBoard: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .accessibilityIdentifier("review-scroll")
+                .accessibilityValue("initializer=\(configuration.buttonInitializer);requested-surface=\(configuration.requestedSurface);reduce-transparency=\(reduceTransparency)")
                 .foregroundStyle(theme.foreground)
                 .background(theme.canvas.ignoresSafeArea())
             }
@@ -209,6 +220,25 @@ private struct ButtonReviewBoard: View {
         return [rect.minX, rect.minY, rect.width, rect.height].map { String(Double($0)) }.joined(separator: ",")
     }
 
+    /// Keep both public call sites real: the original branch deliberately omits
+    /// `surface`, even when the fixture requests Glass for the other branch.
+    @ViewBuilder
+    private func behaviorButton<Label: View, LoadingLabel: View>(
+        variant: NativeButtonVariant,
+        isLoading: Bool,
+        action: @escaping () -> Void,
+        @ViewBuilder label: () -> Label,
+        @ViewBuilder loadingLabel: () -> LoadingLabel
+    ) -> some View {
+        if configuration.buttonInitializer == "original-solid" {
+            NativeButton(theme: theme, variant: variant, isLoading: isLoading,
+                         action: action, label: label, loadingLabel: loadingLabel)
+        } else {
+            NativeButton(theme: theme, variant: variant, surface: configuration.surface,
+                         isLoading: isLoading, action: action, label: label, loadingLabel: loadingLabel)
+        }
+    }
+
     private var matrix: some View {
         VStack(alignment: .leading, spacing: 12) {
             ForEach(["primary", "secondary", "ghost"], id: \.self) { variant in
@@ -218,8 +248,8 @@ private struct ButtonReviewBoard: View {
                         HStack(spacing: 12) {
                             Text(state.capitalized).font(.caption)
                                 .frame(width: 60, alignment: .leading)
-                            NativeButton(theme: theme, variant: variantValue(variant), surface: configuration.surface,
-                                         isLoading: state == "loading", action: { actionCount += 1 }) {
+                            behaviorButton(variant: variantValue(variant), isLoading: state == "loading",
+                                           action: { actionCount += 1 }) {
                                 Text(variant == "primary" ? "Continue" : variant == "secondary" ? "Save draft" : "Learn more")
                             } loadingLabel: { Text("Working…") }
                             .disabled(state == "disabled")
@@ -236,8 +266,7 @@ private struct ButtonReviewBoard: View {
 
     private var interaction: some View {
         VStack(alignment: .leading, spacing: 20) {
-            NativeButton(theme: theme, variant: .primary, surface: configuration.surface, isLoading: isLoading,
-                         action: { actionCount += 1 }) {
+            behaviorButton(variant: .primary, isLoading: isLoading, action: { actionCount += 1 }) {
                 Text("Save")
             } loadingLabel: { Text("Saving all your changes…") }
             .disabled(isDisabled)
@@ -252,8 +281,7 @@ private struct ButtonReviewBoard: View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 16) {
                 Text("320 pt narrow layout").font(.headline)
-                NativeButton(theme: theme, variant: .primary, surface: configuration.surface, isLoading: isLoading,
-                             action: { actionCount += 1 }) {
+                behaviorButton(variant: .primary, isLoading: isLoading, action: { actionCount += 1 }) {
                     Text("confirm_selection")
                         .background {
                             GeometryReader { proxy in

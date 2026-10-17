@@ -36,6 +36,17 @@ primary/hover/active contrast pairs, Ghost's role, disabled colors and the
 bounded-corner regression. Actual composite contrast and Reduce Transparency
 need the runtime evidence recorded against the exact PR head.
 
+A separate original-initializer runtime lane calls the public overload without
+`surface`. It adds the same strict enabled/disabled/loading and held-press action
+checks, minimum target, stable footprint and full localized narrow-label checks;
+the explicit-surface lane remains. Paired original/explicit Solid matrices for
+both legacy brands and themes record all variant/state frames and actual PNGs.
+The original lane ignores the fixture's requested Glass by omitting the argument,
+so actual pixel/background comparison against explicit Solid and Glass can
+detect a wrong material default. This repairs the earlier semantic coverage loss
+when the behavior boards switched overloads despite retaining their test names.
+New results and independent review must bind the repaired clean source SHA.
+
 Generated screenshots and result bundles live outside git. Screenshots do not
 establish VoiceOver, minimum-OS, physical-device or macOS pointer/keyboard
 acceptance. Remote gates and an independent exact-SHA visual review are

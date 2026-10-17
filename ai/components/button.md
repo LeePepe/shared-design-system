@@ -79,6 +79,14 @@ coordinate taps do not. Run `python3 Tests/Fixtures/Support/run.py ButtonReview
 --results <external-new-path>.xcresult --screenshots <external-empty-directory>`
 from the checkout; full instructions and the moved-test mapping are in
 `Tests/Fixtures/Support/README.md` and `Tests/Fixtures/ButtonReview/README.md`.
+The original initializer has a separate runtime lane that omits `surface`,
+retaining its documented Solid treatment. It exercises action suppression and
+re-enabling, a native held press, loading footprint and both complete German
+accessibility labels with the same strict assertions as the explicit-surface
+lane. Original and explicit Solid legacy-brand matrices provide paired actual
+captures and frame observations for surface compatibility; explicit Glass
+coverage remains alongside them. Runtime results and image comparisons must
+identify the new exact source revision before claiming compatibility verification.
 This fixture is separate from package gates. macOS package checks do not claim
 rendered UI or iOS Dynamic Type evidence. Opaque provider RGBA checks
 require at least 4.5:1 for onAccent/accent and foreground/surface in both brands

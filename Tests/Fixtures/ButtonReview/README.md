@@ -14,10 +14,50 @@ preferences through Settings, and assert SwiftUI observed those preferences.
 `specimen` uses the shared `StrataSpecimen` shell and a dense inner stage,
 with five real Strata palettes × light/dark × Glass/solid (20 named captures).
 The compact normal row shows Primary, Secondary and Ghost, followed by
-disabled/loading examples. `matrix` retains the original behavior boards. Matrix captures show all three
+disabled/loading examples. `matrix` keeps the behavior-board content. Matrix captures show all three
 variants in normal/loading/disabled states for ocean/graphite × light/dark.
 The 320 pt board uses German localized labels and actual iOS accessibility2
 typography. XCTest captures the running app, not a hosted view bitmap.
+
+## Original initializer compatibility lane
+
+`NDK_BUTTON_INITIALIZER=original-solid` selects a separate SwiftUI branch that
+calls the original public initializer **without a `surface` argument** for
+`matrix`, `interaction` and `long-label`. `explicit-surface` is the default and
+continues to call the additive overload with the requested surface. Specimen and
+native-input routes are unchanged; selecting the original lane for either is a
+configuration error. The running behavior board exposes its selected initializer
+and requested surface in the `review-scroll` accessibility value.
+
+The eight `testOriginalInitializer…` tests add runtime coverage alongside the
+32 existing tests. They run the same strict action, held-press, stable-footprint,
+44 pt target and German accessibility2 narrow-label assertions through the
+original call site. The action captures include enabled dispatch, three disabled
+coordinate taps, three loading coordinate taps and successful re-enabled dispatch.
+The narrow captures show both complete localized active labels and their measured
+containment in the production fill path. Both overloads run the same assertions
+for these four behavior checks; no construction-only check substitutes for this
+lane.
+
+Four compatibility tests capture the original initializer and explicit Solid
+for ocean/graphite × light/dark, with all three variants × normal/loading/disabled.
+The original lane deliberately requests Glass in fixture configuration but never
+passes it to NativeButton. Tests compare all nine runtime frames within 0.5 pt,
+check targets and enabled states, and require actual system Reduce Transparency
+to be false. `BUTTON_COMPATIBILITY` log records bind each named XCTest PNG to its
+observed route, labels, states, frames and viewport. Delivery evidence must compare
+the actual original/Solid static control pixels and backgrounds, using existing
+explicit Glass matrix captures as the material discriminator for Secondary.
+Loading rotation is animated; its whole-image bytes are not an equality oracle.
+The full shared runner collects all 48 named XCTest captures, including the
+16 compatibility/action/narrow/press additions in `screenshots.json`.
+
+The previous `0db54cc` revision preserved test names and assertions while moving
+all runtime boards to the additive overload. That lost original-initializer
+coverage; its construction-only package check did not repair the loss. This lane
+addresses the independent review finding without changing production code or
+replacing the explicit-surface tests. A fresh clean-head run and independent
+review are required; historical screenshots and passes do not apply to this repair.
 
 ## Test migration / PR integrity record
 
