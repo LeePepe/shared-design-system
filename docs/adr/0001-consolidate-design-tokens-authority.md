@@ -39,11 +39,32 @@ the old repository.
 - `DesignTokens` remains Foundation-only and UI-free. `NativeDesignKit` remains
   SwiftUI-only and depends on the local `DesignTokens` target. Token or style
   code never imports component code.
-- Development authority transfers at the reviewed S200 activation revision:
-  after that point no new source, PR, tag, or release is accepted from the old
-  repository. A later Owner-authorized archive only enforces that already-made
-  authority decision in GitHub settings; it does not control historical fetch
-  availability or postpone the transfer.
+- S100 must merge before a separate provider-quiescence PR starts. That PR is
+  based on the exact provider revision and changes only `AGENTS.md`,
+  `docs/constitution.md`, and `README.md`: it removes permission for ordinary
+  provider development, identifies the target as the future development
+  authority, and states that future adopters must use a version-matched target
+  migration contract after activation without claiming a target SHA or public
+  route before S200/T260. It preserves old exact pins, tags, releases, public
+  APIs/data, and URL resolution. It requires ordinary exact-head independent review,
+  CODEOWNERS/delegated Owner approval, required CI, PR Manager merge, and
+  merged-main/blob readback before S200 may start. It does not change provider
+  source, generated data, manifests, gates, provider shared-ci pin
+  `42d1704a5690ab5890657feaadb8929384632766`,
+  rulesets, settings, credentials, releases, tags, archive state, or repository
+  identity.
+- P175 records the exact three pre-change provider blobs. If Root abandons
+  activation after P175 but before S200, rollback is a separate ordinary
+  exact-head provider PR that restores only those three blobs, with the same
+  Owner approval, CI, merge, and readback. That restore must merge before the
+  inert S100 import is removed, so rollback never leaves a falsely writable
+  target or silently reopens provider development.
+- The provider becomes quiescent when that prerequisite merges; development
+  authority becomes active in the target at the reviewed S200 activation
+  revision. S200 atomically removes the old executable dependency and the stale
+  root `AGENTS.md`/README authority declarations. A later Owner-authorized
+  archive only enforces the already-made authority decision in GitHub settings;
+  it does not control historical fetch availability or postpone the transfer.
 - The nested provider release unit retains its npm name, exports, licenses,
   versioned `ai/` contract, and independent Node/Swift-data gates. The root
   contract remains the NativeDesignKit entry and gains a deterministic pointer
@@ -69,10 +90,12 @@ the old repository.
   consumer moving DesignTokens from the old URL must change its SwiftPM package
   URL/identity to `shared-design-system`. Revision-mode external consumers prove
   this route before any release decision.
-- The old repository stays fetchable for historical exact versions. Its archive
-  is a later, explicit Owner settings action after the consolidated revision,
-  consumer migration evidence, release decision, and rollback packet pass. It is
-  never deleted, renamed, tag-rewritten, or treated as a live mirror.
+- The old repository stays fetchable for historical exact versions. Its
+  three-file quiescence notice is an ordinary reviewed implementation
+  prerequisite, not an archive/settings action. Archive remains a later,
+  explicit Owner settings decision after the consolidated revision, consumer
+  migration evidence, release decision, and rollback packet pass. The provider
+  is never deleted, renamed, tag-rewritten, or treated as a live mirror.
 
 The stable acceptance, compatibility, retirement, and rollback boundaries are
 specified in `docs/design-tokens-consolidation-spec.md`.
