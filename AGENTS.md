@@ -67,6 +67,13 @@ Public provider tag `v0.2.0` resolves to
 `87bef8fbab5bf67a748815d7ed04d7ae199f760a`; `Package.resolved` records
 that exact release revision.
 
+Prospective S200 exception: only the already Owner-approved S200/PR #37 feature
+PR may atomically replace that external exact dependency and obsolete lock
+resolution with the repository-local `DesignTokens` target, while updating the
+root manifest and authoritative architecture/contracts to the same truth. This
+does not activate S200 and is not a general dependency-policy exception; every
+other dependency change remains subject to the existing exact-pin rule.
+
 ## Delivery
 
 - One task → one branch + worktree → one PR using `.github/pull_request_template.md`.

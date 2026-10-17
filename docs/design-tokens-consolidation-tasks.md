@@ -19,12 +19,22 @@ ADR: `docs/adr/0001-consolidate-design-tokens-authority.md`
   and read back the exact reviewed four artifact blobs before P050 starts.
 - P050 must actually merge before S100 starts or publishes. S100 must actually
   merge and read back before P175 starts. P175 must actually merge and read back
-  before P190 starts. P190 must actually merge and read back before the preserved
-  S200 candidate resumes or publishes. S300 begins only after S200 merges and
-  the exact target main revision is recorded. No stacked merge order is inferred.
+  before P190 starts. P190 must actually merge and read back before P195 starts.
+  P195 must actually merge and read back before preserved S200 PR #37 resumes or
+  republishes. Normal S300 activation evidence begins only after S200 merges and
+  the exact target main revision is recorded. If activation is abandoned after
+  P195, only the terminal T330/T320 rollback reconciliation follows the ordered
+  provider restore, target-policy restore/invalidation and S100 cleanup; T310 and
+  D400 do not run on that branch. No stacked merge order is inferred.
 - Mechanical source relocation is isolated in S100. P175 changes only the
-  provider governance contract; target public package resolution, manifest
-  identity, and consumer-contract behavior change only in S200.
+  provider governance contract. P195 changes only prospective trusted-base
+  policy; target public package resolution, manifest identity, and consumer-
+  contract behavior change only in S200.
+- If Root abandons activation after P195 but before S200, rollback is conditional,
+  not a forward dependency: provider restore/merge/readback runs first; an
+  ordinary reviewed, Owner-approved and CI-gated target PR then restores the
+  recorded pre-P195 policy blob or removes only the P195 exception while
+  preserving unrelated policy, before S100 cleanup or atomically with it.
 - One writer owns every path in a slice. Parallel `[P]` rows are permitted only
   after the slice writer verifies nonoverlapping paths and no incomplete edge.
 - Product/component source, semantic token values, generated values, tests,
@@ -39,7 +49,9 @@ ADR: `docs/adr/0001-consolidate-design-tokens-authority.md`
   snapshot, patch SHA-256 and repair/review history untouched while P190 is open.
   P190 uses its own task/worktree/PR from exact base
   `5eec04eac574e41586e0c42732faa623e64cf9f9`; only its actual merge/readback
-  permits Team Lead to return the original writer to S200.
+  admits P195. Decision `s37ownc1` then requires P195 to land the prospective
+  trusted rule on actual P190 main before Team Lead may return the original
+  writer to S200. P195 and its planner do not edit or resume PR #37.
 - Provider source acquisition is from public immutable revision
   `87bef8fbab5bf67a748815d7ed04d7ae199f760a`, never a stale checkout. Target
   implementation starts from reviewed planning landed on base
@@ -71,6 +83,10 @@ T001 planning artifacts
         T190 -> exact-head review + Owner approval + CI + PRM merge/readback
                        |
                        v
+      -> P195 prospective local-dependency trusted-rule prerequisite
+        T195 -> exact-head review + Owner approval + CI + PRM merge/readback
+                       |
+                       v
       -> S200 local Swift activation
         T210 -> T215 -> T220
           |              |
@@ -85,6 +101,9 @@ T001 planning artifacts
 ```
 
 The graph is acyclic. `D400` is a decision boundary, not an implementation task.
+The conditional abandonment branch from P195 is also acyclic:
+`provider restore/readback → target-policy restore/invalidation and S100 cleanup
+→ T330 → T320`; it is terminal and never rejoins S200.
 
 ## `P001` — Reviewed planning contract
 
@@ -187,7 +206,27 @@ two-product topology.**
 | task-local acceptance | `P190-AC-001`: the unchanged real one-product root executes its actual `NativeDesignKitTests` through `scripts/ci/swift-package.sh ios` and passes `scripts/verify --all`; a simulated fixture alone does not satisfy this. `P190-AC-002`: a real minimal two-library-product/two-test-target Swift fixture executes both `NativeDesignKitTests` and `DesignTokensTests` through the same helper with no filtered test selection. `P190-AC-003`: reordering schemes does not change the selected usable scheme. `P190-AC-004`: missing/malformed/empty metadata and zero usable candidates fail closed. `P190-AC-005`: two usable complete candidates fail as ambiguous. `P190-AC-006`: a candidate omitting either declared test target fails as incomplete. `P190-AC-007`: all excluded gate/product/policy bytes remain unchanged; exact candidate review, normal hooks, delegated Owner approval, required CI, PR Manager merge and merged-main readback bind one head. |
 | verification | focused parser/command-harness negatives for `P190-AC-003`–`006`; real task-local two-product iOS fixture with machine-readable executed-test evidence naming both test targets; actual one-product `scripts/ci/swift-package.sh ios`; `scripts/verify --all`; `git diff --check`; exact path/exclusion/blob audit; frozen-candidate AI Reviewer PASS with publication permission; local = remote = PR head reconciliation; Owner approval and required checks; merged-main helper/test/fixture/leaf-wiring blob readback |
 | depends on | P175 actual merge/readback; exact S100 target base `5eec04eac574e41586e0c42732faa623e64cf9f9` |
-| blocks | every S200/S300 task; the staged S200 candidate remains untouched until this prerequisite actually merges and is read back |
+| blocks | P195 and every S200/S300 task; the staged S200 candidate remains untouched until this prerequisite actually merges and is read back |
+
+## `P195` — Prospective local-dependency trusted-rule prerequisite
+
+Observable PR intent: **After this PR, target main prospectively trusts the
+already Owner-approved S200 dependency transition without claiming that the
+still-blocked feature change has already landed.**
+
+- [ ] T195 [US2] Land the exact reviewed dependency supplement and minimum prospective trusted-base rule before resuming PR #37.
+
+| Field | `T195` |
+| --- | --- |
+| owner area | repository support / trusted dependency policy |
+| context | exact public target base and P190 merge/readback `bdd495d70b7dc936c8ebbabbeb266a015d1dfc6a`; exact pre-P195 target `AGENTS.md` blob `22750bed4a6b480256f3cc76260daa471dcf78d5`; pinned shared-ci protocol §§2, 3, 6 and repository-contract dependency/exception rules; accepted plan `f7893ebd5bc4d6e0b187b9052e85b493d401c0ee`; reviewed P190 supplement `740d838d933399f6e4a7503be3d5f627949e12fe`; Team Lead-verified delegated Owner decision `s37ownc1` / `01a14a25-2c35-72cf-a938-48d5e02ce7e7`; delegated, unedited repository-Owner-authored GitHub record `6234668757` (not manual Owner posting); exact-head approval review `5558038551`; preserved PR #37 head `c1777c3d2a5a20354970686ad33af7c39b050c5f` |
+| paths | exact independently reviewed `docs/design-tokens-consolidation-plan.md` and `docs/design-tokens-consolidation-tasks.md` blobs; the minimum prospective rule in root `AGENTS.md` |
+| excludes | root/nested `Package.swift` and locks; every README and tech-context final-state claim; all source, tests, products, semantic token data/schema/values and generated outputs; root/nested consumer contracts other than the two planning artifacts; `scripts/verify`; `scripts/ci/**`; hooks; workflows; CODEOWNERS; shared-ci source/pin; rulesets/settings; credentials; releases/tags/publication; six-component work; provider repository; preserved S200 branch/worktree/candidate/PR/review/evidence |
+| contract impact | keeps current base truth and executable resolution unchanged: NativeDesignKit still uses external exact DesignTokens `0.2.0` and its existing lock. Adds only a prospective, decision-bound rule that permits the accepted S200 feature PR to atomically replace that external edge and obsolete lock with the repository-local DesignTokens target while updating the root manifest and authoritative architecture/contracts to the same truth. It is not a general dependency exception and does not authorize P195 itself to make the transition. Records the exact pre-rule target policy blob so abandonment cannot leave a stale exception. |
+| task-local acceptance | `P195-AC-001`: the PR is based on exact P190 public main `bdd495d70b7dc936c8ebbabbeb266a015d1dfc6a` and changes exactly the reviewed plan, reviewed tasks, and `AGENTS.md`. `P195-AC-002`: the two planning blobs are byte-identical to the exact AI Reviewer-approved Planner revision. `P195-AC-003`: `AGENTS.md` retains the current external exact `0.2.0`/resolved-lock declaration until S200 merge and contains no final-state local-resolution claim. `P195-AC-004`: the prospective rule is limited to the accepted S200/PR #37 atomic manifest/local-edge/obsolete-lock plus architecture/contract reconciliation; every other dependency change remains under the existing exact-pin rule. `P195-AC-005`: manifests, locks, README, tech-contexts, code, tests, gates and every excluded byte remain unchanged; the delegated record is cited as delegated posting, never manual Owner authorship. `P195-AC-006`: one frozen candidate receives exact-head independent review, CODEOWNERS/delegated Owner approval, normal hooks, required CI, PR Manager merge, and target-main three-blob readback. `P195-AC-007`: the receipt records pre-P195 `AGENTS.md` blob `22750bed4a6b480256f3cc76260daa471dcf78d5`; if activation is abandoned after P195 but before S200, the P175 provider restore must merge/read back first, then an ordinary exact-head-reviewed, CODEOWNERS/delegated-Owner-approved, required-CI target PR restores that exact policy blob or removes only the P195 exception while preserving unrelated policy. Its resulting blob and no-exception assertion must be read back before S100 cleanup or atomically with it. |
+| verification | exact three-path diff and excluded-blob audit; exact-base `AGENTS.md` blob assertion; current `Package.swift`/`Package.resolved` external exact-resolution readback; positive assertion for the narrowly prospective S200 rule and negative assertions against current-local/final-state/general-exception claims; planning AC/task/DAG checks; contract audit and workflow lint; `scripts/verify`; frozen-candidate AI Reviewer PASS with publication permission; local = remote = PR head reconciliation; CODEOWNERS approval and required checks; merged-main reviewed plan/tasks/`AGENTS.md` blob readback; rollback receipt fields for the pre-P195 blob, provider-restore SHA, target-policy restore/invalidation SHA and resulting blob, cleanup SHA, ordering, and no-exception assertion; if abandonment is exercised, exact merge/blob readback for that ordered chain |
+| depends on | P190 actual merge/readback at exact target main `bdd495d70b7dc936c8ebbabbeb266a015d1dfc6a`; exact-revision AI Reviewer PASS for this plan/tasks supplement; Team Lead acceptance and separate child/workspace preparation |
+| blocks | every S200/S300 task; MY-1895 remains blocked and PR #37 remains untouched until actual P195 merge/readback |
 
 ## `S200` — Local Swift activation and version-matched contracts
 
@@ -205,13 +244,13 @@ using the local DesignTokens target and version-matched migration contracts.**
 
 | Task | Owner layer/area | In-scope paths | Contract / task-local acceptance | Verification | Depends on |
 | --- | --- | --- | --- | --- | --- |
-| `T210` | repository support / Swift package integration | root `Package.swift`, `Package.resolved` as applicable, `AGENTS.md`, and architecture dependency/authority declarations | Root products/modules are exactly `DesignTokens` and `NativeDesignKit`; Native target depends on local DesignTokens; the old provider URL/package is absent from active root resolution and root `AGENTS.md`; executable resolution and documented authority agree; package floors are iOS15/macOS12/watchOS8. The original writer integrates the actual P190 merged base into the preserved registered candidate without replacing its worktree or resetting its repair history. | `swift package dump-package`; root resolve/build/test; manifest/`AGENTS.md` negative search for active external dependency; context/authority audit; P175 three-blob merge-receipt readback; P190 merged helper/test/wiring blob readback and preserved-candidate snapshot reconciliation | P175 and P190 actual merge/readback; Team Lead bounded continuation to the original S200 writer |
+| `T210` | repository support / Swift package integration | root `Package.swift`, `Package.resolved` as applicable, `AGENTS.md`, and architecture dependency/authority declarations | Root products/modules are exactly `DesignTokens` and `NativeDesignKit`; Native target depends on local DesignTokens; the old provider URL/package is absent from active root resolution and root `AGENTS.md`; executable resolution and documented authority agree; package floors are iOS15/macOS12/watchOS8. The original writer integrates actual P195 merged target main into preserved PR #37 without replacing its worktree or resetting P190/S200 repair and review history. The merged prospective rule then becomes final-state truth only through this atomic manifest/architecture/contract change. | `swift package dump-package`; root resolve/build/test; manifest/`AGENTS.md` negative search for active external dependency; context/authority audit; P175 three-blob merge-receipt readback; P190 merged helper/test/wiring readback; P195 reviewed plan/tasks/`AGENTS.md` merge readback; preserved PR #37 head/history reconciliation | P175, P190 and P195 actual merge/readback; Team Lead bounded continuation to the original S200 writer |
 | `T215` | NativeDesignKit | one new platform-boundary source file plus an external negative compile fixture; no component implementation file | DesignTokens-only watchOS consumer builds. Selecting NativeDesignKit for watchOS fails with the documented stable unavailable diagnostic before component use. iOS/macOS API and behavior are unchanged; no watchOS component implementation is added. | watchOS DesignTokens-only compile; negative NativeDesignKit watchOS compile matching the diagnostic; iOS/macOS package build/tests | `T210` candidate |
 | `T220` | NativeDesignKit | Native tests/fixtures only when needed for migration regression; existing production source is inspection-only except the exact T215 platform guard | Native public API and accepted Button/Card/List blobs/semantics remain unchanged. Explicit themes, exact errors, five palettes, Solid/Glass/fallback stay. Deferred Button input assertions/history remain unchanged and are not rerun as claimed evidence. | baseline blob comparison; existing package tests; applicable actual fixture regression without unchanged pointer diagnosis; no removed/weakened test diff | `T215` |
 | `T230` | Tokens | `Packages/DesignTokens/ai/**`, nested compatibility/migration/changelog, contract checker/tests, and Node/package examples | Contract names the new target URL/revision route while preserving npm artifact identity/exports and documenting the unchanged public Swift interface. Old immutable versions remain documented. Swift target-revision resolution is owned by T260 after push, not this contract task. | nested AI checker/tests; packed Node consumer; contract byte/version/surface checks | `T210` |
 | `T240` | NativeDesignKit contract | root `ai/**`, root `README.md`, compatibility/migration/integration/examples/registry/checker tests as necessary | Root README and version-matched contract discover both release units, replace the stale external-provider route, explain local target dependency and consumer manifest migration, preserve Native release/unreleased split, rollback, accepted component evidence, and deferred Button truth. | root contract checker/tests; README/`AGENTS.md`/manifest authority consistency; broken-pointer/version negative fixtures; local-path consumer fixture compiling public imports without a public-resolution claim | `T210`, `T220`, `T230` contract location fixed |
-| `T250` | repository support / integration | `scripts/ci/external-consumer.py`; `scripts/ci/test-ai.py`; `Tests/Fixtures/LocalConsumer/verify.py`; their focused tests/fixtures; and the three S200 leaf gate declarations | The P190-merged helper/tests/leaf wiring, S100 hook, `scripts/verify`, CI caller, setup wrapper, Linux Tokens lane, and Owner-routing policy remain byte-identical during S200. Generic layer routing runs every local gate, exact ten-output generation check, local-path Swift consumer, and real packed npm consumer before push. The configured local-consumer evidence directory is fresh and task-owned; the harness passes that exact path and reads only that run's receipt. Receipt state starts failed/unknown and becomes `passed` only after Swift exit, the exact required marker, product/local-only assertions, and every other success condition are validated; every error retains durable truthful failed evidence. Focused regressions cover a non-default configured output path and zero Swift exit with a missing/drifted marker. The P175 receipt is present, and provider freeze plus target `Package.swift`/lock/`AGENTS.md`/README/contexts agree on authority. The CI companion imports both Swift products only after the pushed target SHA is fetchable. Missing/cancelled/skipped/mismatched resolution fails; no path/mirror/stale-receipt fallback may count as evidence. Any further normal-entry/helper/workflow change is a contract blocker returned to Team Lead. | pre-push `scripts/verify`; `scripts/verify --all`; P190 helper/test/wiring blob equality; explicit configured-output regression; zero-exit/missing-or-drifted-marker negative receipt regression; fresh receipt path/run-identity assertion; exact ten-output check; S100 hook/caller/setup/CODEOWNERS blob comparison; workflow lint; contract/authority audit; P175 receipt readback; local-path Swift consumer; real nested npm tarball consumer; post-push public route is deliberately not claimed here | `T220`, `T230`, `T240`; P190 actual merge/readback |
-| `T260` | integration evidence | no extra tracked scope | One frozen clean candidate has exact provider/import/P175/P190 provenance, current local results, and AI Reviewer pre-push PASS before the normal hook-protected push. Only after publication, the pushed branch and PR `headRefOid` are reconciled to local HEAD; required CI's existing companion resolves that exact public SHA and imports both products before delivery. Protected-path Owner review and every real required gate bind the same head. Any byte change during push reconciliation or repair invalidates all candidate evidence and restarts freeze, local verification, exact-head review, push, public-SHA CI, and reconciliation. The Owner-directed continuation retains all earlier S200 repair/review history; it is not a fresh automatic round. | captured local/remote/PR SHA equality after push; exact-public-SHA consumer receipt from required CI; P175 merge receipt; P190 merge/readback receipt; check rollup at head; diff path audit; reviewer verdict; explicit no-byte-change reconciliation | `T250` |
+| `T250` | repository support / integration | `scripts/ci/external-consumer.py`; `scripts/ci/test-ai.py`; `Tests/Fixtures/LocalConsumer/verify.py`; their focused tests/fixtures; and the three S200 leaf gate declarations | The P190-merged helper/tests/leaf wiring, S100 hook, `scripts/verify`, CI caller, setup wrapper, Linux Tokens lane, and Owner-routing policy remain byte-identical during S200. Generic layer routing runs every local gate, exact ten-output generation check, local-path Swift consumer, and real packed npm consumer before push. The configured local-consumer evidence directory is fresh and task-owned; the harness passes that exact path and reads only that run's receipt. Receipt state starts failed/unknown and becomes `passed` only after Swift exit, the exact required marker, product/local-only assertions, and every other success condition are validated; every error retains durable truthful failed evidence. Focused regressions cover a non-default configured output path and zero Swift exit with a missing/drifted marker. The P175 and P195 receipts are present, and provider freeze plus target `Package.swift`/lock/`AGENTS.md`/README/contexts agree on authority. The CI companion imports both Swift products only after the pushed target SHA is fetchable. Exact-head job `39037863433/117411236482` proved a current defect: after `scripts/verify --all` passed, public resolution failed at `scripts/ci/external-consumer.py:188-190` because the resolved checkout origin was not the canonical public repository. The original writer must diagnose the observed runner origin and add meaningful fail-closed regression coverage. Missing/cancelled/skipped/mismatched resolution, noncanonical origin, or any path/mirror/stale-receipt fallback fails; no provenance weakening may count as evidence. Any further normal-entry/helper/workflow change is a contract blocker returned to Team Lead. | pre-push `scripts/verify`; `scripts/verify --all`; P190 helper/test/wiring blob equality; explicit configured-output regression; zero-exit/missing-or-drifted-marker negative receipt regression; fresh receipt path/run-identity assertion; focused canonical-origin positives plus observed noncanonical-runner-origin negative regression; exact ten-output check; S100 hook/caller/setup/CODEOWNERS blob comparison; workflow lint; contract/authority audit; P175/P195 receipt readback; local-path Swift consumer; real nested npm tarball consumer; post-push exact-public-SHA consumer proving canonical public origin and no local/mirror substitution | `T220`, `T230`, `T240`; P190 and P195 actual merge/readback |
+| `T260` | integration evidence | no extra tracked scope | Preserved PR #37 head `c1777c3d2a5a20354970686ad33af7c39b050c5f`, R2 review/publication history, delegated decision record and approval remain historical evidence while blocked; P195 does not reset them. After the original writer integrates actual P195 main and repairs T250 on the same PR, one new frozen clean candidate has exact provider/import/P175/P190/P195 provenance, current local results, and fresh AI Reviewer pre-push PASS before normal hook-protected publication. The pushed branch and PR `headRefOid` are reconciled to local HEAD; required CI's existing companion resolves that exact public SHA from the canonical public origin and imports both products. Protected-path Owner review and every real required gate bind the same head. Any byte change invalidates candidate-current evidence and restarts freeze, local verification, exact-head review, push, public-SHA CI, and reconciliation without erasing prior history or resetting repair/review counts. | preserved-to-new PR #37 head history; captured local/remote/PR SHA equality after repush; exact-public-SHA canonical-origin consumer receipt from required CI; P175, P190 and P195 merge/readback receipts; check rollup at new head; diff path audit; reviewer verdict; explicit main-integration and no-unreviewed-byte reconciliation | `T250` |
 
 S200 excludes semantic data/value/schema changes, generated-value changes,
 component/API redesign, new platform components, provider release/tag, npm
@@ -229,8 +268,8 @@ S100/P175/S200 defect is routed back and corrected there.
 | Task | Owner layer/area | In-scope evidence | Acceptance / verification | Depends on |
 | --- | --- | --- | --- | --- |
 | `T310` | integration verification | disposable external consumers and receipts outside tracked source | Node installs actual nested tarball; Swift resolves public target URL at exact merged SHA, imports both products, runs public behavior tests, and has no old provider URL/identity in resolution. Record hashes, lock, commands/exits/counts. | S200 merged and exact merge SHA fetchable |
-| `T330` | repository support / decision packet | read-only consumer discovery plus reviewed migration/retirement/rollback docs, P175 receipt, and release mapping | Known consumers and limitations are listed. Historical tag/URL availability and the already-landed three-file provider quiescence notice are proven. Packet recommends a consolidated `v0.3.0` candidate and separately identifies archive/settings/release decisions; it rejects delete/rename/transfer/rewrite/mirror. No external mutation occurs. | `T310` |
-| `T320` | integration verification | target/provider main, PR/check/review/provenance readbacks, T330 packet, and the canonical acceptance matrix | Every one of the 26 AC rows has cited producer and final evidence; the T330 consumer/retirement/rollback/release packet and P175 receipt are reconciled; three-layer audit/gates pass; native baseline blobs/tests and Button deferral history are intact; no unrequested source/test/policy change; local/remote/merge/check SHAs are reconciled. A stale or partial result is `unverified`, not pass. | `T330` |
+| `T330` | repository support / decision packet | read-only consumer discovery plus reviewed migration/retirement/rollback docs, P175/P195 receipts, and release mapping | Known consumers and limitations are listed. Historical tag/URL availability, the already-landed three-file provider quiescence notice, and the exact pre-P195 target policy blob are proven. If abandonment occurred after P195 but before S200, the packet includes provider-restore, target-policy restoration/invalidation and S100 cleanup merge/readbacks; it proves that order, the resulting target policy blob, absence of the P195 exception, and preservation of unrelated policy. Packet recommends a consolidated `v0.3.0` candidate only when activation continued and separately identifies archive/settings/release decisions; it rejects delete/rename/transfer/rewrite/mirror. No external mutation occurs. | `T310` when activation continued; terminal rollback receipts when abandoned |
+| `T320` | integration verification | target/provider main, PR/check/review/provenance readbacks, T330 packet, and the canonical acceptance matrix | Every one of the 26 AC rows has cited producer and final evidence; the T330 consumer/retirement/rollback/release packet and P175/P195 receipts are reconciled, including provider, resulting target-policy blob/no-exception, cleanup and ordering readbacks when the abandonment branch was exercised; three-layer audit/gates pass when activation continued; native baseline blobs/tests and Button deferral history are intact; no unrequested source/test/policy change; local/remote/merge/check SHAs are reconciled. A stale or partial result is `unverified`, not pass. | `T330` |
 
 ## Decision boundary `D400`
 
@@ -256,7 +295,7 @@ the universal final evidence task `T320`; `D400` is never an acceptance producer
 | --- | --- | --- | --- |
 | `AC-REVIEW-001` | P050 `T050`; S100 `T150` | `T320` | — |
 | `AC-AUTH-001` | S100 `T110`, `T130`, `T150` | `T320` | — |
-| `AC-AUTH-002` | P175 `T175`; S200 `T210`, `T240`, `T260`; S300 `T330` | `T320` | `D400` archive/settings only |
+| `AC-AUTH-002` | P175 `T175`; P195 `T195`; S200 `T210`, `T240`, `T260`; S300 `T330` | `T320` | `D400` archive/settings only |
 | `AC-LAYER-001` | S100 `T130`; S200 `T210`, `T250` | `T320` | — |
 | `AC-LAYER-002` | S100 `T120`; S200 `T210`, `T250` | `T320` | — |
 | `AC-GEN-001` | S100 `T110`, `T150`; S200 `T250` | `T320` | — |
@@ -267,19 +306,19 @@ the universal final evidence task `T320`; `D400` is never an acceptance producer
 | `AC-NATIVE-003` | S200 `T220`, `T240` | `T320` | — |
 | `AC-WEB-001` | S100 `T110`, `T130`, `T140`; S200 `T230`; S300 `T310` | `T320` | — |
 | `AC-CONTRACT-001` | S100 `T140`; S200 `T230`, `T240`, `T250` | `T320` | — |
-| `AC-VERIFY-001` | S100 `T130`, `T150`; P190 `T190`; S200 `T250`, `T260` | `T320` | — |
+| `AC-VERIFY-001` | S100 `T130`, `T150`; P190 `T190`; P195 `T195`; S200 `T250`, `T260` | `T320` | — |
 | `AC-CONSUMER-001` | S100 `T140`; S200 `T230`, `T250`, `T260`; S300 `T310` | `T320` | — |
 | `AC-CONSUMER-002` | S200 `T230`, `T250`, `T260`; S300 `T310` | `T320` | — |
-| `AC-EVIDENCE-001` | S100 `T150`; P175 `T175`; P190 `T190`; S200 `T260` | `T320` | — |
+| `AC-EVIDENCE-001` | S100 `T150`; P175 `T175`; P190 `T190`; P195 `T195`; S200 `T260` | `T320` | — |
 | `AC-HISTORY-001` | S100 `T110`, `T130`, `T150` | `T320` | — |
 | `AC-HISTORY-002` | P175 `T175`; S200 `T230`, `T240`; S300 `T330` | `T320` | `D400` release choice only |
-| `AC-COMPAT-001` | S200 `T210`, `T230`, `T240`; S300 `T310` | `T320` | — |
+| `AC-COMPAT-001` | P195 `T195`; S200 `T210`, `T230`, `T240`; S300 `T310` | `T320` | — |
 | `AC-COMPAT-002` | P175 `T175`; S200 `T240`; S300 `T330` | `T320` | — |
 | `AC-RETIRE-001` | S300 `T330` | `T320` | — |
 | `AC-RETIRE-002` | P175 `T175`; S300 `T330` | `T320` | `D400` archive/settings only |
-| `AC-ROLLBACK-001` | P175 `T175`; S200 `T230`, `T240`; S300 `T330` | `T320` | — |
-| `AC-SCOPE-001` | P050 `T050`; S100 `T110`, `T120`, `T130`, `T140`, `T150`; P175 `T175`; P190 `T190`; S200 `T210`, `T215`, `T220`, `T230`, `T240`, `T250`, `T260`; S300 `T310`, `T330` | `T320` | — |
-| `AC-SCOPE-002` | P001 `T001`; P050 `T050`; S100 `T110`, `T120`, `T130`, `T140`, `T150`; P175 `T175`; P190 `T190`; S200 `T210`, `T215`, `T220`, `T230`, `T240`, `T250`, `T260`; S300 `T310`, `T330` | `T320` | — |
+| `AC-ROLLBACK-001` | P175 `T175`; P195 `T195`; S200 `T230`, `T240`; S300 `T330` | `T320` | — |
+| `AC-SCOPE-001` | P050 `T050`; S100 `T110`, `T120`, `T130`, `T140`, `T150`; P175 `T175`; P190 `T190`; P195 `T195`; S200 `T210`, `T215`, `T220`, `T230`, `T240`, `T250`, `T260`; S300 `T310`, `T330` | `T320` | — |
+| `AC-SCOPE-002` | P001 `T001`; P050 `T050`; S100 `T110`, `T120`, `T130`, `T140`, `T150`; P175 `T175`; P190 `T190`; P195 `T195`; S200 `T210`, `T215`, `T220`, `T230`, `T240`, `T250`, `T260`; S300 `T310`, `T330` | `T320` | — |
 
 All implementation tasks have one owning layer/area, explicit paths, exclusions,
 contract effect, verification, and blocking edges. No task requires Fullstack to
@@ -289,21 +328,22 @@ invent product behavior or a release/settings decision.
 
 Before handing this graph to Team Lead:
 
-1. only this plan and task graph differ from exact S100 base
-   `5eec04eac574e41586e0c42732faa623e64cf9f9`; the accepted ADR/spec and all
+1. only this plan and task graph differ from exact P190 public main
+   `bdd495d70b7dc936c8ebbabbeb266a015d1dfc6a`; the accepted ADR/spec and all
    product/gate bytes remain unchanged;
 2. `git diff --check` and the repository's normal planning-safe verification
    pass at the candidate revision;
 3. planning checks prove the canonical matrix has exactly one row for every spec
-   AC, every task including P190/T190 exists in its stated slice, every producer
-   reaches T320 in the DAG, P190 merge/readback blocks S200, T330 precedes T320,
-   and D400 appears only in the three permitted downstream-decision cells;
+   AC, every task including P190/T190 and P195/T195 exists in its stated slice,
+   every producer reaches T320 in the DAG, P195 merge/readback blocks S200, T330
+   precedes T320, and D400 appears only in the three permitted downstream-
+   decision cells;
 4. the exact commit plus supplemented plan/tasks blob SHAs and unchanged accepted
    ADR/spec blob SHAs are recorded;
 5. an independent AI Reviewer returns architecture/spec `PASS` for that exact
    revision; and
 6. any byte change after review triggers a fresh gate.
 
-Planner does not implement P050/S100/P175/P190/S200, create implementation children
+Planner does not implement P050/S100/P175/P190/P195/S200, create implementation children
 before PASS, assign roles, merge, release, mutate the old repository, or decide
 D400.
