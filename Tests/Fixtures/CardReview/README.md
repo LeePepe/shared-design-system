@@ -24,9 +24,11 @@ Keep the complete runner log for geometry anchors. Both checkers read actual
 XCTest PNGs and the manifest/lockfile's exact provider checkout. If resolution
 uses an isolated scratch directory, pass `--provider-checkout` explicitly.
 The default is `.build/checkouts/shared-design-tokens`. Reports record provider
-revision/version/data hash, PNG hashes, coordinates and observed bytes. A
-candidate mirror must be documented with both source SHAs and labeled local
-only; it does not establish release or remote-CI acceptance.
+revision/version/data hash, PNG hashes, coordinates and observed bytes. Final
+evidence uses public exact DesignTokens `0.2.0` at revision
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a`, with no package-root or generated
+workspace mirror. Historical candidate evidence remains bound to its original
+source/provider and does not establish current-head or remote-CI acceptance.
 
 The original behavior fixture retains caller action and disabled-descendant
 taps, no implicit card activation, long-text growth, ordered slots, horizontal
@@ -62,7 +64,10 @@ override and asserts the actual system Reduce Transparency preference is off
 before any Glass capture. The system fallback test opens Settings,
 records the current Reduce Transparency value, turns it on, launches without
 the internal override, confirms the actual SwiftUI environment value and
-captures the fallback, then restores the original setting. Run simulator work
+captures the fallback, then restores the actual original setting and relaunches SwiftUI to assert its
+restored environment. The off preflight is a read-only guard for meaningful
+Glass captures, not permission to overwrite an initially enabled system setting.
+Run simulator work
 serially; do not run fixture suites or change simulator settings concurrently.
 The matrix's other fallback captures explicitly use the internal test input.
 

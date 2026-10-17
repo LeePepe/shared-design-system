@@ -36,9 +36,10 @@ scroll segments. A separate UI test changes and restores the simulator's real
 Reduce Transparency setting and launches without the internal override.
 
 The runtime PNG checker validates actual composite backgrounds and full-glyph
-provider colors; generated reports and PNGs remain outside git. Candidate
-verification records both native and provider SHAs and explicitly distinguishes
-a local-only provider mirror from a published exact-version dependency. Every
+provider colors; generated reports and PNGs remain outside git. Final
+verification records both native and public exact DesignTokens `0.2.0` provider
+SHAs, without a package or generated-workspace mirror. Historical candidate
+evidence retains its original source/provider binding. Every
 new source SHA requires fresh captures and review. No screenshot is represented
 as VoiceOver, minimum-OS, physical-device or release acceptance.
 

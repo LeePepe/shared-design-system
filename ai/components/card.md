@@ -53,11 +53,11 @@ The [public-import compile fixture](../../Tests/NativeDesignKitTests/Components/
 uses only public API. A consumer that names `Theme` also declares the direct
 `DesignTokens` product dependency at exact `0.2.0`; NativeDesignKit does not
 re-export Tokens. Theme resolution errors propagate unchanged before rendering.
-The candidate provider adds explicit `strata-blue`, `strata-green`,
-`strata-pink`, `strata-yellow` and `strata-purple` brands; `ocean` and `graphite`
-remain supported. The five families are independently resolved provider colors.
-Until the provider version is published, candidate-only local evidence does not
-establish remote dependency or release acceptance.
+Public DesignTokens `0.2.0` at revision
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a` supplies explicit `strata-blue`,
+`strata-green`, `strata-pink`, `strata-yellow` and `strata-purple` brands;
+`ocean` and `graphite` remain supported. The five families are independently
+resolved provider colors. This provider release does not release NativeCard.
 
 The header uses `.headline` and a heading accessibility trait. Content uses
 `.body`; supporting content uses `.subheadline` and `secondaryForeground` on
