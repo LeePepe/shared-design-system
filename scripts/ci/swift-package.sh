@@ -144,6 +144,15 @@ def walk(value):
         for child in value:
             yield from walk(child)
 
+def contains_result_test(node):
+    return any(
+        isinstance(descendant, dict)
+        and descendant.get("nodeType") == "Test Case"
+        and isinstance(descendant.get("name"), str)
+        and descendant["name"]
+        for descendant in walk(node)
+    )
+
 try:
     with open(expected_path, encoding="utf-8") as stream:
         expected = set(json.load(stream))
@@ -192,6 +201,7 @@ try:
                 and node.get("nodeType") == "Unit test bundle"
                 and isinstance(node.get("name"), str)
                 and node["name"]
+                and contains_result_test(node)
             )
         }
     else:

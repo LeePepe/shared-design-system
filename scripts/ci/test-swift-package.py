@@ -282,9 +282,17 @@ class SchemeSelectionTests(unittest.TestCase):
                     "testNodes": [{
                         "nodeType": "Unit test bundle",
                         "name": "NativeDesignKitTests",
+                        "children": [{
+                            "nodeType": "Test Case",
+                            "name": "testExecutes()",
+                        }],
                     }, {
                         "nodeType": "Unit test bundle",
                         "name": "DesignTokensTests",
+                        "children": [{
+                            "nodeType": "Test Case",
+                            "name": "testExecutes()",
+                        }],
                     }],
                 }},
             },
@@ -307,6 +315,10 @@ class SchemeSelectionTests(unittest.TestCase):
                     "testNodes": [{
                         "nodeType": "Unit test bundle",
                         "name": "NativeDesignKitTests",
+                        "children": [{
+                            "nodeType": "Test Case",
+                            "name": "testExecutes()",
+                        }],
                     }, {
                         "nodeType": "Test suite",
                         "name": "DesignTokensTests",
@@ -316,6 +328,31 @@ class SchemeSelectionTests(unittest.TestCase):
                     }, {
                         "nodeType": "Unit test bundle",
                         "name": "DesignTokensTestsExtra",
+                    }],
+                }},
+            },
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("found 0", result.stderr)
+        self.assert_no_final_test()
+
+    def test_matching_empty_result_bundle_fails_closed(self):
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture",
+                                      "schemes": ["Empty"]}}),
+            {
+                "Empty": {"result": {
+                    "testNodes": [{
+                        "nodeType": "Unit test bundle",
+                        "name": "NativeDesignKitTests",
+                        "children": [{
+                            "nodeType": "Test Case",
+                            "name": "testExecutes()",
+                        }],
+                    }, {
+                        "nodeType": "Unit test bundle",
+                        "name": "DesignTokensTests",
+                        "children": [],
                     }],
                 }},
             },
@@ -342,9 +379,17 @@ class SchemeSelectionTests(unittest.TestCase):
                     "testNodes": [{
                         "nodeType": "Unit test bundle",
                         "name": "NativeDesignKitTests",
+                        "children": [{
+                            "nodeType": "Test Case",
+                            "name": "testExecutes()",
+                        }],
                     }, {
                         "nodeType": "Unit test bundle",
                         "name": "DesignTokensTests",
+                        "children": [{
+                            "nodeType": "Test Case",
+                            "name": "testExecutes()",
+                        }],
                     }],
                 },
                 "extraction_exit": 1,
@@ -373,9 +418,17 @@ class SchemeSelectionTests(unittest.TestCase):
                         "testNodes": [{
                             "nodeType": "Unit test bundle",
                             "name": "NativeDesignKitTests",
+                            "children": [{
+                                "nodeType": "Test Case",
+                                "name": "testExecutes()",
+                            }],
                         }, {
                             "nodeType": "Unit test bundle",
                             "name": "DesignTokensTests",
+                            "children": [{
+                                "nodeType": "Test Case",
+                                "name": "testExecutes()",
+                            }],
                         }],
                     },
                 },
@@ -396,9 +449,17 @@ class SchemeSelectionTests(unittest.TestCase):
                         "testNodes": [{
                             "nodeType": "Unit test bundle",
                             "name": "NativeDesignKitTests",
+                            "children": [{
+                                "nodeType": "Test Case",
+                                "name": "testExecutes()",
+                            }],
                         }, {
                             "nodeType": "Unit test bundle",
                             "name": "DesignTokensTests",
+                            "children": [{
+                                "nodeType": "Test Case",
+                                "name": "testExecutes()",
+                            }],
                         }],
                     },
                 },
