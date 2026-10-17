@@ -307,6 +307,67 @@ class ConsumerHarnessTests(unittest.TestCase):
         self.assertEqual(receipt["status"], "failed")
         self.assertFalse(receipt["source"]["publiclyResolvable"])
 
+    def test_public_resolution_accepts_swiftpm_repository_cache_origin(self):
+        receipt = {
+            "source": {"publiclyResolvable": False},
+            "packageIdentities": [],
+            "status": "running",
+        }
+        with tempfile.TemporaryDirectory() as scratch:
+            repositories = Path(scratch) / "consumer/.build/repositories"
+            checkout_origin = repositories / "shared-design-system-045b4029"
+            checkout_origin.mkdir(parents=True)
+            EXTERNAL.validate_public_resolution(
+                receipt, self.resolved_pin(), "revision", "a" * 40)
+            EXTERNAL.validate_effective_public_source(
+                receipt, 1, "not found\n", str(checkout_origin),
+                repositories, EXTERNAL.REPOSITORY_URL + "\n")
+        self.assertTrue(receipt["source"]["publiclyResolvable"])
+        self.assertEqual(
+            receipt["source"]["repositoryCacheOrigin"],
+            EXTERNAL.REPOSITORY_URL)
+
+    def test_public_resolution_rejects_swiftpm_repository_cache_mirror(self):
+        receipt = {
+            "source": {"publiclyResolvable": False},
+            "packageIdentities": [],
+            "status": "running",
+        }
+        with tempfile.TemporaryDirectory() as scratch:
+            repositories = Path(scratch) / "consumer/.build/repositories"
+            checkout_origin = repositories / "shared-design-system-045b4029"
+            checkout_origin.mkdir(parents=True)
+            EXTERNAL.validate_public_resolution(
+                receipt, self.resolved_pin(), "revision", "a" * 40)
+            with self.assertRaisesRegex(RuntimeError, "checkout origin"):
+                EXTERNAL.validate_effective_public_source(
+                    receipt, 1, "not found\n", str(checkout_origin),
+                    repositories,
+                    "https://mirror.example/shared-design-system.git\n")
+        self.assertFalse(receipt["source"]["publiclyResolvable"])
+        self.assertEqual(receipt["status"], "failed")
+
+    def test_public_resolution_rejects_cache_outside_swiftpm_repositories(self):
+        receipt = {
+            "source": {"publiclyResolvable": False},
+            "packageIdentities": [],
+            "status": "running",
+        }
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            repositories = root / "consumer/.build/repositories"
+            repositories.mkdir(parents=True)
+            checkout_origin = root / "substituted/shared-design-system"
+            checkout_origin.mkdir(parents=True)
+            EXTERNAL.validate_public_resolution(
+                receipt, self.resolved_pin(), "revision", "a" * 40)
+            with self.assertRaisesRegex(RuntimeError, "checkout origin"):
+                EXTERNAL.validate_effective_public_source(
+                    receipt, 1, "not found\n", str(checkout_origin),
+                    repositories, EXTERNAL.REPOSITORY_URL + "\n")
+        self.assertFalse(receipt["source"]["publiclyResolvable"])
+        self.assertEqual(receipt["status"], "failed")
+
     def test_parse_resolved_retains_current_and_legacy_provenance(self):
         current = EXTERNAL.parse_resolved_pins({
             "version": 3,
@@ -414,6 +475,7 @@ class ConsumerHarnessTests(unittest.TestCase):
                     "output": "not found",
                 },
                 "checkoutOrigin": EXTERNAL.REPOSITORY_URL,
+                "resolvedRepositoryURL": EXTERNAL.REPOSITORY_URL,
                 "observed": [{
                     "schemaVersion": 3,
                     "identity": "shared-design-system",

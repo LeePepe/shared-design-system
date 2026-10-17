@@ -145,6 +145,27 @@ def canonical_repository_url(location):
     return REPOSITORY_URL
 
 
+def canonical_checkout_repository(
+        checkout_origin, repositories_root=None, repository_cache_origin=None):
+    direct = canonical_repository_url(checkout_origin.strip())
+    if direct:
+        return direct
+    if repositories_root is None or repository_cache_origin is None:
+        return None
+
+    origin_path = Path(checkout_origin.strip())
+    if not origin_path.is_absolute():
+        return None
+    try:
+        resolved_origin = origin_path.resolve(strict=True)
+        resolved_root = Path(repositories_root).resolve(strict=True)
+    except OSError:
+        return None
+    if resolved_origin.parent != resolved_root or not resolved_origin.is_dir():
+        return None
+    return canonical_repository_url(repository_cache_origin.strip())
+
+
 def validate_public_resolution(receipt, pins, kind, value):
     observed = [dict(pin) for pin in pins]
     for pin in observed:
@@ -172,12 +193,19 @@ def validate_public_resolution(receipt, pins, kind, value):
 
 
 def validate_effective_public_source(
-        receipt, mirror_exit_status, mirror_output, checkout_origin):
+        receipt, mirror_exit_status, mirror_output, checkout_origin,
+        repositories_root=None, repository_cache_origin=None):
     receipt["source"]["effectiveMirrorQuery"] = {
         "exitStatus": mirror_exit_status,
         "output": mirror_output.strip(),
     }
     receipt["source"]["checkoutOrigin"] = checkout_origin.strip()
+    if repository_cache_origin is not None:
+        receipt["source"]["repositoryCacheOrigin"] = (
+            repository_cache_origin.strip())
+    resolved_repository = canonical_checkout_repository(
+        checkout_origin, repositories_root, repository_cache_origin)
+    receipt["source"]["resolvedRepositoryURL"] = resolved_repository
     try:
         if mirror_exit_status == 0:
             raise RuntimeError(
@@ -185,7 +213,7 @@ def validate_effective_public_source(
         if mirror_exit_status != 1 or mirror_output.strip() != "not found":
             raise RuntimeError(
                 "SwiftPM mirror configuration could not be verified")
-        if canonical_repository_url(checkout_origin.strip()) != REPOSITORY_URL:
+        if resolved_repository != REPOSITORY_URL:
             raise RuntimeError(
                 "resolved checkout origin is not the canonical public repository")
     except Exception:
@@ -232,9 +260,14 @@ def validate_success_receipt(receipt):
             mirror_query.get("exitStatus") != 1 or
             mirror_query.get("output") != "not found"):
         raise RuntimeError("external receipt does not exclude SwiftPM mirrors")
-    if canonical_repository_url(
-            receipt["source"].get("checkoutOrigin", "")) != REPOSITORY_URL:
+    checkout_origin = receipt["source"].get("checkoutOrigin", "")
+    if receipt["source"].get("resolvedRepositoryURL") != REPOSITORY_URL:
         raise RuntimeError("external receipt lacks canonical checkout origin")
+    if (canonical_repository_url(checkout_origin) is None and
+            canonical_repository_url(receipt["source"].get(
+                "repositoryCacheOrigin", "")) != REPOSITORY_URL):
+        raise RuntimeError(
+            "external receipt lacks canonical repository cache origin")
     if receipt["status"] != "passed":
         raise RuntimeError("external receipt status is not passed")
 
@@ -311,8 +344,24 @@ def main():
             raise RuntimeError(
                 "resolved checkout origin could not be inspected: " +
                 origin.stdout.strip())
+        repositories = consumer / ".build/repositories"
+        repository_cache_origin = None
+        if canonical_repository_url(origin.stdout.strip()) is None:
+            repository_cache = subprocess.run(
+                [
+                    "git", "--git-dir", origin.stdout.strip(),
+                    "remote", "get-url", "origin",
+                ],
+                cwd=consumer, text=True, stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT)
+            if repository_cache.returncode:
+                raise RuntimeError(
+                    "resolved repository cache origin could not be inspected: " +
+                    repository_cache.stdout.strip())
+            repository_cache_origin = repository_cache.stdout
         validate_effective_public_source(
-            receipt, mirror.returncode, mirror.stdout, origin.stdout)
+            receipt, mirror.returncode, mirror.stdout, origin.stdout,
+            repositories, repository_cache_origin)
         write_receipt(receipt_path, receipt)
 
         registry = json.loads((checkout / "ai/registry.json").read_text())
