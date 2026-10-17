@@ -6,7 +6,7 @@ Version `0.2.0` (immutable Git tag `v0.2.0` after release verification) of `@lee
 
 - [Version-matched AI task router](ai/README.md), [changelog](CHANGELOG.md)
 - [Specification](specs/001-shared-colors/spec.md), [plan](specs/001-shared-colors/plan.md), [tasks](specs/001-shared-colors/tasks.md)
-- [Constitution](docs/constitution.md), [technical context](docs/architecture/tech-context.md)
+- [Constitution](docs/constitution.md), [provider technical context](docs/architecture/provider-tech-context.md)
 - [Basalt baseline and public API audit](docs/upstream.md), [third-party notices](THIRD_PARTY_NOTICES.md)
 - [Compatibility / upgrade / rollback / deferred work](docs/compatibility.md)
 
