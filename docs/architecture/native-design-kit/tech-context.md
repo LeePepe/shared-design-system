@@ -10,6 +10,7 @@ depends_on: []
 gate:
   docs: python3 scripts/ci/check-ai.py
   docs_test: python3 scripts/ci/test-ai.py
+  swift_package_test: python3 scripts/ci/test-swift-package.py --integration
   build: scripts/ci/swift-package.sh build
   test: scripts/ci/swift-package.sh test
   ios: scripts/ci/swift-package.sh ios
@@ -30,8 +31,9 @@ name, declared platforms iOS 15 and macOS 12. It depends on the
 - **Sources:** `Sources/NativeDesignKit/`. The public API is described in `ai/USAGE.md`.
 - **Tests:** `Tests/NativeDesignKitTests/`. They extract native sRGB through
   AppKit on macOS and UIKit on iOS.
-- **Gates:** `build` and `test` run on the macOS host. `ios` builds and tests
-  the package scheme on the newest available iPhone simulator. All three run
-  in CI through `scripts/verify --all`.
+- **Gates:** `build` and `test` run on the macOS host. `swift_package_test`
+  proves deterministic complete-scheme selection and executes the two-product
+  fixture; `ios` builds and tests the real package on the newest available
+  iPhone simulator. All four run in CI through `scripts/verify --all`.
 - **Contract:** `ai/` travels with each release tag; update it in the same PR
   as any public API change.

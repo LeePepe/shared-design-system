@@ -8,7 +8,8 @@
 # without a manifest (that fails).
 set -euo pipefail
 
-cd "$(git rev-parse --show-toplevel)"
+root="${SWIFT_PACKAGE_ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$root"
 mode="${1:?usage: swift-package.sh build|test|ios}"
 
 if [ ! -f Package.swift ]; then
@@ -24,6 +25,8 @@ case "$mode" in
     build) swift build ;;
     test) swift test ;;
     ios)
+        metadata_dir="$(mktemp -d "${TMPDIR:-/tmp}/swift-package.XXXXXX")"
+        trap 'rm -rf "$metadata_dir"' EXIT
         device="$(xcrun simctl list devices available -j | python3 -c '
 import json, sys
 devices = json.load(sys.stdin)["devices"]
@@ -33,8 +36,138 @@ for runtime in sorted(devices, reverse=True):
             if d["name"].startswith("iPhone"):
                 print(d["udid"]); sys.exit(0)
 sys.exit("no available iPhone simulator")')"
-        scheme="$(python3 -c 'import json,sys; print(json.load(sys.stdin)["name"])' < <(swift package dump-package))"
+
+        swift package dump-package > "$metadata_dir/package.json"
+        python3 - "$metadata_dir/package.json" "$metadata_dir/expected-tests.json" <<'PY'
+import json
+import sys
+
+source, destination = sys.argv[1:]
+try:
+    with open(source, encoding="utf-8") as stream:
+        package = json.load(stream)
+    targets = package["targets"]
+    names = sorted({
+        target["name"]
+        for target in targets
+        if isinstance(target, dict) and target.get("type") == "test"
+    })
+    if not names or any(not isinstance(name, str) or not name for name in names):
+        raise ValueError("no declared test targets")
+except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
+    sys.exit(f"[swift] invalid package metadata: {error}")
+with open(destination, "w", encoding="utf-8") as stream:
+    json.dump(names, stream)
+PY
+
+        xcodebuild -list -json > "$metadata_dir/schemes.json"
+        python3 - "$metadata_dir/schemes.json" "$metadata_dir/schemes.txt" <<'PY'
+import json
+import sys
+
+source, destination = sys.argv[1:]
+try:
+    with open(source, encoding="utf-8") as stream:
+        listing = json.load(stream)
+    containers = [
+        listing[key]
+        for key in ("workspace", "project")
+        if isinstance(listing.get(key), dict)
+    ]
+    if len(containers) != 1:
+        raise ValueError("expected exactly one workspace or project")
+    schemes = containers[0]["schemes"]
+    if not isinstance(schemes, list) or not schemes:
+        raise ValueError("no generated schemes")
+    if any(not isinstance(name, str) or not name or "\n" in name for name in schemes):
+        raise ValueError("invalid generated scheme name")
+    schemes = sorted(set(schemes))
+except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
+    sys.exit(f"[swift] invalid Xcode scheme metadata: {error}")
+with open(destination, "w", encoding="utf-8") as stream:
+    stream.write("".join(f"{name}\n" for name in schemes))
+PY
+
+        : > "$metadata_dir/usable-schemes.txt"
+        index=0
+        while IFS= read -r candidate; do
+            enumeration="$metadata_dir/enumeration-$index.json"
+            if xcodebuild \
+                -scheme "$candidate" \
+                -destination "id=$device" \
+                -skipPackagePluginValidation \
+                test \
+                -enumerate-tests \
+                -test-enumeration-format json \
+                -test-enumeration-style hierarchical \
+                -test-enumeration-output-path "$enumeration"
+            then
+                if python3 - "$metadata_dir/expected-tests.json" "$enumeration" <<'PY'
+import json
+import sys
+
+expected_path, enumeration_path = sys.argv[1:]
+
+def contains_test(node):
+    if isinstance(node, dict):
+        if node.get("kind") == "test":
+            return True
+        return any(contains_test(value) for value in node.values())
+    if isinstance(node, list):
+        return any(contains_test(value) for value in node)
+    return False
+
+def covered_targets(node):
+    covered = set()
+    if isinstance(node, dict):
+        if (
+            node.get("kind") == "target"
+            and isinstance(node.get("name"), str)
+            and contains_test(node.get("children", []))
+        ):
+            covered.add(node["name"])
+        for value in node.values():
+            covered.update(covered_targets(value))
+    elif isinstance(node, list):
+        for value in node:
+            covered.update(covered_targets(value))
+    return covered
+
+try:
+    with open(expected_path, encoding="utf-8") as stream:
+        expected = set(json.load(stream))
+    with open(enumeration_path, encoding="utf-8") as stream:
+        enumeration = json.load(stream)
+    if not isinstance(enumeration, dict) or not enumeration:
+        raise ValueError("empty test enumeration")
+    if not isinstance(enumeration.get("errors"), list) or enumeration["errors"]:
+        raise ValueError("test enumeration reported errors")
+except (OSError, TypeError, ValueError, json.JSONDecodeError):
+    sys.exit(1)
+sys.exit(0 if expected.issubset(covered_targets(enumeration)) else 1)
+PY
+                then
+                    printf '%s\n' "$candidate" >> "$metadata_dir/usable-schemes.txt"
+                fi
+            fi
+            index=$((index + 1))
+        done < "$metadata_dir/schemes.txt"
+
+        usable_count="$(wc -l < "$metadata_dir/usable-schemes.txt" | tr -d ' ')"
+        if [ "$usable_count" -ne 1 ]; then
+            echo "[swift] expected exactly one complete test-capable scheme, found $usable_count" >&2
+            exit 1
+        fi
+        scheme="$(sed -n '1p' "$metadata_dir/usable-schemes.txt")"
         echo "[swift] iOS simulator $device, scheme $scheme"
-        xcodebuild -scheme "$scheme" -destination "id=$device" -skipPackagePluginValidation test ;;
+        test_args=(
+            -scheme "$scheme"
+            -destination "id=$device"
+            -skipPackagePluginValidation
+        )
+        if [ -n "${SWIFT_PACKAGE_RESULT_BUNDLE_PATH:-}" ]; then
+            test_args+=(-resultBundlePath "$SWIFT_PACKAGE_RESULT_BUNDLE_PATH")
+        fi
+        xcodebuild "${test_args[@]}" test ;;
     *) echo "[swift] unknown mode: $mode" >&2; exit 2 ;;
 esac
