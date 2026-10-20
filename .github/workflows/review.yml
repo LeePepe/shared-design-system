@@ -24,6 +24,7 @@ concurrency:
 jobs:
   codex-review-target:
     if: vars.SHARED_CI_REVIEW_RUNNER == 'true'
+    # P12 aligns shared-ci v0.7.1 (auto-merge, no human approval, new stuck-PR bot); required check names and content stay unchanged.
     uses: LeePepe/shared-ci/.github/workflows/codex-review.yml@88c09b3f68ceea82a4ca979c689e3dc50266ee10
     with:
       codex-bin: /opt/homebrew/bin/codex

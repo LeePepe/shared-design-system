@@ -25,6 +25,7 @@ concurrency:
 
 jobs:
   quality:
+    # P12 aligns shared-ci v0.7.1 (auto-merge, no human approval, new stuck-PR bot); required check names and content stay unchanged.
     uses: LeePepe/shared-ci/.github/workflows/quality.yml@88c09b3f68ceea82a4ca979c689e3dc50266ee10
     with:
       runs-on: macos-15
