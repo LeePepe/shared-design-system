@@ -13,8 +13,8 @@ point here.
 
 ## Protocol
 
-Follow `LeePepe/shared-ci@6e354f476bc53d68f0f09fc231d5cd938466af9c/ai/agent-protocol.md`
-(https://github.com/LeePepe/shared-ci/blob/6e354f476bc53d68f0f09fc231d5cd938466af9c/ai/agent-protocol.md).
+Follow `LeePepe/shared-ci@88c09b3f68ceea82a4ca979c689e3dc50266ee10/ai/agent-protocol.md`
+(https://github.com/LeePepe/shared-ci/blob/88c09b3f68ceea82a4ca979c689e3dc50266ee10/ai/agent-protocol.md).
 It must be the same SHA as the `uses:` pins in `.github/workflows/`.
 
 ## Verify
@@ -58,7 +58,7 @@ iOS simulator build and test), contract audit, workflow-lint and the PR-body che
 
 ## Dependencies
 
-- `shared-ci` `6e354f476bc53d68f0f09fc231d5cd938466af9c` — https://github.com/LeePepe/shared-ci/blob/6e354f476bc53d68f0f09fc231d5cd938466af9c/ai/
+- `shared-ci` `88c09b3f68ceea82a4ca979c689e3dc50266ee10` — https://github.com/LeePepe/shared-ci/blob/88c09b3f68ceea82a4ca979c689e3dc50266ee10/ai/
 - `NativeDesignKit` depends on the repository-local `DesignTokens` target.
 - The root package publishes both stable products from one exact
   `shared-design-system` revision. The nested npm artifact remains
