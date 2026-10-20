@@ -14,7 +14,7 @@ permissions:
 jobs:
   report:
     # Replace with the delivered full 40-character provider SHA, matching other pins.
-    uses: LeePepe/shared-ci/.github/workflows/stuck-pr-bot.yml@88c09b3f68ceea82a4ca979c689e3dc50266ee10
+    uses: LeePepe/shared-ci/.github/workflows/stuck-pr-bot.yml@46c88fbae98b03dc6cf2e23c2e5a19c48ff68fe4
     with:
       failure-hours: 2
       open-hours: 24

@@ -13,8 +13,8 @@ point here.
 
 ## Protocol
 
-Follow `LeePepe/shared-ci@88c09b3f68ceea82a4ca979c689e3dc50266ee10/ai/agent-protocol.md`
-(https://github.com/LeePepe/shared-ci/blob/88c09b3f68ceea82a4ca979c689e3dc50266ee10/ai/agent-protocol.md).
+Follow `LeePepe/shared-ci@46c88fbae98b03dc6cf2e23c2e5a19c48ff68fe4/ai/agent-protocol.md`
+(https://github.com/LeePepe/shared-ci/blob/46c88fbae98b03dc6cf2e23c2e5a19c48ff68fe4/ai/agent-protocol.md).
 It must be the same SHA as the `uses:` pins in `.github/workflows/`.
 
 ## Verify
@@ -58,7 +58,7 @@ iOS simulator build and test), contract audit, workflow-lint and the PR-body che
 
 ## Dependencies
 
-- `shared-ci` `88c09b3f68ceea82a4ca979c689e3dc50266ee10` — https://github.com/LeePepe/shared-ci/blob/88c09b3f68ceea82a4ca979c689e3dc50266ee10/ai/
+- `shared-ci` `46c88fbae98b03dc6cf2e23c2e5a19c48ff68fe4` — https://github.com/LeePepe/shared-ci/blob/46c88fbae98b03dc6cf2e23c2e5a19c48ff68fe4/ai/
 - `NativeDesignKit` depends on the repository-local `DesignTokens` target.
 - The root package publishes both stable products from one exact
   `shared-design-system` revision. The nested npm artifact remains
@@ -77,7 +77,6 @@ subject to the existing exact-pin rule.
 
 - One task → one branch + worktree → one PR using `.github/pull_request_template.md`.
 - Done = required checks green on the PR head SHA; a new push invalidates old evidence.
-- CODEOWNERS paths (`.github/**`, `.githooks/**`, AGENTS.md, tech-context,
-  `scripts/verify`, `scripts/ci/`, manifests and lockfiles, `ai/`) need Owner
-  approval; until enforced, add the `owner-review` label.
+- Changes to policies, gates, CI, hooks, manifests, lockfiles and `ai/`
+  must state their rationale and verification evidence in the PR.
 - Public API changes update `ai/` in the same PR.
