@@ -132,3 +132,13 @@ test('existing 97 text contrast pairs retain the 4.5 minimum',()=>{
   assert.equal(textPairs.length,97);
   assert.ok(textPairs.every(p=>p.minimum>=4.5));
 });
+
+test('omitted and explicit text use keep the 4.5 schema floor',()=>{
+  for(const use of [undefined,'text']) {
+    const changed=structuredClone(source);
+    const pair=changed.contrastPairs.find(p=>p.use===undefined);
+    pair.minimum=3;
+    if(use) pair.use=use;
+    assert.throws(()=>resolveSource(changed),/schema/);
+  }
+});

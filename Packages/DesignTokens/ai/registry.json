@@ -120,7 +120,7 @@
     {
       "path": "tokens/schema.json",
       "format": "asset",
-      "sha256": "d90410dc27fffb4609d29125324502213422152c82c1cbb1d35ba3a6be095d94",
+      "sha256": "6bb9db73868195d4c458e4bc48a13cbae387a4203c3baaf6f6299e66813c742a",
       "symbols": [],
       "doc": "ai/USAGE.md#public-data-api"
     },

@@ -282,7 +282,10 @@
                 "use": {
                   "const": "non-text"
                 }
-              }
+              },
+              "required": [
+                "use"
+              ]
             },
             "then": {
               "properties": {
