@@ -259,14 +259,48 @@
           },
           "minimum": {
             "type": "number",
-            "minimum": 4.5,
+            "minimum": 3,
             "maximum": 21
+          },
+          "use": {
+            "type": "string",
+            "enum": [
+              "text",
+              "non-text"
+            ]
           }
         },
         "required": [
           "foreground",
           "background",
           "minimum"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "use": {
+                  "const": "non-text"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "minimum": {
+                  "type": "number",
+                  "minimum": 3
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "minimum": {
+                  "type": "number",
+                  "minimum": 4.5
+                }
+              }
+            }
+          }
         ]
       }
     }
