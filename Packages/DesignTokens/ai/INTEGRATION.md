@@ -21,6 +21,20 @@ Expect checker JSON `ok: true`, no errors, exit 0; each fixture prints PASS. Loc
 
 Uninstall: first remove imports, scoped CSS references and dependent code, then `npm uninstall @leepepe/design-tokens`; verify the consumer build and lockfile. Rollback is [explicit](MIGRATION.md), not a change to generated provider files.
 
+## Web style CSS
+
+The package includes the theme-independent style data asset
+`@leepepe/design-tokens/styles.css`. Import it when a web adapter needs the
+generated `--lp-spacing-*`, `--lp-radius-*`, `--lp-dimension-*`, or typography
+custom properties:
+
+```css
+@import '@leepepe/design-tokens/styles.css';
+```
+
+The asset contains no Tailwind configuration and does not establish a default
+theme. Consumers choose where to apply the namespaced variables.
+
 ## Swift revision
 
 Swift tools 6.0+; public product/module `DesignTokens`. Pin the consolidated

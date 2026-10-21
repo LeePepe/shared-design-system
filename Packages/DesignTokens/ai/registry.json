@@ -171,7 +171,7 @@
     {
       "path": "dist/styles.js",
       "format": "javascript",
-      "sha256": "c488cdab627df644dde83e144d61124b99e0a1366268aba2a194c57a24745f40",
+      "sha256": "24ecffab1c115ef6f3f7003b0b93f2eeb3bbb276db56269e981f7514ce42ebda",
       "symbols": [
         "border",
         "borderIDs",
@@ -204,7 +204,7 @@
     {
       "path": "dist/styles.d.ts",
       "format": "typescript",
-      "sha256": "c7a6223d31d9ef8e80e38c4e4c5c17bbb8d054ef33b40c34d7ec5c2051da694f",
+      "sha256": "878619a48c5e8a0bd589d0373e2f42059707fbb7483da0c19b15366b7464c2b6",
       "symbols": [
         "BorderID",
         "CubicBezierToken",
@@ -253,14 +253,14 @@
     {
       "path": "dist/styles.resolved.json",
       "format": "asset",
-      "sha256": "772a99933fb7f2cee3fc19e2c72f2e7357464e6c3d9960d5b676a27f5f240eeb",
+      "sha256": "d9204fb190c497abb6e67819298da01a5f3cd8e67e8ccf276b32357817a0b16d",
       "symbols": [],
       "doc": "ai/USAGE.md#style-foundations-020"
     },
     {
       "path": "tokens/styles.json",
       "format": "asset",
-      "sha256": "12f9cae1101b106f54026678a04aef57f2a3f7bc050c6e3b646910df7c8524df",
+      "sha256": "564ea17d430bc1e7c66220ad75bc551581c574154086be0d989bb52239bc70d8",
       "symbols": [],
       "doc": "ai/USAGE.md#style-foundations-020"
     },
@@ -327,9 +327,16 @@
     {
       "path": "Sources/DesignTokens/GeneratedStyles.swift",
       "format": "asset",
-      "sha256": "f7a9e4b7d4e04a77fd850470d6cbe20b946327416b7c59fb98083aa0bd99277c",
+      "sha256": "bc473102c78041b9b09e2e18a8041a298e2e0b47748ab6dbe32aa186a8534dda",
       "symbols": [],
       "doc": "ai/USAGE.md#style-foundations-020"
+    },
+    {
+      "path": "dist/styles.css",
+      "format": "asset",
+      "sha256": "e2e26ca60b3b100d1dc2c889764cc3f8bc0f76f8e5bb6552f84a6bf5af758066",
+      "symbols": [],
+      "doc": "ai/INTEGRATION.md#web-style-css"
     }
   ]
 }

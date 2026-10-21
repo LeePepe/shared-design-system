@@ -38,10 +38,12 @@
     },
     "./styles.resolved.json": "./dist/styles.resolved.json",
     "./styles.source.json": "./tokens/styles.json",
-    "./styles.schema.json": "./tokens/styles.schema.json"
+    "./styles.schema.json": "./tokens/styles.schema.json",
+    "./styles.css": "./dist/styles.css"
   },
   "sideEffects": [
-    "./dist/colors.css"
+    "./dist/colors.css",
+    "./dist/styles.css"
   ],
   "scripts": {
     "test": "node --test tests/*.test.mjs",

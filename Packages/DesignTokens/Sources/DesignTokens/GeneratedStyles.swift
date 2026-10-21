@@ -18,6 +18,7 @@ extension StyleTokens {
         "dimension.control.compact": 28,
         "dimension.control.large": 44,
         "dimension.control.regular": 36,
+        "dimension.control.strata": 40,
         "dimension.grid.minimum": 180,
         "dimension.hit.minimum": 44,
         "dimension.icon.large": 24,
@@ -25,6 +26,9 @@ extension StyleTokens {
         "dimension.icon.small": 14
     ]
     static let radiusTable: [String: Double] = [
+        "radius.card": 24,
+        "radius.container": 32,
+        "radius.control": 16,
         "radius.large": 20,
         "radius.medium": 12,
         "radius.none": 0,
@@ -64,6 +68,10 @@ extension StyleTokens {
         "typography.headline": TypographyToken(size: 17, weight: 600, lineHeight: 22, tracking: 0, relativeTo: "headline", monospacedDigits: false),
         "typography.large-title": TypographyToken(size: 34, weight: 700, lineHeight: 41, tracking: 0.25, relativeTo: "largeTitle", monospacedDigits: false),
         "typography.number": TypographyToken(size: 40, weight: 600, lineHeight: 48, tracking: 0, relativeTo: "largeTitle", monospacedDigits: true),
+        "typography.strata.body": TypographyToken(size: 14, weight: 400, lineHeight: 20, tracking: 0, relativeTo: "body", monospacedDigits: false),
+        "typography.strata.meta": TypographyToken(size: 12, weight: 400, lineHeight: 16, tracking: 0, relativeTo: "caption", monospacedDigits: false),
+        "typography.strata.section": TypographyToken(size: 18, weight: 600, lineHeight: 24, tracking: 0, relativeTo: "title3", monospacedDigits: false),
+        "typography.strata.title": TypographyToken(size: 32, weight: 700, lineHeight: 40, tracking: 0, relativeTo: "title", monospacedDigits: false),
         "typography.subheadline": TypographyToken(size: 15, weight: 400, lineHeight: 20, tracking: 0, relativeTo: "subheadline", monospacedDigits: false),
         "typography.title": TypographyToken(size: 28, weight: 700, lineHeight: 34, tracking: 0.2, relativeTo: "title", monospacedDigits: false),
         "typography.title2": TypographyToken(size: 22, weight: 600, lineHeight: 28, tracking: 0, relativeTo: "title2", monospacedDigits: false),

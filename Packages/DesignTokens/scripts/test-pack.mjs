@@ -16,7 +16,7 @@ function run(cmd,args,cwd=dir) {
 try {
   const [pack]=JSON.parse(run('npm',['pack','--json','--ignore-scripts','--pack-destination',dir],root));
   const files=pack.files.map(f=>f.path);
-  for(const required of ['dist/index.js','dist/index.d.ts','dist/styles.js','dist/styles.d.ts','dist/styles.resolved.json','tokens/styles.json','tokens/styles.schema.json','dist/colors.css','dist/colors.ts','dist/resolved.json','tokens/colors.json','tokens/schema.json','THIRD_PARTY_NOTICES.md','tokens/upstream/basalt-2.1.8/LICENSE']) assert.ok(files.includes(required),required);
+  for(const required of ['dist/index.js','dist/index.d.ts','dist/styles.js','dist/styles.d.ts','dist/styles.resolved.json','dist/styles.css','tokens/styles.json','tokens/styles.schema.json','dist/colors.css','dist/colors.ts','dist/resolved.json','tokens/colors.json','tokens/schema.json','THIRD_PARTY_NOTICES.md','tokens/upstream/basalt-2.1.8/LICENSE']) assert.ok(files.includes(required),required);
   assert.ok(!files.some(p=>/^(node_modules|\.github|\.build|examples\/demo)\//.test(p)));
   assert.deepEqual(files.filter(p=>p.startsWith('scripts/')), ['scripts/check-ai-contract.mjs']);
   assert.ok(files.filter(p=>p.startsWith('tests/')).every(p=>p.startsWith('tests/DesignTokensTests/')));

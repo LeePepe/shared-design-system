@@ -42,6 +42,7 @@ const data = {
     "dimension.control.compact": 28,
     "dimension.control.large": 44,
     "dimension.control.regular": 36,
+    "dimension.control.strata": 40,
     "dimension.grid.minimum": 180,
     "dimension.hit.minimum": 44,
     "dimension.icon.large": 24,
@@ -56,6 +57,9 @@ const data = {
     "opacity.full": 1,
     "opacity.overlay": 0.4,
     "opacity.subtle": 0.12,
+    "radius.card": 24,
+    "radius.container": 32,
+    "radius.control": 16,
     "radius.large": 20,
     "radius.medium": 12,
     "radius.none": 0,
@@ -171,6 +175,38 @@ const data = {
       "size": 40,
       "tracking": 0,
       "weight": 600
+    },
+    "typography.strata.body": {
+      "lineHeight": 20,
+      "monospacedDigits": false,
+      "relativeTo": "body",
+      "size": 14,
+      "tracking": 0,
+      "weight": 400
+    },
+    "typography.strata.meta": {
+      "lineHeight": 16,
+      "monospacedDigits": false,
+      "relativeTo": "caption",
+      "size": 12,
+      "tracking": 0,
+      "weight": 400
+    },
+    "typography.strata.section": {
+      "lineHeight": 24,
+      "monospacedDigits": false,
+      "relativeTo": "title3",
+      "size": 18,
+      "tracking": 0,
+      "weight": 600
+    },
+    "typography.strata.title": {
+      "lineHeight": 40,
+      "monospacedDigits": false,
+      "relativeTo": "title",
+      "size": 32,
+      "tracking": 0,
+      "weight": 700
     },
     "typography.subheadline": {
       "lineHeight": 20,

@@ -49,5 +49,18 @@ export declare const styleTokenIDs: readonly StyleTokenID[];
 ${ids(category).map(id => `        "${id}": ${swiftValue(category,data.tokens[id])}`).join(',\n')}
     ]
 `).join('') + '}\n';
-  return {'dist/styles.js':js,'dist/styles.d.ts':dts,'dist/styles.resolved.json':json(data)+'\n','Sources/DesignTokens/GeneratedStyles.swift':swift};
+  const cssEntries = Object.entries(data.tokens).flatMap(([id, value]) => {
+    const name = `--lp-${id.replaceAll('.', '-')}`;
+    if (typeof value === 'number') return [[name, `${value}px`]];
+    if (id.startsWith('typography.')) return Object.entries(value)
+      .filter(([property]) => ['size', 'weight', 'lineHeight', 'tracking'].includes(property))
+      .map(([property, propertyValue]) => [
+        `${name}-${property.replace(/[A-Z]/g, letter => '-' + letter.toLowerCase())}`,
+        `${propertyValue}${property === 'weight' ? '' : 'px'}`
+      ]);
+    return [];
+  });
+  const css = '/* Generated; namespaced style data only, not a framework theme. */\n:root {\n' +
+    cssEntries.map(([name, value]) => `  ${name}: ${value};`).join('\n') + '\n}\n';
+  return {'dist/styles.js':js,'dist/styles.d.ts':dts,'dist/styles.resolved.json':json(data)+'\n','dist/styles.css':css,'Sources/DesignTokens/GeneratedStyles.swift':swift};
 }
