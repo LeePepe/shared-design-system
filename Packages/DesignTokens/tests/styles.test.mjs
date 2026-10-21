@@ -80,7 +80,10 @@ test('Strata v0.2 geometry and web typography are emitted as CSS variables', () 
     'spacing.xs': '4px', 'spacing.xxl': '32px', 'radius.control': '16px',
     'radius.card': '24px', 'radius.container': '32px', 'dimension.control.strata': '40px',
     'typography.strata.body-size': '14px', 'typography.strata.title-size': '32px',
-    'typography.strata.section-size': '18px', 'typography.strata.meta-size': '12px'
+    'typography.strata.section-size': '18px', 'typography.strata.meta-size': '12px',
+    'duration.fast': '0.16s', 'stagger.tight': '0.016666666666666666s',
+    'opacity.disabled': '0.45', 'curve.standard-x1': '0.2',
+    'spring.standard-response': '0.4s', 'shadow.small-opacity': '0.08'
   })) assert.match(css, new RegExp(`--lp-${id.replaceAll('.', '-')}: ${value};`));
 });
 test('real generator detects each style artifact drift without repairing it', () => {

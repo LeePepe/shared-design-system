@@ -334,7 +334,7 @@
     {
       "path": "dist/styles.css",
       "format": "asset",
-      "sha256": "e2e26ca60b3b100d1dc2c889764cc3f8bc0f76f8e5bb6552f84a6bf5af758066",
+      "sha256": "f8b3168aae409d299e04bf43ac326465d1f63e03a7f6eba88ba1fdef72e30ef3",
       "symbols": [],
       "doc": "ai/INTEGRATION.md#web-style-css"
     }
