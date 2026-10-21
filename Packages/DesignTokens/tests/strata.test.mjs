@@ -15,15 +15,21 @@ const rgbToLab=({r,g,b})=>{
   const f=v=>v>.008856?v**(1/3):7.787*v+16/116;
   return [116*f(y)-16,500*(f(x)-f(y)),200*(f(y)-f(z))];
 };
-const deltaE00=(a,b)=>{
-  const [L1,a1,b1]=rgbToLab(a),[L2,a2,b2]=rgbToLab(b),C1=Math.hypot(a1,b1),C2=Math.hypot(a2,b2),C=(C1+C2)/2;
+const meanHue=(h1,h2)=>{
+  if(Math.abs(h1-h2)<=180)return (h1+h2)/2;
+  const sum=h1+h2;
+  return sum<360?(sum+360)/2:(sum-360)/2;
+};
+const deltaE00Lab=(lab1,lab2)=>{
+  const [L1,a1,b1]=lab1,[L2,a2,b2]=lab2,C1=Math.hypot(a1,b1),C2=Math.hypot(a2,b2),C=(C1+C2)/2;
   const G=.5*(1-Math.sqrt(C**7/(C**7+25**7))),ap=(1+G)*a1,bp=(1+G)*a2,Cp1=Math.hypot(ap,b1),Cp2=Math.hypot(bp,b2);
   const hp=(x,y)=>{let h=Math.atan2(y,x)*180/Math.PI;return h<0?h+360:h;},h1=hp(ap,b1),h2=hp(bp,b2),dL=L2-L1,dC=Cp2-Cp1;
   const dh=Math.abs(h2-h1)<=180?h2-h1:h2<=h1?h2-h1+360:h2-h1-360, dH=2*Math.sqrt(Cp1*Cp2)*Math.sin(dh*Math.PI/360),Lm=(L1+L2)/2,Cm=(Cp1+Cp2)/2;
-  const hm=Math.abs(h1-h2)<=180?(h1+h2)/2:(h1+h2+360)/2-(h1+h2>=360?0:180),T=1-.17*Math.cos((hm-30)*Math.PI/180)+.24*Math.cos(2*hm*Math.PI/180)+.32*Math.cos((3*hm+6)*Math.PI/180)-.20*Math.cos((4*hm-63)*Math.PI/180);
+  const hm=meanHue(h1,h2),T=1-.17*Math.cos((hm-30)*Math.PI/180)+.24*Math.cos(2*hm*Math.PI/180)+.32*Math.cos((3*hm+6)*Math.PI/180)-.20*Math.cos((4*hm-63)*Math.PI/180);
   const Sl=1+.015*(Lm-50)**2/Math.sqrt(20+(Lm-50)**2),Sc=1+.045*Cm,Sh=1+.015*Cm*T, Rt=-2*Math.sqrt(Cm**7/(Cm**7+25**7))*Math.sin(60*Math.exp(-(((hm-275)/25)**2))*Math.PI/180);
   return Math.sqrt((dL/Sl)**2+(dC/Sc)**2+(dH/Sh)**2+Rt*(dC/Sc)*(dH/Sh));
 };
+const deltaE00=(a,b)=>deltaE00Lab(rgbToLab(a),rgbToLab(b));
 const deltaL=(a,b)=>Math.abs(rgbToLab(a)[0]-rgbToLab(b)[0]);
 test('Strata addition preserves every legacy source token, brand and pair',()=>{
   assert.equal(createHash('sha256').update(JSON.stringify(legacy)).digest('hex'),'befd0c2841299c73878770edae002def239fe9c56e14245a9943def112405b70');
@@ -111,15 +117,35 @@ test('category colors are signed values and declared non-text card gates',()=>{
   }
 });
 
+test('CIEDE2000 hue wrapping matches Sharma, Wu & Dalal (2005)',()=>{
+  assert.equal(meanHue(10,340),355);
+  assert.equal(meanHue(160,350),75);
+  assert.equal(meanHue(20,40),30);
+  const referencePairs=[
+    [[50,2.6772,-79.7751],[50,0,-82.7485],2.0425],
+    [[50,3.1571,-77.2803],[50,0,-82.7485],2.8615],
+    [[50,2.8361,-74.0200],[50,0,-82.7485],3.4412],
+    [[50,-1.3802,-84.2814],[50,0,-82.7485],1.0000],
+    [[50,-1.1848,-84.8006],[50,0,-82.7485],1.0000],
+    [[50,-0.9009,-85.5211],[50,0,-82.7485],1.0000],
+    [[50,0,0],[50,-1,2],2.3669],
+    [[50,-1,2],[50,0,0],2.3669]
+  ];
+  for(const [first,second,expected] of referencePairs)
+    assert.ok(Math.abs(deltaE00Lab(first,second)-expected)<.0001,`${first}/${second}`);
+  const error=resolveSource(source).colors['status.strata.error'].dark;
+  assert.ok(Math.abs(deltaE00({r:184,g:157,b:191},error)-14.8951)<.0001);
+});
+
 test('category color distinction rules R-b through R-e hold',()=>{
   const resolved=resolveSource(source).colors;
   for(const mode of ['light','dark']) {
     const alpha=mode === 'light' ? 0.14 : 0.24;
-    const badges=categories.map(id=>{
-      const fg=resolved[id][mode], card=resolved['product.strata.blue.surface.card'][mode];
-      return {fg,bg:{r:Math.round(fg.r*alpha+card.r*(1-alpha)),g:Math.round(fg.g*alpha+card.g*(1-alpha)),b:Math.round(fg.b*alpha+card.b*(1-alpha)),a:1}};
-    });
-    for(const {fg,bg} of badges) assert.ok(contrast(fg,bg)>=3,'R-b');
+    for(const family of families) for(const id of categories) {
+      const fg=resolved[id][mode],card=resolved[`product.strata.${family}.surface.card`][mode];
+      const bg={r:Math.round(fg.r*alpha+card.r*(1-alpha)),g:Math.round(fg.g*alpha+card.g*(1-alpha)),b:Math.round(fg.b*alpha+card.b*(1-alpha)),a:1};
+      assert.ok(contrast(fg,bg)>=3,`R-b ${family}/${id}/${mode}`);
+    }
     const statuses=['success','warning','error'].map(id=>resolved[`status.strata.${id}`][mode]);
     for(const [i,id] of categories.entries()) for(const [j,status] of statuses.entries()) assert.ok(deltaE00(resolved[id][mode],status)>=15,`R-c ${mode} category ${i+1} status ${j}`);
     for(const pair of [[0,1],[0,2],[1,2]]) assert.ok(deltaL(resolved[categories[pair[0]]][mode],resolved[categories[pair[1]]][mode])>=10,'R-d');
