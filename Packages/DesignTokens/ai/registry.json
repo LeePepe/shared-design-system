@@ -61,7 +61,7 @@
     {
       "path": "dist/index.js",
       "format": "javascript",
-      "sha256": "9f1795076116c3ca7221186ed7ee3f16a60012eb533e65638488a1c22995b265",
+      "sha256": "19d4aad9d8c19fc7a465c01d98b8486b5ac88eb9fda66662c9ffd020080bcf75",
       "symbols": [
         "brandColor",
         "brandIDs",
@@ -77,7 +77,7 @@
     {
       "path": "dist/index.d.ts",
       "format": "typescript",
-      "sha256": "2df4f1a41f68accc7a951a0c08cf800d11265046260c515d77c8bd877b7eb4fa",
+      "sha256": "bc31e7cecdbcf5e3ae01fb8d7d1fce52351f217028c8f5de8069cf7993df6818",
       "symbols": [
         "BrandID",
         "BrandRole",
@@ -99,28 +99,28 @@
     {
       "path": "dist/colors.css",
       "format": "asset",
-      "sha256": "9f3310e74704a076694f105bf621409e56328e9deeffebae84607b7fe9b1209b",
+      "sha256": "626f92a19ba54ef4cef3c0a13ffc405fca589e3fd6f61e2c0e4e81717d5a0b8b",
       "symbols": [],
       "doc": "ai/USAGE.md#public-data-api"
     },
     {
       "path": "dist/resolved.json",
       "format": "asset",
-      "sha256": "ddef0632c72c3afa3af3de63c027eb95fece9cebfe7672bf203ebf31dcd6128c",
+      "sha256": "14f59e6f8f5b580baad105adebe2638263de8e8b399a43c75d74751acb543b90",
       "symbols": [],
       "doc": "ai/USAGE.md#public-data-api"
     },
     {
       "path": "tokens/colors.json",
       "format": "asset",
-      "sha256": "16c410441df239fafa4a8354c12adf9017cd263dd2a1d6c702f411dbd4f76fd3",
+      "sha256": "bb48cc4c5f413390efeed2806be78810335a69672a7830a40185d55fd2e60d0f",
       "symbols": [],
       "doc": "ai/USAGE.md#public-data-api"
     },
     {
       "path": "tokens/schema.json",
       "format": "asset",
-      "sha256": "c38fe99ce29d50e8babdbb5c484d3db10aef37e8395d9276a07983d27a8d6ba9",
+      "sha256": "6bb9db73868195d4c458e4bc48a13cbae387a4203c3baaf6f6299e66813c742a",
       "symbols": [],
       "doc": "ai/USAGE.md#public-data-api"
     },
@@ -157,7 +157,7 @@
     {
       "path": "Sources/DesignTokens/GeneratedColors.swift",
       "format": "asset",
-      "sha256": "5aa9b1dc1161a447b37051af0942a09bf6e36ec91e939a12f57e05872205abc7",
+      "sha256": "a4315d20448de1bfbb780812c73f61a95019a3763f2db8dd70f4fad19cc6f3c8",
       "symbols": [],
       "doc": "ai/USAGE.md#public-data-api"
     },

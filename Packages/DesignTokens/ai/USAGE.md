@@ -77,3 +77,12 @@ presentation roles, not series identities or status labels. Material values are
 RGBA data, not native blur or a composited text contrast guarantee. The provider
 declares opaque normal-text pairs in both modes; consumers verify actual
 translucent composites. This does not change Basalt Web theme authority.
+
+## Strata category colors (0.2.0)
+
+`product.strata.category.1` through `product.strata.category.8` are the signed
+light/dark classification palette. Resolve them with the normal explicit-theme
+API and always pair the color with a glyph or text label; color alone is not a
+reliable category identity under color-vision simulation. Their card contrast,
+badge contrast, status separation and pairwise distinction rules are recorded
+in [spec 004](../specs/004-category-colors.md).

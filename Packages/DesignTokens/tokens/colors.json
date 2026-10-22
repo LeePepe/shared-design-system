@@ -3431,6 +3431,65 @@
         "locator": "strata-reference@b4bff430517ed2e2944f814d8b5ab89a1866ee33:tokens.mjs#getMaterial.shade",
         "note": "Original Strata v0.2 custom design; approved source b4bff430517ed2e2944f814d8b5ab89a1866ee33. Not Apple or Basalt theme data. Alpha uses intended two-decimal percentage for CSS/native serialization parity; RGB remains exact."
       }
+    },
+    {
+      "id": "product.strata.category.1",
+      "layer": "product",
+      "semanticId": "product.strata.category.1",
+      "values": {
+        "light": {"r": 57, "g": 112, "b": 142, "a": 1},
+        "dark": {"ref": "product.strata.chart.primary"}
+      },
+      "provenance": {"source": "local", "locator": "specs/004-category-colors.md", "note": "Owner-approved TK1a category color; signed 2026-10-21."}
+    },
+    {
+      "id": "product.strata.category.2",
+      "layer": "product",
+      "semanticId": "product.strata.category.2",
+      "values": {"light": {"r": 149, "g": 121, "b": 174, "a": 1}, "dark": {"r": 234, "g": 213, "b": 255, "a": 1}},
+      "provenance": {"source": "local", "locator": "specs/004-category-colors.md", "note": "Owner-approved TK1a category color; signed 2026-10-21."}
+    },
+    {
+      "id": "product.strata.category.3",
+      "layer": "product",
+      "semanticId": "product.strata.category.3",
+      "values": {"light": {"r": 3, "g": 89, "b": 93, "a": 1}, "dark": {"r": 113, "g": 171, "b": 170, "a": 1}},
+      "provenance": {"source": "local", "locator": "specs/004-category-colors.md", "note": "Owner-approved TK1a category color; signed 2026-10-21."}
+    },
+    {
+      "id": "product.strata.category.4",
+      "layer": "product",
+      "semanticId": "product.strata.category.4",
+      "values": {"light": {"r": 137, "g": 80, "b": 122, "a": 1}, "dark": {"r": 196, "g": 143, "b": 191, "a": 1}},
+      "provenance": {"source": "local", "locator": "specs/004-category-colors.md", "note": "Owner-approved TK1a category color; signed 2026-10-21."}
+    },
+    {
+      "id": "product.strata.category.5",
+      "layer": "product",
+      "semanticId": "product.strata.category.5",
+      "values": {"light": {"r": 75, "g": 84, "b": 22, "a": 1}, "dark": {"r": 155, "g": 166, "b": 112, "a": 1}},
+      "provenance": {"source": "local", "locator": "specs/004-category-colors.md", "note": "Owner-approved TK1a category color; signed 2026-10-21."}
+    },
+    {
+      "id": "product.strata.category.6",
+      "layer": "product",
+      "semanticId": "product.strata.category.6",
+      "values": {"light": {"r": 177, "g": 111, "b": 72, "a": 1}, "dark": {"r": 227, "g": 169, "b": 138, "a": 1}},
+      "provenance": {"source": "local", "locator": "specs/004-category-colors.md", "note": "Owner-approved TK1a category color; signed 2026-10-21."}
+    },
+    {
+      "id": "product.strata.category.7",
+      "layer": "product",
+      "semanticId": "product.strata.category.7",
+      "values": {"light": {"r": 74, "g": 75, "b": 127, "a": 1}, "dark": {"r": 165, "g": 168, "b": 216, "a": 1}},
+      "provenance": {"source": "local", "locator": "specs/004-category-colors.md", "note": "Owner-approved TK1a category color; signed 2026-10-21."}
+    },
+    {
+      "id": "product.strata.category.8",
+      "layer": "product",
+      "semanticId": "product.strata.category.8",
+      "values": {"light": {"r": 117, "g": 108, "b": 97, "a": 1}, "dark": {"r": 184, "g": 175, "b": 166, "a": 1}},
+      "provenance": {"source": "local", "locator": "specs/004-category-colors.md", "note": "Owner-approved TK1a category color; signed 2026-10-21."}
     }
   ],
   "brands": {
@@ -3933,6 +3992,246 @@
       "foreground": "brand.strata-purple.text",
       "background": "brand.strata-purple.subtle",
       "minimum": 4.5
+    },
+    {
+      "foreground": "product.strata.category.1",
+      "background": "product.strata.blue.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.1",
+      "background": "product.strata.green.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.1",
+      "background": "product.strata.pink.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.1",
+      "background": "product.strata.yellow.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.1",
+      "background": "product.strata.purple.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.2",
+      "background": "product.strata.blue.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.2",
+      "background": "product.strata.green.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.2",
+      "background": "product.strata.pink.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.2",
+      "background": "product.strata.yellow.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.2",
+      "background": "product.strata.purple.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.3",
+      "background": "product.strata.blue.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.3",
+      "background": "product.strata.green.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.3",
+      "background": "product.strata.pink.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.3",
+      "background": "product.strata.yellow.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.3",
+      "background": "product.strata.purple.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.4",
+      "background": "product.strata.blue.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.4",
+      "background": "product.strata.green.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.4",
+      "background": "product.strata.pink.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.4",
+      "background": "product.strata.yellow.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.4",
+      "background": "product.strata.purple.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.5",
+      "background": "product.strata.blue.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.5",
+      "background": "product.strata.green.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.5",
+      "background": "product.strata.pink.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.5",
+      "background": "product.strata.yellow.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.5",
+      "background": "product.strata.purple.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.6",
+      "background": "product.strata.blue.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.6",
+      "background": "product.strata.green.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.6",
+      "background": "product.strata.pink.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.6",
+      "background": "product.strata.yellow.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.6",
+      "background": "product.strata.purple.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.7",
+      "background": "product.strata.blue.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.7",
+      "background": "product.strata.green.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.7",
+      "background": "product.strata.pink.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.7",
+      "background": "product.strata.yellow.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.7",
+      "background": "product.strata.purple.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.8",
+      "background": "product.strata.blue.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.8",
+      "background": "product.strata.green.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.8",
+      "background": "product.strata.pink.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.8",
+      "background": "product.strata.yellow.surface.card",
+      "minimum": 3,
+      "use": "non-text"
+    },
+    {
+      "foreground": "product.strata.category.8",
+      "background": "product.strata.purple.surface.card",
+      "minimum": 3,
+      "use": "non-text"
     },
     {
       "foreground": "status.strata.success",

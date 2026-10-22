@@ -20,6 +20,8 @@ test('generation is deterministic under token/brand/RGBA reordering and has all 
   }
   assert.deepEqual(render(reordered), first);
   assert.deepEqual(Object.keys(first).sort(), ['Sources/DesignTokens/GeneratedColors.swift','dist/colors.css','dist/colors.ts','dist/index.d.ts','dist/index.js','dist/resolved.json'].sort());
+  assert.match(first['dist/index.js'], /product\.strata\.category\.8/);
+  assert.match(first['dist/index.js'], /product\.strata\.category\.1.*"r": 157/s);
 });
 test('CLI --check fails on missing/drifted output and never repairs it', () => {
   const dir = mkdtempSync(join(tmpdir(), 'colors-check-'));

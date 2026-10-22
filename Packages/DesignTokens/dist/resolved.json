@@ -1052,6 +1052,118 @@
         "a": 1
       }
     },
+    "product.strata.category.1": {
+      "light": {
+        "r": 57,
+        "g": 112,
+        "b": 142,
+        "a": 1
+      },
+      "dark": {
+        "r": 157,
+        "g": 196,
+        "b": 214,
+        "a": 1
+      }
+    },
+    "product.strata.category.2": {
+      "light": {
+        "r": 149,
+        "g": 121,
+        "b": 174,
+        "a": 1
+      },
+      "dark": {
+        "r": 234,
+        "g": 213,
+        "b": 255,
+        "a": 1
+      }
+    },
+    "product.strata.category.3": {
+      "light": {
+        "r": 3,
+        "g": 89,
+        "b": 93,
+        "a": 1
+      },
+      "dark": {
+        "r": 113,
+        "g": 171,
+        "b": 170,
+        "a": 1
+      }
+    },
+    "product.strata.category.4": {
+      "light": {
+        "r": 137,
+        "g": 80,
+        "b": 122,
+        "a": 1
+      },
+      "dark": {
+        "r": 196,
+        "g": 143,
+        "b": 191,
+        "a": 1
+      }
+    },
+    "product.strata.category.5": {
+      "light": {
+        "r": 75,
+        "g": 84,
+        "b": 22,
+        "a": 1
+      },
+      "dark": {
+        "r": 155,
+        "g": 166,
+        "b": 112,
+        "a": 1
+      }
+    },
+    "product.strata.category.6": {
+      "light": {
+        "r": 177,
+        "g": 111,
+        "b": 72,
+        "a": 1
+      },
+      "dark": {
+        "r": 227,
+        "g": 169,
+        "b": 138,
+        "a": 1
+      }
+    },
+    "product.strata.category.7": {
+      "light": {
+        "r": 74,
+        "g": 75,
+        "b": 127,
+        "a": 1
+      },
+      "dark": {
+        "r": 165,
+        "g": 168,
+        "b": 216,
+        "a": 1
+      }
+    },
+    "product.strata.category.8": {
+      "light": {
+        "r": 117,
+        "g": 108,
+        "b": 97,
+        "a": 1
+      },
+      "dark": {
+        "r": 184,
+        "g": 175,
+        "b": 166,
+        "a": 1
+      }
+    },
     "product.strata.chart.primary": {
       "light": {
         "r": 82,
