@@ -2,7 +2,7 @@ name: stuck-PR bot
 
 on:
   schedule:
-    - cron: '17 * * * *'
+    - cron: '19,49 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -13,8 +13,16 @@ permissions:
 
 jobs:
   report:
-    # Replace with the delivered full 40-character provider SHA, matching other pins.
-    uses: LeePepe/shared-ci/.github/workflows/stuck-pr-bot.yml@46c88fbae98b03dc6cf2e23c2e5a19c48ff68fe4
+    # shared-ci v0.8.0; pin the published provider revision exactly.
+    uses: LeePepe/shared-ci/.github/workflows/stuck-pr-bot.yml@fd8a187ef4872aa1aa69c4e9afec9782183cc02d
     with:
       failure-hours: 2
       open-hours: 24
+      stale-days: 14
+      draft-days: 7
+      auto-merge-grace-minutes: 30
+      thread-hours: 24
+      summary-assignee: ${{ github.repository_owner }}
+      mention-allowlist: ${{ github.repository_owner }}
+      exclude-prs: ""
+      auto-merge-exempt-prs: ""
