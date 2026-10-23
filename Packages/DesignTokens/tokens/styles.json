@@ -119,6 +119,14 @@
       }
     },
     {
+      "id": "dimension.control.strata",
+      "value": 40,
+      "provenance": {
+        "source": "project",
+        "note": "Strata v0.2 web control height; native adapters own platform sizing."
+      }
+    },
+    {
       "id": "dimension.hit.minimum",
       "value": 44,
       "provenance": {
@@ -204,6 +212,30 @@
       "provenance": {
         "source": "project",
         "note": "Original platform-neutral foundation values; native and web adapters own rendering."
+      }
+    },
+    {
+      "id": "radius.control",
+      "value": 16,
+      "provenance": {
+        "source": "project",
+        "note": "Strata v0.2 web control radius; native adapters own platform rendering."
+      }
+    },
+    {
+      "id": "radius.card",
+      "value": 24,
+      "provenance": {
+        "source": "project",
+        "note": "Strata v0.2 web card radius; native adapters own platform rendering."
+      }
+    },
+    {
+      "id": "radius.container",
+      "value": 32,
+      "provenance": {
+        "source": "project",
+        "note": "Strata v0.2 web container radius; native adapters own platform rendering."
       }
     },
     {
@@ -423,6 +455,26 @@
         "source": "project",
         "note": "Original platform-neutral foundation values; native and web adapters own rendering."
       }
+    },
+    {
+      "id": "typography.strata.body",
+      "value": {"size": 14, "weight": 400, "lineHeight": 20, "tracking": 0, "relativeTo": "body", "monospacedDigits": false},
+      "provenance": {"source": "project", "note": "Strata v0.2 web body type; native adapters own semantic typography."}
+    },
+    {
+      "id": "typography.strata.title",
+      "value": {"size": 32, "weight": 700, "lineHeight": 40, "tracking": 0, "relativeTo": "title", "monospacedDigits": false},
+      "provenance": {"source": "project", "note": "Strata v0.2 web title type; native adapters own semantic typography."}
+    },
+    {
+      "id": "typography.strata.section",
+      "value": {"size": 18, "weight": 600, "lineHeight": 24, "tracking": 0, "relativeTo": "title3", "monospacedDigits": false},
+      "provenance": {"source": "project", "note": "Strata v0.2 web section type; native adapters own semantic typography."}
+    },
+    {
+      "id": "typography.strata.meta",
+      "value": {"size": 12, "weight": 400, "lineHeight": 16, "tracking": 0, "relativeTo": "caption", "monospacedDigits": false},
+      "provenance": {"source": "project", "note": "Strata v0.2 web metadata type; native adapters own semantic typography."}
     },
     {
       "id": "typography.callout",

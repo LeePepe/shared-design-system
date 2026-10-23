@@ -49,5 +49,36 @@ export declare const styleTokenIDs: readonly StyleTokenID[];
 ${ids(category).map(id => `        "${id}": ${swiftValue(category,data.tokens[id])}`).join(',\n')}
     ]
 `).join('') + '}\n';
-  return {'dist/styles.js':js,'dist/styles.d.ts':dts,'dist/styles.resolved.json':json(data)+'\n','Sources/DesignTokens/GeneratedStyles.swift':swift};
+  const scalarUnits = {
+    spacing: 'px', dimension: 'px', radius: 'px', border: 'px',
+    opacity: '', duration: 's', stagger: 's', curve: ''
+  };
+  const cssEntries = Object.entries(data.tokens).flatMap(([id, value]) => {
+    const name = `--lp-${id.replaceAll('.', '-')}`;
+    const category = id.split('.')[0];
+    if (typeof value === 'number') return [[name, `${value}${scalarUnits[category] ?? ''}`]];
+    if (id.startsWith('typography.')) return Object.entries(value)
+      .filter(([property]) => ['size', 'weight', 'lineHeight', 'tracking'].includes(property))
+      .map(([property, propertyValue]) => [
+        `${name}-${property.replace(/[A-Z]/g, letter => '-' + letter.toLowerCase())}`,
+        `${propertyValue}${property === 'weight' ? '' : 'px'}`
+      ]);
+    if (id.startsWith('spring.')) return Object.entries(value)
+      .map(([property, propertyValue]) => [
+        `${name}-${property.replace(/[A-Z]/g, letter => '-' + letter.toLowerCase())}`,
+        `${propertyValue}${['response', 'blendDuration'].includes(property) ? 's' : ''}`
+      ]);
+    if (id.startsWith('curve.')) return Object.entries(value)
+      .map(([property, propertyValue]) => [`${name}-${property}`, String(propertyValue)]);
+    if (id.startsWith('shadow.')) return Object.entries(value)
+      .filter(([property]) => property !== 'colorToken')
+      .map(([property, propertyValue]) => [
+        `${name}-${property}`,
+        `${propertyValue}${property === 'opacity' ? '' : 'px'}`
+      ]);
+    return [];
+  });
+  const css = '/* Generated; namespaced style data only, not a framework theme. */\n:root {\n' +
+    cssEntries.map(([name, value]) => `  ${name}: ${value};`).join('\n') + '\n}\n';
+  return {'dist/styles.js':js,'dist/styles.d.ts':dts,'dist/styles.resolved.json':json(data)+'\n','dist/styles.css':css,'Sources/DesignTokens/GeneratedStyles.swift':swift};
 }

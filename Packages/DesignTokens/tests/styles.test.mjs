@@ -70,8 +70,21 @@ test('style generation is deterministic across token/property ordering', () => {
   const input = source(); input.tokens.reverse();
   for (const item of input.tokens) if (typeof item.value === 'object') item.value = Object.fromEntries(Object.entries(item.value).reverse());
   assert.deepEqual(renderStyles(input, colors()), first);
-  assert.deepEqual(Object.keys(first).sort(), ['Sources/DesignTokens/GeneratedStyles.swift','dist/styles.js','dist/styles.d.ts','dist/styles.resolved.json'].sort());
+  assert.deepEqual(Object.keys(first).sort(), ['Sources/DesignTokens/GeneratedStyles.swift','dist/styles.js','dist/styles.d.ts','dist/styles.resolved.json','dist/styles.css'].sort());
   for (const [relative, expected] of Object.entries(first)) assert.equal(readFileSync(new URL('../'+relative,import.meta.url),'utf8'), expected, relative);
+});
+
+test('Strata v0.2 geometry and web typography are emitted as CSS variables', () => {
+  const css = readFileSync(new URL('../dist/styles.css', import.meta.url), 'utf8');
+  for (const [id, value] of Object.entries({
+    'spacing.xs': '4px', 'spacing.xxl': '32px', 'radius.control': '16px',
+    'radius.card': '24px', 'radius.container': '32px', 'dimension.control.strata': '40px',
+    'typography.strata.body-size': '14px', 'typography.strata.title-size': '32px',
+    'typography.strata.section-size': '18px', 'typography.strata.meta-size': '12px',
+    'duration.fast': '0.16s', 'stagger.tight': '0.016666666666666666s',
+    'opacity.disabled': '0.45', 'curve.standard-x1': '0.2',
+    'spring.standard-response': '0.4s', 'shadow.small-opacity': '0.08'
+  })) assert.match(css, new RegExp(`--lp-${id.replaceAll('.', '-')}: ${value};`));
 });
 test('real generator detects each style artifact drift without repairing it', () => {
   const dir = mkdtempSync(join(tmpdir(),'styles-drift-'));
