@@ -8,6 +8,7 @@ corresponding tag or GitHub release already exists.
 | Task | Start here |
 | --- | --- |
 | Integrate or remove the library | [INTEGRATION.md](INTEGRATION.md) |
+| Define or audit a consumer project's design contract | [DESIGN-CONTRACT.md](DESIGN-CONTRACT.md) |
 | Use the public API or investigate a lookup error | [USAGE.md](USAGE.md) |
 | Evaluate unreleased Strata components | [COMPONENTS.md](COMPONENTS.md) |
 | Run an ordinary external consumer | [EXAMPLES.md](EXAMPLES.md) |

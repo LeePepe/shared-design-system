@@ -52,6 +52,25 @@ class ContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "AI_DOCUMENT"):
             CHECK.check(self.root)
 
+    def test_missing_design_contract(self):
+        (self.root / "ai/DESIGN-CONTRACT.md").unlink()
+        with self.assertRaisesRegex(ValueError, "AI_DESIGN_CONTRACT"):
+            CHECK.check(self.root)
+
+    def test_design_contract_requires_headings(self):
+        path = self.root / "ai/DESIGN-CONTRACT.md"
+        original = path.read_text()
+        for heading in (
+                "## Design system & version",
+                "## Semantic token profile",
+                "## Required view states",
+                "## Redlines & CI gate"):
+            with self.subTest(heading=heading):
+                path.write_text(original.replace(heading, "## Missing heading"))
+                with self.assertRaisesRegex(ValueError, "AI_DESIGN_CONTRACT"):
+                    CHECK.check(self.root)
+                path.write_text(original)
+
     def test_wrong_version(self):
         self.mutate_registry(lambda r: r.update(version="0.3.1"))
         with self.assertRaisesRegex(ValueError, "AI_RELEASE"):
