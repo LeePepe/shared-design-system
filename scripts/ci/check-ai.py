@@ -57,6 +57,17 @@ def check(root):
         resolve(ai, name)
     for name in registry["releaseUnits"].values():
         resolve(ai, name)
+    design_contract = ai / "DESIGN-CONTRACT.md"
+    require(design_contract.is_file(), "AI_DESIGN_CONTRACT",
+            "ai/DESIGN-CONTRACT.md is missing")
+    design_contract_text = design_contract.read_text()
+    for heading in (
+            "## Design system & version",
+            "## Semantic token profile",
+            "## Required view states",
+            "## Redlines & CI gate"):
+        require(heading in design_contract_text, "AI_DESIGN_CONTRACT",
+                f"ai/DESIGN-CONTRACT.md is missing {heading}")
     if registry["releaseStatus"] == "released":
         changelog = (root / "CHANGELOG.md").read_text()
         version = registry["version"]

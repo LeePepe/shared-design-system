@@ -30,6 +30,22 @@ The library does not re-export Tokens types. NativeDesignKit 0.3.0 uses the
 repository-local DesignTokens target. Historical NativeDesignKit 0.1.0 retains
 its old exact provider route.
 
+## Consumer design contract
+
+When adopting the package in a product repository, create
+`docs/design-contract.md` from the
+[consumer design contract template](DESIGN-CONTRACT.md). Pin the exact
+`shared-design-system` revision or release used by the product, bind brand and
+business semantics to upstream tokens, and record the product's page structure,
+required `populated`/`empty`/`loading`/`error` states, and `light`/`dark`
+coverage. Keep the file thin: do not copy the upstream token table or create
+replacement base components.
+
+Run the shared-ci `design_contract.py` static check and its snapshot/screenshot
+acceptance command from the consumer repository. Store the resulting
+light/dark, four-state evidence with the CI artifacts and review it against
+the Designer's `design.md`.
+
 ## Minimal wiring
 
 Import `NativeDesignKit` and `DesignTokens`; call
