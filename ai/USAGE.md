@@ -10,6 +10,10 @@ The `NativeDesignKit` library exposes `public enum NativeTokenColor` with this s
 public static func resolve(_ id: String, theme: Theme) throws -> SwiftUI.Color
 ```
 
+`NativeSurfaceModifier` and `View.nativeSurface(theme:style:cornerRadius:role:)` are public
+surface APIs. Every call requires an explicit `theme: NativeDesignTheme`; there is no
+environment-derived or default theme.
+
 `Theme` is the top-level type imported from `DesignTokens`, with `.light` and `.dark` cases. It is not `DesignTokens.Theme`; the module and facade share the name `DesignTokens`. NativeDesignKit defines no replacement theme type, alias, or re-export contract. Consumer code that names Tokens types imports `DesignTokens` and declares a compatible direct dependency on that product.
 
 ## Conversion and errors

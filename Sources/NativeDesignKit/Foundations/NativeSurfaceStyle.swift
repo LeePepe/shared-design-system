@@ -50,11 +50,12 @@ struct NativeSurfaceTreatment: Equatable {
     }
 }
 
-struct NativeSurfaceModifier: ViewModifier {
-    let theme: NativeDesignTheme
-    let style: NativeSurfaceStyle
-    let cornerRadius: CGFloat
-    let role: NativeSurfaceRole?
+/// One outer material layer; readable content inherits an opaque token foreground.
+public struct NativeSurfaceModifier: ViewModifier {
+    public let theme: NativeDesignTheme
+    public let style: NativeSurfaceStyle
+    public let cornerRadius: CGFloat
+    public let role: NativeSurfaceRole?
     @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
     @Environment(\.nativeReduceTransparencyOverride) private var reduceTransparencyOverride
     @Environment(\.nativeMaterialAncestor) private var materialAncestor
@@ -68,7 +69,15 @@ struct NativeSurfaceModifier: ViewModifier {
         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
     }
 
-    func body(content: Content) -> some View {
+    public init(theme: NativeDesignTheme, style: NativeSurfaceStyle, cornerRadius: CGFloat,
+                role: NativeSurfaceRole? = nil) {
+        self.theme = theme
+        self.style = style
+        self.cornerRadius = cornerRadius
+        self.role = role
+    }
+
+    public func body(content: Content) -> some View {
         content
             .foregroundStyle(theme.foreground)
             .environment(\.nativeMaterialAncestor, treatment.glass || materialAncestor)
@@ -108,8 +117,8 @@ struct NativeSurfaceModifier: ViewModifier {
 }
 
 extension View {
-    func nativeSurface(theme: NativeDesignTheme, style: NativeSurfaceStyle,
-                       cornerRadius: CGFloat, role: NativeSurfaceRole? = nil) -> some View {
+    public func nativeSurface(theme: NativeDesignTheme, style: NativeSurfaceStyle,
+                              cornerRadius: CGFloat, role: NativeSurfaceRole? = nil) -> some View {
         modifier(NativeSurfaceModifier(theme: theme, style: style, cornerRadius: cornerRadius, role: role))
     }
 }
