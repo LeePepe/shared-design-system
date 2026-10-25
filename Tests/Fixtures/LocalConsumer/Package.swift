@@ -9,8 +9,8 @@ let package = Package(
         .executableTarget(
             name: "LocalConsumer",
             dependencies: [
-                .product(name: "DesignTokens", package: "shared-design-system"),
-                .product(name: "NativeDesignKit", package: "shared-design-system")
+                .product(name: "DesignTokens", package: "sds-nsp-t1"),
+                .product(name: "NativeDesignKit", package: "sds-nsp-t1")
             ]
         )
     ]
