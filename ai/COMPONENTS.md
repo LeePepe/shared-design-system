@@ -48,6 +48,10 @@ Reduce Transparency uses the same theme's solid surface. Material selection
 never changes brand or light/dark mode. Main actions and reading content retain
 opaque semantic colors. No Liquid Glass or minimum-OS visual parity is claimed.
 
+The public `NativeSurfaceModifier` and
+`View.nativeSurface(theme:style:cornerRadius:role:)` APIs require an explicit
+`theme: NativeDesignTheme` on every call.
+
 Component-specific contracts are added under `components/` by their PRs.
 
 | Component | Contract |
