@@ -19,18 +19,24 @@ extension EnvironmentValues {
 }
 
 /// One outer material layer; readable content inherits an opaque token foreground.
-struct NativeSurfaceModifier: ViewModifier {
-    let theme: NativeDesignTheme
-    let style: NativeSurfaceStyle
-    let cornerRadius: CGFloat
+public struct NativeSurfaceModifier: ViewModifier {
+    public let theme: NativeDesignTheme
+    public let style: NativeSurfaceStyle
+    public let cornerRadius: CGFloat
     @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
     @Environment(\.nativeReduceTransparencyOverride) private var reduceTransparencyOverride
+
+    public init(theme: NativeDesignTheme, style: NativeSurfaceStyle, cornerRadius: CGFloat) {
+        self.theme = theme
+        self.style = style
+        self.cornerRadius = cornerRadius
+    }
 
     private var reduceTransparency: Bool {
         reduceTransparencyOverride ?? systemReduceTransparency
     }
 
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         content
             .foregroundStyle(theme.foreground)
             .background {
@@ -47,7 +53,7 @@ struct NativeSurfaceModifier: ViewModifier {
 }
 
 extension View {
-    func nativeSurface(
+    public func nativeSurface(
         theme: NativeDesignTheme,
         style: NativeSurfaceStyle,
         cornerRadius: CGFloat
