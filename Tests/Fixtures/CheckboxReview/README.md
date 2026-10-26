@@ -36,16 +36,16 @@ labels at accessibility2, with the entire target and fixture ending onscreen.
 
 Checkbox is new and has no prior hosting assertions to migrate. No existing
 test is removed, weakened or skipped by this component delta.
-`NativeTokenColorTests` remains unchanged. Button's prior hosting-to-UI mappings
+`StrataTokenColorTests` remains unchanged. Button's prior hosting-to-UI mappings
 belong to its foundation PR and remain in ButtonReview's README.
 
 | Requirement | Check |
 | --- | --- |
 | Exact enabled/disabled token roles, no faded text | Package `testSelectedAndUnselectedUseExactThemeRolesWithoutFadingText` |
 | Public generic construction does not own state | Package `testPublicGenericConstructionDoesNotMutateCallerState` |
-| Native binding action, both row edges, caller updates, stable selection bounds | UI `testNativeBindingAndCallerUpdatesPreserveFootprint` |
+| Strata binding action, both row edges, caller updates, stable selection bounds | UI `testStrataBindingAndCallerUpdatesPreserveFootprint` |
 | Disabled on/off prevent all writes | UI `testDisabledCoordinateTapsCannotChangeEitherCheckedState` |
-| Native Toggle label/value/actionability | UI `testNativeAccessibilityExposesCompleteLabelAndCheckedValue` |
+| Strata Toggle label/value/actionability | UI `testStrataAccessibilityExposesCompleteLabelAndCheckedValue` |
 | Narrow long text grows and remains actionable at accessibility size | UI `testNarrowLongLabelGrowsAtAccessibilitySizeAndRemainsOperable` |
 | All states, target size, viewport containment, real screenshots | Four UI `testVisualMatrix…` tests and narrow test |
 | No fallback on invalid brand | UI `testInvalidBrandDisplaysErrorWithoutFallbackControl` |

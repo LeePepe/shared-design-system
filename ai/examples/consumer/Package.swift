@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "NativeDesignConsumer",
+    name: "StrataDesignConsumer",
     platforms: [.iOS(.v15), .macOS(.v12)],
     products: [.library(name: "SamplePalette", targets: ["SamplePalette"])],
     dependencies: [
@@ -10,7 +10,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "SamplePalette", dependencies: [
-            .product(name: "NativeDesignKit", package: "shared-design-system"),
+            .product(name: "Strata", package: "shared-design-system"),
             .product(name: "DesignTokens", package: "shared-design-system")
         ]),
         .testTarget(name: "SamplePaletteTests", dependencies: [

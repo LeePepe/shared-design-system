@@ -1,4 +1,4 @@
-@testable import NativeDesignKit
+@testable import Strata
 import SwiftUI
 
 /// Caller-owned demonstration content, composed through the real Card and shared shell.
@@ -6,7 +6,7 @@ struct StrataCardSpecimen: View {
     let configuration: CardReviewConfiguration
     @State private var detailViews = 0
     @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
     private var isLong: Bool { configuration.scenario == "specimen-long" }
     private var isAccessibilitySize: Bool { configuration.textSize.isAccessibilitySize }
 
@@ -42,7 +42,7 @@ struct StrataCardSpecimen: View {
     }
 
     private var contentCard: some View {
-        NativeCard(theme: theme, surface: configuration.surface) {
+        StrataCard(theme: theme, surface: configuration.surface) {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .center, spacing: 12) {
                     Image(systemName: "square.3.layers.3d")
@@ -110,7 +110,7 @@ struct StrataCardSpecimen: View {
     }
 
     private var statisticsCard: some View {
-        NativeCard(theme: theme, surface: configuration.surface) {
+        StrataCard(theme: theme, surface: configuration.surface) {
             if isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 8) {
                     statisticTitle
@@ -199,7 +199,7 @@ struct StrataCardSpecimen: View {
 }
 
 private struct CardDetailStyle: ButtonStyle {
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label

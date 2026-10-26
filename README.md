@@ -3,7 +3,7 @@
 One Swift package with two stable products:
 
 - `DesignTokens`: UI-free color and style data for iOS 15, macOS 12 and watchOS 8.
-- `NativeDesignKit`: SwiftUI components for iOS 15 and macOS 12. It depends on
+- `Strata`: SwiftUI components for iOS 15 and macOS 12. It depends on
   the local `DesignTokens` target and is intentionally unavailable on watchOS.
 
 - Agents and contributors: start with [AGENTS.md](AGENTS.md).

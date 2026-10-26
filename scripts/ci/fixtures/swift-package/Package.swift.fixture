@@ -5,15 +5,15 @@ let package = Package(
     name: "SchemeSelectionFixture",
     platforms: [.iOS(.v15), .macOS(.v12)],
     products: [
-        .library(name: "NativeDesignKit", targets: ["NativeDesignKit"]),
+        .library(name: "Strata", targets: ["Strata"]),
         .library(name: "DesignTokens", targets: ["DesignTokens"]),
     ],
     targets: [
-        .target(name: "NativeDesignKit"),
+        .target(name: "Strata"),
         .target(name: "DesignTokens"),
         .testTarget(
-            name: "NativeDesignKitTests",
-            dependencies: ["NativeDesignKit"]
+            name: "StrataTests",
+            dependencies: ["Strata"]
         ),
         .testTarget(
             name: "DesignTokensTests",

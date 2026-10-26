@@ -44,7 +44,7 @@ The checker
 now requires the auxiliary glyph to match the secondary role, guarding against
 the former blanket primary-foreground workaround.
 
-A separate faithful specimen uses the actual NativeCard source in the shared
+A separate faithful specimen uses the actual StrataCard source in the shared
 32pt outer shell. Caller content supplies a token-colored icon plate, context
 pill, title/body, footer/detail action, and a second explicitly synthetic
 statistics card. The progress series and success badge use independent chart

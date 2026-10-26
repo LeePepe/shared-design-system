@@ -93,15 +93,13 @@ def png_rgb(path):
 
 
 def token_provider():
-    pins = json.loads((REPO / "Package.resolved").read_text())["pins"]
-    pin = next(item for item in pins if item["identity"] == "shared-design-tokens")
-    require(pin["state"]["version"] == "0.1.1", "Expected the exact DesignTokens 0.1.1 pin")
-    checkout = REPO / ".build/checkouts/shared-design-tokens"
-    revision = subprocess.check_output(["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True).strip()
-    require(revision == pin["state"]["revision"], "Token checkout differs from Package.resolved")
-    path = checkout / "tokens/colors.json"
+    require(not subprocess.check_output(["git", "status", "--porcelain"], cwd=REPO, text=True),
+            "Require a clean root checkout for provider provenance")
+    revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO, text=True).strip()
+    path = REPO / "Packages/DesignTokens/tokens/colors.json"
     data = path.read_bytes()
-    committed = subprocess.check_output(["git", "-C", str(checkout), "show", "HEAD:tokens/colors.json"])
+    committed = subprocess.check_output(
+        ["git", "show", "HEAD:Packages/DesignTokens/tokens/colors.json"], cwd=REPO)
     require(data == committed, "Token data contains uncommitted changes")
     return json.loads(data), {"path": str(path), "revision": revision, "sha256": hashlib.sha256(data).hexdigest()}
 
@@ -115,7 +113,7 @@ def accent(provider, brand, mode):
         visited.add(token)
         value = values[token][mode]
         if "ref" not in value:
-            require(value["a"] == 1, "Native checkmark test requires an opaque provider accent")
+            require(value["a"] == 1, "Strata checkmark test requires an opaque provider accent")
             rgb = tuple(value[channel] for channel in ("r", "g", "b"))
             require(all(type(channel) is int and 0 <= channel <= 255 for channel in rgb), "Invalid provider RGB")
             return rgb
@@ -162,7 +160,7 @@ def check_image(path, record, expected):
         # Assert this fixture's full-width-row invariant; never use row width
         # as a substitute for the actual app width when computing PNG scale.
         require(abs(x - app[0]) <= 0.001 and abs(w - app[2]) <= 0.001, "Matrix native row must span the app")
-        require(h >= 44 - 0.001 and y >= 0 and y + h <= app[3], "Native row is outside the app")
+        require(h >= 44 - 0.001 and y >= 0 and y + h <= app[3], "Strata row is outside the app")
         rect = [round(v * scale) for v in (x + w * 0.8, y + 2, x + w - 2, y + h - 2)]
         left, top, right, bottom = rect
         require(0 <= left < right <= width and 0 <= top < bottom <= height, "Glyph sample is outside PNG")

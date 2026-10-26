@@ -13,9 +13,9 @@ it is an image fixture, not screenshot evidence or a local palette.
 
 ## Test migration / integrity record
 
-The NativeDesignKit leaf permits UIKit/AppKit only for numeric color
+The Strata leaf permits UIKit/AppKit only for numeric color
 extraction. All prior Avatar hosting/traversal tests, including the failing
-label test, moved to actual SwiftUI app UI tests. `NativeTokenColorTests` is
+label test, moved to actual SwiftUI app UI tests. `StrataTokenColorTests` is
 unchanged. The old native-host AX debug printing and public notification probe
 were diagnostics, not assertions or accepted evidence.
 
@@ -25,7 +25,7 @@ were diagnostics, not assertions or accepted evidence.
 | `testCallerFillIsClippedToCircleAndDoesNotPaintOutsideVisualBounds` | `testClippingMatchesCircularReferenceIncludingOutsideBounds` | Decoded runtime pixels of oversized 200×120 pt content in a 64 pt avatar centered on 88 pt canvas match a token-filled 64 pt circular reference. Solid interior, corners and exterior match exactly; only the two-physical-pixel antialias rim permits a ≤3/255 channel difference. |
 | `testAccessibilityExposesOnlyTheCallerLabelAndImageTrait` (failed native-host AX traversal) | `testCallerLabelIsOneImageAndDecorativeDescendantsAreHidden` | Each of 18 visuals exposes exactly one image with the exact caller label, no descendants and no button role; redundant initials/symbol/image labels remain absent, including the empty visual. |
 | `testAccessibilityDynamicTypeRetainsFixedAvatarVisual` | `testNarrowTextGrowsWhileAllAvatarVisualBoundsStayFixed` | Actual iOS large/accessibility2/accessibility5 environments retain all three fixed visual sizes; adjacent full ordinary text grows at accessibility2 within a 280 pt board, stays separate from the avatar and remains onscreen. |
-| `testRealSwiftUIAvatarScreenshots` / `NativeSnapshot.capture` | Four `testVisualMatrix…` tests plus narrow/clipping tests | Six real app screenshots are kept in xcresult and exported unchanged by explicit manifest names; UIKit/AppKit hosting/windows are absent. |
+| `testRealSwiftUIAvatarScreenshots` / `StrataSnapshot.capture` | Four `testVisualMatrix…` tests plus narrow/clipping tests | Six real app screenshots are kept in xcresult and exported unchanged by explicit manifest names; UIKit/AppKit hosting/windows are absent. |
 
 `testCallerContentUpdatesAndButtonOwnsActionAndDisabledState` additionally
 checks caller-owned content/label updates without size changes, no action from

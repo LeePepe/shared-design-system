@@ -18,8 +18,8 @@ red_lines:
 |---|---|---|---|
 | Tokens | Nested color/style sources, generators, JS/TS/CSS/JSON artifacts, AI contract and Node tests | `docs/architecture/tokens/tech-context.md` | (none) |
 | DesignTokens | Nested UI-free Swift data target, XCTest and disposable local-path consumer | `docs/architecture/design-tokens/tech-context.md` | Tokens |
-| NativeDesignKit | SwiftUI design-system library (iOS, macOS): explicit-theme bridges over DesignTokens, tests, shipped `ai/` contract | `docs/architecture/native-design-kit/tech-context.md` | DesignTokens |
+| Strata | SwiftUI design-system library (iOS, macOS): explicit-theme bridges over DesignTokens, tests, shipped `ai/` contract | `docs/architecture/strata/tech-context.md` | DesignTokens |
 
-The root package publishes both products. `NativeDesignKit` uses the local
+The root package publishes both products. `Strata` uses the local
 `DesignTokens` target; consumers pin one exact `shared-design-system` revision.
 The old provider repository remains immutable compatibility history only.

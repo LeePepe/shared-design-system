@@ -1,22 +1,23 @@
-# NativeProgressBar (unreleased)
+# StrataProgressBar (unreleased)
 
 Native SwiftUI linear progress in the unreleased [Strata rebuild](../COMPONENTS.md).
 HeroUI informs inventory only; no implementation is copied. This API is absent
-from the color-only NativeDesignKit 0.3.0 release.
+from the color-only Strata 0.3.0 release.
 
 ```swift
-public struct NativeProgressBar<Label: View, CurrentValueLabel: View>: View {
-    public init(theme: NativeDesignTheme,
+public struct StrataProgressBar<Label: View, CurrentValueLabel: View>: View {
+    public init(theme: StrataTheme,
                 value: Double?, total: Double,
                 @ViewBuilder label: () -> Label,
                 @ViewBuilder currentValueLabel: () -> CurrentValueLabel)
 }
 ```
 
-Every argument is required. Pass an explicitly resolved `NativeDesignTheme`
+Every argument is required. Pass an explicitly resolved `StrataTheme`
 with provider brand `ocean` or `graphite`; theme construction propagates token
 errors unchanged. The color-bridge behavior, Swift 6 language mode and
 iOS 15/macOS 12 declarations remain unchanged.
+Strata 0.3.0 uses the repository-local DesignTokens target;
 NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;
 NativeDesignKit 0.1.0 historically used exact DesignTokens 0.1.1. This
 ProgressBar remains unreleased.
@@ -30,13 +31,13 @@ matching current-value text for the normalized range; the component does not
 parse or rewrite the builder's content.
 
 ```swift
-NativeProgressBar(theme: theme, value: completedUnits, total: totalUnits) {
+StrataProgressBar(theme: theme, value: completedUnits, total: totalUnits) {
     Text("Preparing files")
 } currentValueLabel: {
     Text(formattedProgress) // Caller-owned, localized and formatted.
 }
 
-NativeProgressBar(theme: theme, value: nil, total: 1) {
+StrataProgressBar(theme: theme, value: nil, total: 1) {
     Text("Preparing files")
 } currentValueLabel: {
     Text("Waiting for the next update…")

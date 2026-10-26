@@ -42,7 +42,7 @@ lane.
 Four compatibility tests capture the original initializer and explicit Solid
 for ocean/graphite × light/dark, with all three variants × normal/loading/disabled.
 The original lane deliberately requests Glass in fixture configuration but never
-passes it to NativeButton. Tests compare all nine runtime frames within 0.5 pt,
+passes it to StrataButton. Tests compare all nine runtime frames within 0.5 pt,
 check targets and enabled states, and require actual system Reduce Transparency
 to be false. `BUTTON_COMPATIBILITY` log records bind each named XCTest PNG to its
 observed route, labels, states, frames and viewport. Delivery evidence must compare
@@ -61,9 +61,9 @@ review are required; historical screenshots and passes do not apply to this repa
 
 ## Test migration / PR integrity record
 
-Trusted NativeDesignKit context restricts test UIKit/AppKit usage to numeric
+Trusted Strata context restricts test UIKit/AppKit usage to numeric
 color extraction. The following hosting-based checks were moved, not waived.
-`NativeTokenColorTests` is unchanged, as are pure action and theme/error tests.
+`StrataTokenColorTests` is unchanged, as are pure action and theme/error tests.
 
 | Previous package check/helper | Replacement UI test | Preserved or stronger coverage |
 | --- | --- | --- |
@@ -71,12 +71,12 @@ color extraction. The following hosting-based checks were moved, not waived.
 | `testLongLabelsGrowAtAccessibilitySizeWithinNarrowIOSHost` | `testLongLocalizedAccessibilityGrowthWithinNarrowBoard` | Real app German text grows by >20 pt at accessibility2, stays ≤272.5 pt wide inside a 320 pt board, exposes the complete active label, contains the text frame inside the production fill path, stays onscreen and retains loading dimensions within 0.5 pt. |
 | `testRealSwiftUIButtonScreenshots` | `testVisualMatrixOceanLight`, `testVisualMatrixOceanDark`, `testVisualMatrixGraphiteLight`, `testVisualMatrixGraphiteDark` | Always capture all four brand/theme boards; assert every variant/state exists, enabled state, ≥44 pt target and full viewport containment before capture. |
 | `testNarrowAccessibilitySizeScreenshot` | `testLongLocalizedAccessibilityGrowthWithinNarrowBoard` | `button-accessibility-narrow` is an actual iOS screenshot with measured accessibility text growth and full-label/frame assertions. |
-| `NativeSnapshot.capture` / `NSHostingView` / `NSWindow` / `UIHostingController` | `XCTAttachment(screenshot: app.screenshot())` + shared runner export | Runtime iOS screenshots with preserved `.xcresult` attachments and deterministic PNG names; no UIKit/AppKit hosting. |
+| `StrataSnapshot.capture` / `NSHostingView` / `NSWindow` / `UIHostingController` | `XCTAttachment(screenshot: app.screenshot())` + shared runner export | Runtime iOS screenshots with preserved `.xcresult` attachments and deterministic PNG names; no UIKit/AppKit hosting. |
 
 `testActionDispatchAndDisabledLoadingCoordinateTaps` additionally verifies a
 real enabled tap increments the synthetic count, three disabled coordinate
 taps and three loading coordinate taps cannot increment it, then a re-enabled
-tap works. The pure package dispatch matrix stays in `NativeButtonTests`.
+tap works. The pure package dispatch matrix stays in `StrataButtonTests`.
 `testInvalidBrandShowsErrorWithoutFallback` checks the fixture's visible error
 boundary; it does not change production error propagation.
 
@@ -94,8 +94,8 @@ or lower target-size threshold is used.
 
 The narrow-board regression also measures the active SwiftUI `Text` and button
 bounds through `GeometryReader` preferences in the same coordinate space. The
-fixture uses test-only `@testable import NativeDesignKit` to check every text
-rectangle corner against the production `NativeButtonShape` fill path, for
+fixture uses test-only `@testable import Strata` to check every text
+rectangle corner against the production `StrataButtonShape` fill path, for
 both idle and loading labels. This convex shape contains the entire text
 rectangle when it contains its corners. A capsule control must reject the idle
 text bounds, proving this case exercises the former shape-escape bug rather
@@ -170,10 +170,10 @@ navigation screenshot is an observation; claim a visible focus ring only after
 inspecting that actual capture. Host automation permissions remain a separate
 runtime requirement and cannot be inferred from a package build.
 
-`testStandardControlsDiagnoseNativeInputDelivery` adds an `input-diagnostics`
+`testStandardControlsDiagnoseStrataInputDelivery` adds an `input-diagnostics`
 board alongside the unchanged specimens. A standard bordered SwiftUI Button,
 plain Text hover sentinel, TextField and focusable key probe compare actual
-callbacks with NativeButton. It records both requested and observed focus,
+callbacks with StrataButton. It records both requested and observed focus,
 requires real focused Space activation on both controls, and compares element
 and coordinate hover with mouse-click delivery. Successful text entry or a
 shortcut alone does not establish focus navigation. The board never changes
@@ -181,11 +181,11 @@ system preferences and supplies no synthetic hover/focus override. Preserve
 the XCTest synthesized-event attachments and observations when this test fails;
 those identify the event source and coordinates without guessing from idle PNGs.
 
-`ButtonFlatControlIsolationUITests/testFlatStandardHoverNativeTabFocusAndSpace`
+`ButtonFlatControlIsolationUITests/testFlatStandardHoverStrataTabFocusAndSpace`
 is a bounded diagnostic positive control launched with
 `--button-flat-control-isolation`. Its separate flat `VStack` contains one
 ordinary bordered SwiftUI Button and a Text sentinel, without ScrollView,
-NativeButton, FocusState, focus setters, TextField or shortcuts. It records
+StrataButton, FocusState, focus setters, TextField or shortcuts. It records
 free-movement hover entry/exit counts and monotonic callback timestamps, actual
 frames/hittability, label `isFocused` callbacks, separate AX `hasFocus`, native
 Tab/Space dispatch timing, action count, AX text attachments and runtime PNGs.
@@ -203,7 +203,7 @@ method for the isolation experiment; preserve cumulative prior failures.
 ## Public-base delivery and deferred native input
 
 Final delivery consumes public exact DesignTokens0.2.0 at
-`87bef8fbab5bf67a748815d7ed04d7ae199f760a` with no local mirror. NativeDesignKit
+`87bef8fbab5bf67a748815d7ed04d7ae199f760a` with no local mirror. Strata
 remains unreleased. Historical candidate packets remain scoped to their original
 source/provider revisions.
 

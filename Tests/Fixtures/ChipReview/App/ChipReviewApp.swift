@@ -1,4 +1,4 @@
-@testable import NativeDesignKit
+@testable import Strata
 import SwiftUI
 
 @main
@@ -21,7 +21,7 @@ struct ChipReviewApp: App {
 
 private struct Configuration {
     enum Invalid: Error { case input(String) }
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     let brand: String
     let mode: String
     let scenario: String
@@ -36,8 +36,8 @@ private struct Configuration {
         brand = try required("NDK_BRAND")
         mode = try required("NDK_THEME")
         switch mode {
-        case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
-        case "dark": theme = try NativeDesignTheme(theme: .dark, brand: brand)
+        case "light": theme = try StrataTheme(theme: .light, brand: brand)
+        case "dark": theme = try StrataTheme(theme: .dark, brand: brand)
         default: throw Invalid.input("NDK_THEME")
         }
         scenario = try required("NDK_SCENARIO")
@@ -58,13 +58,13 @@ private struct ChipBoard: View {
     @State private var isDisabled = false
     @State private var isPresent = true
     @State private var bounds: [String: CGRect] = [:]
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
     private let longText = "Forschungsnotizen und ausführliche Beschreibungen gemeinsam organisieren"
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Native Chip").font(.title.bold())
+                Text("Strata Chip").font(.title.bold())
                 Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · Synthetic review")
                     .font(.caption).foregroundStyle(theme.secondaryForeground)
                 switch configuration.scenario {
@@ -87,13 +87,13 @@ private struct ChipBoard: View {
             ForEach(["neutral", "accent", "critical"], id: \.self) { name in
                 VStack(alignment: .leading, spacing: 6) {
                     Text(name.capitalized).font(.headline)
-                    NativeChip(theme: theme, tone: tone(name)) {
+                    StrataChip(theme: theme, tone: tone(name)) {
                         Text("\(name.capitalized) static").accessibilityIdentifier("static-\(name)")
                     }
-                    NativeChip(theme: theme, tone: tone(name),
+                    StrataChip(theme: theme, tone: tone(name),
                                removalAccessibilityLabel: Text("Remove \(name) item"),
                                onRemove: { count += 1 }) { Text("Removable item") }
-                    NativeChip(theme: theme, tone: tone(name),
+                    StrataChip(theme: theme, tone: tone(name),
                                removalAccessibilityLabel: Text("Remove disabled \(name) item"),
                                onRemove: { count += 1 }) { Text("Disabled removal") }
                         .disabled(true)
@@ -106,10 +106,10 @@ private struct ChipBoard: View {
 
     private var interaction: some View {
         VStack(alignment: .leading, spacing: 16) {
-            NativeChip(theme: theme, tone: .neutral) {
+            StrataChip(theme: theme, tone: .neutral) {
                 Text("Static content").accessibilityIdentifier("static-content")
             }
-            NativeChip(theme: theme, tone: .accent,
+            StrataChip(theme: theme, tone: .accent,
                        removalAccessibilityLabel: Text("Remove research note"), onRemove: { count += 1 }) {
                 Text("Research note").accessibilityIdentifier("action-label")
             }
@@ -121,7 +121,7 @@ private struct ChipBoard: View {
             Button(isDisabled ? "Enable removal" : "Disable removal") { isDisabled.toggle() }
                 .accessibilityIdentifier("toggle-disabled").buttonStyle(.bordered)
             if isPresent {
-                NativeChip(theme: theme, tone: .critical,
+                StrataChip(theme: theme, tone: .critical,
                            removalAccessibilityLabel: Text("Remove temporary note"), onRemove: { isPresent = false }) {
                     Text("Temporary note").accessibilityIdentifier("owned-label")
                 }
@@ -137,12 +137,12 @@ private struct ChipBoard: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("320 pt narrow layout").font(.headline)
             VStack(alignment: .leading, spacing: 16) {
-                NativeChip(theme: theme, tone: .neutral) {
+                StrataChip(theme: theme, tone: .neutral) {
                     Text(longText).accessibilityIdentifier("long-static-label")
                         .background(measure("static-label"))
                 }
                 .background(measure("static"))
-                NativeChip(theme: theme, tone: .critical,
+                StrataChip(theme: theme, tone: .critical,
                            removalAccessibilityLabel: Text("Forschungsnotiz entfernen"), onRemove: { count += 1 }) {
                     Text(longText).accessibilityIdentifier("long-removable-label")
                         .background(measure("removable-label"))
@@ -181,13 +181,13 @@ private struct ChipBoard: View {
     private func safety(_ name: String, capsule: Bool = false) -> String {
         guard let rect = bounds[name], let label = bounds[name + "-label"],
               !rect.isEmpty, !label.isEmpty else { return "pending" }
-        let path = capsule ? Capsule().path(in: rect) : NativeChipShape().path(in: rect)
+        let path = capsule ? Capsule().path(in: rect) : StrataChipShape().path(in: rect)
         let corners = [CGPoint(x: label.minX, y: label.minY), CGPoint(x: label.maxX, y: label.minY),
                        CGPoint(x: label.minX, y: label.maxY), CGPoint(x: label.maxX, y: label.maxY)]
         return corners.allSatisfy { path.contains($0) } ? "inside" : "outside"
     }
 
-    private func tone(_ name: String) -> NativeChipTone {
+    private func tone(_ name: String) -> StrataChipTone {
         switch name {
         case "accent": .accent
         case "critical": .critical

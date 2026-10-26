@@ -1,6 +1,6 @@
-# NativeDesignKit compatibility
+# Strata compatibility
 
-NativeDesignKit 0.3.0 is the current release contract. [USAGE.md](USAGE.md)
+Strata 0.3.0 is the current release contract. [USAGE.md](USAGE.md)
 describes its interface and conversion semantics. The [contract entry](README.md)
 and [external fixture](EXAMPLES.md) travel with the release source revision;
 tag-time validation results are recorded in the GitHub release notes after a
@@ -9,8 +9,8 @@ historical release (Git tag `v0.1.0`).
 
 ## Local dependency
 
-The current root manifest publishes `DesignTokens` and `NativeDesignKit`;
-NativeDesignKit and both test targets depend on the local `DesignTokens` target.
+The current root manifest publishes `DesignTokens` and `Strata`;
+Strata and both test targets depend on the local `DesignTokens` target.
 There is no external package pin or root `Package.resolved`. Consumers select
 both products from one exact `shared-design-system` revision. NativeDesignKit
 v0.1.0 retains its historical exact `shared-design-tokens` 0.1.1 requirement.
@@ -21,14 +21,14 @@ The historical 0.1.1 requirement replaced candidate `1db868d` and release `0.1.0
 
 | Surface | Source declaration | Verification for this slice |
 | --- | --- | --- |
-| Package | `NativeDesignKit` library product and module; Swift tools 6.0 | Evaluated and compiled in the scoped run below; Swift 6.0 itself **NOT TESTED** |
+| Package | `Strata` library product and module; Swift tools 6.0 | Evaluated and compiled in the scoped run below; Swift 6.0 itself **NOT TESTED** |
 | iOS | iOS 15 minimum; SwiftUI bridge with UIKit test extraction | Simulator build and tests run in CI (`ios` gate, newest available iPhone simulator); device and minimum-OS verification **NOT RUN** |
 | macOS | macOS 12 minimum; SwiftUI bridge with AppKit test extraction | AppKit path exercised in the scoped run below; macOS 12 **NOT TESTED** |
 | Tokens | Local stable `DesignTokens` product; top-level `Theme` and public RGBA facade | Root and local-path consumer build/tests compile both public imports; pushed-revision CI owns public resolution |
 | External consumer | Separate Swift package using public products only | [Fixture and runner](EXAMPLES.md); matching revision/version results belong in the PR/release notes, not inferred from `@testable` tests |
 
-NativeDesignKit is declared only for iOS and macOS. DesignTokens alone supports
-watchOS 8; selecting NativeDesignKit for watchOS fails with its stable
+Strata is declared only for iOS and macOS. DesignTokens alone supports
+watchOS 8; selecting Strata for watchOS fails with its stable
 unavailability diagnostic. No watchOS component implementation or behavior is
 claimed.
 

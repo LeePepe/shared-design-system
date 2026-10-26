@@ -1,4 +1,4 @@
-@testable import NativeDesignKit
+@testable import Strata
 import SwiftUI
 
 /// Synthetic review fixture only. Theme resolution failures are shown, never replaced.
@@ -31,11 +31,11 @@ struct ButtonReviewApp: App {
 
 private struct ReviewConfiguration {
     enum ConfigurationError: Error { case missing(String), invalid(String) }
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     let brand: String
     let mode: String
     let scenario: String
-    let surface: NativeSurfaceStyle
+    let surface: StrataSurfaceStyle
     let buttonInitializer: String
     let requestedSurface: String
     let textSize: DynamicTypeSize
@@ -75,8 +75,8 @@ private struct ReviewConfiguration {
             throw ConfigurationError.invalid("NDK_BUTTON_INITIALIZER scenario")
         }
         switch mode {
-        case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
-        case "dark": theme = try NativeDesignTheme(theme: .dark, brand: brand)
+        case "light": theme = try StrataTheme(theme: .light, brand: brand)
+        case "dark": theme = try StrataTheme(theme: .dark, brand: brand)
         default: throw ConfigurationError.invalid("NDK_THEME")
         }
         switch try required("NDK_TEXT_SIZE") {
@@ -106,7 +106,7 @@ private struct ButtonReviewBoard: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Environment(\.nativeReduceTransparencyOverride) private var reduceTransparencyOverride
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
 
     var body: some View {
         Group {
@@ -160,14 +160,14 @@ private struct ButtonReviewBoard: View {
                     HStack(spacing: 8) {
                         Text("States").font(.caption).foregroundStyle(theme.secondaryForeground)
                             .accessibilityIdentifier("specimen-state-label")
-                        NativeButton(theme: theme, variant: .secondary, surface: configuration.surface,
+                        StrataButton(theme: theme, variant: .secondary, surface: configuration.surface,
                                      isLoading: false, action: { actionCount += 1 }) {
                             specimenLabel("Disabled", id: "specimen-disabled")
                         } loadingLabel: { Text("Working…") }
                         .disabled(true)
                         .accessibilityIdentifier("specimen-disabled")
                         .accessibilityValue(textRectangle(for: "specimen-disabled"))
-                        NativeButton(theme: theme, variant: .primary, surface: configuration.surface,
+                        StrataButton(theme: theme, variant: .primary, surface: configuration.surface,
                                      isLoading: true, action: { actionCount += 1 }) {
                             Text("Load")
                         } loadingLabel: { specimenLabel("Loading", id: "specimen-loading") }
@@ -181,7 +181,7 @@ private struct ButtonReviewBoard: View {
                 }
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .nativeSurface(theme: theme, style: configuration.surface, cornerRadius: 24, role: .card)
+                .strataSurface(theme: theme, style: configuration.surface, cornerRadius: 24, role: .card)
                 Text(actionCount == 0 ? "Tap Save to try a native action." : "Example saved · \(actionCount)")
                     .font(.subheadline).foregroundStyle(theme.secondaryForeground)
                     .accessibilityIdentifier("specimen-feedback")
@@ -189,9 +189,9 @@ private struct ButtonReviewBoard: View {
         }
     }
 
-    private func specimenButton<Content: View>(_ variant: NativeButtonVariant, id: String,
+    private func specimenButton<Content: View>(_ variant: StrataButtonVariant, id: String,
                                                @ViewBuilder content: () -> Content) -> some View {
-        NativeButton(theme: theme, variant: variant, surface: configuration.surface,
+        StrataButton(theme: theme, variant: variant, surface: configuration.surface,
                      isLoading: false, action: { actionCount += 1 }, label: content) {
             Text("Wait")
         }
@@ -224,17 +224,17 @@ private struct ButtonReviewBoard: View {
     /// `surface`, even when the fixture requests Glass for the other branch.
     @ViewBuilder
     private func behaviorButton<Label: View, LoadingLabel: View>(
-        variant: NativeButtonVariant,
+        variant: StrataButtonVariant,
         isLoading: Bool,
         action: @escaping () -> Void,
         @ViewBuilder label: () -> Label,
         @ViewBuilder loadingLabel: () -> LoadingLabel
     ) -> some View {
         if configuration.buttonInitializer == "original-solid" {
-            NativeButton(theme: theme, variant: variant, isLoading: isLoading,
+            StrataButton(theme: theme, variant: variant, isLoading: isLoading,
                          action: action, label: label, loadingLabel: loadingLabel)
         } else {
-            NativeButton(theme: theme, variant: variant, surface: configuration.surface,
+            StrataButton(theme: theme, variant: variant, surface: configuration.surface,
                          isLoading: isLoading, action: action, label: label, loadingLabel: loadingLabel)
         }
     }
@@ -323,7 +323,7 @@ private struct ButtonReviewBoard: View {
     }
 
     private var labelShapeSafety: String {
-        labelSafety(in: NativeButtonShape().path(in: buttonBounds))
+        labelSafety(in: StrataButtonShape().path(in: buttonBounds))
     }
 
     private var shapeGeometryDescription: String {
@@ -352,7 +352,7 @@ private struct ButtonReviewBoard: View {
         .buttonStyle(.bordered)
     }
 
-    private func variantValue(_ name: String) -> NativeButtonVariant {
+    private func variantValue(_ name: String) -> StrataButtonVariant {
         switch name {
         case "primary": .primary
         case "secondary": .secondary
@@ -364,7 +364,7 @@ private struct ButtonReviewBoard: View {
 /// Standard SwiftUI controls isolate event delivery from the library's styling.
 /// This board requests view focus only; it never changes a system preference.
 private struct ButtonInputDiagnostics: View {
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     @State private var visits: Set<String> = []
     @State private var currentHover = "none"
     @State private var input = ""
@@ -385,8 +385,8 @@ private struct ButtonInputDiagnostics: View {
                 .focused($focus, equals: .standard)
                 .onHover { record("standard", inside: $0) }
                 .accessibilityIdentifier("input-standard")
-            NativeButton(theme: theme, variant: .primary, surface: .glass, isLoading: false,
-                         action: { nativeActions += 1 }) { Text("Native action") } loadingLabel: { Text("Working…") }
+            StrataButton(theme: theme, variant: .primary, surface: .glass, isLoading: false,
+                         action: { nativeActions += 1 }) { Text("Strata action") } loadingLabel: { Text("Working…") }
                 .focused($focus, equals: .native)
                 .onHover { record("native", inside: $0) }
                 .accessibilityIdentifier("input-native")

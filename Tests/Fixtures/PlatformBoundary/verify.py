@@ -10,7 +10,7 @@ ROOT = FIXTURE.parents[2]
 EVIDENCE = Path(os.environ.get(
     "NATIVE_EVIDENCE_DIR", ROOT / ".build/evidence")).resolve()
 DIAGNOSTIC = (
-    "NativeDesignKit is unavailable on watchOS; depend on the DesignTokens "
+    "Strata is unavailable on watchOS; depend on the DesignTokens "
     "product only."
 )
 
@@ -42,14 +42,14 @@ def main():
         raise RuntimeError("DesignTokens-only watchOS consumer must compile")
 
     negative = build(
-        "NativeDesignKitWatchConsumer", run_root / "NativeDesignKit")
+        "StrataWatchConsumer", run_root / "Strata")
     (run_root / "native-negative.log").write_text(negative.stdout)
     if negative.returncode == 0:
-        raise RuntimeError("NativeDesignKit watchOS consumer unexpectedly compiled")
+        raise RuntimeError("Strata watchOS consumer unexpectedly compiled")
     if DIAGNOSTIC not in negative.stdout:
         print(negative.stdout, file=sys.stderr)
-        raise RuntimeError("NativeDesignKit watchOS diagnostic drift")
-    print("WATCH_BOUNDARY_OK: DesignTokens builds; NativeDesignKit fails with stable diagnostic")
+        raise RuntimeError("Strata watchOS diagnostic drift")
+    print("WATCH_BOUNDARY_OK: DesignTokens builds; Strata fails with stable diagnostic")
 
 
 if __name__ == "__main__":

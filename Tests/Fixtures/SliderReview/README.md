@@ -19,7 +19,7 @@ in `screenshots.json`; generated Xcode projects and external evidence are not
 committed. Run on a clean exact head, inspect all PNGs, and retain the shared
 runner's SHA/device/attachment records.
 
-Native adjustment tests check caller-unit binding updates, step alignment,
+Strata adjustment tests check caller-unit binding updates, step alignment,
 reachable endpoints for the tested divisible span, balanced begin/end editing
 callbacks, actual disabled drag suppression, native accessibility label/value,
 stable frames under value and disabled changes, and minimum 44 pt control
@@ -33,5 +33,5 @@ Test-integrity mapping: this fresh component had no prior hosting assertions
 or screenshot helper dependency. No previous tests are removed or moved. The
 new package suite validates configuration/public construction; real UI checks
 live in `SliderReviewUITests` and do not replace the unchanged color tests.
-Native keyboard/VoiceOver operation, minimum OS, hardware, and macOS rendered
+Strata keyboard/VoiceOver operation, minimum OS, hardware, and macOS rendered
 layout remain unobserved; do not infer them from simulator screenshots.

@@ -2,11 +2,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "NativeDesignKit",
+    name: "Strata",
     platforms: [.iOS(.v15), .macOS(.v12), .watchOS(.v8)],
     products: [
         .library(name: "DesignTokens", targets: ["DesignTokens"]),
-        .library(name: "NativeDesignKit", targets: ["NativeDesignKit"])
+        .library(name: "Strata", targets: ["Strata"])
     ],
     targets: [
         .target(
@@ -14,12 +14,12 @@ let package = Package(
             path: "Packages/DesignTokens/Sources/DesignTokens"
         ),
         .target(
-            name: "NativeDesignKit",
+            name: "Strata",
             dependencies: ["DesignTokens"]
         ),
         .testTarget(
-            name: "NativeDesignKitTests",
-            dependencies: ["NativeDesignKit", "DesignTokens"]
+            name: "StrataTests",
+            dependencies: ["Strata", "DesignTokens"]
         ),
         .testTarget(
             name: "DesignTokensTests",

@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "PlatformBoundaryFixture",
     platforms: [.watchOS(.v8)],
-    dependencies: [.package(path: "../../..")],
+    dependencies: [.package(name: "shared-design-system", path: "../../..")],
     targets: [
         .executableTarget(
             name: "DesignTokensWatchConsumer",
@@ -13,9 +13,9 @@ let package = Package(
             ]
         ),
         .executableTarget(
-            name: "NativeDesignKitWatchConsumer",
+            name: "StrataWatchConsumer",
             dependencies: [
-                .product(name: "NativeDesignKit", package: "shared-design-system")
+                .product(name: "Strata", package: "shared-design-system")
             ]
         )
     ]

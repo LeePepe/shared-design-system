@@ -106,7 +106,7 @@ class ContractTests(unittest.TestCase):
             CHECK.check(self.root)
 
     def test_api_drift(self):
-        (self.root / "Sources/NativeDesignKit/NativeTokenColor.swift").write_text("enum Removed {}")
+        (self.root / "Sources/Strata/StrataTokenColor.swift").write_text("enum Removed {}")
         with self.assertRaisesRegex(ValueError, "AI_API"):
             CHECK.check(self.root)
 
@@ -164,7 +164,7 @@ class ContractTests(unittest.TestCase):
             "ai/USAGE.md":
                 "The current unreleased checkout pins Tokens at exactly `0.2.0`",
             "Packages/DesignTokens/ai/USAGE.md":
-                "Planned elsewhere: independent Apple NativeDesignKit/SPM repository",
+                "Planned elsewhere: independent Apple Strata/SPM repository",
         }
         for relative, statement in obsolete.items():
             with self.subTest(relative=relative):
@@ -210,12 +210,12 @@ class ContractTests(unittest.TestCase):
             CHECK.check(self.root)
 
     def test_rejects_watch_boundary_drift(self):
-        (self.root / "Sources/NativeDesignKit/PlatformBoundary.swift").write_text("")
+        (self.root / "Sources/Strata/PlatformBoundary.swift").write_text("")
         with self.assertRaisesRegex(ValueError, "AI_PLATFORMS"):
             CHECK.check(self.root)
 
     def test_consumer_test_only_import(self):
-        (self.root / "ai/examples/consumer/Sources/SamplePalette/SamplePalette.swift").write_text("@testable import NativeDesignKit")
+        (self.root / "ai/examples/consumer/Sources/SamplePalette/SamplePalette.swift").write_text("@testable import Strata")
         with self.assertRaisesRegex(ValueError, "AI_EXAMPLE"):
             CHECK.check(self.root)
 
@@ -273,7 +273,7 @@ class ConsumerHarnessTests(unittest.TestCase):
 
     def test_version_contract_matches_requested_version(self):
         registry = {
-            "library": "NativeDesignKit",
+            "library": "Strata",
             "version": "0.3.0",
             "releaseStatus": "released",
         }
@@ -282,7 +282,7 @@ class ConsumerHarnessTests(unittest.TestCase):
 
     def test_version_contract_rejects_requested_version_mismatch(self):
         registry = {
-            "library": "NativeDesignKit",
+            "library": "Strata",
             "version": "0.3.0",
             "releaseStatus": "released",
         }
@@ -466,14 +466,14 @@ class ConsumerHarnessTests(unittest.TestCase):
         harness = (
             ROOT / "Packages/DesignTokens/scripts/test-swift-local-consumer.mjs"
         ).read_text()
-        self.assertNotIn("NativeDesignKit", harness)
+        self.assertNotIn("Strata", harness)
         self.assertIn('.product(name: "DesignTokens"', harness)
 
     def test_local_dual_product_consumer_is_native_owned_and_non_public(self):
         fixture = ROOT / "Tests/Fixtures/LocalConsumer"
         manifest = (fixture / "Package.swift").read_text()
         self.assertIn('.product(name: "DesignTokens"', manifest)
-        self.assertIn('.product(name: "NativeDesignKit"', manifest)
+        self.assertIn('.product(name: "Strata"', manifest)
         evidence_root = Path(os.environ.get(
             "NATIVE_EVIDENCE_DIR", ROOT / ".build/evidence"))
         evidence_root.mkdir(parents=True, exist_ok=True)
@@ -490,7 +490,7 @@ class ConsumerHarnessTests(unittest.TestCase):
             receipt = json.loads(
                 (evidence / "local-consumer/receipt.json").read_text())
         self.assertEqual(receipt["selectedProducts"],
-                         ["DesignTokens", "NativeDesignKit"])
+                         ["DesignTokens", "Strata"])
         self.assertFalse(receipt["source"]["publiclyResolvable"])
         self.assertIsNone(receipt["source"]["revision"])
         self.assertEqual(receipt["status"], "passed")
@@ -526,7 +526,7 @@ class ConsumerHarnessTests(unittest.TestCase):
 
     def test_local_consumer_zero_exit_with_drifted_marker_fails_closed(self):
         self.assert_local_consumer_failure(
-            "PASS local DesignTokens and NativeDesignKit consumer (drifted)\n",
+            "PASS local DesignTokens and Strata consumer (drifted)\n",
             0, "output drift")
 
     def test_local_consumer_nonzero_exit_persists_failed_receipt(self):

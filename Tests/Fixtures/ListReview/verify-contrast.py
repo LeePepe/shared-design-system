@@ -60,17 +60,18 @@ def measured_contrast(pixels, frame, target):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("run", type=Path, help="External capture directory containing run.json and Results.attachments")
+    parser.add_argument("run", type=Path, help="External capture directory containing Results.run.json and Results.attachments")
     parser.add_argument("--provider-bare", required=True, type=Path)
     parser.add_argument("--provider-sha", required=True)
     args = parser.parse_args()
-    run = json.loads((args.run / "run.json").read_text())
+    run = json.loads((args.run / "Results.run.json").read_text())
     if run["dirty"]:
         raise ValueError("Final contrast evidence requires a clean captured SHA")
-    if run["providerSHA"] != args.provider_sha:
-        raise ValueError("Provider SHA does not match the capture receipt")
+    if run["sha"] != args.provider_sha:
+        raise ValueError("Source SHA does not match the capture receipt")
+    provider_path = f"{args.provider_sha}:Packages/DesignTokens/dist/resolved.json"
     provider = json.loads(subprocess.check_output(
-        ["git", "--git-dir=" + str(args.provider_bare), "show", args.provider_sha + ":dist/resolved.json"], text=True))["colors"]
+        ["git", "--git-dir=" + str(args.provider_bare), "show", provider_path], text=True))["colors"]
     raw = args.run / "Results.attachments"
     manifest = json.loads((raw / "manifest.json").read_text())
     attachments = [attachment for test in manifest for attachment in test["attachments"]]

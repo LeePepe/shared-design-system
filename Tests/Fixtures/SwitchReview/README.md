@@ -1,8 +1,8 @@
 # Switch UI review fixture
 
-This synthetic fixture exercises the public `NativeSwitch` API in a pure
+This synthetic fixture exercises the public `StrataSwitch` API in a pure
 SwiftUI iOS App. It contains no product integration or business data. The App
-imports SwiftUI and NativeDesignKit; UI tests import XCTest only. Theme inputs
+imports SwiftUI and Strata; UI tests import XCTest only. Theme inputs
 are explicit launch-environment values supplied by the UI tests. Production
 Switch source, package/platform pins, policy, and color-extraction tests are
 unchanged by this test migration.
@@ -29,20 +29,20 @@ external simulator lock before invoking it.
 ## Moved-test integrity
 
 The prior candidate was `dc4292240b801966e0a5bd1b115ea1b8e40b5cf9`.
-Its entire `Tests/NativeDesignKitTests/Controls/NativeSwitchTests.swift` used
+Its entire `Tests/StrataTests/Controls/StrataSwitchTests.swift` used
 prohibited AppKit/UIKit hosting, native-control traversal or capture. There
 were no pure Switch tests in that file. It is replaced by the following UI
 tests; no existing color-extraction or pure-policy test is removed or weakened.
 
 | Prior native-hosting assertion | XCTest UI replacement |
 | --- | --- |
-| `testNativeActivationWritesBindingAndReflectsCallerUpdates` | `testNativeTapWritesBindingAndCallerUpdateChangesSwitch`: actual switch taps change both native on/off value and caller-visible state, each writes exactly once; a caller button updates the switch without an interaction write. |
-| `testDisabledNativeControlDoesNotWriteBinding` | `testDisabledCoordinateTapDoesNotWriteBindingInEitherState`: actual knob-coordinate taps in both disabled initial states preserve native value, caller-visible state and zero binding writes. The test also checks the control is disabled. |
-| `testNativeAccessibilityPressRetainsOnOffValue` | `testMeaningfulNativeAccessibilityLabelAndOnOffValue`: XCTest identifies the native switch type and exact caller-supplied label; tapping changes the native on/off value and visible state while preserving the label. |
-| `testNativeSwitchCanReceiveKeyboardFocus` | `testNativeSwitchRemainsAnActionableAccessibilityTarget`: the native accessibility switch is hittable before and after real UI activation and remains operable in both directions. The old macOS first-responder check cannot establish iOS external-keyboard focus; macOS focus and live external-keyboard activation remain explicitly unverified. No keyboard event is synthesized through native frameworks. |
-| `testNarrowMultilineLabelGrowsAndRetainsNativeSwitch` | `testNarrowLongLabelGrowsAtAccessibilitySizeAndRemainsOperable`: the visible native switch row is at least 44 pt high, fits 280 pt, grows with larger text, preserves its full accessible long label and remains coordinate-tappable without the label obscuring the switch. |
+| `testStrataActivationWritesBindingAndReflectsCallerUpdates` | `testStrataTapWritesBindingAndCallerUpdateChangesSwitch`: actual switch taps change both native on/off value and caller-visible state, each writes exactly once; a caller button updates the switch without an interaction write. |
+| `testDisabledStrataControlDoesNotWriteBinding` | `testDisabledCoordinateTapDoesNotWriteBindingInEitherState`: actual knob-coordinate taps in both disabled initial states preserve native value, caller-visible state and zero binding writes. The test also checks the control is disabled. |
+| `testStrataAccessibilityPressRetainsOnOffValue` | `testMeaningfulStrataAccessibilityLabelAndOnOffValue`: XCTest identifies the native switch type and exact caller-supplied label; tapping changes the native on/off value and visible state while preserving the label. |
+| `testStrataSwitchCanReceiveKeyboardFocus` | `testStrataSwitchRemainsAnActionableAccessibilityTarget`: the native accessibility switch is hittable before and after real UI activation and remains operable in both directions. The old macOS first-responder check cannot establish iOS external-keyboard focus; macOS focus and live external-keyboard activation remain explicitly unverified. No keyboard event is synthesized through native frameworks. |
+| `testNarrowMultilineLabelGrowsAndRetainsStrataSwitch` | `testNarrowLongLabelGrowsAtAccessibilitySizeAndRemainsOperable`: the visible native switch row is at least 44 pt high, fits 280 pt, grows with larger text, preserves its full accessible long label and remains coordinate-tappable without the label obscuring the switch. |
 | `testAccessibilityDynamicTypeIncreasesNarrowLabelHeight` | The same UI layout test launches the actual App at standard and accessibility3 sizes, comparing the accessibility row frames with a required height increase greater than 30 pt. |
-| `testRealSwiftUISwitchScreenshots` | `testNativeSwitchScreenshotMatrix`: actual iOS XCTest screenshots for ocean/graphite × light/dark, with enabled off/on and disabled off/on rows; each combination also captures a 280 pt long-label layout at accessibility3. |
+| `testRealSwiftUISwitchScreenshots` | `testStrataSwitchScreenshotMatrix`: actual iOS XCTest screenshots for ocean/graphite × light/dark, with enabled off/on and disabled off/on rows; each combination also captures a 280 pt long-label layout at accessibility3. |
 
 The App exposes state and write counts as ordinary SwiftUI Text, so assertions
 observe caller behavior rather than inspecting internal control objects.

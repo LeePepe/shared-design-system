@@ -1,4 +1,4 @@
-import NativeDesignKit
+import Strata
 import SwiftUI
 
 @main
@@ -22,7 +22,7 @@ struct CheckboxReviewApp: App {
 private enum CheckboxReviewError: Error { case missingExplicitConfiguration }
 
 private struct CheckboxReviewConfiguration {
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     let brand: String
     let mode: String
     let narrow: Bool
@@ -39,7 +39,7 @@ private struct CheckboxReviewConfiguration {
         else { throw CheckboxReviewError.missingExplicitConfiguration }
         self.brand = brand
         self.mode = mode
-        theme = try NativeDesignTheme(theme: mode == "light" ? .light : .dark, brand: brand)
+        theme = try StrataTheme(theme: mode == "light" ? .light : .dark, brand: brand)
         narrow = scenario == "narrow"
         accessibilitySize = textSize == "accessibility2"
         disabled = environment["NDK_DISABLED"] == "1"
@@ -57,7 +57,7 @@ private struct CheckboxReviewContent: View {
         _isOn = State(initialValue: configuration.initiallyOn)
     }
 
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
     private var label: String {
         configuration.narrow
             ? "Auswahl und Benachrichtigungen für wichtige Änderungen bestätigen"
@@ -67,13 +67,13 @@ private struct CheckboxReviewContent: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text(configuration.narrow ? "Long labels" : "Native Checkbox")
+                Text(configuration.narrow ? "Long labels" : "Strata Checkbox")
                     .font(configuration.narrow ? .headline : .largeTitle.bold())
                 Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · Strata")
                     .font(.subheadline)
                     .foregroundStyle(theme.secondaryForeground)
 
-                NativeCheckbox(theme: theme, isOn: Binding(
+                StrataCheckbox(theme: theme, isOn: Binding(
                     get: { isOn },
                     set: { isOn = $0; bindingWrites += 1 }
                 )) { Text(verbatim: label) }
@@ -91,12 +91,12 @@ private struct CheckboxReviewContent: View {
                     Button("Set from caller") { isOn.toggle() }
                         .tint(theme.accent)
                         .accessibilityIdentifier("checkbox.caller")
-                    NativeCheckbox(theme: theme, isOn: .constant(true)) { Text("Checked") }
+                    StrataCheckbox(theme: theme, isOn: .constant(true)) { Text("Checked") }
                         .accessibilityIdentifier("checkbox.selected")
-                    NativeCheckbox(theme: theme, isOn: .constant(false)) { Text("Disabled · unchecked") }
+                    StrataCheckbox(theme: theme, isOn: .constant(false)) { Text("Disabled · unchecked") }
                         .disabled(true)
                         .accessibilityIdentifier("checkbox.disabledOff")
-                    NativeCheckbox(theme: theme, isOn: .constant(true)) { Text("Disabled · checked") }
+                    StrataCheckbox(theme: theme, isOn: .constant(true)) { Text("Disabled · checked") }
                         .disabled(true)
                         .accessibilityIdentifier("checkbox.disabledOn")
                     Text("Synthetic fixture · caller-owned state")

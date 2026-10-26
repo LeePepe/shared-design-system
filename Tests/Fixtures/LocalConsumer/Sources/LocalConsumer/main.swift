@@ -1,7 +1,7 @@
 import DesignTokens
-import NativeDesignKit
+import Strata
 
 let color = try DesignTokens.color("product.text.primary", theme: .light)
 precondition(color.a == 1)
-_ = NativeTokenColor.self
-print("PASS local DesignTokens and NativeDesignKit consumer")
+_ = StrataTokenColor.self
+print("PASS local DesignTokens and Strata consumer")

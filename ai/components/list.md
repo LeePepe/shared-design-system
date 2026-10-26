@@ -1,16 +1,16 @@
-# NativeList (unreleased)
+# StrataList (unreleased)
 
-This additive SwiftUI component is absent from the NativeDesignKit 0.3.0
+This additive SwiftUI component is absent from the Strata 0.3.0
 release. Evaluate the reviewed component revision together with its required
 Strata foundation revision and exact DesignTokens dependency. It introduces
 no released package version, business model, storage or navigation destination.
 
-`NativeList<Data, ID, Header, Leading, Primary, Secondary, Trailing, Footer>`
+`StrataList<Data, ID, Header, Leading, Primary, Secondary, Trailing, Footer>`
 accepts any `RandomAccessCollection`, a caller-supplied stable ID key path,
 and caller-owned selection. All six content slots are generic SwiftUI views.
 
 ```swift
-NativeList(
+StrataList(
     theme: theme,
     surface: .glass,
     items: notes,
@@ -35,7 +35,7 @@ NativeList(
 
 `theme` and `surface` are required. `notes`, all of its fields, `selectedID`
 (of type `Note.ID?`) and `selectionContext` belong to the caller. Resolve
-`NativeDesignTheme(theme:brand:)` outside rendering and handle unchanged
+`StrataTheme(theme:brand:)` outside rendering and handle unchanged
 provider errors there. The List never resolves tokens, invents colors or chooses
 an ambient mode or brand. Use provider-supported `strata-blue`, `strata-green`,
 `strata-pink`, `strata-yellow` or `strata-purple` with the required foundation;
@@ -46,7 +46,7 @@ builders, beginning with `leading`. Use `EmptyView` for an unused slot. Supply
 localized content; `selectedLabel` defaults to localized SwiftUI `Text("Selected")`
 and may be replaced. `isRowEnabled` defaults to `true` for each item.
 
-`NativeListSelection<ID: Hashable>` has exactly three cases:
+`StrataListSelection<ID: Hashable>` has exactly three cases:
 
 | Case | Behavior |
 | --- | --- |

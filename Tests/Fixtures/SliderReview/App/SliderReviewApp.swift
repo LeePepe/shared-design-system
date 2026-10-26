@@ -1,4 +1,4 @@
-import NativeDesignKit
+import Strata
 import SwiftUI
 
 /// Synthetic test-only state. Theme/configuration errors remain visible.
@@ -22,7 +22,7 @@ struct SliderReviewApp: App {
 
 private struct ReviewConfiguration {
     enum ConfigurationError: Error { case missing(String), invalid(String) }
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     let brand: String
     let mode: String
     let scenario: String
@@ -41,8 +41,8 @@ private struct ReviewConfiguration {
             throw ConfigurationError.invalid("NDK_SCENARIO")
         }
         switch mode {
-        case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
-        case "dark": theme = try NativeDesignTheme(theme: .dark, brand: brand)
+        case "light": theme = try StrataTheme(theme: .light, brand: brand)
+        case "dark": theme = try StrataTheme(theme: .dark, brand: brand)
         default: throw ConfigurationError.invalid("NDK_THEME")
         }
         switch try required("NDK_TEXT_SIZE") {
@@ -65,12 +65,12 @@ private struct SliderReviewBoard: View {
     @State private var editingStarts = 0
     @State private var editingEnds = 0
     @State private var bounds: [String: CGRect] = [:]
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Native Slider").font(.title.bold())
+                Text("Strata Slider").font(.title.bold())
                 Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · iOS SwiftUI")
                     .font(.subheadline).foregroundStyle(theme.secondaryForeground)
                 switch configuration.scenario {
@@ -158,7 +158,7 @@ private struct SliderReviewBoard: View {
 }
 
 private struct ReviewSlider: View {
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     let id: String
     let title: String
     @Binding var value: Double
@@ -169,7 +169,7 @@ private struct ReviewSlider: View {
 
     var body: some View {
         switch Result(catching: {
-            try NativeSlider(theme: theme, value: $value, in: range, step: 5,
+            try StrataSlider(theme: theme, value: $value, in: range, step: 5,
                              onEditingChanged: onEditingChanged) {
                 Text(verbatim: title).background { measure("\(id)-title") }
             } minimumValueLabel: {

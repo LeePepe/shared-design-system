@@ -18,7 +18,7 @@ Store identity-to-series bindings in the consumer, independently of brand, sort 
 
 JS throws on unknown IDs, invalid themes/brands/roles, absent bindings and non-series binding values; no fallback or token alias is installed. TypeScript rejects illegal literals at compile time; untrusted runtime input still needs validation. Swift uses typed themes and roles; its exact error cases are defined in `TokenError` in the linked facade. RGBA initialization rejects invalid/nonfinite values and contrast rejects translucency. A consumer must handle errors explicitly rather than substitute an arbitrary color.
 
-Implemented: immutable color and style data and producer-local integrity checks. The current SwiftPM route selects the stable `DesignTokens` and `NativeDesignKit` products from one exact `shared-design-system` revision or version; the root `NativeDesignKit` target depends on this repository-local `DesignTokens` target. The provider DesignTokens `0.2.0` release remains immutable compatibility history at its original repository. Out of scope: UI, persistence, product migration, shared-ci policy/approval/downgrade checks and publication.
+Implemented: immutable color and style data and producer-local integrity checks. The current SwiftPM route selects the stable `DesignTokens` and `Strata` products from one exact `shared-design-system` revision or version; the root `Strata` target depends on this repository-local `DesignTokens` target. The provider DesignTokens `0.2.0` release remains immutable compatibility history at its original repository. Out of scope: UI, persistence, product migration, shared-ci policy/approval/downgrade checks and publication.
 
 ## Style foundations (0.2.0)
 

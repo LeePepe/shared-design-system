@@ -1,12 +1,12 @@
 {
   "$schema": "registry.schema.json",
   "schemaVersion": 1,
-  "library": "NativeDesignKit",
+  "library": "Strata",
   "version": "0.3.0",
   "releaseStatus": "released",
-  "releaseUnit": {"ecosystem": "swiftpm", "product": "NativeDesignKit", "module": "NativeDesignKit"},
+  "releaseUnit": {"ecosystem": "swiftpm", "product": "Strata", "module": "Strata"},
   "releaseUnits": {
-    "nativeDesignKit": "README.md",
+    "strata": "README.md",
     "designTokens": "../Packages/DesignTokens/ai/README.md"
   },
   "documents": {
@@ -19,9 +19,9 @@
     "changelog": "../CHANGELOG.md"
   },
   "capabilities": [{
-    "id": "native-token-color",
-    "symbol": "NativeTokenColor.resolve(_:theme:)",
-    "source": "../Sources/NativeDesignKit/NativeTokenColor.swift",
+    "id": "strata-token-color",
+    "symbol": "StrataTokenColor.resolve(_:theme:)",
+    "source": "../Sources/Strata/StrataTokenColor.swift",
     "documentation": "USAGE.md",
     "example": "examples/consumer/Sources/SamplePalette/SamplePalette.swift"
   }]

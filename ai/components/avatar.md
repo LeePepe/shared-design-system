@@ -1,17 +1,17 @@
-# NativeAvatar (unreleased)
+# StrataAvatar (unreleased)
 
 Part of the unreleased [Strata rebuild](../COMPONENTS.md); absent from the
-NativeDesignKit 0.3.0 release. This is native SwiftUI with no networking,
+Strata 0.3.0 release. This is native SwiftUI with no networking,
 identity model, initials derivation or image loader.
 
 ```swift
-public enum NativeAvatarSize: Equatable, Sendable {
+public enum StrataAvatarSize: Equatable, Sendable {
     case small, medium, large
 }
 
-public struct NativeAvatar<Content: View>: View {
-    public init(theme: NativeDesignTheme,
-                size: NativeAvatarSize,
+public struct StrataAvatar<Content: View>: View {
+    public init(theme: StrataTheme,
+                size: StrataAvatarSize,
                 accessibilityLabel: Text,
                 @ViewBuilder content: () -> Content)
 }
@@ -26,22 +26,22 @@ Theme construction and its unchanged provider errors follow the
 
 ```swift
 import DesignTokens
-import NativeDesignKit
+import Strata
 import SwiftUI
 
-let theme = try NativeDesignTheme(theme: .light, brand: "ocean")
-let initials = NativeAvatar(theme: theme, size: .medium,
+let theme = try StrataTheme(theme: .light, brand: "ocean")
+let initials = StrataAvatar(theme: theme, size: .medium,
                             accessibilityLabel: Text("Example member")) {
     Text("AB")
 }
-let symbol = NativeAvatar(theme: theme, size: .small,
+let symbol = StrataAvatar(theme: theme, size: .small,
                           accessibilityLabel: Text("Example group")) {
     Image(systemName: "person.2.fill")
 }
 
 // A caller-owned local Image; loading and error policy stay in the consumer.
-func picture(_ image: Image, theme: NativeDesignTheme) -> some View {
-    NativeAvatar(theme: theme, size: .large,
+func picture(_ image: Image, theme: StrataTheme) -> some View {
+    StrataAvatar(theme: theme, size: .large,
                  accessibilityLabel: Text("Example member")) {
         image.resizable().scaledToFill()
     }

@@ -5,7 +5,7 @@
 For a consumer already using `DesignTokens` 0.2.0, preserve every source import
 and API call. Replace the `shared-design-tokens` URL/package identity with
 `shared-design-system` at a reviewed exact revision and select the stable
-`DesignTokens` product from that package. NativeDesignKit and DesignTokens then
+`DesignTokens` product from that package. Strata and DesignTokens then
 resolve from one package graph.
 
 Before an authorized consolidated release, rollback restores the recorded old
@@ -13,7 +13,7 @@ URL, exact 0.2.0 requirement and lockfile together. Historical provider tags and
 NativeDesignKit 0.1.0 remain immutable. Re-run the same consumer behavior/error
 tests; never copy token values or use a local path/mirror as public evidence.
 
-## Local bridge → NativeDesignKit 0.3.0
+## Local bridge → Strata 0.3.0
 
 NativeDesignKit 0.1.0 is the earlier historical release. The supported 0.3.0
 interface remains a color-only bridge; this is not a migration of components,
@@ -21,9 +21,9 @@ typography, spacing or Web styles. No existing product adoption is claimed.
 
 1. Record the old consumer revision and its color/theme behavior. Identify
    explicit Tokens IDs; do not invent mappings from unreviewed local colors.
-2. Pin NativeDesignKit at exact `0.3.0` as described in [INTEGRATION.md](INTEGRATION.md).
+2. Pin Strata at exact `0.3.0` as described in [INTEGRATION.md](INTEGRATION.md).
 3. Replace only the consumer's native color conversion with
-   `NativeTokenColor.resolve(_:theme:)`. Preserve the consumer's theme selection,
+   `StrataTokenColor.resolve(_:theme:)`. Preserve the consumer's theme selection,
    error handling, consent/behavior and business ID-to-series bindings.
 4. Resolve every used ID in both themes. Confirm encoded sRGB byte conversion
    and unmodified alpha. Run consumer build/tests and compare the real UI in

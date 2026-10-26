@@ -1,12 +1,12 @@
-# NativeRadioGroup (unreleased)
+# StrataRadioGroup (unreleased)
 
-Part of the [Strata rebuild](../COMPONENTS.md); absent from NativeDesignKit
+Part of the [Strata rebuild](../COMPONENTS.md); absent from Strata
 0.3.0. The HeroUI inventory supplies the name only. This is a fresh SwiftUI
 implementation with no copied component code or additional dependency.
 
 ```swift
-public struct NativeRadioGroup<Selection: Hashable, Label: View, Options: View>: View {
-    public init(theme: NativeDesignTheme,
+public struct StrataRadioGroup<Selection: Hashable, Label: View, Options: View>: View {
+    public init(theme: StrataTheme,
                 selection: Binding<Selection>,
                 @ViewBuilder label: () -> Label,
                 @ViewBuilder options: () -> Options)
@@ -14,7 +14,7 @@ public struct NativeRadioGroup<Selection: Hashable, Label: View, Options: View>:
 ```
 
 ```swift
-NativeRadioGroup(theme: theme, selection: $density) {
+StrataRadioGroup(theme: theme, selection: $density) {
     Text("Review density")
 } options: {
     Text("Compact").tag(Density.compact)
@@ -43,7 +43,7 @@ not visual radio circles. Native selected semantics and the checkmark identify
 the selected row without relying on color. Caller `.disabled(...)` applies to
 the whole group, and caller option modifiers remain part of the options builder.
 
-The explicit `NativeDesignTheme` provides foreground and accent colors. There
+The explicit `StrataTheme` provides foreground and accent colors. There
 is no ambient theme, palette, fallback, provider modification or glass layer.
 Theme construction and unchanged provider errors follow the foundation contract.
 The native Picker subtree receives the explicit `theme.mode` as its SwiftUI
@@ -66,6 +66,7 @@ Exact tested SHA and results belong to the external run manifest and PR.
 These checks do not claim live VoiceOver, native keyboard/focus interaction,
 macOS rendering, physical-device or minimum-OS acceptance.
 
+Strata 0.3.0 uses the repository-local DesignTokens target;
 NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;
 NativeDesignKit 0.1.0 historically used exact DesignTokens 0.1.1. This
 unreleased RadioGroup preserves Swift 6, iOS 15/macOS 12 declarations and the

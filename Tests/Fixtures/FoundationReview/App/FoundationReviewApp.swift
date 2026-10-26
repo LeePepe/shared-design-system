@@ -1,11 +1,11 @@
 import DesignTokens
-@testable import NativeDesignKit
+@testable import Strata
 import SwiftUI
 
 @main
 struct FoundationReviewApp: App {
-    let theme: NativeDesignTheme
-    let surface: NativeSurfaceStyle
+    let theme: StrataTheme
+    let surface: StrataSurfaceStyle
     let reduceTransparency: Bool
 
     init() {
@@ -21,7 +21,7 @@ struct FoundationReviewApp: App {
         guard ["glass", "solid"].contains(material) else { fatalError("Invalid explicit surface") }
         surface = material == "glass" ? .glass : .solid
         reduceTransparency = args.contains("--reduce-transparency")
-        do { theme = try NativeDesignTheme(theme: mode, brand: value("--brand")) }
+        do { theme = try StrataTheme(theme: mode, brand: value("--brand")) }
         catch { fatalError("Provider resolution failed: \(error)") }
     }
 
@@ -52,7 +52,7 @@ struct FoundationReviewApp: App {
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .nativeSurface(theme: theme, style: surface, cornerRadius: 24, role: .card)
+                .strataSurface(theme: theme, style: surface, cornerRadius: 24, role: .card)
                 HStack(spacing: 8) {
                     ForEach(0..<3) { index in
                         RoundedRectangle(cornerRadius: 16)

@@ -78,7 +78,7 @@ def contrast(foreground, background):
     return (b + 0.05) / (a + 0.05)
 
 
-# NativeCardBehaviorFixture's unchanged four-slot, large-text specimen, measured
+# StrataCardBehaviorFixture's unchanged four-slot, large-text specimen, measured
 # in native points on the 402x874 iPhone fixture. Offsets use CARD_UI_PIXEL's
 # runtime anchor (Card.maxX - 8, Card.midY), rather than PNG pixel dimensions.
 # Primary: fully covered last "d" in "caller-owned"; auxiliary: full glyph in
@@ -93,20 +93,24 @@ TEXT_SAMPLES = {
 
 def provider_colors(checkout=None):
     repo = Path(__file__).resolve().parents[3]
-    pin = next(pin for pin in json.loads((repo / "Package.resolved").read_text())["pins"]
-               if pin["identity"] == "shared-design-tokens")
-    checkout = checkout or repo / ".build/checkouts/shared-design-tokens"
-    revision = subprocess.check_output(["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True).strip()
-    exact = re.search(r'exact:\s*"([^"]+)"', (repo / "Package.swift").read_text())
-    if not exact or pin["state"]["version"] != exact[1] or revision != pin["state"]["revision"]:
-        raise ValueError("Contrast colors must come from the exact manifest and lockfile's Tokens checkout")
-    path = checkout / "dist/resolved.json"
+    root_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
+    if subprocess.check_output(["git", "status", "--porcelain"], cwd=repo, text=True):
+        raise ValueError("Require a clean root checkout for provider provenance")
+    path = (checkout or repo / "Packages/DesignTokens").resolve()
+    expected = (repo / "Packages/DesignTokens").resolve()
+    if path != expected:
+        raise ValueError("Provider colors must come from the repository-local DesignTokens target")
+    path /= "dist/resolved.json"
     data = path.read_bytes()
+    committed = subprocess.check_output(
+        ["git", "show", f"HEAD:Packages/DesignTokens/dist/resolved.json"], cwd=repo)
+    if data != committed:
+        raise ValueError("Provider data must match the containing root HEAD")
     provider = json.loads(data)
     if provider["colorSpace"] != "srgb":
         raise ValueError("Expected pinned provider's encoded sRGB bytes")
-    return provider["colors"], dict(path=str(path), version=pin["state"]["version"],
-                                   revision=revision, sha256=hashlib.sha256(data).hexdigest())
+    return provider["colors"], dict(path=str(path), version=provider["schemaVersion"],
+                                   revision=root_sha, sha256=hashlib.sha256(data).hexdigest())
 
 
 def text_contrast(png, anchor, mode, colors):
@@ -196,7 +200,7 @@ def main():
                                 inner_glass_delta=inner_glass_delta, text_contrast=text,
                                 png_sha256={key: value.sha256 for key, value in captures.items()}))
     report = dict(material_cases=4, contrast_cases=8, failures=failures, provider=provider,
-                  sampling_source="NativeCardBehaviorFixture four-slot/large; offsets from CARD_UI_PIXEL runtime Card anchor",
+                  sampling_source="StrataCardBehaviorFixture four-slot/large; offsets from CARD_UI_PIXEL runtime Card anchor",
                   material_sampling_source="CARD_UI_OUTER_PIXEL runtime region anchor; one outer blur, dense inner Card",
                   sample_offsets_native_points=TEXT_SAMPLES, results=results)
     args.output.write_text(json.dumps(report, indent=2) + "\n")

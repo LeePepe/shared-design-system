@@ -1,4 +1,4 @@
-import NativeDesignKit
+import Strata
 import SwiftUI
 
 /// Synthetic caller-owned state for real SwiftUI/XCTest review only.
@@ -25,7 +25,7 @@ struct TextFieldReviewApp: App {
 
 private struct ReviewConfiguration {
     enum ConfigurationError: Error { case missing(String), invalid(String) }
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     let brand: String
     let mode: String
     let scenario: String
@@ -46,8 +46,8 @@ private struct ReviewConfiguration {
             throw ConfigurationError.invalid("NDK_SCENARIO")
         }
         switch mode {
-        case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
-        case "dark": theme = try NativeDesignTheme(theme: .dark, brand: brand)
+        case "light": theme = try StrataTheme(theme: .light, brand: brand)
+        case "dark": theme = try StrataTheme(theme: .dark, brand: brand)
         default: throw ConfigurationError.invalid("NDK_THEME")
         }
         switch try required("NDK_TEXT_SIZE") {
@@ -68,12 +68,12 @@ private struct TextFieldReviewBoard: View {
     @State private var edits = 0
     @State private var submissions = 0
     @State private var bounds: [String: CGRect] = [:]
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Native TextField").font(.title.bold())
+                Text("Strata TextField").font(.title.bold())
                 Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · iOS SwiftUI")
                     .font(.subheadline).foregroundStyle(theme.secondaryForeground)
                 switch configuration.scenario {
@@ -94,20 +94,20 @@ private struct TextFieldReviewBoard: View {
 
     private var matrix: some View {
         VStack(alignment: .leading, spacing: 24) {
-            NativeTextField(theme: theme, text: $name) { Text("Display name") }
+            StrataTextField(theme: theme, text: $name) { Text("Display name") }
                 .accessibilityIdentifier("matrix-populated")
-            NativeTextField(theme: theme, text: $empty, prompt: Text("Enter a short note")) {
+            StrataTextField(theme: theme, text: $empty, prompt: Text("Enter a short note")) {
                 Text("A longer label that can wrap at narrow widths")
             }
             .accessibilityIdentifier("matrix-empty")
-            NativeTextField(theme: theme, text: $unavailable,
+            StrataTextField(theme: theme, text: $unavailable,
                             accessibilityLabel: Text("Unavailable field")) {
                 Label("Unavailable field", systemImage: "lock")
             }
             .disabled(true)
             .accessibilityIdentifier("matrix-disabled")
             VStack(alignment: .leading, spacing: 8) {
-                NativeTextField(theme: theme, text: $contact, prompt: Text("name@example.com")) {
+                StrataTextField(theme: theme, text: $contact, prompt: Text("name@example.com")) {
                     Text("Email address")
                 }
                 .accessibilityIdentifier("matrix-validation")
@@ -124,7 +124,7 @@ private struct TextFieldReviewBoard: View {
 
     private var interaction: some View {
         VStack(alignment: .leading, spacing: 16) {
-            NativeTextField(theme: theme, text: $name, prompt: Text("Enter a value"),
+            StrataTextField(theme: theme, text: $name, prompt: Text("Enter a value"),
                             accessibilityLabel: Text("Display name")) {
                 Text("Display name")
                     .recordBounds("active-label", color: theme.surface)
@@ -139,7 +139,7 @@ private struct TextFieldReviewBoard: View {
             Text(name).accessibilityIdentifier("caller-value")
             Text("Edits: \(edits)").accessibilityIdentifier("edit-count")
             Text("Submissions: \(submissions)").accessibilityIdentifier("submit-count")
-            NativeTextField(theme: theme, text: $unavailable,
+            StrataTextField(theme: theme, text: $unavailable,
                             accessibilityLabel: Text("Unavailable field")) {
                 Text("Unavailable field")
                     .recordBounds("disabled-label", color: theme.surface)
@@ -156,7 +156,7 @@ private struct TextFieldReviewBoard: View {
     private var longLabel: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 16) {
-                NativeTextField(theme: theme, text: $note,
+                StrataTextField(theme: theme, text: $note,
                                 accessibilityLabel: Text("Vollständiger Anzeigename für die gemeinsame Zusammenarbeit")) {
                     Text("Vollständiger Anzeigename für die gemeinsame Zusammenarbeit")
                         .recordBounds("long-label", color: theme.surface)

@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Explicit `NativeDesignTheme` and native solid/Glass surface policy for the
+- Explicit `StrataTheme` and native solid/Glass surface policy for the
   [Strata rebuild](docs/strata-component-rebuild.md), preserving the historical
   NativeDesignKit 0.1.0 exact DesignTokens 0.1.1 route and color-resolver
   behavior. NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;
@@ -14,7 +14,7 @@
   simulator screenshot evidence. Components remain unreleased; no new package
   version, tag or product adoption is declared.
 
-## 0.3.0 — consolidated Native release unit
+## 0.3.0 — consolidated NativeDesignKit release unit
 
 - Publish stable `DesignTokens` and `NativeDesignKit` products from one package;
   NativeDesignKit uses the local data target with unchanged APIs and behavior.

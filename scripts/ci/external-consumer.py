@@ -13,7 +13,7 @@ from urllib.parse import urlsplit
 
 
 REPOSITORY_URL = "https://github.com/LeePepe/shared-design-system.git"
-PRODUCTS = ["DesignTokens", "NativeDesignKit"]
+PRODUCTS = ["DesignTokens", "Strata"]
 CONTRACT_PATHS = [
     "ai/registry.json",
     "Packages/DesignTokens/ai/registry.json",
@@ -223,7 +223,7 @@ def validate_effective_public_source(
 
 
 def validate_registry_contract(registry, kind, value):
-    if registry["library"] != "NativeDesignKit":
+    if registry["library"] != "Strata":
         raise RuntimeError("resolved checkout AI contract mismatch")
     if kind == "version":
         if registry["version"] != value:
@@ -395,7 +395,7 @@ def main():
         run(
             "xcodebuild",
             [
-                "-quiet", "-scheme", "NativeDesignConsumer",
+                "-quiet", "-scheme", "StrataDesignConsumer",
                 "-destination", "generic/platform=iOS Simulator",
                 "-derivedDataPath", str(evidence / "DerivedData"),
                 "CODE_SIGNING_ALLOWED=NO", "build",

@@ -6,7 +6,7 @@ import subprocess
 
 FIXTURE = Path(__file__).resolve().parent
 ROOT = FIXTURE.parents[2]
-EXPECTED_MARKER = "PASS local DesignTokens and NativeDesignKit consumer"
+EXPECTED_MARKER = "PASS local DesignTokens and Strata consumer"
 
 
 def main(run=subprocess.run):
@@ -20,7 +20,7 @@ def main(run=subprocess.run):
             "publiclyResolvable": False,
             "revision": None,
         },
-        "selectedProducts": ["DesignTokens", "NativeDesignKit"],
+        "selectedProducts": ["DesignTokens", "Strata"],
         "commands": [],
         "status": "failed",
     }

@@ -25,12 +25,12 @@ to the real SwiftUI app driven through XCTest UI automation:
 
 | Previous package test/helper | Real UI replacement | Preserved or strengthened assertion |
 | --- | --- | --- |
-| `testNativeEditingWritesTheCallerBindingWithoutRewritingInput` | `testNativeEditingPreservesCallerBindingAndSubmits`, `testNativeSelectionCanReplaceInputWithoutPaddingGestureInterference` | Actual keyboard edits update the caller binding; leading/trailing spaces remain; initial value remains; real native selection can replace all text. No native-control mutation or synthetic editing event. |
-| `testDisabledEnvironmentReachesTheNativeInput` | `testDisabledCoordinateTapsCannotFocusOrEdit` | AX reports disabled; center and all four padded edges cannot open the keyboard; coordinate taps cannot steal focus or change disabled input while typing into an enabled editor. |
-| `testNativeSubmitReachesTheCaller` | `testNativeEditingPreservesCallerBindingAndSubmits` | Actual Done keyboard action calls the caller's `.onSubmit` exactly once and preserves input. |
+| `testStrataEditingWritesTheCallerBindingWithoutRewritingInput` | `testStrataEditingPreservesCallerBindingAndSubmits`, `testStrataSelectionCanReplaceInputWithoutPaddingGestureInterference` | Actual keyboard edits update the caller binding; leading/trailing spaces remain; initial value remains; real native selection can replace all text. No native-control mutation or synthetic editing event. |
+| `testDisabledEnvironmentReachesTheStrataInput` | `testDisabledCoordinateTapsCannotFocusOrEdit` | AX reports disabled; center and all four padded edges cannot open the keyboard; coordinate taps cannot steal focus or change disabled input while typing into an enabled editor. |
+| `testStrataSubmitReachesTheCaller` | `testStrataEditingPreservesCallerBindingAndSubmits` | Actual Done keyboard action calls the caller's `.onSubmit` exactly once and preserves input. |
 | `testScreenshotBoards` wide brand/theme loop | Four `testVisualMatrix*` tests | Actual iOS ocean/graphite light/dark PNGs show populated, prompt, disabled and caller validation states; all native inputs meet 44 pt target dimensions and every captured element fits the viewport. |
 | `testScreenshotBoards` narrow accessibility loop | `testLongNarrowAccessibleLabelAndEditorGrowWithoutClipping` | A real 320 pt SwiftUI layout grows at accessibility2; full German AX label, native editor and visible label remain contained and separate; measured editor and label both grow; actual runtime screenshot. The old macOS size-override captures did not establish iOS Dynamic Type or interaction. |
-| `withHostedTextField`, native `firstSubview`, `NativeSnapshot.capture` callers | `XCUIApplication`, geometry preferences and `XCTAttachment(screenshot: app.screenshot())` | Native input is exercised through real UI events and AX; geometry comes from pure SwiftUI, not native view traversal. |
+| `withHostedTextField`, native `firstSubview`, `StrataSnapshot.capture` callers | `XCUIApplication`, geometry preferences and `XCTAttachment(screenshot: app.screenshot())` | Strata input is exercised through real UI events and AX; geometry comes from pure SwiftUI, not native view traversal. |
 
 `testPaddedEdgesFocusTheRealEditor` additionally taps within 2 pt of each
 straight edge of the visible padded surface and types into the real bound
@@ -54,14 +54,14 @@ for every matrix state, editing and long-label scenarios.
 
 The package retains a public-construction test for both initializer forms,
 optional prompts, unchanged caller input and ordinary SwiftUI
-input/submit/disabled modifiers. `NativeTokenColorTests` is unchanged. No test
+input/submit/disabled modifiers. `StrataTokenColorTests` is unchanged. No test
 is skipped or expected to fail; no gate or policy changes are involved.
 
 ## Evidence limits
 
 The fixture verifies iOS simulator behavior only. It does not establish
 VoiceOver speech/focus order, physical keyboard or macOS interaction,
-minimum-OS support, device rendering or a multiline editor. Native single-line
+minimum-OS support, device rendering or a multiline editor. Strata single-line
 input retains its native horizontal scrolling for long values; visible labels
 wrap and the editor grows in height with semantic typography. Color authority,
 theme resolution, exact Tokens 0.1.1 and the released bridge are unchanged.

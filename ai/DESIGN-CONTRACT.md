@@ -7,7 +7,7 @@ consumer-facing specification, not a product screen specification.
 ## Upstream and downstream responsibilities
 
 The upstream package owns the `DesignTokens` token vocabulary, the
-`NativeDesignKit` component APIs, the web `Basalt` component APIs where
+`Strata` component APIs, the web `Basalt` component APIs where
 applicable, and the accessibility and platform floors of those APIs. It
 provides the stable primitives and their light/dark behavior; it does not
 choose a product's brand, page hierarchy, business terminology, or required
@@ -37,7 +37,7 @@ as written so shared CI can validate the contract mechanically.
 
 - Package: `shared-design-system` [exact semver or 40-character revision]
 - Token source: `DesignTokens` [version/revision]
-- Native components: `NativeDesignKit` [version/revision]
+- Native components: `Strata` [version/revision]
 - Web components (if applicable): `Basalt` [version/revision or N/A]
 - Platforms: [iOS/macOS/web/etc.]
 - Appearance modes: `light`, `dark`
