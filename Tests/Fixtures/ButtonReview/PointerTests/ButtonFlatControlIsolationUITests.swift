@@ -51,7 +51,7 @@ final class ButtonFlatControlIsolationUITests: XCTestCase {
             return elapsed
         }
         func stoppedAfterStalledDispatch(_ step: String) {
-            XCTFail("Strata \(step) exceeded the 20-second dispatch bound; stop this failed experiment without repeating quiescence waits.")
+            XCTFail("Native \(step) exceeded the 20-second dispatch bound; stop this failed experiment without repeating quiescence waits.")
             let png = XCTAttachment(screenshot: app.screenshot())
             png.name = "button-flat-stalled-\(step)"
             png.lifetime = .keepAlways

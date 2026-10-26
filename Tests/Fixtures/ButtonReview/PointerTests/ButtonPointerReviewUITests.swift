@@ -3,7 +3,7 @@ import XCTest
 /// Real pointer/keyboard events run on macOS or iPad; iPhone rejects pointer events.
 @MainActor
 final class ButtonPointerReviewUITests: XCTestCase {
-    func testStandardControlsDiagnoseStrataInputDelivery() {
+    func testStandardControlsDiagnoseNativeInputDelivery() {
         let app = launch(scenario: "input-diagnostics")
         let observation = app.staticTexts["input-observation"]
         func report(_ step: String) {
@@ -51,7 +51,7 @@ final class ButtonPointerReviewUITests: XCTestCase {
             report("probe-keys")
         }
         capture("button-input-keyboard-diagnostic", app: app)
-        XCTAssertTrue(observation.label.contains("visited=native,sentinel,standard"), "Standard controls and StrataButton must receive actual hover callbacks.")
+        XCTAssertTrue(observation.label.contains("visited=native,sentinel,standard"), "Standard controls and NativeButton must receive actual hover callbacks.")
     }
 
     func testPointerHoverForEveryVariant() {
