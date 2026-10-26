@@ -73,3 +73,6 @@ Component-specific contracts are added under `components/` by their PRs.
 | IndexRail | [StrataIndexRail](components/index-rail.md) |
 | Snackbar | [StrataSnackbar](components/snackbar.md) |
 | Dialog | [StrataDialog](components/dialog.md) |
+| Menu | [StrataMenu](components/menu.md) |
+| SegmentedBar | [StrataSegmentedBar](components/segmented-bar.md) |
+| StateView | [StrataStateView](components/state-view.md) |

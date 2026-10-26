@@ -32,4 +32,45 @@ public enum SamplePalette {
             }
         }
     }
+
+    @MainActor
+    public static func menu(theme: StrataTheme) -> some View {
+        StrataMenu(
+            theme: theme,
+            label: "More actions",
+            actions: [
+                StrataMenuAction(id: "copy", title: "Copy set", systemImage: "doc.on.doc") {},
+                StrataMenuAction(
+                    id: "delete",
+                    title: "Delete set",
+                    systemImage: "trash",
+                    role: .destructive
+                ) {}
+            ]
+        )
+    }
+
+    @MainActor
+    public static func segmentedBar(theme: StrataTheme) -> some View {
+        StrataSegmentedBar(
+            theme: theme,
+            items: [
+                StrataSegmentedItem(id: "all", title: "All", badgeCount: 3),
+                StrataSegmentedItem(id: "legs", title: "Legs")
+            ],
+            selection: .constant("all")
+        )
+    }
+
+    @MainActor
+    public static func stateView(theme: StrataTheme) -> some View {
+        StrataStateView(
+            theme: theme,
+            kind: .empty,
+            title: "No matches",
+            message: "Try a different search.",
+            actionTitle: "Reset",
+            action: {}
+        )
+    }
 }
