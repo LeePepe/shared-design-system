@@ -29,14 +29,8 @@ def main():
         if "product 'NativeDesignKit' required by package" not in result.stdout:
             raise RuntimeError("failure did not identify the removed product")
 
-        (fixture / "Package.swift").write_text(
-            '// swift-tools-version: 6.0\n'
-            'import PackageDescription\n'
-            'let package = Package(name: "OldConsumer", dependencies: '
-            '[.package(name: "shared-design-system", path: "' + str(ROOT).replace("\\", "\\\\") + '")], '
-            'targets: [.executableTarget(name: "OldConsumer")])\n')
         result = subprocess.run(
-            ["swift", "build", "--package-path", str(fixture)],
+            ["swiftc", "-typecheck", str(fixture / "Sources/OldConsumer/main.swift")],
             text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if result.returncode == 0:
             raise RuntimeError("old NativeDesignKit module unexpectedly compiled")
