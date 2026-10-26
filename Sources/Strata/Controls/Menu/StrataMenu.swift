@@ -1,26 +1,30 @@
 import DesignTokens
 import SwiftUI
 
-enum StrataComponentMetrics {
-    static let cardRadius = token("radius.large", StyleTokens.radius)
-    static let controlRadius = token("radius.medium", StyleTokens.radius)
-    static let spacingSM = token("spacing.sm", StyleTokens.spacing)
-    static let spacingMD = token("spacing.md", StyleTokens.spacing)
-    static let spacingLG = token("spacing.lg", StyleTokens.spacing)
-    static let spacingXL = token("spacing.xl", StyleTokens.spacing)
-    static let minimumHit = token("dimension.hit.minimum", StyleTokens.dimension)
+struct StrataComponentMetrics {
+    static let cardRadius: CGFloat = 24
+    static let controlRadius: CGFloat = 16
+    static let minimumHit: CGFloat = 44
+    static let verticalItemWidth: CGFloat = 76
+    static let spacingXS: CGFloat = 6
+    static let spacingSM: CGFloat = 8
+    static let spacingMD: CGFloat = 12
+    static let spacingLG: CGFloat = 16
+    static let spacingXL: CGFloat = 24
 
-    static let verticalItemWidth = minimumHit + spacingSM + spacingXL
-
-    private static func token(
-        _ id: String,
-        _ resolve: (String) throws -> Double
-    ) -> CGFloat {
-        do {
-            return CGFloat(try resolve(id))
-        } catch {
-            preconditionFailure("Strata token \(id) failed to resolve: \(error)")
-        }
+    init(
+        dimension: (String) throws -> Double = StyleTokens.dimension,
+        spacing: (String) throws -> Double = StyleTokens.spacing,
+        radius: (String) throws -> Double = StyleTokens.radius
+    ) throws {
+        _ = try dimension("dimension.hit.minimum")
+        _ = try spacing("spacing.xs")
+        _ = try spacing("spacing.sm")
+        _ = try spacing("spacing.md")
+        _ = try spacing("spacing.lg")
+        _ = try spacing("spacing.xl")
+        _ = try radius("radius.large")
+        _ = try radius("radius.medium")
     }
 }
 

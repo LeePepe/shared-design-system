@@ -39,7 +39,7 @@ public struct StrataStateView: View {
                 if kind == .loading {
                     ProgressView()
                         .tint(theme.accent)
-                        .accessibilityLabel("Loading")
+                        .accessibilityHidden(true)
                 } else if kind == .error {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(theme.critical)
@@ -64,44 +64,73 @@ public struct StrataStateView: View {
                     HStack(spacing: StrataComponentMetrics.spacingSM) {
                         if isActionLoading {
                             ProgressView()
-                                .tint(theme.accent)
+                                .tint(theme.onAccent)
                                 .accessibilityHidden(true)
                         }
                         Text(actionTitle)
                     }
+                    .foregroundStyle(theme.onAccent)
                     .frame(minWidth: StrataComponentMetrics.minimumHit,
                            minHeight: StrataComponentMetrics.minimumHit)
-                    .padding(.horizontal, StrataComponentMetrics.spacingMD)
+                    .padding(.horizontal, StrataComponentMetrics.spacingLG)
+                    .background(
+                        RoundedRectangle(
+                            cornerRadius: StrataComponentMetrics.controlRadius,
+                            style: .continuous
+                        )
+                        .fill(theme.accent)
+                    )
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(theme.accent)
+                .buttonStyle(.plain)
                 .disabled(isActionLoading)
                 .accessibilityLabel(actionTitle)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, StrataComponentMetrics.spacingLG)
-        .padding(.vertical, StrataComponentMetrics.spacingMD)
-        .strataSurface(
-            theme: theme,
-            style: .solid,
-            cornerRadius: StrataComponentMetrics.cardRadius,
-            role: kind == .error ? nil : .card
-        )
-        .background {
-            if kind == .error {
-                RoundedRectangle(
-                    cornerRadius: StrataComponentMetrics.cardRadius,
-                    style: .continuous
-                )
-                .fill(theme.onCritical)
-            }
-        }
+        .padding(.horizontal, StrataComponentMetrics.spacingXL)
+        .padding(.vertical, StrataComponentMetrics.spacingLG)
+        .modifier(CardSurface(theme: theme, kind: kind))
         .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
         .accessibilityElement(children: .contain)
     }
 
     private var foreground: Color {
         kind == .error ? theme.critical : theme.foreground
+    }
+
+    nonisolated static func usesErrorSurface(for kind: Kind) -> Bool {
+        kind == .error
+    }
+}
+
+private struct CardSurface: ViewModifier {
+    let theme: StrataTheme
+    let kind: StrataStateView.Kind
+
+    func body(content: Content) -> some View {
+        if kind == .error {
+            content
+                .background {
+                    RoundedRectangle(
+                        cornerRadius: StrataComponentMetrics.cardRadius,
+                        style: .continuous
+                    )
+                    .fill(theme.onCritical)
+                }
+                .overlay {
+                    RoundedRectangle(
+                        cornerRadius: StrataComponentMetrics.cardRadius,
+                        style: .continuous
+                    )
+                    .strokeBorder(theme.critical, lineWidth: 1)
+                }
+        } else {
+            content.strataSurface(
+                theme: theme,
+                style: .solid,
+                cornerRadius: StrataComponentMetrics.cardRadius,
+                role: .card
+            )
+        }
     }
 }

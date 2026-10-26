@@ -32,7 +32,7 @@ final class StrataMenuStateTests: XCTestCase {
         ]
         let menuAction = StrataMenuAction(id: "copy", title: "Copy", systemImage: "doc.on.doc") {}
 
-        for brand in ["strata-blue", "strata-purple"] {
+        for brand in ["strata-blue", "strata-green", "strata-pink", "strata-yellow", "strata-purple"] {
             for mode in Theme.allCases {
                 let theme = try StrataTheme(theme: mode, brand: brand)
                 var selection = "all"
@@ -81,5 +81,31 @@ final class StrataMenuStateTests: XCTestCase {
             StrataSegmentedItem(id: "all", title: "All", badgeCount: 2),
             StrataSegmentedItem(id: "all", title: "All", badgeCount: 0)
         )
+    }
+
+    func testComponentMetricsPropagatesTokenErrorsUnchanged() {
+        let expected = StyleTokenError.unknownToken("dimension.failure")
+
+        XCTAssertThrowsError(
+            try StrataComponentMetrics(
+                dimension: { _ in throw expected },
+                spacing: { _ in 0 },
+                radius: { _ in 0 }
+            )
+        ) { error in
+            XCTAssertEqual(error as? StyleTokenError, expected)
+        }
+    }
+
+    func testSegmentedAccessibilityValueContainsOnlyBadgeCount() {
+        XCTAssertEqual(StrataSegmentedBar.accessibilityValue(for: 7), "7")
+        XCTAssertEqual(StrataSegmentedBar.accessibilityValue(for: 0), "")
+        XCTAssertEqual(StrataSegmentedBar.accessibilityValue(for: nil), "")
+    }
+
+    func testStateViewSurfaceConfigurationKeepsErrorDistinct() {
+        XCTAssertTrue(StrataStateView.usesErrorSurface(for: .error))
+        XCTAssertFalse(StrataStateView.usesErrorSurface(for: .empty))
+        XCTAssertFalse(StrataStateView.usesErrorSurface(for: .loading))
     }
 }

@@ -31,49 +31,20 @@ private struct MenuStateReviewBoard: View {
     ]
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Menu and state components")
-                    .font(.title2.bold())
-                    .accessibilityIdentifier("board-title")
-                Text("\(brand) · \(mode)")
-                    .font(.caption)
-                    .foregroundStyle(theme.secondaryForeground)
-                    .accessibilityIdentifier("theme-label")
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Menu and state components")
+                .font(.title2.bold())
+                .accessibilityIdentifier("board-title")
 
-                themeControls
+            themeControls
 
-                HStack(alignment: .center, spacing: 8) {
-                    Text("Set actions")
-                        .font(.headline)
-                    Spacer()
-                    StrataMenu(
-                        theme: theme,
-                        label: "More actions",
-                        actions: [
-                            StrataMenuAction(
-                                id: "copy",
-                                title: "Copy set",
-                                systemImage: "doc.on.doc"
-                            ) {
-                                menuResult = "Copied"
-                            },
-                            StrataMenuAction(
-                                id: "delete",
-                                title: "Delete set",
-                                systemImage: "trash",
-                                role: .destructive
-                            ) {
-                                menuResult = "Deleted"
-                            }
-                        ]
-                    )
-                }
-                Text("Menu result: \(menuResult)")
-                    .font(.caption)
-                    .foregroundStyle(theme.secondaryForeground)
-                    .accessibilityIdentifier("menu-result")
+            HStack(spacing: 8) {
+                statusLine("Theme: \(brand) · \(mode)", identifier: "theme-status")
+                statusLine("Menu: \(menuResult)", identifier: "menu-result")
+                statusLine("State: \(stateResult)", identifier: "state-result")
+            }
 
+            HStack(alignment: .center, spacing: 8) {
                 StrataSegmentedBar(
                     theme: theme,
                     items: segments,
@@ -81,58 +52,90 @@ private struct MenuStateReviewBoard: View {
                 )
                 .accessibilityIdentifier("horizontal-segmented-bar")
 
-                HStack(alignment: .top, spacing: 12) {
-                    Text("Muscle groups")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    StrataSegmentedBar(
-                        theme: theme,
-                        items: segments,
-                        selection: $selection,
-                        axis: .vertical
-                    )
-                    .accessibilityIdentifier("vertical-segmented-bar")
-                }
-
-                StrataStateView(
+                StrataMenu(
                     theme: theme,
-                    kind: .error,
-                    title: "Could not load history",
-                    message: "Try again to refresh this workout.",
-                    actionTitle: "Retry",
-                    isActionLoading: stateResult == "Retrying",
-                    action: {
-                        stateResult = "Retrying"
-                        DispatchQueue.main.async {
-                            stateResult = "Retry available"
+                    label: "More actions",
+                    actions: [
+                        StrataMenuAction(
+                            id: "copy",
+                            title: "Copy set",
+                            systemImage: "doc.on.doc"
+                        ) {
+                            menuResult = "Copied"
+                        },
+                        StrataMenuAction(
+                            id: "delete",
+                            title: "Delete set",
+                            systemImage: "trash",
+                            role: .destructive
+                        ) {
+                            menuResult = "Deleted"
                         }
-                    }
+                    ]
                 )
-                .accessibilityIdentifier("error-state")
-                Text("State: \(stateResult)")
-                    .font(.caption)
-                    .foregroundStyle(theme.secondaryForeground)
-                    .accessibilityIdentifier("state-result")
             }
-            .padding(16)
+
+            HStack(alignment: .top, spacing: 12) {
+                StrataSegmentedBar(
+                    theme: theme,
+                    items: segments,
+                    selection: $selection,
+                    axis: .vertical
+                )
+                .accessibilityIdentifier("vertical-segmented-bar")
+
+                VStack(spacing: 8) {
+                    StrataStateView(
+                        theme: theme,
+                        kind: .empty,
+                        title: "No matches",
+                        message: "Clear filters.",
+                        actionTitle: "Reset",
+                        action: { stateResult = "reset" }
+                    )
+                    .accessibilityIdentifier("empty-state")
+
+                    StrataStateView(
+                        theme: theme,
+                        kind: .loading,
+                        title: "Syncing",
+                        message: "Loading templates."
+                    )
+                    .accessibilityIdentifier("loading-state")
+                }
+            }
+
+            StrataStateView(
+                theme: theme,
+                kind: .error,
+                title: "Could not load history",
+                message: "Try again to refresh.",
+                actionTitle: "Retry",
+                action: { stateResult = "retried" }
+            )
+            .accessibilityIdentifier("error-state")
         }
+        .padding(8)
         .foregroundStyle(theme.foreground)
         .background(theme.canvas.ignoresSafeArea())
         .preferredColorScheme(mode == "dark" ? .dark : .light)
     }
 
     private var themeControls: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Review theme").font(.headline)
-            HStack(spacing: 8) {
-                themeButton(brand: "strata-blue", mode: "light", title: "Blue light")
-                themeButton(brand: "strata-blue", mode: "dark", title: "Blue dark")
-            }
-            HStack(spacing: 8) {
-                themeButton(brand: "strata-purple", mode: "light", title: "Purple light")
-                themeButton(brand: "strata-purple", mode: "dark", title: "Purple dark")
-            }
+        HStack(spacing: 4) {
+            themeButton(brand: "strata-blue", mode: "light", title: "Blue L")
+            themeButton(brand: "strata-blue", mode: "dark", title: "Blue D")
+            themeButton(brand: "strata-purple", mode: "light", title: "Purple L")
+            themeButton(brand: "strata-purple", mode: "dark", title: "Purple D")
         }
+    }
+
+    private func statusLine(_ value: String, identifier: String) -> some View {
+        Text(value)
+            .font(.caption2)
+            .foregroundStyle(theme.secondaryForeground)
+            .lineLimit(1)
+            .accessibilityIdentifier(identifier)
     }
 
     private func themeButton(brand: String, mode: String, title: String) -> some View {
@@ -141,7 +144,7 @@ private struct MenuStateReviewBoard: View {
             self.mode = mode
         }
         .accessibilityIdentifier("theme-\(brand.dropFirst(7))-\(mode)")
-        .frame(minWidth: 44, minHeight: 44)
+        .frame(minWidth: 44, minHeight: 36)
         .buttonStyle(.bordered)
         .tint(theme.accent)
     }
