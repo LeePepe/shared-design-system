@@ -25,11 +25,11 @@ final class MenuStateReviewUITests: XCTestCase {
         XCTAssertTrue(legs.isSelected)
 
         capture("menu-state-blue-light", app: app)
-        app.buttons["theme-strata-blue-dark"].tap()
+        app.buttons["theme-blue-dark"].tap()
         capture("menu-state-blue-dark", app: app)
-        app.buttons["theme-strata-purple-light"].tap()
+        app.buttons["theme-purple-light"].tap()
         capture("menu-state-purple-light", app: app)
-        app.buttons["theme-strata-purple-dark"].tap()
+        app.buttons["theme-purple-dark"].tap()
         capture("menu-state-purple-dark", app: app)
     }
 
