@@ -229,10 +229,10 @@ public struct StrataDialog<Base: View, Content: View>: View {
                 configuration.scrimColor.opacity(configuration.scrimOpacity)
                     .ignoresSafeArea()
                     .contentShape(Rectangle())
+                    .accessibilityIdentifier("strata-dialog-scrim")
                     .onTapGesture {
                         dismiss(item, reason: .outside)
                     }
-                    .accessibilityHidden(true)
                 dialog(item)
             }
         }
