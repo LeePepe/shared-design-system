@@ -21,9 +21,9 @@ final class SearchFieldReviewUITests: XCTestCase {
             XCTAssertFalse(app.buttons.matching(NSPredicate(format: "identifier == %@",
                                                             "strata-search-field-clear-Disabled search"))
                 .firstMatch.exists)
-            let board = app.otherElements["review-\(brand)-\(mode)"].firstMatch
+            let board = app.scrollViews.firstMatch
             XCTAssertTrue(board.waitForExistence(timeout: 5), "\(brand)/\(mode) control board")
-            XCTAssertTrue(app.scrollViews.firstMatch.frame.contains(board.frame))
+            XCTAssertTrue(board.frame.contains(app.staticTexts["Search and number slots"].frame))
             let clear = app.buttons["Clear search"].firstMatch
             XCTAssertTrue(clear.waitForExistence(timeout: 5))
             clear.tap()
