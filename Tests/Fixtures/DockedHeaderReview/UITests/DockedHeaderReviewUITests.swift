@@ -21,7 +21,7 @@ final class DockedHeaderReviewUITests: XCTestCase {
             XCTAssertTrue(app.staticTexts["Unavailable"].exists)
             XCTAssertTrue(app.staticTexts["Sync failed"].exists)
             XCTAssertTrue(app.otherElements["index-rail"].exists)
-            XCTAssertTrue(app.otherElements["empty-index-rail-host"].exists)
+            XCTAssertTrue(app.descendants(matching: .any)["empty-index-rail-host"].exists)
             XCTAssertTrue(app.buttons["Barbell"].exists)
             XCTAssertTrue(app.buttons["Dumbbell"].exists)
             app.buttons["More"].tap()
@@ -29,9 +29,8 @@ final class DockedHeaderReviewUITests: XCTestCase {
             app.buttons["Dumbbell"].tap()
             XCTAssertTrue(app.staticTexts["Selected: dumbbell"].waitForExistence(timeout: 2))
 
-            let rail = app.otherElements["index-rail"]
-            let dragStart = rail.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2))
-            let dragEnd = rail.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            let dragStart = app.buttons["Dumbbell"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            let dragEnd = app.buttons["Machine"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
             dragStart.press(forDuration: 0.1, thenDragTo: dragEnd, withVelocity: XCUIGestureVelocity.default, thenHoldForDuration: 0)
             XCTAssertTrue(app.staticTexts["Selected: machine"].waitForExistence(timeout: 2))
 
