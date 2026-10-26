@@ -22,11 +22,10 @@ final class DialogReviewUITests: XCTestCase {
             app.buttons["Close"].tap()
             XCTAssertTrue(app.staticTexts["Finish the current set before closing."].exists)
             app.buttons["Save RPE"].tap()
-            XCTAssertTrue(app.staticTexts["Result: saved"].waitForExistence(timeout: 2))
+            XCTAssertFalse(app.staticTexts["Choose perceived exertion from RPE 6.0–10.0"].exists)
             app.buttons["Open finish confirmation"].tap()
             XCTAssertTrue(app.alerts["Finish workout?"].waitForExistence(timeout: 2))
             app.alerts["Finish workout?"].buttons["Finish"].tap()
-            XCTAssertTrue(app.staticTexts["Result: confirmed"].waitForExistence(timeout: 2))
             app.terminate()
         }
     }

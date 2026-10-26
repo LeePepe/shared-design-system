@@ -248,7 +248,7 @@ public struct StrataDialog<Base: View, Content: View>: View {
             }
             configuration.content(item)
             status(item.state)
-            if let guardMessage {
+            if let guardMessage = guardReason(for: item) ?? guardMessage {
                 Text(guardMessage)
                     .font(.system(size: configuration.body.size))
                     .foregroundStyle(configuration.theme.critical)
@@ -336,6 +336,11 @@ public struct StrataDialog<Base: View, Content: View>: View {
         if configuration.presentation.wrappedValue == nil {
             _ = configuration.restoreFocus()
         }
+    }
+
+    private func guardReason(for item: StrataDialogPresentation) -> String? {
+        guard case .guarded(let reason) = item.dismissalPolicy else { return nil }
+        return reason
     }
 
     @State private var guardMessage: String?
