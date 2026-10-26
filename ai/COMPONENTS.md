@@ -71,3 +71,4 @@ Component-specific contracts are added under `components/` by their PRs.
 | DockedBar | [StrataDockedBar](components/docked-bar.md) |
 | SectionHeader | [StrataSectionHeader](components/section-header.md) |
 | IndexRail | [StrataIndexRail](components/index-rail.md) |
+| Snackbar | [StrataSnackbar](components/snackbar.md) |
