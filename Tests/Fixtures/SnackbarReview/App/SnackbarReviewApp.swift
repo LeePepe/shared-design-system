@@ -66,12 +66,6 @@ private extension StrataSnackbar where Content == AnyView, BottomBar == AnyView 
                 item: item,
                 onDismiss: { _, dismissal in
                     result.wrappedValue = String(describing: dismissal)
-                    if dismissal == .action {
-                        item.wrappedValue = try! StrataSnackbarItem(
-                            message: "Undo available",
-                            closeLabel: "Close"
-                        )
-                    }
                 },
                 content: {
                     AnyView(VStack(alignment: .leading, spacing: 16) {

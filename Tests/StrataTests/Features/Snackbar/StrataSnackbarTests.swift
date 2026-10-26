@@ -51,6 +51,58 @@ final class StrataSnackbarTests: XCTestCase {
     }
 
     @MainActor
+    func testLifetimeDoesNotSubtractSuspendedBackgroundTime() {
+        var lifetime = StrataFeedbackLifetime()
+        let id = UUID()
+        let epoch = UUID()
+        lifetime.synchronize(id: id, hasAction: false, hostEpoch: epoch, now: 0)
+        lifetime.setPaused(false, now: 0)
+        lifetime.synchronize(id: id, hasAction: false, hostEpoch: epoch, now: 1)
+        XCTAssertEqual(lifetime.remaining, 4, accuracy: 0.001)
+        lifetime.setPaused(true, now: 1)
+        lifetime.synchronize(id: id, hasAction: false, hostEpoch: epoch, now: 11)
+        XCTAssertEqual(lifetime.remaining, 4, accuracy: 0.001)
+        lifetime.setPaused(false, now: 11)
+        XCTAssertEqual(lifetime.remaining, 4, accuracy: 0.001)
+    }
+
+    @MainActor
+    func testActionReplacementKeepsReplacementItemLifetime() throws {
+        var item: StrataSnackbarItem?
+        let replacement = try StrataSnackbarItem(message: "Undo available", closeLabel: "Close")
+        let action = try StrataSnackbarAction(label: "Undo") {
+            item = replacement
+        }
+        let original = try StrataSnackbarItem(message: "Set deleted", closeLabel: "Close", action: action)
+        item = original
+        original.action?.perform()
+        XCTAssertEqual(item?.id, replacement.id)
+
+        var lifetime = StrataFeedbackLifetime()
+        let epoch = UUID()
+        lifetime.synchronize(id: replacement.id, hasAction: false, hostEpoch: epoch, now: 10)
+        lifetime.synchronize(id: replacement.id, hasAction: false, hostEpoch: epoch, now: 15)
+        XCTAssertEqual(lifetime.remaining, 0, accuracy: 0.001)
+    }
+
+    @MainActor
+    func testSnackbarConfigurationCoversAllBrandsAndThemes() throws {
+        for brand in ["strata-blue", "strata-green", "strata-pink", "strata-yellow", "strata-purple"] {
+            for mode in [Theme.light, Theme.dark] {
+                let theme = try StrataTheme(theme: mode, brand: brand)
+                var item: StrataSnackbarItem? = try StrataSnackbarItem(message: "Saved", closeLabel: "Close")
+                let configuration = try StrataSnackbar<Text, EmptyView>.Configuration(
+                    theme: theme,
+                    item: Binding(get: { item }, set: { item = $0 }),
+                    content: { Text("Content") },
+                    bottomBar: { EmptyView() }
+                )
+                _ = StrataSnackbar<Text, EmptyView>(configuration: configuration).body
+            }
+        }
+    }
+
+    @MainActor
     func testPublicViewConfigurationResolvesTokensBeforeRendering() throws {
         let theme = try StrataTheme(theme: .light, brand: "strata-blue")
         var item: StrataSnackbarItem? = try StrataSnackbarItem(message: "Saved", closeLabel: "Close")

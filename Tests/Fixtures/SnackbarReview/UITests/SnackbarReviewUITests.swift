@@ -18,11 +18,12 @@ final class SnackbarReviewUITests: XCTestCase {
             XCTAssertTrue(app.buttons["Undo"].exists)
             XCTAssertTrue(app.buttons["Close"].exists)
             XCTAssertTrue(app.staticTexts["Bottom bar coordination"].exists)
+            capture(attachmentName, app: app)
             app.buttons["Undo"].tap()
             XCTAssertTrue(app.staticTexts["Result: action"].waitForExistence(timeout: 2))
+            XCTAssertTrue(app.staticTexts["Undo available"].exists)
             app.buttons["Close"].tap()
             XCTAssertTrue(app.staticTexts["Result: close"].waitForExistence(timeout: 2))
-            capture(attachmentName, app: app)
             app.terminate()
         }
     }

@@ -90,7 +90,7 @@ struct StrataFeedbackLifetime: Sendable {
         currentID = id
         self.hostEpoch = hostEpoch
         self.hasAction = hasAction
-        remaining = id == nil || hasAction ? .infinity : 5
+        remaining = id == nil ? 0 : (hasAction ? .infinity : 5)
         lastNow = now
         generation &+= 1
     }
@@ -163,17 +163,21 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
             self.bottomBar = bottomBar()
             // The consolidated provider currently exposes these geometry values
             // through its stable spacing scale.
-            radius = try CGFloat(StyleTokens.spacing("spacing.xxl"))
-            controlRadius = try CGFloat(StyleTokens.spacing("spacing.lg"))
+            radius = try CGFloat(StyleTokens.radius("radius.large"))
+            controlRadius = try CGFloat(StyleTokens.radius("radius.medium"))
             spacingXS = try CGFloat(StyleTokens.spacing("spacing.xs"))
             spacingSM = try CGFloat(StyleTokens.spacing("spacing.sm"))
             spacingMD = try CGFloat(StyleTokens.spacing("spacing.md"))
             spacingLG = try CGFloat(StyleTokens.spacing("spacing.lg"))
             minimumHit = try CGFloat(StyleTokens.dimension("dimension.hit.minimum"))
             border = try CGFloat(StyleTokens.border("border.regular"))
+            let subtleOpacity = try StyleTokens.opacity("opacity.subtle")
+            self.borderOpacity = CGFloat(subtleOpacity)
             bodyTypography = try StyleTokens.typography("typography.body")
             calloutTypography = try StyleTokens.typography("typography.callout")
         }
+
+        let borderOpacity: CGFloat
     }
 
     private let configuration: Configuration
@@ -187,6 +191,14 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
     @State private var modalVisible = false
     @State private var isHovered = false
     @FocusState private var isFocused: Bool
+    @FocusState private var ownedFocus: FocusTarget?
+    @AccessibilityFocusState private var ownedAccessibilityFocus: FocusTarget?
+    @State private var announcedItemID: UUID?
+
+    private enum FocusTarget: Hashable {
+        case action
+        case close
+    }
 
     public init(configuration: Configuration) {
         self.configuration = configuration
@@ -196,23 +208,40 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
         ZStack(alignment: .bottom) {
             configuration.content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            if let item = configuration.item.wrappedValue {
-                snackbar(item)
+        }
+        .safeAreaInset(edge: .bottom) {
+            VStack(spacing: configuration.spacingSM) {
+                if let item = configuration.item.wrappedValue, !isObscured {
+                    snackbar(item)
+                        .padding(.horizontal, configuration.spacingMD)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+                configuration.bottomBar
                     .padding(.horizontal, configuration.spacingMD)
-                    .padding(.bottom, configuration.spacingSM)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
-            configuration.bottomBar
-                .padding(.horizontal, configuration.spacingMD)
-                .padding(.bottom, configuration.spacingSM)
-                .opacity(configuration.item.wrappedValue == nil ? 1 : 0)
-                .allowsHitTesting(configuration.item.wrappedValue == nil)
+            .padding(.bottom, configuration.spacingSM)
         }
         .background(configuration.theme.canvas.ignoresSafeArea())
         .environment(\.colorScheme, configuration.theme.mode == .light ? .light : .dark)
         .onPreferenceChange(StrataModalVisibilityPreference.self) { modalVisible = $0 }
-        .onChange(of: configuration.item.wrappedValue?.id) { _ in synchronizeLifetime() }
-        .onAppear { synchronizeLifetime() }
+        .onChange(of: isPaused) { paused in
+            lifetime.setPaused(paused, now: ProcessInfo.processInfo.systemUptime)
+        }
+        .onChange(of: scenePhase) { phase in
+            lifetime.setPaused(
+                phase != .active || isFocusedOrHoveredOrObscured,
+                now: ProcessInfo.processInfo.systemUptime
+            )
+        }
+        .onChange(of: configuration.item.wrappedValue?.id) { _ in
+            synchronizeLifetime()
+            announceIfNeeded()
+        }
+        .onChange(of: isObscured) { _ in announceIfNeeded() }
+        .onAppear {
+            synchronizeLifetime()
+            announceIfNeeded()
+        }
         .task(id: configuration.item.wrappedValue?.id) { await monitorLifetime() }
     }
 
@@ -227,12 +256,13 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
                 .accessibilityIdentifier("strata-snackbar-message")
             if let action = item.action {
                 Button(action.label) {
-                    action.perform()
                     dismiss(item, reason: .action)
                 }
                 .font(.system(size: configuration.calloutTypography.size, weight: .semibold))
                 .frame(minWidth: configuration.minimumHit, minHeight: configuration.minimumHit)
                 .accessibilityIdentifier("strata-snackbar-action")
+                .focused($ownedFocus, equals: .action)
+                .accessibilityFocused($ownedAccessibilityFocus, equals: .action)
             }
             Button(item.closeLabel) {
                 dismiss(item, reason: .close)
@@ -240,6 +270,8 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
             .font(.system(size: configuration.calloutTypography.size, weight: .semibold))
             .frame(minWidth: configuration.minimumHit, minHeight: configuration.minimumHit)
             .accessibilityIdentifier("strata-snackbar-close")
+            .focused($ownedFocus, equals: .close)
+            .accessibilityFocused($ownedAccessibilityFocus, equals: .close)
         }
         .padding(.horizontal, configuration.spacingMD)
         .padding(.vertical, configuration.spacingXS)
@@ -250,7 +282,7 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
         )
         .overlay {
             RoundedRectangle(cornerRadius: configuration.radius, style: .continuous)
-                .stroke(configuration.theme.foreground.opacity(0.18), lineWidth: configuration.border)
+                .stroke(configuration.theme.foreground.opacity(configuration.borderOpacity), lineWidth: configuration.border)
         }
         .onHover { isHovered = $0 }
         .focused($isFocused)
@@ -261,25 +293,46 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
     }
 
     private var isPaused: Bool {
+        isFocusedOrHoveredOrObscured || ownedFocus != nil || ownedAccessibilityFocus != nil
+    }
+
+    private var isFocusedOrHoveredOrObscured: Bool {
         isFocused || isHovered || scenePhase != .active || environmentObscured ||
             configuration.isPresentationObscured || modalVisible
     }
 
+    private var isObscured: Bool {
+        configuration.isPresentationObscured || environmentObscured || modalVisible
+    }
+
     private func synchronizeLifetime() {
+        let now = ProcessInfo.processInfo.systemUptime
+        if isPaused {
+            lifetime.setPaused(true, now: now)
+        }
         lifetime.synchronize(
             id: configuration.item.wrappedValue?.id,
             hasAction: configuration.item.wrappedValue?.action != nil,
             hostEpoch: hostEpoch,
-            now: ProcessInfo.processInfo.systemUptime
+            now: now
         )
-        lifetime.setPaused(isPaused, now: ProcessInfo.processInfo.systemUptime)
+        lifetime.setPaused(isPaused, now: now)
     }
 
     private func dismiss(_ item: StrataSnackbarItem, reason: StrataSnackbarDismissal) {
-        configuration.item.wrappedValue = nil
+        guard configuration.item.wrappedValue?.id == item.id else { return }
+        let shouldRestoreFocus = ownedFocus != nil || ownedAccessibilityFocus != nil
         lifetime.cancel()
+        configuration.item.wrappedValue = nil
+        if reason == .action {
+            item.action?.perform()
+        }
         configuration.onDismiss(item.id, reason)
-        _ = configuration.restoreFocus()
+        if configuration.item.wrappedValue != nil {
+            synchronizeLifetime()
+        } else if shouldRestoreFocus {
+            _ = configuration.restoreFocus()
+        }
     }
 
     private func monitorLifetime() async {
@@ -291,6 +344,9 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
             }
             guard let item = configuration.item.wrappedValue else { return }
             let now = ProcessInfo.processInfo.systemUptime
+            if isPaused {
+                lifetime.setPaused(true, now: now)
+            }
             lifetime.synchronize(id: item.id, hasAction: item.action != nil, hostEpoch: hostEpoch, now: now)
             lifetime.setPaused(isPaused, now: now)
             let generation = lifetime.generation
@@ -300,6 +356,17 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
                 dismiss(item, reason: .timeout)
                 return
             }
+        }
+
+    }
+
+    private func announceIfNeeded() {
+        guard let item = configuration.item.wrappedValue, !isObscured, announcedItemID != item.id else {
+            return
+        }
+        announcedItemID = item.id
+        if #available(iOS 17.0, macOS 14.0, *) {
+            AccessibilityNotification.Announcement(item.message).post()
         }
     }
 }
