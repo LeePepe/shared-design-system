@@ -16,6 +16,7 @@ private struct MenuStateReviewBoard: View {
     @State private var selection = "all"
     @State private var menuResult = "Ready"
     @State private var stateResult = "Retry available"
+    private let metrics = try! StrataComponentMetrics()
 
     private var theme: StrataTheme {
         try! StrataTheme(
@@ -48,7 +49,8 @@ private struct MenuStateReviewBoard: View {
                 StrataSegmentedBar(
                     theme: theme,
                     items: segments,
-                    selection: $selection
+                    selection: $selection,
+                    metrics: metrics
                 )
                 .accessibilityIdentifier("horizontal-segmented-bar")
 
@@ -71,7 +73,8 @@ private struct MenuStateReviewBoard: View {
                         ) {
                             menuResult = "Deleted"
                         }
-                    ]
+                    ],
+                    metrics: metrics
                 )
             }
 
@@ -80,7 +83,8 @@ private struct MenuStateReviewBoard: View {
                     theme: theme,
                     items: segments,
                     selection: $selection,
-                    axis: .vertical
+                    axis: .vertical,
+                    metrics: metrics
                 )
                 .accessibilityIdentifier("vertical-segmented-bar")
 
@@ -91,7 +95,8 @@ private struct MenuStateReviewBoard: View {
                         title: "No matches",
                         message: "Clear filters.",
                         actionTitle: "Reset",
-                        action: { stateResult = "reset" }
+                        action: { stateResult = "reset" },
+                        metrics: metrics
                     )
                     .accessibilityIdentifier("empty-state")
 
@@ -99,7 +104,8 @@ private struct MenuStateReviewBoard: View {
                         theme: theme,
                         kind: .loading,
                         title: "Syncing",
-                        message: "Loading templates."
+                        message: "Loading templates.",
+                        metrics: metrics
                     )
                     .accessibilityIdentifier("loading-state")
                 }
@@ -111,7 +117,8 @@ private struct MenuStateReviewBoard: View {
                 title: "Could not load history",
                 message: "Try again to refresh.",
                 actionTitle: "Retry",
-                action: { stateResult = "retried" }
+                action: { stateResult = "retried" },
+                metrics: metrics
             )
             .accessibilityIdentifier("error-state")
         }

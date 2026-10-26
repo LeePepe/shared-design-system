@@ -23,6 +23,7 @@ public struct StrataSegmentedBar: View {
     @Binding private var selection: String
     private let axis: Axis
     private let isDisabled: Bool
+    private let metrics: StrataComponentMetrics
 
     public init(
         theme: StrataTheme,
@@ -30,28 +31,45 @@ public struct StrataSegmentedBar: View {
         selection: Binding<String>,
         axis: Axis = .horizontal,
         isDisabled: Bool = false
+    ) throws {
+        self.theme = theme
+        self.items = items
+        self._selection = selection
+        self.axis = axis
+        self.isDisabled = isDisabled
+        self.metrics = try StrataComponentMetrics()
+    }
+
+    public init(
+        theme: StrataTheme,
+        items: [StrataSegmentedItem],
+        selection: Binding<String>,
+        axis: Axis = .horizontal,
+        isDisabled: Bool = false,
+        metrics: StrataComponentMetrics
     ) {
         self.theme = theme
         self.items = items
         self._selection = selection
         self.axis = axis
         self.isDisabled = isDisabled
+        self.metrics = metrics
     }
 
     public var body: some View {
         Group {
             switch axis {
             case .horizontal:
-                HStack(spacing: StrataComponentMetrics.spacingSM) {
+                HStack(spacing: metrics.spacingSM) {
                     itemViews
                 }
             case .vertical:
-                VStack(spacing: StrataComponentMetrics.spacingSM) {
+                VStack(spacing: metrics.spacingSM) {
                     itemViews
                 }
             }
         }
-        .padding(StrataComponentMetrics.spacingSM)
+        .padding(metrics.spacingSM)
         .background(theme.surface(.inset), in: shape)
         .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
     }
@@ -80,18 +98,21 @@ public struct StrataSegmentedBar: View {
 
     @ViewBuilder
     private func itemLabel(_ item: StrataSegmentedItem, isSelected: Bool) -> some View {
-        let horizontalPadding = axis == .vertical
-            ? StrataComponentMetrics.spacingSM
-            : StrataComponentMetrics.spacingMD
-        HStack(alignment: .center, spacing: StrataComponentMetrics.spacingSM) {
+        let isVertical = axis == .vertical
+        let horizontalPadding = isVertical ? metrics.spacingSM : metrics.spacingMD
+        let itemContent = HStack(
+            alignment: .center,
+            spacing: isVertical ? metrics.spacingXS : metrics.spacingSM
+        ) {
             Text(item.title)
+                .font(isVertical ? .subheadline.weight(.semibold) : .callout.weight(.semibold))
                 .fixedSize(horizontal: false, vertical: true)
             if let badgeCount = item.badgeCount, badgeCount > 0 {
                 Text(verbatim: String(badgeCount))
                     .font(.caption.weight(.semibold))
                     .monospacedDigit()
-                    .padding(.horizontal, StrataComponentMetrics.spacingSM)
-                    .frame(minHeight: StrataComponentMetrics.spacingMD)
+                    .padding(.horizontal, isVertical ? metrics.spacingXS : metrics.spacingSM)
+                    .frame(minHeight: metrics.spacingMD)
                     .foregroundStyle(badgeForeground(isSelected: isSelected))
                     .background(
                         badgeBackground(isSelected: isSelected),
@@ -100,22 +121,33 @@ public struct StrataSegmentedBar: View {
                     .accessibilityHidden(true)
             }
         }
-        .font(.callout.weight(.semibold))
-        .lineLimit(axis == .vertical ? 2 : nil)
-        .minimumScaleFactor(1)
-        .padding(.horizontal, horizontalPadding)
-        .frame(
-            minWidth: axis == .vertical
-                ? StrataComponentMetrics.verticalItemWidth
-                : StrataComponentMetrics.minimumHit,
-            minHeight: StrataComponentMetrics.minimumHit,
-            alignment: axis == .vertical ? .leading : .center
-        )
+        let paddedContent = itemContent
+            .lineLimit(isVertical ? 2 : nil)
+            .minimumScaleFactor(1)
+            .padding(.horizontal, horizontalPadding)
+        Group {
+            if isVertical {
+                    paddedContent
+                        .frame(
+                            width: metrics.verticalItemWidth,
+                            alignment: .leading
+                        )
+                        .frame(minHeight: metrics.minimumHit, alignment: .leading)
+            } else {
+                paddedContent
+                    .frame(
+                        minWidth: metrics.minimumHit,
+                        minHeight: metrics.minimumHit,
+                        alignment: .center
+                    )
+            }
+        }
+        .fixedSize(horizontal: false, vertical: true)
         .foregroundStyle(foreground(isSelected: isSelected))
         .background(
             background(isSelected: isSelected),
             in: RoundedRectangle(
-                cornerRadius: StrataComponentMetrics.controlRadius,
+                cornerRadius: metrics.controlRadius,
                 style: .continuous
             )
         )
@@ -123,7 +155,7 @@ public struct StrataSegmentedBar: View {
 
     private var shape: RoundedRectangle {
         RoundedRectangle(
-            cornerRadius: StrataComponentMetrics.controlRadius,
+            cornerRadius: metrics.controlRadius,
             style: .continuous
         )
     }

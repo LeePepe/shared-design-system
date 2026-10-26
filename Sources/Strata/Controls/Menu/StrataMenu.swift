@@ -1,30 +1,44 @@
 import DesignTokens
 import SwiftUI
 
-struct StrataComponentMetrics {
-    static let cardRadius: CGFloat = 24
-    static let controlRadius: CGFloat = 16
-    static let minimumHit: CGFloat = 44
-    static let verticalItemWidth: CGFloat = 76
-    static let spacingXS: CGFloat = 6
-    static let spacingSM: CGFloat = 8
-    static let spacingMD: CGFloat = 12
-    static let spacingLG: CGFloat = 16
-    static let spacingXL: CGFloat = 24
+public struct StrataComponentMetrics: Equatable, Sendable {
+    public let cardRadius: CGFloat
+    public let controlRadius: CGFloat
+    public let minimumHit: CGFloat
+    public let verticalItemWidth: CGFloat
+    public let spacingXS: CGFloat
+    public let spacingSM: CGFloat
+    public let spacingMD: CGFloat
+    public let spacingLG: CGFloat
+    public let spacingXL: CGFloat
+    public let borderRegular: CGFloat
 
-    init(
+    public init(
         dimension: (String) throws -> Double = StyleTokens.dimension,
         spacing: (String) throws -> Double = StyleTokens.spacing,
-        radius: (String) throws -> Double = StyleTokens.radius
+        radius: (String) throws -> Double = StyleTokens.radius,
+        border: (String) throws -> Double = StyleTokens.border
     ) throws {
-        _ = try dimension("dimension.hit.minimum")
-        _ = try spacing("spacing.xs")
-        _ = try spacing("spacing.sm")
-        _ = try spacing("spacing.md")
-        _ = try spacing("spacing.lg")
-        _ = try spacing("spacing.xl")
-        _ = try radius("radius.large")
-        _ = try radius("radius.medium")
+        let minimumHit = CGFloat(try dimension("dimension.hit.minimum"))
+        let spacingXS = CGFloat(try spacing("spacing.xs"))
+        let spacingSM = CGFloat(try spacing("spacing.sm"))
+        let spacingMD = CGFloat(try spacing("spacing.md"))
+        let spacingLG = CGFloat(try spacing("spacing.lg"))
+        let spacingXL = CGFloat(try spacing("spacing.xl"))
+        let radiusMedium = CGFloat(try radius("radius.medium"))
+        let radiusLarge = CGFloat(try radius("radius.large"))
+        let borderRegular = CGFloat(try border("border.regular"))
+
+        self.minimumHit = minimumHit
+        self.spacingXS = spacingXS
+        self.spacingSM = spacingSM
+        self.spacingMD = spacingMD
+        self.spacingLG = spacingLG
+        self.spacingXL = spacingXL
+        self.cardRadius = radiusLarge + spacingXS
+        self.controlRadius = radiusMedium + spacingXS
+        self.verticalItemWidth = minimumHit + spacingXL + spacingSM
+        self.borderRegular = borderRegular
     }
 }
 
@@ -63,17 +77,33 @@ public struct StrataMenu: View {
     private let label: String
     private let systemImage: String
     private let actions: [StrataMenuAction]
+    private let metrics: StrataComponentMetrics
 
     public init(
         theme: StrataTheme,
         label: String,
         systemImage: String = "ellipsis",
         actions: [StrataMenuAction]
+    ) throws {
+        self.theme = theme
+        self.label = label
+        self.systemImage = systemImage
+        self.actions = actions
+        self.metrics = try StrataComponentMetrics()
+    }
+
+    public init(
+        theme: StrataTheme,
+        label: String,
+        systemImage: String = "ellipsis",
+        actions: [StrataMenuAction],
+        metrics: StrataComponentMetrics
     ) {
         self.theme = theme
         self.label = label
         self.systemImage = systemImage
         self.actions = actions
+        self.metrics = metrics
     }
 
     public var body: some View {
@@ -84,8 +114,8 @@ public struct StrataMenu: View {
         } label: {
             Image(systemName: systemImage)
                 .font(.body.weight(.semibold))
-                .frame(minWidth: StrataComponentMetrics.minimumHit,
-                       minHeight: StrataComponentMetrics.minimumHit)
+                .frame(minWidth: metrics.minimumHit,
+                       minHeight: metrics.minimumHit)
                 .contentShape(Rectangle())
         }
         .accessibilityLabel(label)

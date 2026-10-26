@@ -11,13 +11,16 @@ let items = [
     StrataSegmentedItem(id: "legs", title: "Legs")
 ]
 
-StrataSegmentedBar(
+try StrataSegmentedBar(
     theme: theme,
     items: items,
     selection: $selection,
     axis: .horizontal
 )
 ```
+
+The initializer is throwing because it resolves DesignTokens-backed component
+metrics. Vertical items use a uniform token-derived rail width.
 
 Selected state and badge counts are exposed to accessibility, text grows
 naturally with Dynamic Type, and disabled bars do not write to the binding.

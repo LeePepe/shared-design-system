@@ -34,8 +34,8 @@ public enum SamplePalette {
     }
 
     @MainActor
-    public static func menu(theme: StrataTheme) -> some View {
-        StrataMenu(
+    public static func menu(theme: StrataTheme) throws -> some View {
+        try StrataMenu(
             theme: theme,
             label: "More actions",
             actions: [
@@ -51,8 +51,8 @@ public enum SamplePalette {
     }
 
     @MainActor
-    public static func segmentedBar(theme: StrataTheme) -> some View {
-        StrataSegmentedBar(
+    public static func segmentedBar(theme: StrataTheme) throws -> some View {
+        try StrataSegmentedBar(
             theme: theme,
             items: [
                 StrataSegmentedItem(id: "all", title: "All", badgeCount: 3),
@@ -63,8 +63,8 @@ public enum SamplePalette {
     }
 
     @MainActor
-    public static func stateView(theme: StrataTheme) -> some View {
-        StrataStateView(
+    public static func stateView(theme: StrataTheme) throws -> some View {
+        try StrataStateView(
             theme: theme,
             kind: .empty,
             title: "No matches",

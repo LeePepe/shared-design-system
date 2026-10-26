@@ -53,6 +53,9 @@ The public `StrataSurfaceModifier` and
 `theme: StrataTheme` on every call.
 
 Component-specific contracts are added under `components/` by their PRs.
+`StrataMenu`, `StrataSegmentedBar`, and `StrataStateView` resolve
+DesignTokens-backed metrics in throwing initializers; use `try` when constructing
+them.
 
 | Component | Contract |
 | --- | --- |

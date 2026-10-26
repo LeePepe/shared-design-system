@@ -6,7 +6,7 @@ action. Loading renders a non-interactive progress state; error remains
 visually distinct from empty and can expose a retry action.
 
 ```swift
-StrataStateView(
+try StrataStateView(
     theme: theme,
     kind: .error,
     title: "Could not load history",
@@ -15,6 +15,9 @@ StrataStateView(
     action: retry
 )
 ```
+
+The initializer is throwing because it resolves DesignTokens-backed component
+metrics.
 
 The view owns no network request, persistence, navigation, localization, or
 business state. It uses only the explicit theme and local DesignTokens-backed

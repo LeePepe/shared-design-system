@@ -7,7 +7,7 @@ the more-actions control on a workout set. It requires an explicit
 disabled without changing their identity.
 
 ```swift
-StrataMenu(
+try StrataMenu(
     theme: theme,
     label: "More actions",
     actions: [
@@ -25,6 +25,9 @@ StrataMenu(
     ]
 )
 ```
+
+The initializer is throwing because it resolves DesignTokens-backed component
+metrics.
 
 The trigger has the token minimum hit size and does not own row completion,
 navigation, localization, persistence, or business data.

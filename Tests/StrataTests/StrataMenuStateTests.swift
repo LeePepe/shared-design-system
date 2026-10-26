@@ -37,16 +37,16 @@ final class StrataMenuStateTests: XCTestCase {
                 let theme = try StrataTheme(theme: mode, brand: brand)
                 var selection = "all"
                 let binding = Binding(get: { selection }, set: { selection = $0 })
-                _ = StrataMenu(theme: theme, label: "More actions", actions: [menuAction]).body
-                _ = StrataSegmentedBar(theme: theme, items: items, selection: binding).body
-                _ = StrataSegmentedBar(
+                _ = try StrataMenu(theme: theme, label: "More actions", actions: [menuAction]).body
+                _ = try StrataSegmentedBar(theme: theme, items: items, selection: binding).body
+                _ = try StrataSegmentedBar(
                     theme: theme,
                     items: items,
                     selection: binding,
                     axis: .vertical,
                     isDisabled: true
                 ).body
-                _ = StrataStateView(
+                _ = try StrataStateView(
                     theme: theme,
                     kind: .empty,
                     title: "No matches",
@@ -54,13 +54,13 @@ final class StrataMenuStateTests: XCTestCase {
                     actionTitle: "Reset",
                     action: {}
                 ).body
-                _ = StrataStateView(
+                _ = try StrataStateView(
                     theme: theme,
                     kind: .loading,
                     title: "Loading",
                     isActionLoading: true
                 ).body
-                _ = StrataStateView(
+                _ = try StrataStateView(
                     theme: theme,
                     kind: .error,
                     title: "Could not load",
@@ -83,6 +83,53 @@ final class StrataMenuStateTests: XCTestCase {
         )
     }
 
+    func testComponentMetricsRetainsResolvedValues() throws {
+        let metrics = try StrataComponentMetrics(
+            dimension: { _ in 48 },
+            spacing: { id in
+                switch id {
+                case "spacing.xs": return 5
+                case "spacing.sm": return 7
+                case "spacing.md": return 9
+                case "spacing.lg": return 11
+                case "spacing.xl": return 13
+                default: XCTFail("Unexpected spacing token: \(id)"); return 0
+                }
+            },
+            radius: { id in id == "radius.medium" ? 15 : 17 },
+            border: { _ in 2 }
+        )
+
+        XCTAssertEqual(metrics.minimumHit, 48)
+        XCTAssertEqual(metrics.spacingXS, 5)
+        XCTAssertEqual(metrics.spacingSM, 7)
+        XCTAssertEqual(metrics.spacingMD, 9)
+        XCTAssertEqual(metrics.spacingLG, 11)
+        XCTAssertEqual(metrics.spacingXL, 13)
+        XCTAssertEqual(metrics.controlRadius, 20)
+        XCTAssertEqual(metrics.cardRadius, 22)
+        XCTAssertEqual(metrics.verticalItemWidth, 68)
+        XCTAssertEqual(metrics.borderRegular, 2)
+
+        let theme = try StrataTheme(theme: .light, brand: "strata-blue")
+        var selection = "all"
+        let binding = Binding(get: { selection }, set: { selection = $0 })
+        let action = StrataMenuAction(id: "copy", title: "Copy") {}
+        _ = StrataMenu(theme: theme, label: "More actions", actions: [action], metrics: metrics).body
+        _ = StrataSegmentedBar(
+            theme: theme,
+            items: [StrataSegmentedItem(id: "all", title: "All")],
+            selection: binding,
+            metrics: metrics
+        ).body
+        _ = StrataStateView(
+            theme: theme,
+            kind: .empty,
+            title: "No matches",
+            metrics: metrics
+        ).body
+    }
+
     func testComponentMetricsPropagatesTokenErrorsUnchanged() {
         let expected = StyleTokenError.unknownToken("dimension.failure")
 
@@ -90,7 +137,8 @@ final class StrataMenuStateTests: XCTestCase {
             try StrataComponentMetrics(
                 dimension: { _ in throw expected },
                 spacing: { _ in 0 },
-                radius: { _ in 0 }
+                radius: { _ in 0 },
+                border: { _ in 0 }
             )
         ) { error in
             XCTAssertEqual(error as? StyleTokenError, expected)

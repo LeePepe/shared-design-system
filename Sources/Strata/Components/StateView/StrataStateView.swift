@@ -14,6 +14,7 @@ public struct StrataStateView: View {
     private let actionTitle: String?
     private let isActionLoading: Bool
     private let action: (() -> Void)?
+    private let metrics: StrataComponentMetrics
 
     public init(
         theme: StrataTheme,
@@ -23,6 +24,26 @@ public struct StrataStateView: View {
         actionTitle: String? = nil,
         isActionLoading: Bool = false,
         action: (() -> Void)? = nil
+    ) throws {
+        self.theme = theme
+        self.kind = kind
+        self.title = title
+        self.message = message
+        self.actionTitle = actionTitle
+        self.isActionLoading = isActionLoading
+        self.action = action
+        self.metrics = try StrataComponentMetrics()
+    }
+
+    public init(
+        theme: StrataTheme,
+        kind: Kind,
+        title: String,
+        message: String? = nil,
+        actionTitle: String? = nil,
+        isActionLoading: Bool = false,
+        action: (() -> Void)? = nil,
+        metrics: StrataComponentMetrics
     ) {
         self.theme = theme
         self.kind = kind
@@ -31,11 +52,12 @@ public struct StrataStateView: View {
         self.actionTitle = actionTitle
         self.isActionLoading = isActionLoading
         self.action = action
+        self.metrics = metrics
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: StrataComponentMetrics.spacingMD) {
-            HStack(alignment: .center, spacing: StrataComponentMetrics.spacingSM) {
+        VStack(alignment: .leading, spacing: metrics.spacingMD) {
+            HStack(alignment: .center, spacing: metrics.spacingSM) {
                 if kind == .loading {
                     ProgressView()
                         .tint(theme.accent)
@@ -61,7 +83,7 @@ public struct StrataStateView: View {
                     guard !isActionLoading else { return }
                     action()
                 } label: {
-                    HStack(spacing: StrataComponentMetrics.spacingSM) {
+                    HStack(spacing: metrics.spacingSM) {
                         if isActionLoading {
                             ProgressView()
                                 .tint(theme.onAccent)
@@ -70,12 +92,12 @@ public struct StrataStateView: View {
                         Text(actionTitle)
                     }
                     .foregroundStyle(theme.onAccent)
-                    .frame(minWidth: StrataComponentMetrics.minimumHit,
-                           minHeight: StrataComponentMetrics.minimumHit)
-                    .padding(.horizontal, StrataComponentMetrics.spacingLG)
+                    .frame(minWidth: metrics.minimumHit,
+                           minHeight: metrics.minimumHit)
+                    .padding(.horizontal, metrics.spacingLG)
                     .background(
                         RoundedRectangle(
-                            cornerRadius: StrataComponentMetrics.controlRadius,
+                            cornerRadius: metrics.controlRadius,
                             style: .continuous
                         )
                         .fill(theme.accent)
@@ -87,9 +109,9 @@ public struct StrataStateView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, StrataComponentMetrics.spacingXL)
-        .padding(.vertical, StrataComponentMetrics.spacingLG)
-        .modifier(CardSurface(theme: theme, kind: kind))
+        .padding(.horizontal, metrics.spacingXL)
+        .padding(.vertical, metrics.spacingLG)
+        .modifier(CardSurface(theme: theme, kind: kind, metrics: metrics))
         .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
         .accessibilityElement(children: .contain)
     }
@@ -106,29 +128,30 @@ public struct StrataStateView: View {
 private struct CardSurface: ViewModifier {
     let theme: StrataTheme
     let kind: StrataStateView.Kind
+    let metrics: StrataComponentMetrics
 
     func body(content: Content) -> some View {
         if kind == .error {
             content
                 .background {
                     RoundedRectangle(
-                        cornerRadius: StrataComponentMetrics.cardRadius,
+                        cornerRadius: metrics.cardRadius,
                         style: .continuous
                     )
                     .fill(theme.onCritical)
                 }
                 .overlay {
                     RoundedRectangle(
-                        cornerRadius: StrataComponentMetrics.cardRadius,
+                        cornerRadius: metrics.cardRadius,
                         style: .continuous
                     )
-                    .strokeBorder(theme.critical, lineWidth: 1)
+                    .strokeBorder(theme.critical, lineWidth: metrics.borderRegular)
                 }
         } else {
             content.strataSurface(
                 theme: theme,
                 style: .solid,
-                cornerRadius: StrataComponentMetrics.cardRadius,
+                cornerRadius: metrics.cardRadius,
                 role: .card
             )
         }
