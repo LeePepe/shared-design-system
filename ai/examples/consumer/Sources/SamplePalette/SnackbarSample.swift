@@ -4,18 +4,19 @@ import SwiftUI
 public enum SnackbarSample {
     @MainActor
     public static func view(theme: StrataTheme, item: Binding<StrataSnackbarItem?>) throws -> some View {
-        let configuration = try StrataSnackbar<Text, EmptyView>.Configuration(
+        let configuration = try StrataSnackbar<AnyView, AnyView>.Configuration(
             theme: theme,
             item: item,
             onDismiss: { _, _ in },
             content: {
-                Text("Workout")
+                AnyView(Text("Workout")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                )
             },
             bottomBar: {
-                EmptyView()
+                AnyView(EmptyView())
             }
         )
-        return StrataSnackbar(configuration: configuration)
+        return StrataSnackbar<AnyView, AnyView>(configuration: configuration)
     }
 }
