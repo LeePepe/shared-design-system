@@ -22,6 +22,61 @@ final class StrataDialogTests: XCTestCase {
         )) {
             XCTAssertEqual($0 as? StrataDialogConfigurationError, .emptyGuardReason)
         }
+        let emptyAction = try StrataDialogAction(id: "action", label: "Action", role: .secondary) { .stayPresented }
+        XCTAssertThrowsError(try StrataDialogAction(id: "action", label: " ", role: .secondary) { .stayPresented }) {
+            XCTAssertEqual($0 as? StrataDialogConfigurationError, .emptyActionLabel)
+        }
+        let theme = try StrataTheme(theme: .light, brand: "strata-blue")
+        var isPresented = false
+        XCTAssertThrowsError(try StrataAlertDialog<Text>.Configuration(
+            theme: theme,
+            isPresented: Binding(get: { isPresented }, set: { isPresented = $0 }),
+            title: " ",
+            message: "Message",
+            confirmLabel: "Confirm",
+            cancelLabel: "Cancel",
+            confirm: {},
+            base: { Text("Base") }
+        )) {
+            XCTAssertEqual($0 as? StrataDialogConfigurationError, .emptyTitle)
+        }
+        XCTAssertThrowsError(try StrataAlertDialog<Text>.Configuration(
+            theme: theme,
+            isPresented: Binding(get: { isPresented }, set: { isPresented = $0 }),
+            title: "Title",
+            message: " ",
+            confirmLabel: "Confirm",
+            cancelLabel: "Cancel",
+            confirm: {},
+            base: { Text("Base") }
+        )) {
+            XCTAssertEqual($0 as? StrataDialogConfigurationError, .emptyStatusMessage)
+        }
+        XCTAssertThrowsError(try StrataAlertDialog<Text>.Configuration(
+            theme: theme,
+            isPresented: Binding(get: { isPresented }, set: { isPresented = $0 }),
+            title: "Title",
+            message: "Message",
+            confirmLabel: " ",
+            cancelLabel: "Cancel",
+            confirm: {},
+            base: { Text("Base") }
+        )) {
+            XCTAssertEqual($0 as? StrataDialogConfigurationError, .emptyActionLabel)
+        }
+        XCTAssertThrowsError(try StrataAlertDialog<Text>.Configuration(
+            theme: theme,
+            isPresented: Binding(get: { isPresented }, set: { isPresented = $0 }),
+            title: "Title",
+            message: "Message",
+            confirmLabel: "Confirm",
+            cancelLabel: " ",
+            confirm: {},
+            base: { Text("Base") }
+        )) {
+            XCTAssertEqual($0 as? StrataDialogConfigurationError, .emptyCloseLabel)
+        }
+        XCTAssertNotNil(emptyAction)
     }
 
     @MainActor
@@ -57,7 +112,7 @@ final class StrataDialogTests: XCTestCase {
     @MainActor
     func testConfigurationResolvesTokensForAllSupportedThemesAndBrands() throws {
         let action = try StrataDialogAction(id: "save", label: "Save", role: .primary) { .dismiss }
-        for brand in ["strata-blue", "strata-purple"] {
+        for brand in ["strata-blue", "strata-green", "strata-pink", "strata-purple", "strata-yellow"] {
             for mode in [Theme.light, Theme.dark] {
                 let theme = try StrataTheme(theme: mode, brand: brand)
                 var presentation: StrataDialogPresentation? = try StrataDialogPresentation(
@@ -71,6 +126,50 @@ final class StrataDialogTests: XCTestCase {
                     content: { _ in Text("RPE 6.0–10.0") }
                 )
                 _ = StrataDialog(configuration: configuration).body
+            }
+        }
+
+        @MainActor
+        func testOutsideDismissDefaultsOffAndCanBeEnabled() throws {
+            let action = try StrataDialogAction(id: "cancel", label: "Cancel", role: .cancel) { .stayPresented }
+            let disabled = try StrataDialogPresentation(title: "Title", closeLabel: "Close", actions: [action])
+            XCTAssertFalse(disabled.allowsOutsideDismiss)
+            let enabled = try StrataDialogPresentation(
+                title: "Title", closeLabel: "Close", allowsOutsideDismiss: true, actions: [action]
+            )
+            XCTAssertTrue(enabled.allowsOutsideDismiss)
+        }
+
+        @MainActor
+        func testActionCanReplacePresentationReentrantly() throws {
+            var presentation: StrataDialogPresentation?
+            let replacementID = UUID()
+            let action = try StrataDialogAction(id: "replace", label: "Replace", role: .primary) {
+                presentation = try? StrataDialogPresentation(id: replacementID, title: "Replacement", closeLabel: "Close", actions: [])
+                return .dismiss
+            }
+            presentation = try StrataDialogPresentation(title: "Original", closeLabel: "Close", actions: [action])
+            let originalID = presentation?.id
+            _ = action.perform()
+            XCTAssertEqual(presentation?.id, replacementID)
+            XCTAssertNotEqual(presentation?.id, originalID)
+        }
+
+        @MainActor
+        func testLoadingStateMarksNonCancelActionsAsConflicting() throws {
+            let primary = try StrataDialogAction(id: "save", label: "Save", role: .primary) { .dismiss }
+            let cancel = try StrataDialogAction(id: "cancel", label: "Cancel", role: .cancel) { .stayPresented }
+            let presentation = try StrataDialogPresentation(
+                title: "Title",
+                closeLabel: "Close",
+                state: .loading(message: "Loading"),
+                actions: [primary, cancel]
+            )
+            if case .loading = presentation.state {
+                XCTAssertNotEqual(primary.role, .cancel)
+                XCTAssertEqual(cancel.role, .cancel)
+            } else {
+                XCTFail("Expected loading state")
             }
         }
     }

@@ -168,6 +168,10 @@ public struct StrataDialog<Base: View, Content: View>: View {
         let minimumHit: CGFloat
         let border: CGFloat
         let opacity: CGFloat
+        let scrimColor: Color
+        let scrimOpacity: CGFloat
+        let destructiveColor: Color
+        let onDestructiveColor: Color
         let headline: TypographyToken
         let body: TypographyToken
         let callout: TypographyToken
@@ -195,6 +199,10 @@ public struct StrataDialog<Base: View, Content: View>: View {
             minimumHit = try CGFloat(StyleTokens.dimension("dimension.hit.minimum"))
             border = try CGFloat(StyleTokens.border("border.regular"))
             opacity = try CGFloat(StyleTokens.opacity("opacity.subtle"))
+            scrimColor = try StrataTokenColor.resolve("product.strata.material.shadow", theme: theme.mode)
+            scrimOpacity = try CGFloat(StyleTokens.opacity("opacity.overlay"))
+            destructiveColor = try StrataTokenColor.resolve("status.critical", theme: theme.mode)
+            onDestructiveColor = try StrataTokenColor.resolve("status.on-critical", theme: theme.mode)
             headline = try StyleTokens.typography("typography.headline")
             body = try StyleTokens.typography("typography.body")
             callout = try StyleTokens.typography("typography.callout")
@@ -202,7 +210,11 @@ public struct StrataDialog<Base: View, Content: View>: View {
     }
 
     private let configuration: Configuration
-    @FocusState private var focused: Bool
+    @FocusState private var ownedFocus: String?
+    @AccessibilityFocusState private var ownedAccessibilityFocus: String?
+    @State private var session: StrataModalSession?
+    @State private var guardMessage: String?
+    @State private var announcedStatus: StrataDialogState?
 
     public init(configuration: Configuration) {
         self.configuration = configuration
@@ -211,9 +223,10 @@ public struct StrataDialog<Base: View, Content: View>: View {
     public var body: some View {
         ZStack {
             configuration.base
+                .disabled(configuration.presentation.wrappedValue != nil)
                 .accessibilityHidden(configuration.presentation.wrappedValue != nil)
             if let item = configuration.presentation.wrappedValue {
-                Color.black.opacity(0.35)
+                configuration.scrimColor.opacity(configuration.scrimOpacity)
                     .ignoresSafeArea()
                     .contentShape(Rectangle())
                     .onTapGesture {
@@ -230,6 +243,15 @@ public struct StrataDialog<Base: View, Content: View>: View {
             value: configuration.presentation.wrappedValue != nil
         )
         .environment(\.strataPresentationObscured, configuration.presentation.wrappedValue != nil)
+        .onChange(of: configuration.presentation.wrappedValue?.id) { _ in
+            guardMessage = nil
+            if let item = configuration.presentation.wrappedValue {
+                synchronizeSession(for: item)
+            } else {
+                session?.invalidate()
+                session = nil
+            }
+        }
     }
 
     private func dialog(_ item: StrataDialogPresentation) -> some View {
@@ -245,6 +267,9 @@ public struct StrataDialog<Base: View, Content: View>: View {
                 }
                 .frame(minWidth: configuration.minimumHit, minHeight: configuration.minimumHit)
                 .accessibilityIdentifier("strata-dialog-close")
+                .focused($ownedFocus, equals: "close")
+                .accessibilityFocused($ownedAccessibilityFocus, equals: "close")
+                .dialogCancelShortcut(enabled: item.dismissalPolicy == .dismissible)
             }
             configuration.content(item)
             status(item.state)
@@ -256,14 +281,7 @@ public struct StrataDialog<Base: View, Content: View>: View {
             }
             HStack(spacing: configuration.spacingSM) {
                 ForEach(item.actions) { action in
-                    Button(action.label) {
-                        perform(action, for: item)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(action.role == .destructive ? configuration.theme.critical : configuration.theme.accent)
-                    .disabled(!action.isEnabled)
-                    .frame(minHeight: configuration.minimumHit)
-                    .accessibilityIdentifier("strata-dialog-action-\(action.id)")
+                    actionButton(action, item: item)
                 }
             }
         }
@@ -278,10 +296,81 @@ public struct StrataDialog<Base: View, Content: View>: View {
                 .stroke(configuration.theme.foreground.opacity(configuration.opacity), lineWidth: configuration.border)
         }
         .padding(configuration.spacingMD)
-        .focused($focused)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("strata-dialog")
-        .dialogEscapeDismissal { dismiss(item, reason: .escape) }
+        .dialogEscapeDismissal(enabled: item.dismissalPolicy == .dismissible) {
+            dismiss(item, reason: .escape)
+        }
+        .onAppear {
+            synchronizeSession(for: item)
+            if ownedFocus == nil && ownedAccessibilityFocus == nil {
+                let target = item.actions.first(where: { $0.role != .destructive && $0.isEnabled })?.id ?? "close"
+                ownedFocus = target
+                ownedAccessibilityFocus = target
+            }
+        }
+        .onChange(of: item.state) { state in
+            announceStatusIfNeeded(state)
+        }
+        .onChange(of: item.dismissalPolicy) { policy in
+            if case .dismissible = policy {
+                guardMessage = nil
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func actionButton(_ action: StrataDialogAction, item: StrataDialogPresentation) -> some View {
+        let isLoading = isLoading(item.state)
+        switch action.role {
+        case .primary:
+            Button(action.label) { perform(action, for: item) }
+                .buttonStyle(.borderedProminent)
+                .tint(configuration.theme.accent)
+                .foregroundStyle(configuration.theme.onAccent)
+                .keyboardShortcut(.defaultAction)
+                .disabled(!action.isEnabled || (isLoading && action.role != .cancel))
+                .frame(minHeight: configuration.minimumHit)
+                .accessibilityIdentifier("strata-dialog-action-\(action.id)")
+                .focused($ownedFocus, equals: action.id)
+                .accessibilityFocused($ownedAccessibilityFocus, equals: action.id)
+        case .destructive:
+            Button(role: .destructive) { perform(action, for: item) } label: { Text(action.label) }
+                .buttonStyle(.borderedProminent)
+                .tint(configuration.destructiveColor)
+                .foregroundStyle(configuration.onDestructiveColor)
+                .disabled(!action.isEnabled || (isLoading && action.role != .cancel))
+                .frame(minHeight: configuration.minimumHit)
+                .accessibilityIdentifier("strata-dialog-action-\(action.id)")
+                .focused($ownedFocus, equals: action.id)
+                .accessibilityFocused($ownedAccessibilityFocus, equals: action.id)
+        case .secondary:
+            Button(action.label) { perform(action, for: item) }
+                .buttonStyle(.bordered)
+                .tint(configuration.theme.foreground)
+                .disabled(!action.isEnabled || (isLoading && action.role != .cancel))
+                .frame(minHeight: configuration.minimumHit)
+                .accessibilityIdentifier("strata-dialog-action-\(action.id)")
+                .focused($ownedFocus, equals: action.id)
+                .accessibilityFocused($ownedAccessibilityFocus, equals: action.id)
+        case .cancel:
+            Button(role: .cancel) { perform(action, for: item) } label: { Text(action.label) }
+                .buttonStyle(.bordered)
+                .tint(configuration.theme.foreground)
+                .disabled(!action.isEnabled)
+                .frame(minHeight: configuration.minimumHit)
+                .accessibilityIdentifier("strata-dialog-action-\(action.id)")
+                .focused($ownedFocus, equals: action.id)
+                .accessibilityFocused($ownedAccessibilityFocus, equals: action.id)
+        }
+
+    }
+
+    private func isLoading(_ state: StrataDialogState) -> Bool {
+        if case .loading = state {
+            return true
+        }
+        return false
     }
 
     @ViewBuilder
@@ -289,16 +378,26 @@ public struct StrataDialog<Base: View, Content: View>: View {
         switch state {
         case .populated:
             EmptyView()
-        case .loading(let message), .error(let message):
+        case .loading(let message):
             Text(message)
                 .font(.system(size: configuration.body.size))
                 .foregroundStyle(configuration.theme.secondaryForeground)
+                .accessibilityIdentifier("strata-dialog-status")
+        case .error(let message):
+            Text(message)
+                .font(.system(size: configuration.body.size))
+                .foregroundStyle(configuration.theme.critical)
                 .accessibilityIdentifier("strata-dialog-status")
         }
     }
 
     private func perform(_ action: StrataDialogAction, for item: StrataDialogPresentation) {
-        guard action.isEnabled, configuration.presentation.wrappedValue?.id == item.id else { return }
+        let isLoading = isLoading(item.state)
+        guard action.isEnabled, (!isLoading || action.role == .cancel),
+              configuration.presentation.wrappedValue?.id == item.id else { return }
+        synchronizeSession(for: item)
+        guard let generation = session?.generation,
+              session?.matches(id: item.id, generation: generation) == true else { return }
         if action.role == .cancel {
             guard case .dismissible = item.dismissalPolicy else {
                 dismiss(item, reason: .cancel)
@@ -307,25 +406,40 @@ public struct StrataDialog<Base: View, Content: View>: View {
             configuration.presentation.wrappedValue = nil
             _ = action.perform()
             configuration.onDismiss(item.id, .cancel)
-            if configuration.presentation.wrappedValue == nil {
-                _ = configuration.restoreFocus()
-            }
+            restoreFocusIfNeeded()
             return
         }
         let outcome = action.perform()
-        if outcome == .dismiss {
-            if configuration.presentation.wrappedValue?.id == item.id {
-                configuration.presentation.wrappedValue = nil
-            }
-            configuration.onDismiss(item.id, .action(action.id))
-            if configuration.presentation.wrappedValue == nil {
-                _ = configuration.restoreFocus()
-            }
+        guard outcome == .dismiss,
+              configuration.presentation.wrappedValue?.id == item.id,
+              session?.matches(id: item.id, generation: generation) == true else { return }
+        configuration.presentation.wrappedValue = nil
+        configuration.onDismiss(item.id, .action(action.id))
+        restoreFocusIfNeeded()
+    }
+
+    private func restoreFocusIfNeeded() {
+        guard (ownedFocus != nil || ownedAccessibilityFocus != nil),
+              configuration.presentation.wrappedValue == nil else { return }
+        _ = configuration.restoreFocus()
+        ownedFocus = nil
+        ownedAccessibilityFocus = nil
+        session?.invalidate()
+        session = nil
+        guardMessage = nil
+    }
+
+    private func synchronizeSession(for item: StrataDialogPresentation) {
+        if session == nil {
+            session = StrataModalSession(id: item.id)
+        } else if session?.id != item.id {
+            session?.replace(id: item.id)
         }
     }
 
     private func dismiss(_ item: StrataDialogPresentation, reason: StrataDialogDismissal) {
         guard configuration.presentation.wrappedValue?.id == item.id else { return }
+        if reason == .outside, !item.allowsOutsideDismiss { return }
         if case .guarded(let guardReason) = item.dismissalPolicy,
            reason == .close || reason == .cancel || reason == .escape || reason == .outside {
             guardMessage = guardReason
@@ -333,9 +447,7 @@ public struct StrataDialog<Base: View, Content: View>: View {
         }
         configuration.presentation.wrappedValue = nil
         configuration.onDismiss(item.id, reason)
-        if configuration.presentation.wrappedValue == nil {
-            _ = configuration.restoreFocus()
-        }
+        restoreFocusIfNeeded()
     }
 
     private func guardReason(for item: StrataDialogPresentation) -> String? {
@@ -343,7 +455,18 @@ public struct StrataDialog<Base: View, Content: View>: View {
         return reason
     }
 
-    @State private var guardMessage: String?
+    private func announceStatusIfNeeded(_ state: StrataDialogState) {
+        guard state != .populated, announcedStatus != state else { return }
+        announcedStatus = state
+        if #available(iOS 17.0, macOS 14.0, *) {
+            switch state {
+            case .loading(let message), .error(let message):
+                AccessibilityNotification.Announcement(message).post()
+            case .populated:
+                break
+            }
+        }
+    }
 }
 
 @MainActor
@@ -404,6 +527,8 @@ public struct StrataAlertDialog<Base: View>: View {
     public var body: some View {
         configuration.base
             .environment(\.colorScheme, configuration.theme.mode == .light ? .light : .dark)
+            .preference(key: StrataModalVisibilityPreference.self, value: configuration.isPresented.wrappedValue)
+            .environment(\.strataPresentationObscured, configuration.isPresented.wrappedValue)
             .alert(configuration.title, isPresented: configuration.isPresented) {
                 Button(configuration.cancelLabel, role: .cancel) {}
                 Button(configuration.confirmLabel, role: configuration.isDestructive ? .destructive : nil) {
@@ -417,11 +542,24 @@ public struct StrataAlertDialog<Base: View>: View {
 
 private extension View {
     @ViewBuilder
-    func dialogEscapeDismissal(perform action: @escaping () -> Void) -> some View {
+    func dialogEscapeDismissal(enabled: Bool, perform action: @escaping () -> Void) -> some View {
 #if os(macOS)
-        onExitCommand(perform: action)
+        if enabled {
+            onExitCommand(perform: action)
+        } else {
+            self
+        }
 #else
         self
 #endif
+    }
+
+    @ViewBuilder
+    func dialogCancelShortcut(enabled: Bool) -> some View {
+        if enabled {
+            keyboardShortcut(.escape, modifiers: [])
+        } else {
+            self
+        }
     }
 }

@@ -81,6 +81,18 @@ private struct DialogReviewBoard: View {
                                 result.wrappedValue = "saved"
                                 return .dismiss
                             },
+                            try! StrataDialogAction(id: "allow-outside", label: "Allow outside", role: .secondary) {
+                                guard let current = presentation.wrappedValue else { return .stayPresented }
+                                presentation.wrappedValue = try! StrataDialogPresentation(
+                                    id: current.id,
+                                    title: current.title,
+                                    closeLabel: current.closeLabel,
+                                    dismissalPolicy: .dismissible,
+                                    allowsOutsideDismiss: true,
+                                    actions: current.actions
+                                )
+                                return .stayPresented
+                            },
                             try! StrataDialogAction(id: "cancel", label: "Cancel", role: .cancel) { .stayPresented }
                         ]
                     )
