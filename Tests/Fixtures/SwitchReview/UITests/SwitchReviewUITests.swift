@@ -15,7 +15,7 @@ final class SwitchReviewUITests: XCTestCase {
     }
 
     @MainActor
-    func testStrataTapWritesBindingAndCallerUpdateChangesSwitch() {
+    func testNativeTapWritesBindingAndCallerUpdateChangesSwitch() {
         let app = launch()
         let control = app.switches["switch.primary"]
         assertState(app, control: control, on: false, writes: 0)
@@ -46,7 +46,7 @@ final class SwitchReviewUITests: XCTestCase {
     }
 
     @MainActor
-    func testMeaningfulStrataAccessibilityLabelAndOnOffValue() {
+    func testMeaningfulNativeAccessibilityLabelAndOnOffValue() {
         let app = launch(mode: "dark")
         let control = app.switches["switch.primary"]
         XCTAssertEqual(control.elementType, .switch)
@@ -59,7 +59,7 @@ final class SwitchReviewUITests: XCTestCase {
     }
 
     @MainActor
-    func testStrataSwitchRemainsAnActionableAccessibilityTarget() {
+    func testNativeSwitchRemainsAnActionableAccessibilityTarget() {
         let app = launch(brand: "graphite")
         let control = app.switches["switch.primary"]
         XCTAssertTrue(control.isHittable)
@@ -94,7 +94,7 @@ final class SwitchReviewUITests: XCTestCase {
     }
 
     @MainActor
-    func testStrataSwitchScreenshotMatrix() {
+    func testNativeSwitchScreenshotMatrix() {
         for brand in ["ocean", "graphite"] {
             for mode in ["light", "dark"] {
                 let app = launch(brand: brand, mode: mode)

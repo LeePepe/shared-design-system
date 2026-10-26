@@ -93,15 +93,13 @@ def png_rgb(path):
 
 
 def token_provider():
-    pins = json.loads((REPO / "Package.resolved").read_text())["pins"]
-    pin = next(item for item in pins if item["identity"] == "shared-design-tokens")
-    require(pin["state"]["version"] == "0.1.1", "Expected the exact DesignTokens 0.1.1 pin")
-    checkout = REPO / ".build/checkouts/shared-design-tokens"
-    revision = subprocess.check_output(["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True).strip()
-    require(revision == pin["state"]["revision"], "Token checkout differs from Package.resolved")
-    path = checkout / "tokens/colors.json"
+    require(not subprocess.check_output(["git", "status", "--porcelain"], cwd=REPO, text=True),
+            "Require a clean root checkout for provider provenance")
+    revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO, text=True).strip()
+    path = REPO / "Packages/DesignTokens/tokens/colors.json"
     data = path.read_bytes()
-    committed = subprocess.check_output(["git", "-C", str(checkout), "show", "HEAD:tokens/colors.json"])
+    committed = subprocess.check_output(
+        ["git", "show", "HEAD:Packages/DesignTokens/tokens/colors.json"], cwd=REPO)
     require(data == committed, "Token data contains uncommitted changes")
     return json.loads(data), {"path": str(path), "revision": revision, "sha256": hashlib.sha256(data).hexdigest()}
 

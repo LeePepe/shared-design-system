@@ -4,7 +4,7 @@ Strata 0.3.0 is the current release contract. [USAGE.md](USAGE.md)
 describes its interface and conversion semantics. The [contract entry](README.md)
 and [external fixture](EXAMPLES.md) travel with the release source revision;
 tag-time validation results are recorded in the GitHub release notes after a
-separately authorized tag exists. Strata 0.1.0 remains the first
+separately authorized tag exists. NativeDesignKit 0.1.0 remains the first
 historical release (Git tag `v0.1.0`).
 
 ## Local dependency
@@ -12,7 +12,7 @@ historical release (Git tag `v0.1.0`).
 The current root manifest publishes `DesignTokens` and `Strata`;
 Strata and both test targets depend on the local `DesignTokens` target.
 There is no external package pin or root `Package.resolved`. Consumers select
-both products from one exact `shared-design-system` revision. Strata
+both products from one exact `shared-design-system` revision. NativeDesignKit
 v0.1.0 retains its historical exact `shared-design-tokens` 0.1.1 requirement.
 
 The historical 0.1.1 requirement replaced candidate `1db868d` and release `0.1.0` with licensing metadata only. The released 0.2.0 dependency adds styles and explicit Strata palettes while preserving legacy colors and APIs. No dependency contents are vendored. Upgrades follow the resolved Tokens revision's `ai/MIGRATION.md`.
@@ -42,7 +42,7 @@ The prior results apply only to the revision tested then. Fresh PR checks and ex
 
 ## Remaining gates
 
-Historical exact-tag validation for Strata `v0.1.0` uses that tag's
+Historical exact-tag validation for NativeDesignKit `v0.1.0` uses that tag's
 own fixture and scripts. Current revision validation binds both products to one
 target SHA and does not establish a new release. Minimum deployment OS versions
 and Swift 6.0 still require their own evidence.

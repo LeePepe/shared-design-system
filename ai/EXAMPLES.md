@@ -35,7 +35,7 @@ The current runner selects both `Strata` and `DesignTokens` from the
 same immutable `shared-design-system` revision. Historical native tag validation
 uses the fixture and runner from that same tag.
 
-The historical Strata `v0.1.0` tag retains its own fixture, runner and
+The historical NativeDesignKit `v0.1.0` tag retains its own fixture, runner and
 exact DesignTokens 0.1.1 dependency.
 
 Do not report a revision run as release-tag validation. Git/Xcode caches may

@@ -195,7 +195,7 @@ class ContractTests(unittest.TestCase):
                 content = (self.root / relative).read_text()
                 self.assertRegex(
                     content,
-                    r"Strata 0\.3\.0 uses the repository-local\s+"
+                    r"NativeDesignKit 0\.3\.0 uses the repository-local\s+"
                     r"DesignTokens target")
                 self.assertRegex(
                     content,

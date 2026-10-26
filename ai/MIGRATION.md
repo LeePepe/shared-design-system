@@ -10,12 +10,12 @@ resolve from one package graph.
 
 Before an authorized consolidated release, rollback restores the recorded old
 URL, exact 0.2.0 requirement and lockfile together. Historical provider tags and
-Strata 0.1.0 remain immutable. Re-run the same consumer behavior/error
+NativeDesignKit 0.1.0 remain immutable. Re-run the same consumer behavior/error
 tests; never copy token values or use a local path/mirror as public evidence.
 
 ## Local bridge → Strata 0.3.0
 
-Strata 0.1.0 is the earlier historical release. The supported 0.3.0
+NativeDesignKit 0.1.0 is the earlier historical release. The supported 0.3.0
 interface remains a color-only bridge; this is not a migration of components,
 typography, spacing or Web styles. No existing product adoption is claimed.
 

@@ -2,7 +2,7 @@ import XCTest
 
 @MainActor
 final class SliderReviewUITests: XCTestCase {
-    func testStrataAdjustmentUpdatesBindingInCallerUnitsAndForwardsEditing() {
+    func testNativeAdjustmentUpdatesBindingInCallerUnitsAndForwardsEditing() {
         let app = launch(scenario: "interaction")
         let slider = app.sliders["adjustable"]
         XCTAssertEqual(slider.label, "Synthetic amount")
@@ -25,7 +25,7 @@ final class SliderReviewUITests: XCTestCase {
         XCTAssertEqual(boundValue(app), 50)
     }
 
-    func testDisabledStrataInputCannotChangeBindingOrEditingEffects() {
+    func testDisabledNativeInputCannotChangeBindingOrEditingEffects() {
         let app = launch(scenario: "interaction")
         let slider = app.sliders["adjustable"]
         slider.adjust(toNormalizedSliderPosition: 0.7)
@@ -42,7 +42,7 @@ final class SliderReviewUITests: XCTestCase {
         XCTAssertLessThan(boundValue(app), before)
     }
 
-    func testCallerUpdatesAndDisabledStatePreserveStrataFootprint() {
+    func testCallerUpdatesAndDisabledStatePreserveNativeFootprint() {
         let app = launch(scenario: "interaction")
         let slider = app.sliders["adjustable"]
         let initial = slider.frame
@@ -57,7 +57,7 @@ final class SliderReviewUITests: XCTestCase {
         XCTAssertTrue(app.scrollViews["review-scroll"].frame.contains(slider.frame))
     }
 
-    func testStrataTouchTargetIncludesTopAndBottomOf44PointFrame() {
+    func testNativeTouchTargetIncludesTopAndBottomOf44PointFrame() {
         let app = launch(scenario: "interaction")
         let slider = app.sliders["adjustable"]
         assertMinimumTarget(slider)

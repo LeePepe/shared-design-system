@@ -14,12 +14,12 @@
   simulator screenshot evidence. Components remain unreleased; no new package
   version, tag or product adoption is declared.
 
-## 0.3.0 — consolidated Native release unit
+## 0.3.0 — consolidated NativeDesignKit release unit
 
-- Publish stable `DesignTokens` and `Strata` products from one package;
-  Strata uses the local data target with unchanged APIs and behavior.
+- Publish stable `DesignTokens` and `NativeDesignKit` products from one package;
+  NativeDesignKit uses the local data target with unchanged APIs and behavior.
 - Preserve iOS 15/macOS 12 floors, add the DesignTokens-only watchOS 8 boundary,
-  and reject Strata watchOS selection with a stable diagnostic.
+  and reject NativeDesignKit watchOS selection with a stable diagnostic.
 - Move new DesignTokens consumers to exact `shared-design-system` revisions or
   version 0.3.0 while preserving immutable historical provider routes and
   private npm identity.
@@ -29,12 +29,12 @@ the corresponding Git tag or GitHub release already exists.
 
 ## 0.1.0 — first release (Git tag v0.1.0)
 
-- SwiftUI `StrataTokenColor.resolve(_:theme:)` bridge over exact DesignTokens
+- SwiftUI `NativeTokenColor.resolve(_:theme:)` bridge over exact DesignTokens
   0.1.1, with explicit themes, encoded sRGB conversion and unchanged errors.
 - Versioned AI-contract entry, integration/migration guidance, machine registry
   and an ordinary external SwiftPM consumer fixture.
 
-Strata is MIT licensed, and the initial bridge (#1) is retained.
+NativeDesignKit is MIT licensed, and the initial bridge (#1) is retained.
 Git tag `v0.1.0` marks the merge commit of the release pull request.
 Exact-tag external consumer validation runs against `v0.1.0`; its results are
 recorded in the GitHub release notes, not claimed here. UI demos/style acceptance and unmeasured 6DQ dimensions remain

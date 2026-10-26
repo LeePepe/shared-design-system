@@ -11,9 +11,10 @@ Supported mode/material values are explicit light/dark and glass/solid. Add
 `--reduce-transparency` for the same-theme opaque fallback. The internal preference
 override is fixture-only; shipping views follow the system setting.
 
-Resolve the public exact DesignTokens 0.2.0 release at
-`87bef8fbab5bf67a748815d7ed04d7ae199f760a` without package-root or generated-workspace
-mirrors. Record the exact native/provider revisions and public-origin proof.
+Resolve the containing `shared-design-system` revision and its repository-local
+`Packages/DesignTokens` target. The historical external DesignTokens 0.2.0
+tag remains immutable compatibility history, not the active provider route.
+Record the exact root/provider revisions and source-bound proof.
 Do not commit generated projects, screenshots, caches or runtime logs. Fixture
 compilation alone does not establish rendered component or interaction acceptance;
 those remain with the original component authors on their final merged base.

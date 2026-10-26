@@ -6,7 +6,7 @@
   "releaseStatus": "released",
   "releaseUnit": {"ecosystem": "swiftpm", "product": "Strata", "module": "Strata"},
   "releaseUnits": {
-    "nativeDesignKit": "README.md",
+    "strata": "README.md",
     "designTokens": "../Packages/DesignTokens/ai/README.md"
   },
   "documents": {
@@ -19,7 +19,7 @@
     "changelog": "../CHANGELOG.md"
   },
   "capabilities": [{
-    "id": "native-token-color",
+    "id": "strata-token-color",
     "symbol": "StrataTokenColor.resolve(_:theme:)",
     "source": "../Sources/Strata/StrataTokenColor.swift",
     "documentation": "USAGE.md",

@@ -17,9 +17,9 @@
     },
     "releaseUnits": {
       "type": "object", "additionalProperties": false,
-      "required": ["nativeDesignKit", "designTokens"],
+      "required": ["strata", "designTokens"],
       "properties": {
-        "nativeDesignKit": {"const": "README.md"},
+        "strata": {"const": "README.md"},
         "designTokens": {"const": "../Packages/DesignTokens/ai/README.md"}
       }
     },
@@ -39,7 +39,7 @@
         "type": "object", "additionalProperties": false,
         "required": ["id", "symbol", "source", "documentation", "example"],
         "properties": {
-          "id": {"const": "native-token-color"},
+        "id": {"const": "strata-token-color"},
           "symbol": {"const": "StrataTokenColor.resolve(_:theme:)"},
           "source": {"const": "../Sources/Strata/StrataTokenColor.swift"},
           "documentation": {"const": "USAGE.md"},

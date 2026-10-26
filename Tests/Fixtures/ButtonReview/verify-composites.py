@@ -83,14 +83,15 @@ def main():
     head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
     if run["dirty"] or run["sha"] != head or run["exit_code"] != 0:
         raise ValueError("Require a passing clean run at the current exact source SHA")
-    pin = next(p for p in json.loads((root / "Package.resolved").read_text())["pins"]
-               if p["identity"] == "shared-design-tokens")
-    checkout = root / ".build/checkouts/shared-design-tokens"
-    provider_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=checkout, text=True).strip()
-    if provider_sha != pin["state"]["revision"]:
-        raise ValueError("Contrast data must match the exact resolved provider revision")
-    provider_path = checkout / "dist/resolved.json"
+    if subprocess.check_output(["git", "status", "--porcelain"], cwd=root, text=True):
+        raise ValueError("Require a clean root checkout for provider provenance")
+    provider_path = root / "Packages/DesignTokens/dist/resolved.json"
     provider_bytes = provider_path.read_bytes()
+    committed_provider = subprocess.check_output(
+        ["git", "show", f"HEAD:Packages/DesignTokens/dist/resolved.json"], cwd=root)
+    if provider_bytes != committed_provider:
+        raise ValueError("Provider data must match the containing root HEAD")
+    provider_sha = head
     provider = json.loads(provider_bytes)
     if provider["colorSpace"] != "srgb":
         raise ValueError("Expected provider's encoded sRGB data")
@@ -149,7 +150,7 @@ def main():
             for bg_a, bg_b in zip(a["backgrounds"], b["backgrounds"]):
                 if max(abs(x - y) for x, y in zip(bg_a["rgb"], bg_b["rgb"])) > 1:
                     raise ValueError(f"{name} background differs from explicit solid")
-    report = dict(source_sha=head, provider_sha=provider_sha, provider_version=pin["state"]["version"],
+    report = dict(source_sha=head, provider_sha=provider_sha, provider_version=provider["schemaVersion"],
                   provider_data_sha256=hashlib.sha256(provider_bytes).hexdigest(),
                   minimum_contrast=min(s["minimum_contrast"] for r in results.values() for s in r["samples"]),
                   specimens=results, geometry_stable=True, real_fallback_matches_solid=True, forced_fallback_matches_solid=True)

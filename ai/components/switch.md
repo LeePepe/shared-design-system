@@ -61,6 +61,7 @@ macOS keyboard focus, live external-keyboard activation or minimum-OS
 acceptance. Native semantics remain owned by SwiftUI Toggle.
 
 Strata 0.3.0 uses the repository-local DesignTokens target;
+NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;
 NativeDesignKit 0.1.0 historically used exact DesignTokens 0.1.1. This
 unreleased Switch preserves the iOS 15/macOS 12 floors and color-bridge
 behavior. To roll back, remove these call sites and restore the previously

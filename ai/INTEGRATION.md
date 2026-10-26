@@ -27,7 +27,7 @@ package dependency:
 ```
 
 The library does not re-export Tokens types. Strata 0.3.0 uses the
-repository-local DesignTokens target. Historical Strata 0.1.0 retains
+repository-local DesignTokens target. Historical NativeDesignKit 0.1.0 retains
 its old exact provider route.
 
 ## Consumer design contract
