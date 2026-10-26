@@ -20,4 +20,16 @@ public enum SamplePalette {
             label: "Weight", displayValue: "20", unitLabel: "kg")
         return StrataNumberSlot(theme: theme, configuration: configuration, action: {})
     }
+
+    @MainActor
+    public static func dockedHeader(theme: StrataTheme) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            StrataSectionHeader(theme: theme, title: "Equipment") {
+                Button("More") {}
+            }
+            StrataDockedBar(theme: theme) {
+                Button("Done") {}
+            }
+        }
+    }
 }
