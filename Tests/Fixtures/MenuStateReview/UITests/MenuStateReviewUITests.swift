@@ -12,17 +12,17 @@ final class MenuStateReviewUITests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["Menu and state components"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["More actions"].exists)
-        XCTAssertTrue(app.buttons["All"].exists)
-        XCTAssertTrue(app.buttons["Chest"].exists)
-        XCTAssertTrue(app.buttons["Legs"].exists)
+        let horizontalSegments = app.buttons.matching(identifier: "horizontal-segmented-bar")
+        XCTAssertEqual(horizontalSegments.count, 3)
         XCTAssertTrue(app.staticTexts["Could not load history"].exists)
 
         app.buttons["More actions"].tap()
         XCTAssertTrue(app.buttons["Copy set"].waitForExistence(timeout: 2))
         app.buttons["Copy set"].tap()
         XCTAssertEqual(app.staticTexts["menu-result"].label, "Menu result: Copied")
-        app.buttons["Legs"].tap()
-        XCTAssertTrue(app.buttons["Legs"].isSelected)
+        let legs = horizontalSegments.element(boundBy: 2)
+        legs.tap()
+        XCTAssertTrue(legs.isSelected)
 
         capture("menu-state-blue-light", app: app)
         app.buttons["theme-strata-blue-dark"].tap()
