@@ -6,4 +6,18 @@ public enum SamplePalette {
     public static func color(_ id: String, theme: Theme) throws -> Color {
         try StrataTokenColor.resolve(id, theme: theme)
     }
+
+    @MainActor
+    public static func searchField(theme: StrataTheme, text: Binding<String>) throws -> some View {
+        let configuration = try StrataSearchFieldConfiguration(
+            label: "Search", placeholder: "Find an item", clearLabel: "Clear search")
+        return StrataSearchField(theme: theme, text: text, configuration: configuration)
+    }
+
+    @MainActor
+    public static func numberSlot(theme: StrataTheme) throws -> some View {
+        let configuration = try StrataNumberSlotConfiguration(
+            label: "Weight", displayValue: "20", unitLabel: "kg")
+        return StrataNumberSlot(theme: theme, configuration: configuration, action: {})
+    }
 }

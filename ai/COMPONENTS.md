@@ -67,3 +67,4 @@ Component-specific contracts are added under `components/` by their PRs.
 | ProgressBar | [StrataProgressBar](components/progress-bar.md) |
 | Avatar | [StrataAvatar](components/avatar.md) |
 | Chip | [StrataChip](components/chip.md) |
+| SearchField / NumberSlot | [search-field](components/search-field.md) |
