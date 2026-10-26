@@ -36,9 +36,7 @@ private struct DockedHeaderReviewBoard: View {
     private let items = [
         StrataIndexRailItem(id: "bar", shortLabel: "B", fullTitle: "Barbell"),
         StrataIndexRailItem(id: "dumbbell", shortLabel: "D", fullTitle: "Dumbbell"),
-        StrataIndexRailItem(id: "machine", shortLabel: "M", fullTitle: "Machine"),
-        StrataIndexRailItem(id: "cable", shortLabel: "C", fullTitle: "Cable"),
-        StrataIndexRailItem(id: "bodyweight", shortLabel: "W", fullTitle: "Bodyweight")
+        StrataIndexRailItem(id: "machine", shortLabel: "M", fullTitle: "Machine")
     ]
 
     var body: some View {

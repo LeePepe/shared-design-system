@@ -76,7 +76,7 @@ public struct StrataIndexRail: View {
                             }
                     }
                 )
-                .simultaneousGesture(DragGesture(minimumDistance: 4).onChanged { value in
+                .highPriorityGesture(DragGesture(minimumDistance: 4).onChanged { value in
                     selectItem(at: value.location.y)
                 })
 

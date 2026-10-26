@@ -31,7 +31,7 @@ final class DockedHeaderReviewUITests: XCTestCase {
 
             let dragStart = app.buttons["Dumbbell"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
             let dragEnd = app.buttons["Machine"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-            dragStart.press(forDuration: 0.1, thenDragTo: dragEnd, withVelocity: XCUIGestureVelocity.default, thenHoldForDuration: 0)
+            dragStart.press(forDuration: 0.3, thenDragTo: dragEnd, withVelocity: XCUIGestureVelocity.default, thenHoldForDuration: 0)
             XCTAssertTrue(app.staticTexts["Selected: machine"].waitForExistence(timeout: 2))
 
             app.buttons["Done"].tap()
