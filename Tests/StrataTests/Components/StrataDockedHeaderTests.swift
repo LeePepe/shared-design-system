@@ -46,6 +46,7 @@ final class StrataDockedHeaderTests: XCTestCase {
         XCTAssertNotEqual(item, StrataIndexRailItem(id: "machine", shortLabel: "M", fullTitle: "Machine"))
     }
 
+    @MainActor
     func testIndexRailItemIndexUsesRenderedRailHeight() {
         XCTAssertEqual(StrataIndexRail.itemIndex(at: 44, railHeight: 132, itemCount: 3), 1)
         XCTAssertEqual(StrataIndexRail.itemIndex(at: 128, railHeight: 132, itemCount: 3), 2)

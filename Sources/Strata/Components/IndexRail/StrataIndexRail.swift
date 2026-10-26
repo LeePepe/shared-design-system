@@ -102,7 +102,7 @@ public struct StrataIndexRail: View {
         return items.first { $0.id == activeID }
     }
 
-    static func itemIndex(at y: CGFloat, railHeight: CGFloat, itemCount: Int) -> Int? {
+    nonisolated static func itemIndex(at y: CGFloat, railHeight: CGFloat, itemCount: Int) -> Int? {
         guard itemCount > 0 else { return nil }
         let effectiveHeight = railHeight > 0 ? railHeight : CGFloat(itemCount) * 44
         let itemHeight = max(effectiveHeight / CGFloat(itemCount), 1)
