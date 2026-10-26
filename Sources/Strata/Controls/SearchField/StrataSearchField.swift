@@ -57,12 +57,12 @@ public struct StrataSearchField: View {
                           })
                     .textFieldStyle(.plain)
                     .font(.body)
-                    .foregroundStyle(theme.foreground)
+                    .foregroundStyle(configuration.isDisabled ? theme.secondaryForeground : theme.foreground)
                     .tint(theme.accent)
                     .focused($isFocused)
                     .onSubmit { onSubmit?() }
                     .accessibilityLabel(configuration.label)
-                if !text.isEmpty {
+                if !text.isEmpty && !configuration.isDisabled {
                     Button(action: clear) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(theme.secondaryForeground)

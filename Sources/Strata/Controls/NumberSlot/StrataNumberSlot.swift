@@ -88,15 +88,20 @@ public struct StrataNumberSlot: View {
 
         init(theme: StrataTheme, configuration: StrataNumberSlotConfiguration) {
             fill = configuration.isCompleted ? theme.successSurface : theme.surface(.inset)
-            foreground = configuration.isCompleted ? theme.success :
+            foreground = configuration.isDisabled ? theme.secondaryForeground :
+                configuration.isCompleted ? theme.success :
                 configuration.displayValue.isEmpty ? theme.secondaryForeground : theme.foreground
             outline = configuration.isInvalid ? theme.critical :
                 configuration.isCompleted ? theme.success :
                 configuration.isActive ? theme.accent : .clear
-            accessibilityValue = ([configuration.prefixBadge,
-                                   configuration.displayValue.isEmpty ? configuration.placeholder : configuration.displayValue,
-                                   configuration.unitLabel] + (configuration.isCompleted ? ["Completed"] : []))
-                .compactMap { $0 }.joined(separator: " ")
+            accessibilityValue = [
+                configuration.prefixBadge,
+                configuration.displayValue.isEmpty ? configuration.placeholder : configuration.displayValue,
+                configuration.unitLabel
+            ]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
         }
     }
 
