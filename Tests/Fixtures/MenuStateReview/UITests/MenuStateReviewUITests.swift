@@ -24,7 +24,7 @@ final class MenuStateReviewUITests: XCTestCase {
         app.buttons["More actions"].tap()
         XCTAssertTrue(app.buttons["Copy set"].waitForExistence(timeout: 2))
         app.buttons["Copy set"].tap()
-        XCTAssertEqual(app.staticTexts["menu-result"].label, "Menu result: Copied")
+        XCTAssertEqual(app.staticTexts["menu-result"].label, "Menu: Copied")
         let legs = horizontalSegments.element(boundBy: 2)
         legs.tap()
         XCTAssertTrue(legs.isSelected)
