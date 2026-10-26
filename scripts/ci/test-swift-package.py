@@ -116,7 +116,7 @@ class SchemeSelectionTests(unittest.TestCase):
     def run_helper(self, schemes_json, enumerations, targets=None):
         package = {
             "targets": targets or [
-                {"name": "NativeDesignKitTests", "type": "test"},
+                {"name": "StrataTests", "type": "test"},
                 {"name": "DesignTokensTests", "type": "test"},
             ],
         }
@@ -165,9 +165,9 @@ class SchemeSelectionTests(unittest.TestCase):
                     {
                         "Product": {},
                         "Complete": {"output": enumeration(
-                            "DesignTokensTests", "NativeDesignKitTests")},
+                            "DesignTokensTests", "StrataTests")},
                         "Incomplete": {"output": enumeration(
-                            "NativeDesignKitTests")},
+                            "StrataTests")},
                     },
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
@@ -208,7 +208,7 @@ class SchemeSelectionTests(unittest.TestCase):
         self.assert_no_final_test()
 
     def test_two_complete_candidates_are_ambiguous(self):
-        complete = enumeration("NativeDesignKitTests", "DesignTokensTests")
+        complete = enumeration("StrataTests", "DesignTokensTests")
         result = self.run_helper(
             json.dumps({"workspace": {"name": "Fixture",
                                       "schemes": ["CompleteA", "CompleteB"]}}),
@@ -227,7 +227,7 @@ class SchemeSelectionTests(unittest.TestCase):
                                       "schemes": ["Incomplete"]}}),
             {
                 "Incomplete": {"output": enumeration(
-                    "NativeDesignKitTests")},
+                    "StrataTests")},
             },
         )
         self.assertNotEqual(result.returncode, 0)
@@ -235,7 +235,7 @@ class SchemeSelectionTests(unittest.TestCase):
         self.assert_no_final_test()
 
     def test_enumeration_errors_fail_closed(self):
-        metadata = enumeration("NativeDesignKitTests", "DesignTokensTests")
+        metadata = enumeration("StrataTests", "DesignTokensTests")
         metadata["errors"] = [{"message": "enumeration was incomplete"}]
         result = self.run_helper(
             json.dumps({"workspace": {"name": "Fixture",
@@ -247,7 +247,7 @@ class SchemeSelectionTests(unittest.TestCase):
         self.assert_no_final_test()
 
     def test_target_shaped_data_outside_values_fails_closed(self):
-        metadata = enumeration("NativeDesignKitTests")
+        metadata = enumeration("StrataTests")
         metadata["unexpected"] = enumeration("DesignTokensTests")["values"]
         result = self.run_helper(
             json.dumps({"workspace": {"name": "Fixture",
@@ -259,7 +259,7 @@ class SchemeSelectionTests(unittest.TestCase):
         self.assert_no_final_test()
 
     def test_malformed_children_hierarchy_fails_closed(self):
-        metadata = enumeration("NativeDesignKitTests", "DesignTokensTests")
+        metadata = enumeration("StrataTests", "DesignTokensTests")
         metadata["values"][0]["children"][0]["children"] = {
             "kind": "test",
             "name": "forgedTest()",
@@ -281,7 +281,7 @@ class SchemeSelectionTests(unittest.TestCase):
                 "Complete": {"result": {
                     "testNodes": [{
                         "nodeType": "Unit test bundle",
-                        "name": "NativeDesignKitTests",
+                        "name": "StrataTests",
                         "children": [{
                             "nodeType": "Test Case",
                             "name": "testExecutes()",
@@ -314,7 +314,7 @@ class SchemeSelectionTests(unittest.TestCase):
                 "Incomplete": {"result": {
                     "testNodes": [{
                         "nodeType": "Unit test bundle",
-                        "name": "NativeDesignKitTests",
+                        "name": "StrataTests",
                         "children": [{
                             "nodeType": "Test Case",
                             "name": "testExecutes()",
@@ -344,7 +344,7 @@ class SchemeSelectionTests(unittest.TestCase):
                 "Empty": {"result": {
                     "testNodes": [{
                         "nodeType": "Unit test bundle",
-                        "name": "NativeDesignKitTests",
+                        "name": "StrataTests",
                         "children": [{
                             "nodeType": "Test Case",
                             "name": "testExecutes()",
@@ -378,7 +378,7 @@ class SchemeSelectionTests(unittest.TestCase):
                 "result": {
                     "testNodes": [{
                         "nodeType": "Unit test bundle",
-                        "name": "NativeDesignKitTests",
+                        "name": "StrataTests",
                         "children": [{
                             "nodeType": "Test Case",
                             "name": "testExecutes()",
@@ -417,7 +417,7 @@ class SchemeSelectionTests(unittest.TestCase):
                     "result": {
                         "testNodes": [{
                             "nodeType": "Unit test bundle",
-                            "name": "NativeDesignKitTests",
+                            "name": "StrataTests",
                             "children": [{
                                 "nodeType": "Test Case",
                                 "name": "testExecutes()",
@@ -444,11 +444,11 @@ class SchemeSelectionTests(unittest.TestCase):
                                       "schemes": ["Incomplete"]}}),
             {
                 "Incomplete": {
-                    "output": enumeration("NativeDesignKitTests"),
+                    "output": enumeration("StrataTests"),
                     "result": {
                         "testNodes": [{
                             "nodeType": "Unit test bundle",
-                            "name": "NativeDesignKitTests",
+                            "name": "StrataTests",
                             "children": [{
                                 "nodeType": "Test Case",
                                 "name": "testExecutes()",
@@ -510,7 +510,7 @@ def run_real_fixture():
                 and isinstance(node.get("name"), str)
             )
         }
-        expected = {"NativeDesignKitTests", "DesignTokensTests"}
+        expected = {"StrataTests", "DesignTokensTests"}
         if not expected.issubset(observed):
             raise RuntimeError(
                 f"missing executed test targets: expected {sorted(expected)}, "

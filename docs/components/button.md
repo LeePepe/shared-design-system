@@ -26,7 +26,7 @@ from palette, light/dark and caller state. Rollback removes uses of that overloa
 before returning to the earlier package revision; no stored data is involved.
 
 The dedicated [ButtonReview fixture](../../Tests/Fixtures/ButtonReview/README.md)
-composes actual NativeButton controls inside the shared 32 pt specimen shell
+composes actual StrataButton controls inside the shared 32 pt specimen shell
 and a dense 24 pt inner stage. Its 20 theme/material captures retain the same
 content and geometry. Separate behavior boards preserve the existing enabled,
 disabled and loading dispatch checks, 320 pt German localization, Dynamic Type
@@ -52,7 +52,7 @@ establish VoiceOver, minimum-OS, physical-device or macOS pointer/keyboard
 acceptance. Remote gates and an independent exact-SHA visual review are
 separate from local verification against public exact DesignTokens0.2.0.
 
-The pointer fixture also compares ordinary SwiftUI controls with NativeButton
+The pointer fixture also compares ordinary SwiftUI controls with StrataButton
 on a separate diagnostic board. It distinguishes accepted XCTest synthesis,
 actual hover callbacks, text-input delivery, observed native focus and focused
 Space activation. The keyboard lane requires a preconfigured runtime and reads
@@ -67,4 +67,4 @@ the151851e flat experiment remains0PASS/1FAIL/0skip. All strict source assertion
 are preserved, with no unchanged input rerun, skip, xfail or claimed input PASS.
 Normal repository checks and final-head visual/system-preference evidence remain
 required. Public provider0.2.0 at87bef8fbab5bf67a748815d7ed04d7ae199f760a replaces
-the preview-only dependency for final delivery; NativeDesignKit remains unreleased.
+the preview-only dependency for final delivery; Strata remains unreleased.

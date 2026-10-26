@@ -1,17 +1,17 @@
-# NativeCheckbox (unreleased)
+# StrataCheckbox (unreleased)
 
-Part of the unreleased Strata rebuild. NativeDesignKit 0.3.0 contains only
+Part of the unreleased Strata rebuild. Strata 0.3.0 contains only
 the color bridge; evaluate Checkbox at an explicitly reviewed revision.
 HeroUI supplies inventory only; this is a fresh native SwiftUI implementation.
 
 ```swift
-public struct NativeCheckbox<Label: View>: View {
-    public init(theme: NativeDesignTheme,
+public struct StrataCheckbox<Label: View>: View {
+    public init(theme: StrataTheme,
                 isOn: Binding<Bool>,
                 @ViewBuilder label: () -> Label)
 }
 
-NativeCheckbox(theme: theme, isOn: $includeAttachments) {
+StrataCheckbox(theme: theme, isOn: $includeAttachments) {
     Text("Include attachments")
 }
 .disabled(!canEdit)
@@ -20,7 +20,7 @@ NativeCheckbox(theme: theme, isOn: $includeAttachments) {
 Theme and binding are required. Callers own state, localization, formatting,
 and the label content. Reconstruct the explicit theme when mode or brand
 changes. The provider supports ocean/graphite only; token resolution errors
-propagate unchanged through `NativeDesignTheme` construction.
+propagate unchanged through `StrataTheme` construction.
 
 On iOS, the enabled selected square uses the exact accent/onAccent token pair and a
 checkmark. Unselected uses a clear fill and neutral secondary-foreground outline.

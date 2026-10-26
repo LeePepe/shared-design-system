@@ -9,13 +9,13 @@ let package = Package(
         .executableTarget(
             name: "DesignTokensWatchConsumer",
             dependencies: [
-                .product(name: "DesignTokens", package: "shared-design-system")
+                .product(name: "DesignTokens", package: "strata-catalog-rename")
             ]
         ),
         .executableTarget(
-            name: "NativeDesignKitWatchConsumer",
+            name: "StrataWatchConsumer",
             dependencies: [
-                .product(name: "NativeDesignKit", package: "shared-design-system")
+                .product(name: "Strata", package: "strata-catalog-rename")
             ]
         )
     ]

@@ -1,18 +1,18 @@
-@testable import NativeDesignKit
+@testable import Strata
 import SwiftUI
 
 /// Only this internal behavior fixture accesses the nil-default test preference.
 /// The public-import construction tests remain independent of internal symbols.
-struct NativeCardBehaviorFixture: View {
+struct StrataCardBehaviorFixture: View {
     let configuration: CardReviewConfiguration
     @State private var activations = 0
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
     private var isLong: Bool { configuration.scenario == "long" }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Native Card").font(.title.bold())
+                Text("Strata Card").font(.title.bold())
                 Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · synthetic content")
                     .font(.subheadline).foregroundStyle(theme.secondaryForeground)
                 Text(surfaceDescription)
@@ -45,7 +45,7 @@ struct NativeCardBehaviorFixture: View {
                 .accessibilityIdentifier("review-card")
         }
         .padding(16)
-        .nativeSurface(theme: theme, style: configuration.surface, cornerRadius: 32, role: .region)
+        .strataSurface(theme: theme, style: configuration.surface, cornerRadius: 32, role: .region)
         .environment(\.nativeReduceTransparencyOverride,
                      configuration.systemTransparency ? nil : configuration.reduceTransparency)
         .background(alignment: .trailing) {
@@ -64,11 +64,11 @@ struct NativeCardBehaviorFixture: View {
     private var reviewedCard: some View {
         switch configuration.scenario {
         case "content-only":
-            NativeCard(theme: theme, surface: configuration.surface) {
+            StrataCard(theme: theme, surface: configuration.surface) {
                 Text("Only content").accessibilityIdentifier("card-body")
             }
         case "empty-slots":
-            NativeCard(theme: theme, surface: configuration.surface) {
+            StrataCard(theme: theme, surface: configuration.surface) {
                 EmptyView()
             } content: {
                 Text("Only content").accessibilityIdentifier("card-body")
@@ -78,7 +78,7 @@ struct NativeCardBehaviorFixture: View {
                 EmptyView()
             }
         default:
-            NativeCard(theme: theme, surface: configuration.surface) {
+            StrataCard(theme: theme, surface: configuration.surface) {
                 Text(isLong ? "A longer title remains clear as the available width narrows" : "A clear place to begin")
                     .accessibilityIdentifier("card-title")
             } content: {

@@ -1,4 +1,4 @@
-import NativeDesignKit
+import Strata
 import SwiftUI
 
 /// Synthetic component evidence; no product data, persistence or integration.
@@ -24,7 +24,7 @@ struct RadioGroupReviewApp: App {
 
 private struct ReviewConfiguration {
     enum ConfigurationError: Error { case missing(String), invalid(String) }
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     let brand: String
     let mode: String
     let hostMode: String
@@ -48,8 +48,8 @@ private struct ReviewConfiguration {
             throw ConfigurationError.invalid("NDK_SCENARIO")
         }
         switch mode {
-        case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
-        case "dark": theme = try NativeDesignTheme(theme: .dark, brand: brand)
+        case "light": theme = try StrataTheme(theme: .light, brand: brand)
+        case "dark": theme = try StrataTheme(theme: .dark, brand: brand)
         default: throw ConfigurationError.invalid("NDK_THEME")
         }
         switch try required("NDK_TEXT_SIZE") {
@@ -70,7 +70,7 @@ private struct ReviewBoard: View {
     @State private var reversed = false
     @State private var writes = 0
 
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
     private var choices: [(id: String, label: String)] {
         let values = [("compact-id", "Compact"), ("balanced-id", "Balanced"), ("detail-id", "Detailed")]
         return reversed ? Array(values.reversed()) : values
@@ -83,7 +83,7 @@ private struct ReviewBoard: View {
         List {
             Group {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Native RadioGroup").font(.title.bold())
+                    Text("Strata RadioGroup").font(.title.bold())
                     Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · iOS inline selection")
                         .font(.subheadline).foregroundStyle(theme.secondaryForeground)
                 }
@@ -97,7 +97,7 @@ private struct ReviewBoard: View {
                     Text("Selected: \(selection.id)").accessibilityIdentifier("selection-state")
                     Text("Writes: \(writes)").accessibilityIdentifier("write-count")
                     if configuration.scenario == "matrix" {
-                        NativeRadioGroup(theme: theme, selection: $disabledSelection) {
+                        StrataRadioGroup(theme: theme, selection: $disabledSelection) {
                             Text("Disabled choices")
                         } options: {
                             Text("Summary").accessibilityIdentifier("disabled-summary").tag(Choice(id: "summary-id"))
@@ -108,7 +108,7 @@ private struct ReviewBoard: View {
                         controls
                     }
                 }
-                Text("Synthetic review choices · Native inline picker")
+                Text("Synthetic review choices · Strata inline picker")
                     .font(.caption).foregroundStyle(theme.secondaryForeground)
                     .accessibilityIdentifier("review-end")
             }
@@ -124,7 +124,7 @@ private struct ReviewBoard: View {
     }
 
     private var selectionGroup: some View {
-        NativeRadioGroup(theme: theme, selection: trackedSelection) {
+        StrataRadioGroup(theme: theme, selection: trackedSelection) {
             Text("Review density")
         } options: {
             ForEach(choices, id: \.id) { choice in
@@ -137,7 +137,7 @@ private struct ReviewBoard: View {
     private var themeBoundary: some View {
         Group {
             InheritedSchemeProbe(title: "Caller scheme", identifier: "caller-scheme")
-            NativeRadioGroup(theme: theme, selection: trackedSelection) {
+            StrataRadioGroup(theme: theme, selection: trackedSelection) {
                 InheritedSchemeProbe(title: "Picker label scheme", identifier: "picker-label-scheme")
             } options: {
                 InheritedSchemeProbe(title: "First option scheme", identifier: "boundary-first")
@@ -173,7 +173,7 @@ private struct ReviewBoard: View {
     private var longLabel: some View {
         Group {
             Text("320 pt narrow layout").font(.headline)
-            NativeRadioGroup(theme: theme, selection: trackedSelection) {
+            StrataRadioGroup(theme: theme, selection: trackedSelection) {
                 Text("Review preference")
             } options: {
                 Text("Show the complete description of every synthetic review option")

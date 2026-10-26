@@ -2,7 +2,7 @@ import XCTest
 
 @MainActor
 final class ChipReviewUITests: XCTestCase {
-    func testNativeRemovalDisabledBlockingAndStaticContent() {
+    func testStrataRemovalDisabledBlockingAndStaticContent() {
         let app = launch(scenario: "interaction")
         let remove = app.buttons["Remove research note"]
         minimumTarget(remove)

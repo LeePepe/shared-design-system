@@ -69,8 +69,8 @@ let ratio = try color.contrast(with: DesignTokens.color("product.surface.canvas"
 `Theme`, `BrandRole`, `RGBA`, `SeriesColor`, `TokenError` and `DesignTokens` are public immutable/Sendable data APIs. `RGBA(red:green:blue:alpha:)` rejects out-of-range/nonfinite inputs; `relativeLuminance` implements WCAG sRGB math; `contrast(with:)` rejects translucent colors instead of guessing a compositing surface. No HSB API or placeholder non-AppKit values exist.
 
 The containing root `Package.swift` publishes both `DesignTokens` and
-`NativeDesignKit`; NativeDesignKit depends on this local target. DesignTokens is
-UI-free and supports iOS 15, macOS 12 and watchOS 8. NativeDesignKit remains an
+`Strata`; Strata depends on this local target. DesignTokens is
+UI-free and supports iOS 15, macOS 12 and watchOS 8. Strata remains an
 iOS/macOS component product and is unavailable on watchOS.
 
 ## Reproduce

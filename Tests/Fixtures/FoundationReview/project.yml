@@ -4,7 +4,7 @@ options:
   deploymentTarget:
     iOS: "15.0"
 packages:
-  NativeDesignKit:
+  Strata:
     path: ../../..
 settings:
   base:
@@ -19,7 +19,7 @@ targets:
     platform: iOS
     sources: [App, ../Shared]
     dependencies:
-      - package: NativeDesignKit
+      - package: Strata
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.FoundationReview

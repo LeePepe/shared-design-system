@@ -115,7 +115,7 @@ def accent(provider, brand, mode):
         visited.add(token)
         value = values[token][mode]
         if "ref" not in value:
-            require(value["a"] == 1, "Native checkmark test requires an opaque provider accent")
+            require(value["a"] == 1, "Strata checkmark test requires an opaque provider accent")
             rgb = tuple(value[channel] for channel in ("r", "g", "b"))
             require(all(type(channel) is int and 0 <= channel <= 255 for channel in rgb), "Invalid provider RGB")
             return rgb
@@ -162,7 +162,7 @@ def check_image(path, record, expected):
         # Assert this fixture's full-width-row invariant; never use row width
         # as a substitute for the actual app width when computing PNG scale.
         require(abs(x - app[0]) <= 0.001 and abs(w - app[2]) <= 0.001, "Matrix native row must span the app")
-        require(h >= 44 - 0.001 and y >= 0 and y + h <= app[3], "Native row is outside the app")
+        require(h >= 44 - 0.001 and y >= 0 and y + h <= app[3], "Strata row is outside the app")
         rect = [round(v * scale) for v in (x + w * 0.8, y + 2, x + w - 2, y + h - 2)]
         left, top, right, bottom = rect
         require(0 <= left < right <= width and 0 <= top < bottom <= height, "Glyph sample is outside PNG")

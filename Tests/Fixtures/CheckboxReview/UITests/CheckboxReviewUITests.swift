@@ -4,7 +4,7 @@ import XCTest
 final class CheckboxReviewUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
-    func testNativeBindingAndCallerUpdatesPreserveFootprint() {
+    func testStrataBindingAndCallerUpdatesPreserveFootprint() {
         let app = launch()
         let target = app.switches["checkbox.primary"]
         let initialFrame = target.frame
@@ -37,7 +37,7 @@ final class CheckboxReviewUITests: XCTestCase {
         }
     }
 
-    func testNativeAccessibilityExposesCompleteLabelAndCheckedValue() {
+    func testStrataAccessibilityExposesCompleteLabelAndCheckedValue() {
         let app = launch()
         let target = app.switches["checkbox.primary"]
         XCTAssertEqual(target.elementType, .switch)

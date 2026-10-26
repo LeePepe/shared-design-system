@@ -1,0 +1,95 @@
+name: RenameReview
+options:
+  bundleIdPrefix: org.nativedesignkit.fixtures
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+packages:
+  Strata:
+    path: ../../..
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    GENERATE_INFOPLIST_FILE: YES
+    CODE_SIGNING_ALLOWED: NO
+targets:
+  RenameReview:
+    type: application
+    platform: iOS
+    sources: [App]
+    dependencies:
+      - package: Strata
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.RenameReview
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+  RenameReviewUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: RenameReview
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.RenameReviewUITests
+        TEST_TARGET_NAME: RenameReview
+  RenameReviewMac:
+    type: application
+    platform: macOS
+    sources: [App]
+    dependencies:
+      - package: Strata
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.RenameReviewMac
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: YES
+  RenameReviewMacTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources: [MacTests]
+    dependencies:
+      - package: Strata
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.RenameReviewMacTests
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: YES
+  RenameReviewMacUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources: [MacUITests]
+    dependencies:
+      - target: RenameReviewMac
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.RenameReviewMacUITests
+        TEST_TARGET_NAME: RenameReviewMac
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: YES
+schemes:
+  RenameReview:
+    build:
+      targets:
+        RenameReview: all
+        RenameReviewUITests: [test]
+    test:
+      gatherCoverageData: false
+      targets: [RenameReviewUITests]
+  RenameReviewMac:
+    build:
+      targets:
+        RenameReviewMac: all
+        RenameReviewMacTests: [test]
+        RenameReviewMacUITests: [test]
+    test:
+      gatherCoverageData: false
+      targets:
+        - RenameReviewMacTests
+        - RenameReviewMacUITests

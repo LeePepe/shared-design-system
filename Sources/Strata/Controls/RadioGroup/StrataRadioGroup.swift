@@ -1,0 +1,49 @@
+import SwiftUI
+
+/// A caller-owned single selection with native tagged option identity.
+/// On iOS, place directly in a List or Form for native inline option rows.
+public struct StrataRadioGroup<Selection: Hashable, Label: View, Options: View>: View {
+    private let theme: StrataTheme
+    @Binding private var selection: Selection
+    private let label: Label
+    private let options: Options
+
+    public init(
+        theme: StrataTheme,
+        selection: Binding<Selection>,
+        @ViewBuilder label: () -> Label,
+        @ViewBuilder options: () -> Options
+    ) {
+        self.theme = theme
+        _selection = selection
+        self.label = label()
+        self.options = options()
+    }
+
+    public var body: some View {
+        nativePicker
+            .font(.body)
+            .foregroundStyle(theme.foreground)
+            .tint(theme.accent)
+            // Inline Picker's native checkmark reads the accent environment.
+            .accentColor(theme.accent)
+            .environment(\.colorScheme, theme.mode == .dark ? .dark : .light)
+            .frame(minHeight: 44, alignment: .leading)
+    }
+
+    @ViewBuilder private var nativePicker: some View {
+        let picker = Picker(selection: $selection) {
+            Group { options }
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(minWidth: 44, minHeight: 44, alignment: .leading)
+        } label: {
+            label
+        }
+        #if os(macOS)
+        picker.pickerStyle(.radioGroup)
+        #else
+        picker.pickerStyle(.inline)
+            .environment(\.defaultMinListRowHeight, 44)
+        #endif
+    }
+}

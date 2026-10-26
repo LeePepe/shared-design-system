@@ -1,10 +1,10 @@
 # ListReview
 
-A real SwiftUI fixture for the unreleased NativeList. The faithful specimen
+A real SwiftUI fixture for the unreleased StrataList. The faithful specimen
 uses three synthetic caller-owned design notes following the accepted Strata
 reference: icon, primary/secondary text, trailing metadata, selected checkmark
 and label, compact heading, context/footer and selected count. The real
-NativeList supplies rows and the dense 24pt reading plane; shared
+StrataList supplies rows and the dense 24pt reading plane; shared
 `StrataSpecimen` supplies page, backdrop and the 32pt outer region. It contains
 its own ScrollView, so the fixture does not nest scrolling or duplicate glass.
 

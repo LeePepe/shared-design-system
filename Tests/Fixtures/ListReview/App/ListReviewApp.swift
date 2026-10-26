@@ -1,4 +1,4 @@
-@testable import NativeDesignKit
+@testable import Strata
 import SwiftUI
 
 @main
@@ -21,8 +21,8 @@ struct ListReviewApp: App {
 
 private struct ListConfiguration {
     enum Invalid: Error { case input(String) }
-    let theme: NativeDesignTheme
-    let surface: NativeSurfaceStyle
+    let theme: StrataTheme
+    let surface: StrataSurfaceStyle
     let mode: String
     let scenario: String
     let size: DynamicTypeSize
@@ -37,8 +37,8 @@ private struct ListConfiguration {
         let brand = try required("NDK_BRAND")
         mode = try required("NDK_THEME")
         switch mode {
-        case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
-        case "dark": theme = try NativeDesignTheme(theme: .dark, brand: brand)
+        case "light": theme = try StrataTheme(theme: .light, brand: brand)
+        case "dark": theme = try StrataTheme(theme: .dark, brand: brand)
         default: throw Invalid.input("NDK_THEME")
         }
         switch try required("NDK_SURFACE") {
@@ -86,7 +86,7 @@ private struct ListReviewBoard: View {
     @State private var writes = 0
     @State private var textFrames: [String: CGRect] = [:]
     @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
     private var isLong: Bool { configuration.scenario == "long-label" }
     private var items: [DesignNote] {
         if isLong {
@@ -96,7 +96,7 @@ private struct ListReviewBoard: View {
         }
         return isReversed ? DesignNote.samples.reversed() : DesignNote.samples
     }
-    private var selection: NativeListSelection<String> {
+    private var selection: StrataListSelection<String> {
         switch configuration.scenario {
         case "multiple":
             return .multiple(Binding(get: { selectedIDs }, set: { selectedIDs = $0; writes += 1 }))
@@ -165,7 +165,7 @@ private struct ListReviewBoard: View {
     }
 
     private var list: some View {
-        NativeList(
+        StrataList(
             theme: theme, surface: configuration.surface, items: items, id: \.id,
             selection: selection, selectedLabel: Text("已选"),
             isRowEnabled: { configuration.scenario != "interaction" || $0.id != "type" }

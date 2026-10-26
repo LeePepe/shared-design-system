@@ -1,6 +1,6 @@
-# NativeDesignKit consumer contract
+# Strata consumer contract
 
-Release unit: `NativeDesignKit` (SwiftPM), current release contract **0.3.0**.
+Release unit: `Strata` (SwiftPM), current release contract **0.3.0**.
 Use documents from the same immutable revision as the resolved package; do not
 substitute documentation from `main`. The contract does not claim that the
 corresponding tag or GitHub release already exists.

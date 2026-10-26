@@ -1,13 +1,13 @@
 # Card — Strata reading surface
 
-NativeCard remains a noninteractive four-slot container for caller-owned views.
+StrataCard remains a noninteractive four-slot container for caller-owned views.
 Its API, 24pt continuous radius, 16pt inset and 12pt slot rhythm are unchanged.
 The public contract is [ai/components/card.md](../../ai/components/card.md).
 
 The component now requests the shared `.card` surface role. This supplies a
 denser reading plane under a 32pt containing region and avoids another blur
 when an outer material is already present. Solid and Reduce Transparency use
-the same explicit palette and layout with opaque provider fills. NativeCard
+the same explicit palette and layout with opaque provider fills. StrataCard
 contains no local color table, page backdrop or material recipe.
 
 Supporting content uses the distinct secondary text role in Glass, solid and

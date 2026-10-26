@@ -1,19 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "NativeDesignKit AI registry v1",
+  "title": "Strata AI registry v1",
   "type": "object",
   "additionalProperties": false,
   "required": ["$schema", "schemaVersion", "library", "version", "releaseStatus", "releaseUnit", "releaseUnits", "documents", "capabilities"],
   "properties": {
     "$schema": {"const": "registry.schema.json"},
     "schemaVersion": {"const": 1},
-    "library": {"const": "NativeDesignKit"},
+    "library": {"const": "Strata"},
     "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
     "releaseStatus": {"enum": ["unreleased", "released"]},
     "releaseUnit": {
       "type": "object", "additionalProperties": false,
       "required": ["ecosystem", "product", "module"],
-      "properties": {"ecosystem": {"const": "swiftpm"}, "product": {"const": "NativeDesignKit"}, "module": {"const": "NativeDesignKit"}}
+      "properties": {"ecosystem": {"const": "swiftpm"}, "product": {"const": "Strata"}, "module": {"const": "Strata"}}
     },
     "releaseUnits": {
       "type": "object", "additionalProperties": false,
@@ -40,8 +40,8 @@
         "required": ["id", "symbol", "source", "documentation", "example"],
         "properties": {
           "id": {"const": "native-token-color"},
-          "symbol": {"const": "NativeTokenColor.resolve(_:theme:)"},
-          "source": {"const": "../Sources/NativeDesignKit/NativeTokenColor.swift"},
+          "symbol": {"const": "StrataTokenColor.resolve(_:theme:)"},
+          "source": {"const": "../Sources/Strata/StrataTokenColor.swift"},
           "documentation": {"const": "USAGE.md"},
           "example": {"const": "examples/consumer/Sources/SamplePalette/SamplePalette.swift"}
         }

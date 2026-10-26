@@ -3,7 +3,7 @@ import XCTest
 @MainActor final class RadioGroupReviewUITests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
-    func testNativeBindingSelectionDisabledAndExternalWrites() {
+    func testStrataBindingSelectionDisabledAndExternalWrites() {
         let app = launch(scenario: "interaction")
         print("INITIAL NATIVE PICKER TREE\n\(app.debugDescription)")
         let compact = option("option-compact-id", app: app)
@@ -56,7 +56,7 @@ import XCTest
     func testVisualMatrixGraphiteLight() { matrix(brand: "graphite", mode: "light") }
     func testVisualMatrixGraphiteDark() { matrix(brand: "graphite", mode: "dark") }
 
-    func testExplicitThemeReachesNativePickerWhileCallerEnvironmentRemainsOpposing() {
+    func testExplicitThemeReachesStrataPickerWhileCallerEnvironmentRemainsOpposing() {
         for mode in ["light", "dark"] {
             let opposing = mode == "light" ? "dark" : "light"
             let app = launch(scenario: "theme-boundary", brand: "graphite", mode: mode, hostMode: opposing)
@@ -135,12 +135,12 @@ import XCTest
 
     private func option(_ identifier: String, app: XCUIApplication) -> XCUIElement {
         let element = app.buttons[identifier]
-        XCTAssertTrue(element.exists, "Native inline option must be accessible as a button.\n\(app.debugDescription)")
+        XCTAssertTrue(element.exists, "Strata inline option must be accessible as a button.\n\(app.debugDescription)")
         return element
     }
 
     private func assertSelection(_ selected: XCUIElement, others: [XCUIElement]) {
-        XCTAssertTrue(selected.isSelected, "Native selected trait must expose the selection: \(selected.debugDescription)")
+        XCTAssertTrue(selected.isSelected, "Strata selected trait must expose the selection: \(selected.debugDescription)")
         others.forEach { XCTAssertFalse($0.isSelected) }
     }
 

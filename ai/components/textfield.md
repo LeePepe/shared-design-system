@@ -1,22 +1,22 @@
-# NativeTextField — unreleased
+# StrataTextField — unreleased
 
-`NativeTextField` is a SwiftUI text input with a visible caller-provided label,
+`StrataTextField` is a SwiftUI text input with a visible caller-provided label,
 an opaque Strata input surface and a continuous accent focus outline. It uses
 system semantic fonts, a 16 pt corner radius and a minimum 44 pt input height;
 content can grow with Dynamic Type. It requires an explicitly resolved
-`NativeDesignTheme` and owns no product data or validation rules.
+`StrataTheme` and owns no product data or validation rules.
 
 ```swift
 import DesignTokens
-import NativeDesignKit
+import Strata
 import SwiftUI
 
 struct NameInput: View {
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     @State private var name = ""
 
     var body: some View {
-        NativeTextField(theme: theme, text: $name, prompt: Text("Your name")) {
+        StrataTextField(theme: theme, text: $name, prompt: Text("Your name")) {
             Text("Display name")
         }
         .onSubmit {
@@ -26,14 +26,14 @@ struct NameInput: View {
 }
 ```
 
-The public generic shape is `NativeTextField<Label: View>`. Its initializer is
+The public generic shape is `StrataTextField<Label: View>`. Its initializer is
 `init(theme:text:prompt:accessibilityLabel:label:)`, where `text` is
 `Binding<String>`, `prompt` is an optional `Text` defaulting to `nil`,
 `accessibilityLabel` is a required caller-localized `Text`, and `label` is a
 required `@ViewBuilder`. Arbitrary label content needs an explicit editor name:
 
 ```swift
-NativeTextField(theme: theme, text: $name,
+StrataTextField(theme: theme, text: $name,
                 accessibilityLabel: Text("Display name")) {
     Label("Display name", systemImage: "person")
 }
@@ -64,7 +64,7 @@ they do not add an independent glass layer. Reconstruct the explicit theme
 when the consumer changes theme or brand. See [the component contract](../COMPONENTS.md)
 for token authority, the supported `ocean` / `graphite` brands and release status.
 
-This is additive unreleased API; the published `NativeTokenColor` API, token
+This is additive unreleased API; the published `StrataTokenColor` API, token
 dependency and platform floors are unchanged. Rollback removes uses of this
 component before returning to a release that contains only the color bridge.
 

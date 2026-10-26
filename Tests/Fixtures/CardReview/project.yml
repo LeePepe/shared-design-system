@@ -5,7 +5,7 @@ options:
     iOS: "15.0"
   createIntermediateGroups: true
 packages:
-  NativeDesignKit:
+  Strata:
     path: ../../..
 settings:
   base:
@@ -21,7 +21,7 @@ targets:
       - App
       - ../Shared/StrataSpecimen.swift
     dependencies:
-      - package: NativeDesignKit
+      - package: Strata
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.CardReview

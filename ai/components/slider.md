@@ -1,17 +1,17 @@
-# NativeSlider (unreleased)
+# StrataSlider (unreleased)
 
 Part of the [Strata rebuild](../COMPONENTS.md). This is an additive API under
-`Controls/Slider`, not a NativeDesignKit 0.3.0 release. HeroUI supplies the
+`Controls/Slider`, not a Strata 0.3.0 release. HeroUI supplies the
 inventory name only; the interaction is SwiftUI `Slider`.
 
 ```swift
-public enum NativeSliderConfigurationError: Error, Equatable, Sendable {
+public enum StrataSliderConfigurationError: Error, Equatable, Sendable {
     case invalidRange
     case invalidStep
 }
 
-public struct NativeSlider<Label: View, MinimumValueLabel: View, MaximumValueLabel: View>: View {
-    public init(theme: NativeDesignTheme,
+public struct StrataSlider<Label: View, MinimumValueLabel: View, MaximumValueLabel: View>: View {
+    public init(theme: StrataTheme,
                 value: Binding<Double>,
                 in range: ClosedRange<Double>,
                 step: Double,
@@ -22,7 +22,7 @@ public struct NativeSlider<Label: View, MinimumValueLabel: View, MaximumValueLab
 }
 ```
 
-All arguments are explicit. Resolve `NativeDesignTheme` with an explicit mode
+All arguments are explicit. Resolve `StrataTheme` with an explicit mode
 and provider brand (`ocean` or `graphite`), then construct the control at a
 boundary that can handle errors. Theme token errors propagate unchanged before
 Slider construction. The Slider initializer throws `.invalidRange` for
@@ -32,7 +32,7 @@ bounds; do not construct a reversed or NaN range.
 
 ```swift
 // Inside a throwing view factory, using caller-owned @State `amount`:
-try NativeSlider(theme: theme, value: $amount, in: 0...100, step: 5,
+try StrataSlider(theme: theme, value: $amount, in: 0...100, step: 5,
                  onEditingChanged: { isEditing = $0 }) {
     Text("Amount")
 } minimumValueLabel: {
@@ -61,7 +61,7 @@ when their units require it. Keep sufficient width for meaningful adjustment.
 
 Token accent supplies tint, token foregrounds style the content, and explicit
 theme mode sets native chrome. There is no control glass, palette, provider,
-default theme or cache. NativeDesignKit 0.3.0 uses the repository-local
+default theme or cache. Strata 0.3.0 uses the repository-local
 DesignTokens target; NativeDesignKit 0.1.0 historically used exact DesignTokens
 0.1.1. This unreleased Slider preserves the Swift 6 / iOS 15 / macOS 12
 declarations.

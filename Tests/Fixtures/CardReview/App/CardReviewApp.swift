@@ -1,4 +1,4 @@
-import NativeDesignKit
+import Strata
 import SwiftUI
 
 /// Synthetic integration fixture. Configuration errors are visible, never replaced.
@@ -14,7 +14,7 @@ struct CardReviewApp: App {
                     if configuration.scenario == "specimen" || configuration.scenario == "specimen-long" {
                         StrataCardSpecimen(configuration: configuration)
                     } else {
-                        NativeCardBehaviorFixture(configuration: configuration)
+                        StrataCardBehaviorFixture(configuration: configuration)
                     }
                 }
                 .preferredColorScheme(configuration.mode == "dark" ? .dark : .light)
@@ -31,11 +31,11 @@ struct CardReviewApp: App {
 
 struct CardReviewConfiguration {
     enum ConfigurationError: Error { case missing(String), invalid(String) }
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     let mode: String
     let brand: String
     let scenario: String
-    let surface: NativeSurfaceStyle
+    let surface: StrataSurfaceStyle
     let reduceTransparency: Bool
     let systemTransparency: Bool
     let textSize: DynamicTypeSize
@@ -51,8 +51,8 @@ struct CardReviewConfiguration {
         brand = try required("NDK_BRAND")
         mode = try required("NDK_THEME")
         switch mode {
-        case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
-        case "dark": theme = try NativeDesignTheme(theme: .dark, brand: brand)
+        case "light": theme = try StrataTheme(theme: .light, brand: brand)
+        case "dark": theme = try StrataTheme(theme: .dark, brand: brand)
         default: throw ConfigurationError.invalid("NDK_THEME")
         }
         scenario = try required("NDK_SCENARIO")

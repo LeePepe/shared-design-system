@@ -1,4 +1,4 @@
-import NativeDesignKit
+import Strata
 import SwiftUI
 
 @main
@@ -19,7 +19,7 @@ struct AvatarReviewApp: App {
 
 private struct AvatarConfiguration {
     enum ConfigurationError: Error { case missing(String), invalid(String) }
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     let brand: String
     let mode: String
     let scenario: String
@@ -39,8 +39,8 @@ private struct AvatarConfiguration {
             throw ConfigurationError.invalid("NDK_SCENARIO")
         }
         switch mode {
-        case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
-        case "dark": theme = try NativeDesignTheme(theme: .dark, brand: brand)
+        case "light": theme = try StrataTheme(theme: .light, brand: brand)
+        case "dark": theme = try StrataTheme(theme: .dark, brand: brand)
         default: throw ConfigurationError.invalid("NDK_THEME")
         }
         switch try required("NDK_TEXT_SIZE") {
@@ -58,12 +58,12 @@ private struct AvatarReviewBoard: View {
     @State private var disabled = false
     @State private var alternative = false
     private let sizes = ["small", "medium", "large"]
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Native Avatar").font(.title.bold())
+                Text("Strata Avatar").font(.title.bold())
                 Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · iOS SwiftUI")
                     .font(.subheadline).foregroundStyle(theme.secondaryForeground)
                 switch configuration.scenario {
@@ -100,7 +100,7 @@ private struct AvatarReviewBoard: View {
     }
 
     private func avatar(kind: String, size: String) -> some View {
-        NativeAvatar(theme: theme, size: avatarSize(size),
+        StrataAvatar(theme: theme, size: avatarSize(size),
                      accessibilityLabel: Text(verbatim: "\(rowTitle(kind)), \(size) example visual")) {
             switch kind {
             case "symbol": Image(systemName: "person.fill").accessibilityLabel("Redundant symbol glyph")
@@ -120,7 +120,7 @@ private struct AvatarReviewBoard: View {
         VStack(alignment: .leading, spacing: 20) {
             Text("280 pt · caller text outside the circle").font(.headline)
             HStack(alignment: .top, spacing: 12) {
-                NativeAvatar(theme: theme, size: .small, accessibilityLabel: Text("Example member with a full accessible name")) {
+                StrataAvatar(theme: theme, size: .small, accessibilityLabel: Text("Example member with a full accessible name")) {
                     Text("AB")
                 }.accessibilityIdentifier("narrow-avatar")
                 Text("Example member with a long display name that wraps naturally beside a small avatar.")
@@ -128,7 +128,7 @@ private struct AvatarReviewBoard: View {
             }
             HStack(spacing: 20) {
                 ForEach(sizes, id: \.self) { size in
-                    NativeAvatar(theme: theme, size: avatarSize(size), accessibilityLabel: Text(verbatim: "\(size) scalable visual")) {
+                    StrataAvatar(theme: theme, size: avatarSize(size), accessibilityLabel: Text(verbatim: "\(size) scalable visual")) {
                         Text("AB")
                     }.accessibilityIdentifier("scalable-\(size)")
                 }
@@ -145,7 +145,7 @@ private struct AvatarReviewBoard: View {
             Text("Oversized caller content must stay circular").font(.headline)
             HStack(spacing: 16) {
                 VStack {
-                    NativeAvatar(theme: theme, size: .large, accessibilityLabel: Text("Clipped oversized visual")) {
+                    StrataAvatar(theme: theme, size: .large, accessibilityLabel: Text("Clipped oversized visual")) {
                         Rectangle().fill(theme.accent).frame(width: 200, height: 120)
                     }
                 }
@@ -166,11 +166,11 @@ private struct AvatarReviewBoard: View {
 
     private var composition: some View {
         VStack(alignment: .leading, spacing: 20) {
-            NativeAvatar(theme: theme, size: .medium, accessibilityLabel: Text(alternative ? "Changed example visual" : "Original example visual")) {
+            StrataAvatar(theme: theme, size: .medium, accessibilityLabel: Text(alternative ? "Changed example visual" : "Original example visual")) {
                 Text(alternative ? "CD" : "AB")
             }.accessibilityIdentifier("caller-owned-avatar")
             Button { actionCount += 1 } label: {
-                NativeAvatar(theme: theme, size: .small, accessibilityLabel: Text("Example member")) {
+                StrataAvatar(theme: theme, size: .small, accessibilityLabel: Text("Example member")) {
                     Image(systemName: "person.fill")
                 }
                 .padding(6).frame(minWidth: 44, minHeight: 44).contentShape(Rectangle())
@@ -183,7 +183,7 @@ private struct AvatarReviewBoard: View {
         }.buttonStyle(.bordered)
     }
 
-    private func avatarSize(_ name: String) -> NativeAvatarSize {
+    private func avatarSize(_ name: String) -> StrataAvatarSize {
         switch name {
         case "small": .small
         case "medium": .medium

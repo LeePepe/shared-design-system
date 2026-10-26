@@ -3,12 +3,12 @@
 ## Prerequisites and dependency resolution
 
 The package declares Swift tools 6.0, iOS 15, macOS 12 and a watchOS 8 floor for
-the data-only DesignTokens product. NativeDesignKit remains iOS/macOS-only. See
+the data-only DesignTokens product. Strata remains iOS/macOS-only. See
 the distinction
 between declared and tested support in [COMPATIBILITY.md](COMPATIBILITY.md).
 There are no credentials, network calls, persistence or runtime permissions.
 
-Pin the NativeDesignKit 0.3.0 release with:
+Pin the Strata 0.3.0 release with:
 
 ```swift
 .package(url: "https://github.com/LeePepe/shared-design-system.git", exact: "0.3.0")
@@ -22,12 +22,12 @@ Consumers that name `Theme` or `TokenError` declare both products from the same
 package dependency:
 
 ```swift
-.product(name: "NativeDesignKit", package: "shared-design-system"),
+.product(name: "Strata", package: "shared-design-system"),
 .product(name: "DesignTokens", package: "shared-design-system")
 ```
 
-The library does not re-export Tokens types. NativeDesignKit 0.3.0 uses the
-repository-local DesignTokens target. Historical NativeDesignKit 0.1.0 retains
+The library does not re-export Tokens types. Strata 0.3.0 uses the
+repository-local DesignTokens target. Historical Strata 0.1.0 retains
 its old exact provider route.
 
 ## Consumer design contract
@@ -48,8 +48,8 @@ the Designer's `design.md`.
 
 ## Minimal wiring
 
-Import `NativeDesignKit` and `DesignTokens`; call
-`try NativeTokenColor.resolve(id, theme: theme)` with an explicit `Theme`.
+Import `Strata` and `DesignTokens`; call
+`try StrataTokenColor.resolve(id, theme: theme)` with an explicit `Theme`.
 The fixture's `SamplePalette` implements this using public imports only.
 Never use `@testable import` in a consumer.
 
@@ -64,7 +64,7 @@ Its tests resolve every public ID in both themes and verify exact unknown-ID
 errors. iOS build evidence and a visual demo are separate checks; compiling a
 color bridge is not visual, accessibility or minimum-OS acceptance.
 
-To uninstall, remove the consumer adapter calls and the `NativeDesignKit`
+To uninstall, remove the consumer adapter calls and the `Strata`
 product dependency, then re-resolve and build/test the consumer. Keep the same
 package dependency while the consumer still uses `DesignTokens`. No library-owned
 storage, tasks, registration or credentials need cleaning up.

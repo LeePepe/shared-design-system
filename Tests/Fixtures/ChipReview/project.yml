@@ -6,7 +6,7 @@ options:
   createIntermediateGroups: true
   developmentLanguage: en
 packages:
-  NativeDesignKit:
+  Strata:
     path: ../../..
 settings:
   base:
@@ -20,7 +20,7 @@ targets:
     platform: iOS
     sources: [App]
     dependencies:
-      - package: NativeDesignKit
+      - package: Strata
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.ChipReview

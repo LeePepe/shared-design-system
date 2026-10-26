@@ -1,20 +1,20 @@
-# NativeSwitch (unreleased)
+# StrataSwitch (unreleased)
 
-`NativeSwitch` is part of the unreleased [Strata rebuild](../COMPONENTS.md).
+`StrataSwitch` is part of the unreleased [Strata rebuild](../COMPONENTS.md).
 It is a SwiftUI `Toggle` using native switch styling, with caller-owned state
-and label content. It is unavailable in NativeDesignKit 0.3.0.
+and label content. It is unavailable in Strata 0.3.0.
 
 ```swift
 import DesignTokens
-import NativeDesignKit
+import Strata
 import SwiftUI
 
 struct SwitchExample: View {
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     @State private var isOn = false
 
     var body: some View {
-        NativeSwitch(theme: theme, isOn: $isOn) {
+        StrataSwitch(theme: theme, isOn: $isOn) {
             Text("Enable notifications")
         }
     }
@@ -22,9 +22,9 @@ struct SwitchExample: View {
 ```
 
 The public initializer is
-`init(theme: NativeDesignTheme, isOn: Binding<Bool>, @ViewBuilder label: () -> Label)`.
+`init(theme: StrataTheme, isOn: Binding<Bool>, @ViewBuilder label: () -> Label)`.
 Construct the theme explicitly, for example with
-`try NativeDesignTheme(theme: .light, brand: "ocean")`. The provider supports
+`try StrataTheme(theme: .light, brand: "ocean")`. The provider supports
 `ocean` and `graphite`; the five Strata colors remain a provider gap. Theme
 construction propagates token errors unchanged. No default theme or local
 palette is supplied.
@@ -60,7 +60,7 @@ These tests do not establish VoiceOver speech, physical-device interaction,
 macOS keyboard focus, live external-keyboard activation or minimum-OS
 acceptance. Native semantics remain owned by SwiftUI Toggle.
 
-NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;
+Strata 0.3.0 uses the repository-local DesignTokens target;
 NativeDesignKit 0.1.0 historically used exact DesignTokens 0.1.1. This
 unreleased Switch preserves the iOS 15/macOS 12 floors and color-bridge
 behavior. To roll back, remove these call sites and restore the previously

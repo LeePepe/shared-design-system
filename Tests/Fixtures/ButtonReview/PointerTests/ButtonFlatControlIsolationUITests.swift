@@ -3,7 +3,7 @@ import XCTest
 /// One bounded positive control, separate from the unchanged acceptance suite.
 @MainActor
 final class ButtonFlatControlIsolationUITests: XCTestCase {
-    func testFlatStandardHoverNativeTabFocusAndSpace() {
+    func testFlatStandardHoverStrataTabFocusAndSpace() {
         executionTimeAllowance = 180
         let app = XCUIApplication()
         app.launchArguments = ["--button-flat-control-isolation"]
@@ -51,7 +51,7 @@ final class ButtonFlatControlIsolationUITests: XCTestCase {
             return elapsed
         }
         func stoppedAfterStalledDispatch(_ step: String) {
-            XCTFail("Native \(step) exceeded the 20-second dispatch bound; stop this failed experiment without repeating quiescence waits.")
+            XCTFail("Strata \(step) exceeded the 20-second dispatch bound; stop this failed experiment without repeating quiescence waits.")
             let png = XCTAttachment(screenshot: app.screenshot())
             png.name = "button-flat-stalled-\(step)"
             png.lifetime = .keepAlways
@@ -86,9 +86,9 @@ final class ButtonFlatControlIsolationUITests: XCTestCase {
         // mouse click, TextField entry, shortcut or FKA setting substitutes.
         let tabTime = dispatch("native-Tab expected-target=standard request-only") { app.typeKey(.tab, modifierFlags: []) }
         guard tabTime < 20 else { stoppedAfterStalledDispatch("Tab"); return }
-        expect("observed-label-focus=true", "Native Tab must produce independently observed view focus.")
+        expect("observed-label-focus=true", "Strata Tab must produce independently observed view focus.")
         #if os(iOS)
-        XCTAssertTrue(standard.hasFocus, "Native focus must also be observed in the actual AX tree.")
+        XCTAssertTrue(standard.hasFocus, "Strata focus must also be observed in the actual AX tree.")
         #endif
         XCTAssertTrue(observation.label.contains("actions=0"), "Tab must not activate the Button.")
         report("after-native-tab")

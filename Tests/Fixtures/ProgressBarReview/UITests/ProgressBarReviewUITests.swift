@@ -2,7 +2,7 @@ import XCTest
 
 @MainActor
 final class ProgressBarReviewUITests: XCTestCase {
-    func testNativeProgressUpdatesNormalizationAndStableFootprint() {
+    func testStrataProgressUpdatesNormalizationAndStableFootprint() {
         let app = launch(scenario: "interaction")
         let progress = app.progressIndicators["progress-target"]
         XCTAssertTrue(progress.exists, app.debugDescription)
@@ -18,7 +18,7 @@ final class ProgressBarReviewUITests: XCTestCase {
             XCTAssertTrue(indicator.exists, app.debugDescription)
             XCTAssertEqual(indicator.label, "Preparing files")
             if state == 3 {
-                XCTAssertEqual(indicator.value as? String, "1", "Native activity state must be active, rather than a fabricated percentage.")
+                XCTAssertEqual(indicator.value as? String, "1", "Strata activity state must be active, rather than a fabricated percentage.")
                 XCTAssertTrue(app.staticTexts["Waiting for update"].exists, app.debugDescription)
             } else {
                 XCTAssertEqual(progress.value as? String, expected[state], app.debugDescription)
@@ -29,7 +29,7 @@ final class ProgressBarReviewUITests: XCTestCase {
             XCTAssertTrue(app.scrollViews["review-scroll"].frame.contains(indicator.frame))
             if state < expected.count - 1 { next.tap() }
         }
-        print("Native progress semantics and footprint: \(footprint)")
+        print("Strata progress semantics and footprint: \(footprint)")
     }
 
     func testLongNarrowTextGrowsAtAccessibilitySizeWithoutOverlap() {
@@ -66,7 +66,7 @@ final class ProgressBarReviewUITests: XCTestCase {
         print("Reduce Motion request evidence: \(app.staticTexts["motion-observed"].label)")
         let waiting = app.activityIndicators["matrix-indeterminate"]
         XCTAssertEqual(waiting.label, "Waiting")
-        XCTAssertEqual(waiting.value as? String, "1", "Native activity state must be active, rather than a fabricated percentage.")
+        XCTAssertEqual(waiting.value as? String, "1", "Strata activity state must be active, rather than a fabricated percentage.")
         XCTAssertTrue(app.staticTexts["Waiting for the next update…"].exists, app.debugDescription)
         assertMatrixVisible(app)
         capture("progress-bar-reduced-motion-request", app: app)

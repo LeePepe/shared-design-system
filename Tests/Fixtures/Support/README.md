@@ -1,4 +1,4 @@
-# Native SwiftUI fixture UI verification
+# Strata SwiftUI fixture UI verification
 
 Rendering, layout and interaction checks run in standalone SwiftUI fixture
 apps driven by XCTest UI automation. Package tests retain pure behavior,
@@ -42,11 +42,11 @@ attachments when available, as well as successful evidence.
 
 1. Create `Tests/Fixtures/<Component>Review/`. Copy ButtonReview's `project.yml`
    and replace project/target/scheme names and generic bundle identifiers.
-   Keep `packages.NativeDesignKit.path: ../../..`; it refers to this checkout.
+   Keep `packages.Strata.path: ../../..`; it refers to this checkout.
    Keep fixture sources under `App/` and UI automation under `UITests/` so
-   SwiftPM's `NativeDesignKitTests` target does not compile either app entry.
+   SwiftPM's `StrataTests` target does not compile either app entry.
 2. Supply one SwiftUI `@main App` importing only `SwiftUI` and
-   `NativeDesignKit`. Resolve theme/brand explicitly from `NDK_*` launch
+   `Strata`. Resolve theme/brand explicitly from `NDK_*` launch
    environment values. Show resolution/configuration errors as visible text;
    never supply fallback token colors. Use synthetic caller-owned state.
 3. Give important controls stable accessibility identifiers. Use readable
@@ -69,7 +69,7 @@ localized accessibility typography and the four brand/theme captures. Tests
 must not import UIKit/AppKit or use native hosting/window/screenshot helpers.
 Numeric color extraction remains confined to its preexisting package tests.
 For an internal SwiftUI geometry seam, its debug fixture uses `@testable import
-NativeDesignKit`; this does not add public API. UI automation still imports
+Strata`; this does not add public API. UI automation still imports
 only XCTest.
 
 ## Attachment export

@@ -22,7 +22,7 @@ SHA shared by both runs. `screenshots.json` names the seven actual XCTest PNG
 attachments; no generated evidence belongs in git. Inspect every exported PNG
 for clipped/overlapping content before handoff.
 
-## Native checkmark color regression
+## Strata checkmark color regression
 
 An actual iOS review caught the native inline Picker drawing a system-blue
 checkmark even when its SwiftUI `tint` was the correct token accent. The native
@@ -86,9 +86,9 @@ frame may include the list's row margins.
 
 | Test | Meaning |
 | --- | --- |
-| `testNativeBindingSelectionDisabledAndExternalWrites` | Actual native option taps write the exact Hashable tag once; only one option is selected; disabled coordinate taps cannot mutate state; external caller changes update selection. |
+| `testStrataBindingSelectionDisabledAndExternalWrites` | Actual native option taps write the exact Hashable tag once; only one option is selected; disabled coordinate taps cannot mutate state; external caller changes update selection. |
 | `testTaggedIdentitySurvivesCallerReordering` | Reordering dynamic caller options preserves tagged selection and later taps write stable values, rather than indices. |
-| `testExplicitThemeReachesNativePickerWhileCallerEnvironmentRemainsOpposing` | Caller-supplied label and option views observe the actual inherited SwiftUI color scheme. Both explicit modes reach the Picker subtree under an opposing host; the outer probe keeps the host mode. Real selected tags, disabled coordinate input and target containment remain checked. |
+| `testExplicitThemeReachesStrataPickerWhileCallerEnvironmentRemainsOpposing` | Caller-supplied label and option views observe the actual inherited SwiftUI color scheme. Both explicit modes reach the Picker subtree under an opposing host; the outer probe keeps the host mode. Real selected tags, disabled coordinate input and target containment remain checked. |
 | Four `testVisualMatrix*` methods | Both brands/themes show selected, unselected and disabled inline options with >=44 pt targets, native selected traits and complete viewport containment. |
 | `testLongLabelsGrowWithoutClippingAtAccessibilitySizeInNarrowLayout` | A 320 pt board grows rows at accessibility2, retains full accessibility labels, keeps rows disjoint and visible, and remains selectable. |
 | `testInvalidBrandShowsOriginalFailureWithoutControl` | The original unknown-brand error is visible and no control replaces it. |
@@ -101,7 +101,7 @@ not by inspecting or traversing SwiftUI/native control internals.
 Test integrity: RadioGroup adds fresh tests. No existing assertion is removed,
 weakened or moved, so there are no component-specific moved-test mappings.
 Inherited Button hosting-to-UI mappings remain owned by the foundation PR in
-`../ButtonReview/README.md`; `NativeTokenColorTests` is unchanged.
+`../ButtonReview/README.md`; `StrataTokenColorTests` is unchanged.
 
 Evidence is the current iOS simulator runtime only. No physical device,
 minimum-OS, macOS rendered UI, live VoiceOver or keyboard/focus run is implied.

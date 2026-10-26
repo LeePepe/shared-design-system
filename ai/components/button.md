@@ -1,25 +1,25 @@
-# NativeButton (unreleased)
+# StrataButton (unreleased)
 
 This API is part of the unreleased [Strata rebuild](../COMPONENTS.md), not
-NativeDesignKit 0.3.0. HeroUI informs the component inventory only; the
+Strata 0.3.0. HeroUI informs the component inventory only; the
 implementation is native SwiftUI and copies no earlier unmerged component.
 
 ```swift
-public enum NativeButtonVariant: Equatable, Sendable {
+public enum StrataButtonVariant: Equatable, Sendable {
     case primary, secondary, ghost
 }
 
-public struct NativeButton<Label: View, LoadingLabel: View>: View {
+public struct StrataButton<Label: View, LoadingLabel: View>: View {
     // Existing initializer remains source compatible (solid treatment).
-    public init(theme: NativeDesignTheme,
-                variant: NativeButtonVariant,
+    public init(theme: StrataTheme,
+                variant: StrataButtonVariant,
                 isLoading: Bool,
                 action: @escaping () -> Void,
                 @ViewBuilder label: () -> Label,
                 @ViewBuilder loadingLabel: () -> LoadingLabel)
-    public init(theme: NativeDesignTheme,
-                variant: NativeButtonVariant,
-                surface: NativeSurfaceStyle,
+    public init(theme: StrataTheme,
+                variant: StrataButtonVariant,
+                surface: StrataSurfaceStyle,
                 isLoading: Bool,
                 action: @escaping () -> Void,
                 @ViewBuilder label: () -> Label,
@@ -33,7 +33,7 @@ the loading state and action. The loading builder should describe the work
 (e.g. `Text("Saving changes…")`), rather than supplying a spinner alone.
 
 ```swift
-NativeButton(theme: theme, variant: .primary, surface: .glass, isLoading: isSaving,
+StrataButton(theme: theme, variant: .primary, surface: .glass, isLoading: isSaving,
              action: save) {
     Text("Save changes")
 } loadingLabel: {
@@ -103,9 +103,9 @@ the Owner explicitly temporarily deferred this native-input acceptance and
 continued component delivery; the strict tests and failed history are retained.
 Visual or package-test success does not establish these inputs.
 
-`NativeTokenColor` behavior and platform floors remain unchanged. This Button
+`StrataTokenColor` behavior and platform floors remain unchanged. This Button
 revision uses the merged Strata foundation and public exact DesignTokens0.2.0
 at `87bef8fbab5bf67a748815d7ed04d7ae199f760a`. The provider release does not
-release NativeDesignKit or establish remote CI or native input acceptance;
+release Strata or establish remote CI or native input acceptance;
 the PR records exact source/provider SHAs and remaining gates. To roll back, remove this API's call sites and restore the previously
 reviewed package revision. No persisted state or migration is involved.

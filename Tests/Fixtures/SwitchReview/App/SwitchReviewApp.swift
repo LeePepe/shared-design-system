@@ -1,4 +1,4 @@
-import NativeDesignKit
+import Strata
 import SwiftUI
 
 @main
@@ -24,7 +24,7 @@ private enum SwitchReviewConfigurationError: Error {
 }
 
 private struct SwitchReviewConfiguration {
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     let brand: String
     let mode: String
     let narrow: Bool
@@ -39,7 +39,7 @@ private struct SwitchReviewConfiguration {
         else { throw SwitchReviewConfigurationError.missingExplicitSupportedBrandOrMode }
         self.brand = brand
         self.mode = mode
-        theme = try NativeDesignTheme(theme: mode == "light" ? .light : .dark, brand: brand)
+        theme = try StrataTheme(theme: mode == "light" ? .light : .dark, brand: brand)
         narrow = environment["NDK_SWITCH_NARROW"] == "1"
         accessibilitySize = environment["NDK_SWITCH_ACCESSIBILITY"] == "1"
         disabled = environment["NDK_SWITCH_DISABLED"] == "1"
@@ -57,18 +57,18 @@ private struct SwitchReviewContent: View {
         _isOn = State(initialValue: configuration.initiallyOn)
     }
 
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text(configuration.narrow ? "Long labels" : "Native Switch")
+                Text(configuration.narrow ? "Long labels" : "Strata Switch")
                     .font(configuration.narrow ? .headline : .largeTitle.bold())
                 Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · Strata")
                     .font(.subheadline)
                     .foregroundStyle(theme.secondaryForeground)
 
-                NativeSwitch(theme: theme, isOn: Binding(
+                StrataSwitch(theme: theme, isOn: Binding(
                     get: { isOn },
                     set: { isOn = $0; bindingWrites += 1 }
                 )) {
@@ -94,18 +94,18 @@ private struct SwitchReviewContent: View {
                     Button("Set from caller") { isOn.toggle() }
                         .accessibilityIdentifier("switch.callerUpdate")
                         .tint(theme.accent)
-                    NativeSwitch(theme: theme, isOn: .constant(true)) { Text("On") }
+                    StrataSwitch(theme: theme, isOn: .constant(true)) { Text("On") }
                         .accessibilityIdentifier("switch.selected")
-                    NativeSwitch(theme: theme, isOn: .constant(false)) { Text("Disabled · off") }
+                    StrataSwitch(theme: theme, isOn: .constant(false)) { Text("Disabled · off") }
                         .disabled(true)
                         .accessibilityIdentifier("switch.disabledOff")
-                    NativeSwitch(theme: theme, isOn: .constant(true)) { Text("Disabled · on") }
+                    StrataSwitch(theme: theme, isOn: .constant(true)) { Text("Disabled · on") }
                         .disabled(true)
                         .accessibilityIdentifier("switch.disabledOn")
                 }
 
                 if !configuration.narrow {
-                    Text("Native SwiftUI · caller-owned state")
+                    Text("Strata SwiftUI · caller-owned state")
                         .font(.caption)
                         .foregroundStyle(theme.secondaryForeground)
                         .accessibilityIdentifier("switch.footer")

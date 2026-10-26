@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the narrow, versioned NativeDesignKit AI contract (stdlib only)."""
+"""Validate the narrow, versioned Strata AI contract (stdlib only)."""
 import json
 from pathlib import Path
 import re
@@ -85,19 +85,19 @@ def check(root):
         for target in re.findall(r"\[[^\]]*\]\(([^\s)]+)\)", document.read_text()):
             if "://" not in target and not target.startswith("#"):
                 resolve(document.parent, target)
-    source = (root / "Sources/NativeDesignKit/NativeTokenColor.swift").read_text()
-    require("public enum NativeTokenColor" in source and
+    source = (root / "Sources/Strata/StrataTokenColor.swift").read_text()
+    require("public enum StrataTokenColor" in source and
             "public static func resolve(_ id: String, theme: Theme) throws -> SwiftUI.Color" in source,
             "AI_API", "public resolver no longer matches registry")
     manifest = (root / "Package.swift").read_text()
     require("shared-design-tokens" not in manifest and ".package(" not in manifest,
             "AI_DEPENDENCY", "root package must not retain an external package edge")
     require(manifest.count('.library(name: "DesignTokens"') == 1 and
-            manifest.count('.library(name: "NativeDesignKit"') == 1,
+            manifest.count('.library(name: "Strata"') == 1,
             "AI_DEPENDENCY", "root package must publish both stable products exactly once")
     require('name: "DesignTokens",\n            path: "Packages/DesignTokens/Sources/DesignTokens"' in manifest and
-            'name: "NativeDesignKit",\n            dependencies: ["DesignTokens"]' in manifest,
-            "AI_DEPENDENCY", "NativeDesignKit must depend on the local DesignTokens target")
+            'name: "Strata",\n            dependencies: ["DesignTokens"]' in manifest,
+            "AI_DEPENDENCY", "Strata must depend on the local DesignTokens target")
     require(".iOS(.v15)" in manifest and ".macOS(.v12)" in manifest and
             ".watchOS(.v8)" in manifest,
             "AI_PLATFORMS", "package floors must remain iOS 15, macOS 12 and watchOS 8")
@@ -119,8 +119,8 @@ def check(root):
             ("ai/USAGE.md", usage),
             ("Packages/DesignTokens/ai/USAGE.md", nested_usage)):
         stable_products = (
-            "stable `NativeDesignKit` and `DesignTokens` products" in content or
-            "stable `DesignTokens` and `NativeDesignKit` products" in content)
+            "stable `Strata` and `DesignTokens` products" in content or
+            "stable `DesignTokens` and `Strata` products" in content)
         require(stable_products and
                 "exact `shared-design-system` revision or version" in content and
                 "repository-local `DesignTokens` target" in content,
@@ -137,7 +137,7 @@ def check(root):
             "The current unreleased checkout pins Tokens at exactly `0.2.0`",
         ),
         "Packages/DesignTokens/ai/USAGE.md": (
-            "Planned elsewhere: independent Apple NativeDesignKit/SPM repository",
+            "Planned elsewhere: independent Apple Strata/SPM repository",
         ),
     }
     for document, content in (
@@ -146,10 +146,10 @@ def check(root):
         require(not any(route in content for route in obsolete_routes[document]),
                 "AI_DESIGN_TOKENS",
                 f"{document} retains an obsolete dependency route")
-    guard = (root / "Sources/NativeDesignKit/PlatformBoundary.swift").read_text()
+    guard = (root / "Sources/Strata/PlatformBoundary.swift").read_text()
     require('#if os(watchOS)' in guard and
-            '#error("NativeDesignKit is unavailable on watchOS; depend on the DesignTokens product only.")' in guard,
-            "AI_PLATFORMS", "stable NativeDesignKit watchOS boundary is missing")
+            '#error("Strata is unavailable on watchOS; depend on the DesignTokens product only.")' in guard,
+            "AI_PLATFORMS", "stable Strata watchOS boundary is missing")
     for source_file in (ai / "examples").rglob("*.swift"):
         require("@testable" not in source_file.read_text(), "AI_EXAMPLE", "consumer uses test-only API")
     print("AI_OK: registries, links, public API, local dependency and platform boundary")

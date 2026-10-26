@@ -25,7 +25,7 @@ final class TextFieldReviewUITests: XCTestCase {
         }
     }
 
-    func testNativeEditingPreservesCallerBindingAndSubmits() throws {
+    func testStrataEditingPreservesCallerBindingAndSubmits() throws {
         let app = launch(scenario: "interaction")
         let field = input("active-input", app: app)
         XCTAssertEqual(field.value as? String, "Initial value")
@@ -44,7 +44,7 @@ final class TextFieldReviewUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["caller-value"].label, "Initial value  Caller text  ")
     }
 
-    func testNativeSelectionCanReplaceInputWithoutPaddingGestureInterference() throws {
+    func testStrataSelectionCanReplaceInputWithoutPaddingGestureInterference() throws {
         let app = launch(scenario: "interaction")
         let field = input("active-input", app: app)
         let surface = try geometry("active", app: app).surface

@@ -78,7 +78,7 @@ def contrast(foreground, background):
     return (b + 0.05) / (a + 0.05)
 
 
-# NativeCardBehaviorFixture's unchanged four-slot, large-text specimen, measured
+# StrataCardBehaviorFixture's unchanged four-slot, large-text specimen, measured
 # in native points on the 402x874 iPhone fixture. Offsets use CARD_UI_PIXEL's
 # runtime anchor (Card.maxX - 8, Card.midY), rather than PNG pixel dimensions.
 # Primary: fully covered last "d" in "caller-owned"; auxiliary: full glyph in
@@ -196,7 +196,7 @@ def main():
                                 inner_glass_delta=inner_glass_delta, text_contrast=text,
                                 png_sha256={key: value.sha256 for key, value in captures.items()}))
     report = dict(material_cases=4, contrast_cases=8, failures=failures, provider=provider,
-                  sampling_source="NativeCardBehaviorFixture four-slot/large; offsets from CARD_UI_PIXEL runtime Card anchor",
+                  sampling_source="StrataCardBehaviorFixture four-slot/large; offsets from CARD_UI_PIXEL runtime Card anchor",
                   material_sampling_source="CARD_UI_OUTER_PIXEL runtime region anchor; one outer blur, dense inner Card",
                   sample_offsets_native_points=TEXT_SAMPLES, results=results)
     args.output.write_text(json.dumps(report, indent=2) + "\n")

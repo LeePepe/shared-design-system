@@ -34,8 +34,8 @@ repository at a reviewed full revision, never a branch or range:
 .product(name: "DesignTokens", package: "shared-design-system")
 ```
 
-The root package also publishes `NativeDesignKit`, which depends on this local
-target. DesignTokens alone supports watchOS 8; NativeDesignKit is unavailable on
+The root package also publishes `Strata`, which depends on this local
+target. DesignTokens alone supports watchOS 8; Strata is unavailable on
 watchOS. Before publication, the repository verifies the same public imports
 through a local-path consumer without claiming public resolution. Required CI
 after push owns exact-public-revision resolution.

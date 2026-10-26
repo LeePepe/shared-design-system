@@ -1,4 +1,4 @@
-import NativeDesignKit
+import Strata
 import SwiftUI
 
 /// Synthetic caller state only; no product integration or loading engine.
@@ -25,7 +25,7 @@ struct ProgressBarReviewApp: App {
 
 private struct ReviewConfiguration {
     enum ConfigurationError: Error { case missing(String), invalid(String) }
-    let theme: NativeDesignTheme
+    let theme: StrataTheme
     let brand: String
     let mode: String
     let scenario: String
@@ -48,8 +48,8 @@ private struct ReviewConfiguration {
             throw ConfigurationError.invalid("NDK_SCENARIO")
         }
         switch mode {
-        case "light": theme = try NativeDesignTheme(theme: .light, brand: brand)
-        case "dark": theme = try NativeDesignTheme(theme: .dark, brand: brand)
+        case "light": theme = try StrataTheme(theme: .light, brand: brand)
+        case "dark": theme = try StrataTheme(theme: .dark, brand: brand)
         default: throw ConfigurationError.invalid("NDK_THEME")
         }
         switch try required("NDK_TEXT_SIZE") {
@@ -70,14 +70,14 @@ private struct ProgressReviewBoard: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var state = 0
     @State private var bounds: [String: CGRect] = [:]
-    private var theme: NativeDesignTheme { configuration.theme }
+    private var theme: StrataTheme { configuration.theme }
     private let longLabel = "Vorbereitung aller ausgewählten Dateien für die nächste Übertragung"
     private let longValue = "50 von 100 Dateien vorbereitet — bitte warten Sie auf die nächste Aktualisierung"
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("Native Progress Bar").font(.title.bold())
+                Text("Strata Progress Bar").font(.title.bold())
                 Text("\(configuration.brand.capitalized) · \(configuration.mode.capitalized) · iOS SwiftUI")
                     .font(.subheadline).foregroundStyle(theme.secondaryForeground)
                 switch configuration.scenario {
@@ -108,7 +108,7 @@ private struct ProgressReviewBoard: View {
                 .font(.caption).accessibilityIdentifier("motion-request")
             Text("Observed system Reduce Motion: \(reduceMotion ? "on" : "off")")
                 .font(.caption).accessibilityIdentifier("motion-observed")
-            Text("Native animation behavior is platform-owned.").font(.caption)
+            Text("Strata animation behavior is platform-owned.").font(.caption)
         }
     }
 
@@ -157,7 +157,7 @@ private struct ProgressReviewBoard: View {
 
     private var longLabelBoard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            NativeProgressBar(theme: theme, value: 50, total: 100) {
+            StrataProgressBar(theme: theme, value: 50, total: 100) {
                 Text(verbatim: longLabel).background(measure("label"))
             } currentValueLabel: {
                 Text(verbatim: longValue).background(measure("value"))
@@ -201,7 +201,7 @@ private struct ProgressReviewBoard: View {
     }
 
     private func sample(_ label: String, value: Double?, current: String, id: String) -> some View {
-        NativeProgressBar(theme: theme, value: value, total: 100) {
+        StrataProgressBar(theme: theme, value: value, total: 100) {
             Text(verbatim: label)
         } currentValueLabel: {
             Text(verbatim: current)

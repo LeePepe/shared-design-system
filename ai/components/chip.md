@@ -1,17 +1,17 @@
-# NativeChip (unreleased)
+# StrataChip (unreleased)
 
 This additive API belongs to the Strata rebuild and is not in the released
-NativeDesignKit 0.3.0 color bridge. HeroUI supplies inventory only.
+Strata 0.3.0 color bridge. HeroUI supplies inventory only.
 
 ```swift
-public enum NativeChipTone: Equatable, Sendable {
+public enum StrataChipTone: Equatable, Sendable {
     case neutral, accent, critical
 }
 
-public struct NativeChip<Label: View>: View {
-    public init(theme: NativeDesignTheme, tone: NativeChipTone,
+public struct StrataChip<Label: View>: View {
+    public init(theme: StrataTheme, tone: StrataChipTone,
                 @ViewBuilder label: () -> Label)
-    public init(theme: NativeDesignTheme, tone: NativeChipTone,
+    public init(theme: StrataTheme, tone: StrataChipTone,
                 removalAccessibilityLabel: Text, onRemove: @escaping () -> Void,
                 @ViewBuilder label: () -> Label)
 }
@@ -24,9 +24,9 @@ with `foreground`, accent pairs `accent` with `onAccent`, and critical pairs
 local palette, fallback theme, or automatic status/business meaning.
 
 ```swift
-NativeChip(theme: theme, tone: .neutral) { Text("Draft") }
+StrataChip(theme: theme, tone: .neutral) { Text("Draft") }
 
-NativeChip(theme: theme, tone: .accent,
+StrataChip(theme: theme, tone: .accent,
            removalAccessibilityLabel: Text("Remove Design filter"),
            onRemove: { selectedFilters.remove("design") }) {
     Text("Design")
@@ -57,7 +57,7 @@ accessibility-size case. These establish evidence only for the tested simulator
 and exact SHA recorded by the runner; they do not establish minimum-OS,
 physical-device, macOS rendering or observed VoiceOver/keyboard operation.
 
-NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;
+Strata 0.3.0 uses the repository-local DesignTokens target;
 NativeDesignKit 0.1.0 historically used exact DesignTokens 0.1.1. This
 unreleased Chip preserves the color-resolver behavior, Swift 6 and declared
 iOS 15/macOS 12 floors. Roll back by removing Chip call sites and restoring the

@@ -1,16 +1,16 @@
-@testable import NativeDesignKit
+@testable import Strata
 import SwiftUI
 
 /// Synthetic evidence composition; include this source explicitly in fixture targets.
 struct StrataSpecimen<Content: View>: View {
-    let theme: NativeDesignTheme
-    let surface: NativeSurfaceStyle
+    let theme: StrataTheme
+    let surface: StrataSurfaceStyle
     let title: String
     private let content: Content
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Environment(\.nativeReduceTransparencyOverride) private var reduceTransparencyOverride
 
-    init(theme: NativeDesignTheme, surface: NativeSurfaceStyle, title: String,
+    init(theme: StrataTheme, surface: StrataSurfaceStyle, title: String,
          @ViewBuilder content: () -> Content) {
         self.theme = theme; self.surface = surface; self.title = title; self.content = content()
     }
@@ -25,7 +25,7 @@ struct StrataSpecimen<Content: View>: View {
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .nativeSurface(theme: theme, style: surface, cornerRadius: 32, role: .region)
+                .strataSurface(theme: theme, style: surface, cornerRadius: 32, role: .region)
             }
             .padding(16)
             .frame(maxWidth: 640, alignment: .leading)

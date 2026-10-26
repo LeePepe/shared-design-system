@@ -1,14 +1,14 @@
 # AGENTS.md — shared-design-system
 
 Shared Apple/SPM design system with the UI-free `DesignTokens` product and the
-SwiftUI `NativeDesignKit` product for iOS and macOS. Every agent that edits this
+SwiftUI `Strata` product for iOS and macOS. Every agent that edits this
 repository follows the protocol below. Tool-specific files (CLAUDE.md etc.) only
 point here.
 
 ## Read first
 
 1. `docs/architecture/tech-context.md` — layer table: layer → paths → depends_on
-2. The leaf `tech-context.md` of every layer you touch (`NativeDesignKit`)
+2. The leaf `tech-context.md` of every layer you touch (`Strata`)
 3. Consumer-facing contract: `ai/` (ships with every release)
 
 ## Protocol
@@ -23,7 +23,7 @@ It must be the same SHA as the `uses:` pins in `.github/workflows/`.
 git config core.hooksPath .githooks   # once per clone
 scripts/verify                        # contract checks + changed layers vs origin/main (what pre-push runs)
 scripts/verify --all                  # contract checks + every layer (what CI runs)
-scripts/verify --layer NativeDesignKit
+scripts/verify --layer Strata
 ```
 
 Needs Xcode with Swift 6 and an iOS simulator runtime. Never `--no-verify`,
@@ -59,7 +59,7 @@ iOS simulator build and test), contract audit, workflow-lint and the PR-body che
 ## Dependencies
 
 - `shared-ci` `fd8a187ef4872aa1aa69c4e9afec9782183cc02d` — https://github.com/LeePepe/shared-ci/blob/fd8a187ef4872aa1aa69c4e9afec9782183cc02d/ai/
-- `NativeDesignKit` depends on the repository-local `DesignTokens` target.
+- `Strata` depends on the repository-local `DesignTokens` target.
 - The root package publishes both stable products from one exact
   `shared-design-system` revision. The nested npm artifact remains
   `@leepepe/design-tokens` 0.2.0 and is not registry-published.

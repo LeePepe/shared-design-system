@@ -1,20 +1,20 @@
-# NativeTokenColor usage
+# StrataTokenColor usage
 
-This is the public API contract for the NativeDesignKit 0.3.0 color-bridge release. Start with [README.md](README.md) for integration, executable examples and migration routes. Dependency identity, exact Tokens version and remaining compatibility limits are recorded in [COMPATIBILITY.md](COMPATIBILITY.md).
+This is the public API contract for the Strata 0.3.0 color-bridge release. Start with [README.md](README.md) for integration, executable examples and migration routes. Dependency identity, exact Tokens version and remaining compatibility limits are recorded in [COMPATIBILITY.md](COMPATIBILITY.md).
 
 ## Current interface
 
-The `NativeDesignKit` library exposes `public enum NativeTokenColor` with this static method (signature excerpt, not an executed example):
+The `Strata` library exposes `public enum StrataTokenColor` with this static method (signature excerpt, not an executed example):
 
 ```swift
 public static func resolve(_ id: String, theme: Theme) throws -> SwiftUI.Color
 ```
 
-`NativeSurfaceModifier` and `View.nativeSurface(theme:style:cornerRadius:role:)` are public
-surface APIs. Every call requires an explicit `theme: NativeDesignTheme`; there is no
+`StrataSurfaceModifier` and `View.strataSurface(theme:style:cornerRadius:role:)` are public
+surface APIs. Every call requires an explicit `theme: StrataTheme`; there is no
 environment-derived or default theme.
 
-`Theme` is the top-level type imported from `DesignTokens`, with `.light` and `.dark` cases. It is not `DesignTokens.Theme`; the module and facade share the name `DesignTokens`. NativeDesignKit defines no replacement theme type, alias, or re-export contract. Consumer code that names Tokens types imports `DesignTokens` and declares a compatible direct dependency on that product.
+`Theme` is the top-level type imported from `DesignTokens`, with `.light` and `.dark` cases. It is not `DesignTokens.Theme`; the module and facade share the name `DesignTokens`. Strata defines no replacement theme type, alias, or re-export contract. Consumer code that names Tokens types imports `DesignTokens` and declares a compatible direct dependency on that product.
 
 ## Conversion and errors
 
@@ -26,21 +26,21 @@ Lookup errors propagate unchanged. An unknown ID throws `TokenError.unknownToken
 
 ## Scope
 
-This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The current consolidated SwiftPM route selects the stable `NativeDesignKit` and `DesignTokens` products from one exact `shared-design-system` revision or version; the root `NativeDesignKit` target depends on the repository-local `DesignTokens` target. Released NativeDesignKit `0.1.0` historically pinned Tokens at exactly `0.1.1`, while the imported provider DesignTokens `0.2.0` release remains immutable compatibility history. Neither route vendors dependency contents.
+This slice provides color lookup and native conversion only. Components, typography, spacing, demos, style decisions, business series bindings, and product integration remain outside this interface. It adds no Web adapter or other-platform support. The current consolidated SwiftPM route selects the stable `Strata` and `DesignTokens` products from one exact `shared-design-system` revision or version; the root `Strata` target depends on the repository-local `DesignTokens` target. Released NativeDesignKit `0.1.0` historically pinned Tokens at exactly `0.1.1`, while the imported provider DesignTokens `0.2.0` release remains immutable compatibility history. Neither route vendors dependency contents.
 
 ## Strata foundation candidate (unreleased)
 
-`NativeDesignTheme(theme:brand:)` additionally resolves explicit provider brands
+`StrataTheme(theme:brand:)` additionally resolves explicit provider brands
 `strata-blue`, `strata-green`, `strata-pink`, `strata-yellow`, `strata-purple`.
 The data originated in the historical provider DesignTokens 0.2.0 release at
 `87bef8fbab5bf67a748815d7ed04d7ae199f760a`; the current consolidated package
 uses the same 0.2.0 sources through its local `DesignTokens` target. They do not
 alias ocean or graphite. Legacy brands keep their original lookup behavior.
 This native foundation is unreleased; the historical provider release does not
-establish a NativeDesignKit release.
+establish a Strata release.
 
 Additive immutable color properties are `brandSeed`, `brandSeedInk`, `brandText`,
-`accentHover`, `accentActive`, `accentSubtle`. `NativeSurfaceRole` has `region`,
+`accentHover`, `accentActive`, `accentSubtle`. `StrataSurfaceRole` has `region`,
 `card`, `inset`, `hover`, `selected`; `theme.surface(role)` returns its opaque
 provider color. Existing `canvas` is page and `surface` is card for Strata.
 The semantic foreground pair and critical/error pair come from Strata roles.
