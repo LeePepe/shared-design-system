@@ -395,7 +395,7 @@ def main():
         run(
             "xcodebuild",
             [
-                "-quiet", "-scheme", "NativeDesignConsumer",
+                "-quiet", "-scheme", "StrataDesignConsumer",
                 "-destination", "generic/platform=iOS Simulator",
                 "-derivedDataPath", str(evidence / "DerivedData"),
                 "CODE_SIGNING_ALLOWED=NO", "build",
