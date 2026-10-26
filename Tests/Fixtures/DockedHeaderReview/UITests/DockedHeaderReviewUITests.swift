@@ -9,8 +9,8 @@ final class DockedHeaderReviewUITests: XCTestCase {
         ]
         app.launch()
         XCTAssertTrue(app.staticTexts["Docked header components"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.otherElements["section-header"].exists)
-        XCTAssertTrue(app.otherElements["docked-bar"].exists)
+        XCTAssertTrue(app.staticTexts["Barbell"].exists)
+        XCTAssertTrue(app.staticTexts["Add exercise"].exists)
         XCTAssertTrue(app.otherElements["index-rail"].exists)
         XCTAssertTrue(app.buttons["Barbell"].exists)
         XCTAssertTrue(app.buttons["Dumbbell"].exists)
