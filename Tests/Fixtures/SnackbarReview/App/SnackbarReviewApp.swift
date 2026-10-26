@@ -46,6 +46,7 @@ private struct SnackbarReviewBoard: View {
                 closeLabel: "Close",
                 action: try! StrataSnackbarAction(label: "Undo") {
                     result = "Action"
+                    item = try! StrataSnackbarItem(message: "Undo available", closeLabel: "Close")
                 }
             )
         }
