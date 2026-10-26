@@ -64,7 +64,15 @@ private extension StrataSnackbar where Content == AnyView, BottomBar == AnyView 
             configuration: .init(
                 theme: theme,
                 item: item,
-                onDismiss: { _, dismissal in result.wrappedValue = String(describing: dismissal) },
+                onDismiss: { _, dismissal in
+                    result.wrappedValue = String(describing: dismissal)
+                    if dismissal == .action {
+                        item.wrappedValue = try! StrataSnackbarItem(
+                            message: "Undo available",
+                            closeLabel: "Close"
+                        )
+                    }
+                },
                 content: {
                     AnyView(VStack(alignment: .leading, spacing: 16) {
                         Text("Snackbar review")
