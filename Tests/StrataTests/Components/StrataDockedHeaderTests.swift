@@ -1,5 +1,5 @@
 import DesignTokens
-import Strata
+@testable import Strata
 import SwiftUI
 import XCTest
 
@@ -44,5 +44,13 @@ final class StrataDockedHeaderTests: XCTestCase {
         let item = StrataIndexRailItem(id: "cable", shortLabel: "C", fullTitle: "Cable")
         XCTAssertEqual(item, StrataIndexRailItem(id: "cable", shortLabel: "C", fullTitle: "Cable"))
         XCTAssertNotEqual(item, StrataIndexRailItem(id: "machine", shortLabel: "M", fullTitle: "Machine"))
+    }
+
+    func testIndexRailItemIndexUsesRenderedRailHeight() {
+        XCTAssertEqual(StrataIndexRail.itemIndex(at: 44, railHeight: 132, itemCount: 3), 1)
+        XCTAssertEqual(StrataIndexRail.itemIndex(at: 128, railHeight: 132, itemCount: 3), 2)
+        XCTAssertEqual(StrataIndexRail.itemIndex(at: 64, railHeight: 192, itemCount: 3), 1)
+        XCTAssertEqual(StrataIndexRail.itemIndex(at: 190, railHeight: 192, itemCount: 3), 2)
+        XCTAssertNil(StrataIndexRail.itemIndex(at: 0, railHeight: 0, itemCount: 0))
     }
 }

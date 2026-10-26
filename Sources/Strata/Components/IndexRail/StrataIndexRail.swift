@@ -19,6 +19,7 @@ public struct StrataIndexRail: View {
     private let activeID: String?
     private let showsHUD: Bool
     private let onSelect: (String) -> Void
+    @State private var railHeight: CGFloat = 0
 
     public init(
         theme: StrataTheme,
@@ -64,7 +65,18 @@ public struct StrataIndexRail: View {
                 .frame(width: 24)
                 .background(theme.surface(.inset), in: Capsule())
                 .contentShape(Capsule())
-                .simultaneousGesture(DragGesture(minimumDistance: 0).onChanged { value in
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear
+                            .onAppear {
+                                railHeight = proxy.size.height
+                            }
+                            .onChange(of: proxy.size.height) { newHeight in
+                                railHeight = newHeight
+                            }
+                    }
+                )
+                .simultaneousGesture(DragGesture(minimumDistance: 4).onChanged { value in
                     selectItem(at: value.location.y)
                 })
 
@@ -90,8 +102,17 @@ public struct StrataIndexRail: View {
         return items.first { $0.id == activeID }
     }
 
+    static func itemIndex(at y: CGFloat, railHeight: CGFloat, itemCount: Int) -> Int? {
+        guard itemCount > 0 else { return nil }
+        let effectiveHeight = railHeight > 0 ? railHeight : CGFloat(itemCount) * 44
+        let itemHeight = max(effectiveHeight / CGFloat(itemCount), 1)
+        return min(max(Int(y / itemHeight), 0), itemCount - 1)
+    }
+
     private func selectItem(at y: CGFloat) {
-        let index = min(max(Int(y / 44), 0), items.count - 1)
+        guard let index = Self.itemIndex(at: y, railHeight: railHeight, itemCount: items.count) else {
+            return
+        }
         onSelect(items[index].id)
     }
 }

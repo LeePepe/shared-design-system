@@ -55,15 +55,30 @@ private struct DockedHeaderReviewBoard: View {
                             .accessibilityIdentifier("section-more")
                     }
                     .accessibilityIdentifier("section-header")
+                    StrataSectionHeader(theme: theme, title: "Bodyweight") {
+                        EmptyView()
+                    }
+                    .accessibilityIdentifier("empty-section-header")
                     StrataDockedBar(theme: theme) {
                         HStack {
                             Text("Add exercise")
                             Spacer()
                             Button("Done") { selectedID = "done" }
                                 .accessibilityIdentifier("docked-done")
+                            Text("Unavailable")
+                                .foregroundStyle(theme.secondaryForeground)
+                                .accessibilityIdentifier("docked-unavailable")
+                            Text("Sync failed")
+                                .foregroundStyle(theme.critical)
+                                .accessibilityIdentifier("docked-error")
                         }
                     }
                     .accessibilityIdentifier("docked-bar")
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Empty index rail")
+                        StrataIndexRail(theme: theme, items: [], activeID: nil, onSelect: { _ in })
+                    }
+                    .accessibilityIdentifier("empty-index-rail-host")
                     Text("Selected: \(selectedID)")
                         .accessibilityIdentifier("selection")
                 }
