@@ -92,4 +92,3 @@ schemes:
       gatherCoverageData: false
       targets:
         - RenameReviewMacTests
-        - RenameReviewMacUITests

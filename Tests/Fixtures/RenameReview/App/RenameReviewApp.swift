@@ -13,10 +13,10 @@ struct RenameReviewApp: App {
     var body: some Scene {
         WindowGroup {
             VStack(spacing: 20) {
-                Text("Strata rename review")
+                Text("Strata")
                     .accessibilityIdentifier("strata-title")
                 StrataButton(theme: theme, variant: .primary, isLoading: false, action: {}) {
-                    Text("Continue")
+                    Text("Action")
                 } loadingLabel: {
                     Text("Loading")
                 }
