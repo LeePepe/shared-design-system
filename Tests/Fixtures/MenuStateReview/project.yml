@@ -1,0 +1,47 @@
+name: MenuStateReview
+options:
+  bundleIdPrefix: org.nativedesignkit.fixtures
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+packages:
+  Strata:
+    path: ../../..
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    GENERATE_INFOPLIST_FILE: YES
+    CODE_SIGNING_ALLOWED: NO
+targets:
+  MenuStateReview:
+    type: application
+    platform: iOS
+    sources: [App]
+    dependencies:
+      - package: Strata
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.MenuStateReview
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+  MenuStateReviewUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: MenuStateReview
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nativedesignkit.fixtures.MenuStateReviewUITests
+        TEST_TARGET_NAME: MenuStateReview
+schemes:
+  MenuStateReview:
+    build:
+      targets:
+        MenuStateReview: all
+        MenuStateReviewUITests: [test]
+    test:
+      gatherCoverageData: false
+      targets: [MenuStateReviewUITests]
