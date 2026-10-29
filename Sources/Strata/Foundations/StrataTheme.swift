@@ -10,6 +10,8 @@ public struct StrataTheme {
     public let secondaryForeground: Color
     public let accent: Color
     public let onAccent: Color
+    public let interactiveAccent: Color
+    public let onInteractiveAccent: Color
     public let critical: Color
     public let onCritical: Color
     public let brandSeed: Color
@@ -31,6 +33,7 @@ public struct StrataTheme {
     /// Resolves fresh values from the exact DesignTokens dependency.
     /// Unknown brands and token errors propagate unchanged.
     public init(theme: Theme, brand: String) throws {
+        _ = try DesignTokens.interactiveAccentPair(brand, theme: theme)
         try self.init(theme: theme, brand: brand, color: StrataTokenColor.resolve,
                       brandColor: { brand, role, theme in
             StrataTokenColor.color(from: try DesignTokens.brandColor(brand, role: role, theme: theme))
@@ -66,6 +69,8 @@ public struct StrataTheme {
             // Brand validation remains the provider's responsibility.
             accent = try brandColor(brand, .accent, theme)
             onAccent = try brandColor(brand, .onAccent, theme)
+            interactiveAccent = accent
+            onInteractiveAccent = onAccent
             let prefix = "product.strata.\(family)."
             let brandPrefix = "brand.\(brand)."
             canvas = try color(prefix + "surface.page", theme)
@@ -96,6 +101,8 @@ public struct StrataTheme {
             secondaryForeground = try color("product.text.secondary", theme)
             accent = try brandColor(brand, .accent, theme)
             onAccent = try brandColor(brand, .onAccent, theme)
+            interactiveAccent = accent
+            onInteractiveAccent = onAccent
             critical = try color("status.critical", theme)
             onCritical = try color("status.on-critical", theme)
             region = surface; inset = surface; hover = surface; selected = surface

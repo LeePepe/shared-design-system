@@ -31,6 +31,19 @@ final class DesignTokensTests: XCTestCase {
         XCTAssertNil(Theme(rawValue: "system"))
     }
 
+    func testInteractiveAccentPairsMeetWCAGAAForEveryBrandAndTheme() throws {
+        for brand in DesignTokens.brandIDs {
+            for theme in Theme.allCases {
+                let pair = try DesignTokens.interactiveAccentPair(brand, theme: theme)
+                XCTAssertGreaterThanOrEqual(
+                    try pair.fill.contrast(with: pair.onFill),
+                    4.5,
+                    "\(brand)/\(theme.rawValue)"
+                )
+            }
+        }
+    }
+
     func testStableSeriesUnderSortFilterBrandAndTheme() throws {
         let bindings = ["a": "product.series.cobalt", "b": "product.series.rose", "c": "product.series.leaf"]
         for theme in Theme.allCases {
