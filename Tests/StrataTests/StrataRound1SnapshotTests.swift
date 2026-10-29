@@ -102,12 +102,7 @@ final class StrataRound1SnapshotTests: XCTestCase {
         if let path = ProcessInfo.processInfo.environment["STRATA_SNAPSHOT_DIR"], !path.isEmpty {
             return URL(fileURLWithPath: path, isDirectory: true)
         }
-        #if os(macOS)
-        return FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Development/handoff/design-eco-3r/snapshots/round-1/strata", isDirectory: true)
-        #else
         return FileManager.default.temporaryDirectory
-            .appendingPathComponent("design-eco-3r/snapshots/round-1/strata", isDirectory: true)
-        #endif
+            .appendingPathComponent("strata-snapshots/round-1", isDirectory: true)
     }
 }
