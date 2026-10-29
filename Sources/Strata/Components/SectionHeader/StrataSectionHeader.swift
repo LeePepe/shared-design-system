@@ -23,7 +23,10 @@ public struct StrataSectionHeader<TrailingContent: View>: View {
     }
 
     public var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(
+            alignment: (subtitle == nil || subtitle?.isEmpty == true) ? .center : .firstTextBaseline,
+            spacing: 12
+        ) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(title)

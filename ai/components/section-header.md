@@ -12,3 +12,7 @@ StrataSectionHeader(theme: theme, title: "Barbell", subtitle: "Chest", badgeText
 
 The title is exposed with the `.isHeader` accessibility trait. Nil or empty
 optional values do not create placeholder text or layout gaps.
+
+The outer row uses `.center` alignment without a subtitle and
+`.firstTextBaseline` when a subtitle exists, so single-line titles align with
+44pt trailing controls while multiline headings retain their text baseline.

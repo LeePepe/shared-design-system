@@ -102,3 +102,8 @@ belong in the PR/evidence receipt. No VoiceOver, keyboard, hover,
 minimum-OS or physical-device acceptance is inferred from source or screenshots.
 Rollback removes these additive call sites and restores a reviewed revision;
 there is no stored data to migrate.
+
+The icon-and-copy row uses `HStack(alignment: .firstTextBaseline, spacing: 12)`
+and a 28pt icon frame, keeping the icon aligned with the first line of primary
+text. Dense list cells may use the shared `compactCellRadius` rather than a
+local radius.

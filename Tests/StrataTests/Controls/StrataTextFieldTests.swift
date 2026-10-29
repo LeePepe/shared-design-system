@@ -21,4 +21,38 @@ final class StrataTextFieldTests: XCTestCase {
         _ = StrataTextField(theme: theme, text: binding, prompt: Text("Your name")) { Text("Name") }
         XCTAssertEqual(value, "  Caller text — 原样  ")
     }
+
+    @MainActor
+    func testControlsComposeWithStrataAlignmentGuides() throws {
+        var value = ""
+        let binding = Binding(get: { value }, set: { value = $0 })
+        let theme = try StrataTheme(theme: .light, brand: "ocean")
+        let searchConfiguration = try StrataSearchFieldConfiguration(
+            label: "Search", clearLabel: "Clear"
+        )
+        let numberConfiguration = try StrataNumberSlotConfiguration(
+            label: "Count", displayValue: "3"
+        )
+
+        _ = HStack(alignment: .strataControlCenter) {
+            StrataTextField(theme: theme, text: binding) { Text("Name") }
+            StrataSearchField(theme: theme, text: binding, configuration: searchConfiguration)
+            StrataNumberSlot(theme: theme, configuration: numberConfiguration) {}
+            StrataButton(theme: theme, variant: .primary, isLoading: false, action: {}) {
+                Text("Save")
+            } loadingLabel: {
+                Text("Saving")
+            }
+        }
+        _ = HStack(alignment: .strataInputBaseline) {
+            StrataTextField(theme: theme, text: binding) { Text("Name") }
+            StrataSearchField(theme: theme, text: binding, configuration: searchConfiguration)
+            StrataNumberSlot(theme: theme, configuration: numberConfiguration) {}
+            StrataButton(theme: theme, variant: .primary, isLoading: false, action: {}) {
+                Text("Save")
+            } loadingLabel: {
+                Text("Saving")
+            }
+        }
+    }
 }

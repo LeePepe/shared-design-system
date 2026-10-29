@@ -243,7 +243,7 @@ private struct StrataListItemContent<Leading: View, Primary: View, Secondary: Vi
     }
 
     private var copyWithIcon: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
             leadingContent
             copy
         }
@@ -254,7 +254,6 @@ private struct StrataListItemContent<Leading: View, Primary: View, Secondary: Vi
             .font(.body)
             .foregroundStyle(theme.secondaryForeground)
             .frame(width: 28)
-            .frame(minHeight: 28)
             .accessibilityHidden(true)
     }
 

@@ -130,6 +130,19 @@ final class StrataMenuStateTests: XCTestCase {
         ).body
     }
 
+    func testComponentMetricsResolvesCompactCellRadius() throws {
+        let defaultMetrics = try StrataComponentMetrics()
+        XCTAssertEqual(defaultMetrics.compactCellRadius, 6)
+
+        let customMetrics = try StrataComponentMetrics(
+            dimension: { _ in 44 },
+            spacing: { _ in 0 },
+            radius: { id in id == "radius.small" ? 6 : 12 },
+            border: { _ in 1 }
+        )
+        XCTAssertEqual(customMetrics.compactCellRadius, 6)
+    }
+
     func testComponentMetricsPropagatesTokenErrorsUnchanged() {
         let expected = StyleTokenError.unknownToken("dimension.failure")
 

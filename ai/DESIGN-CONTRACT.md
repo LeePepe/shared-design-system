@@ -24,6 +24,30 @@ agents. A product may add requirements, but it must preserve the required
 sections, the four required view states, both appearance modes, and the
 upstream accessibility guarantees.
 
+## 6-Dimension design specification
+
+- **Visual modes:** `Strata-Core` (native solid foundation), `Strata-Glass`
+  (functional-layer material), `Independent-Glass` (detached host material),
+  and `Independent-Custom` (consumer-owned detached styling).
+- **Two-stage verbal spec workflow:** Stage 1 names the terminology and
+  relationships; Stage 2 records the parameter table. Implement directly in
+  product or design-system code after the verbal specification. Do not create
+  throwaway HTML or `Prototype/` code demos.
+- **Size-aware geometry:** concentric radii narrow as `32 -> 24 -> 16 ->
+  Capsule`; dense collections and custom keyboards use the `4–8pt`
+  `compactCellRadius` resolved from `radius.small`.
+- **Alignment:** same-row controls use `.strataControlCenter` or
+  `.strataInputBaseline`; icon-and-copy rows use `.firstTextBaseline`.
+- **Anti-collision:** Glass is limited to the functional layer while Cards,
+  Lists, forms, and keypads remain solid content layers; never use Glass-on-
+  Glass. Use one bottom `.safeAreaInset(edge: .bottom)` stack in
+  `Content -> Snackbar -> DockedBar -> Safe Area/Keyboard` order. Detached
+  hosts such as `UITextField.inputView` receive explicit `theme` and
+  `colorScheme`.
+- **Macro layouts:** `Compact-Portrait` targets iPhone portrait,
+  `Wide-Touch` targets iPhone landscape and iPad, and `Desktop-Pointer`
+  targets macOS.
+
 ## Required consumer document
 
 Create `docs/design-contract.md` in every consuming repository by copying the

@@ -48,8 +48,10 @@ public struct StrataTextField<Label: View>: View {
             .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
             .focused($isFocused)
             .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .padding(.vertical, 10)
             .frame(minHeight: 44)
+            .alignmentGuide(.strataControlCenter) { $0[VerticalAlignment.center] }
+            .alignmentGuide(.strataInputBaseline) { $0[.firstTextBaseline] }
             .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .background {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)

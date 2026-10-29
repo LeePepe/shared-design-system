@@ -77,6 +77,8 @@ public struct StrataSearchField: View {
             }
             .padding(.horizontal, 12)
             .frame(minHeight: 44)
+            .alignmentGuide(.strataControlCenter) { $0[VerticalAlignment.center] }
+            .alignmentGuide(.strataInputBaseline) { $0[.firstTextBaseline] }
             .background(theme.surface(.card), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)

@@ -72,3 +72,8 @@ The synthetic [runtime review fixture](../../Tests/Fixtures/TextFieldReview/READ
 records how prior hosting assertions move to actual SwiftUI/XCTest UI tests.
 Its simulator evidence does not claim VoiceOver, macOS keyboard interaction,
 physical-device or minimum-OS acceptance.
+
+The 44pt input box publishes `.strataControlCenter` and
+`.strataInputBaseline` alignment guides. The visible label remains outside that
+box, so same-row controls align on their input geometry rather than the label.
+Use `compactCellRadius` for dense input cells and custom keyboards.

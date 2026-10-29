@@ -60,6 +60,8 @@ public struct StrataNumberSlot: View {
                 }
             }
             .frame(minWidth: 44, minHeight: 44)
+            .alignmentGuide(.strataControlCenter) { $0[VerticalAlignment.center] }
+            .alignmentGuide(.strataInputBaseline) { $0[.firstTextBaseline] }
             .padding(.horizontal, 12)
             .background(appearance.fill, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay {
