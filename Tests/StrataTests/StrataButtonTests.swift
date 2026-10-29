@@ -22,30 +22,18 @@ final class StrataButtonTests: XCTestCase {
                 let theme = try StrataTheme(theme: mode, brand: brand)
                 for (pressed, hovered, role) in [(false, false, "primary"), (false, true, "hover"), (true, true, "active")] {
                     let background = try DesignTokens.color("brand.\(brand).\(role)", theme: mode)
-                    let pair = try DesignTokens.interactiveAccentPair(brand, theme: mode)
+                    let foreground = try DesignTokens.brandColor(brand, role: .onAccent, theme: mode)
                     let paint = StrataButtonPaint(theme: theme, variant: .primary, isEnabled: true,
                                                   isLoading: false, isPressed: pressed, isHovered: hovered)
-                    XCTAssertEqual(paint.foreground, theme.onInteractiveAccent)
+                    XCTAssertEqual(paint.foreground, StrataTokenColor.color(from: foreground))
                     XCTAssertEqual(paint.fill, StrataTokenColor.color(from: background))
-                    XCTAssertGreaterThanOrEqual(try pair.onFill.contrast(with: background), 4.5,
+                    XCTAssertGreaterThanOrEqual(try foreground.contrast(with: background), 4.5,
                                                "\(brand)/\(mode)/\(role)")
                 }
                 let loading = StrataButtonPaint(theme: theme, variant: .primary, isEnabled: false,
                                                 isLoading: true, isPressed: true, isHovered: true)
-                XCTAssertEqual(loading.foreground, theme.onInteractiveAccent)
-                XCTAssertEqual(loading.fill, theme.interactiveAccent, "Loading cannot inherit stale hover or press feedback.")
-            }
-        }
-    }
-
-    func testToolbarVariantUsesSemanticForegroundWithoutCustomChrome() throws {
-        for brand in DesignTokens.brandIDs {
-            for mode in Theme.allCases {
-                let theme = try StrataTheme(theme: mode, brand: brand)
-                let toolbar = StrataButtonPaint(theme: theme, variant: .toolbar, isEnabled: true,
-                                                isLoading: false, isPressed: true, isHovered: true)
-                XCTAssertEqual(toolbar.foreground, theme.accent)
-                XCTAssertNil(toolbar.fill)
+                XCTAssertEqual(loading.foreground, theme.onAccent)
+                XCTAssertEqual(loading.fill, theme.accent, "Loading cannot inherit stale hover or press feedback.")
             }
         }
     }
@@ -60,14 +48,11 @@ final class StrataButtonTests: XCTestCase {
                                               isLoading: false, isPressed: false, isHovered: false)
                 XCTAssertEqual(ghost.foreground, theme.brandText)
                 XCTAssertNil(ghost.fill)
-                for variant in [StrataButtonVariant.primary, .secondary, .ghost, .toolbar] {
+                for variant in [StrataButtonVariant.primary, .secondary, .ghost] {
                     let disabled = StrataButtonPaint(theme: theme, variant: variant, isEnabled: false,
                                                      isLoading: false, isPressed: true, isHovered: true)
                     XCTAssertEqual(disabled.foreground, theme.secondaryForeground)
-                    XCTAssertEqual(
-                        disabled.fill,
-                        variant == .ghost || variant == .toolbar ? nil : theme.surface(.inset)
-                    )
+                    XCTAssertEqual(disabled.fill, variant == .ghost ? nil : theme.surface(.inset))
                 }
             }
         }

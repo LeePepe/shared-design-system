@@ -127,7 +127,7 @@
     {
       "path": "Sources/DesignTokens/DesignTokens.swift",
       "format": "swift",
-      "sha256": "60bc761b94d73f6afac7ea4179868a3ba51a1eab1739be38a78b66f84812bc66",
+      "sha256": "4e58779a43d17d8aeee8eec425e915bf9cf409ef767f36f27bfd6d9502dcb51e",
       "symbols": [
         "BrandRole",
         "DesignTokens",
@@ -146,6 +146,7 @@
         "id",
         "ids",
         "init",
+        "interactiveAccentPair",
         "r",
         "relativeLuminance",
         "schemaVersion",

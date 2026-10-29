@@ -34,6 +34,20 @@ final class StrataThemeTests: XCTestCase {
         }
     }
 
+    func testToolbarVariantUsesSemanticForegroundWithoutCustomChrome() throws {
+        for brand in DesignTokens.brandIDs {
+            for mode in Theme.allCases {
+                let theme = try StrataTheme(theme: mode, brand: brand)
+                for isEnabled in [true, false] {
+                    let toolbar = StrataButtonPaint(theme: theme, variant: .toolbar, isEnabled: isEnabled,
+                                                    isLoading: false, isPressed: true, isHovered: true)
+                    XCTAssertEqual(toolbar.foreground, isEnabled ? theme.accent : theme.secondaryForeground)
+                    XCTAssertNil(toolbar.fill)
+                }
+            }
+        }
+    }
+
     func testAllProviderBrandsAndThemesResolveFreshSnapshots() throws {
         for brand in DesignTokens.brandIDs {
             for mode in [Theme.light, .dark, .light] {
