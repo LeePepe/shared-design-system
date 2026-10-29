@@ -22,6 +22,18 @@ final class StrataThemeTests: XCTestCase {
         }
     }
 
+    func testInteractiveAccentPropertiesUseTheAuthoritativeTokenPair() throws {
+        for brand in DesignTokens.brandIDs {
+            for mode in Theme.allCases {
+                let pair = try DesignTokens.interactiveAccentPair(brand, theme: mode)
+                let theme = try StrataTheme(theme: mode, brand: brand)
+                XCTAssertEqual(theme.interactiveAccent, StrataTokenColor.color(from: pair.fill))
+                XCTAssertEqual(theme.onInteractiveAccent, StrataTokenColor.color(from: pair.onFill))
+                XCTAssertGreaterThanOrEqual(try pair.fill.contrast(with: pair.onFill), 4.5)
+            }
+        }
+    }
+
     func testAllProviderBrandsAndThemesResolveFreshSnapshots() throws {
         for brand in DesignTokens.brandIDs {
             for mode in [Theme.light, .dark, .light] {

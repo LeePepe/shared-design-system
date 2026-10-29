@@ -4,6 +4,7 @@ public enum StrataButtonVariant: Equatable, Sendable {
     case primary
     case secondary
     case ghost
+    case toolbar
 }
 
 /// A native action with explicit style, caller-owned labels and loading state.
@@ -76,7 +77,7 @@ public struct StrataButton<Label: View, LoadingLabel: View>: View {
                                             isLoading: isLoading, reduceMotion: reduceMotion))
         .focused($isFocused)
         .overlay {
-            if isFocused {
+            if isFocused && variant != .toolbar {
                 StrataButtonShape().strokeBorder(theme.accent, lineWidth: 3).padding(-4)
                     .allowsHitTesting(false)
             }
@@ -187,11 +188,13 @@ private struct StrataActionButtonBody: View {
                         }
                 case .ghost:
                     if let fill = paint.fill { StrataButtonShape().fill(fill) }
+                case .toolbar:
+                    EmptyView()
                 }
             }
             .foregroundStyle(paint.foreground)
             .overlay {
-                if pressed {
+                if pressed && variant != .toolbar {
                     StrataButtonShape().strokeBorder(paint.foreground, lineWidth: 2)
                 }
             }
@@ -210,17 +213,23 @@ struct StrataButtonPaint {
          isLoading: Bool, isPressed: Bool, isHovered: Bool) {
         if !isEnabled && !isLoading {
             foreground = theme.secondaryForeground
-            fill = variant == .ghost ? nil : theme.surface(.inset)
+            fill = variant == .ghost || variant == .toolbar ? nil : theme.surface(.inset)
             return
         }
-        foreground = variant == .primary ? theme.onAccent : variant == .ghost ? theme.brandText : theme.foreground
+        foreground = variant == .primary ? theme.onInteractiveAccent :
+            variant == .toolbar ? theme.accent :
+            variant == .ghost ? theme.brandText : theme.foreground
         switch variant {
         case .primary:
-            fill = isLoading ? theme.accent : isPressed ? theme.accentActive : isHovered ? theme.accentHover : theme.accent
+            fill = isLoading ? theme.interactiveAccent :
+                isPressed ? theme.accentActive :
+                isHovered ? theme.accentHover : theme.interactiveAccent
         case .secondary:
             fill = isLoading ? nil : isPressed ? theme.surface(.selected) : isHovered ? theme.surface(.hover) : nil
         case .ghost:
             fill = !isLoading && (isPressed || isHovered) ? theme.accentSubtle : nil
+        case .toolbar:
+            fill = nil
         }
     }
 }

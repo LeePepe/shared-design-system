@@ -10,6 +10,7 @@ public enum TokenError: Error, Equatable, Sendable {
     case invalidSeriesToken(String)
     case invalidRGBA
     case translucentContrast
+    case insufficientInteractiveAccentContrast(String, Theme)
 }
 
 /// Encoded sRGB bytes (not linear RGB, Display P3 or HSB). Alpha is 0...1.
@@ -68,6 +69,17 @@ public enum DesignTokens {
     public static func brandColor(_ brand: String, role: BrandRole, theme: Theme) throws -> RGBA {
         guard let id = brands[brand]?[role] else { throw TokenError.unknownBrand(brand) }
         return try color(id, theme: theme)
+    }
+
+    /// Returns the opaque fill and foreground pair reserved for primary interactive controls.
+    /// The pair is rejected rather than replaced when provider data fails WCAG 2.1 AA.
+    public static func interactiveAccentPair(_ brand: String, theme: Theme) throws -> (fill: RGBA, onFill: RGBA) {
+        let fill = try brandColor(brand, role: .accent, theme: theme)
+        let onFill = try brandColor(brand, role: .onAccent, theme: theme)
+        guard try fill.contrast(with: onFill) >= 4.5 else {
+            throw TokenError.insufficientInteractiveAccentContrast(brand, theme)
+        }
+        return (fill: fill, onFill: onFill)
     }
 
     /// Bindings are consumer-persisted identity -> semantic ID, never positions in a chart.

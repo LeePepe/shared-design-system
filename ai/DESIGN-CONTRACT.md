@@ -24,6 +24,31 @@ agents. A product may add requirements, but it must preserve the required
 sections, the four required view states, both appearance modes, and the
 upstream accessibility guarantees.
 
+## Round 1 interaction contracts
+
+### Rule 1 — System Chrome & Toolbar Integration Contract (Zero Double-Chrome)
+
+Consumers must not apply custom `.background(..., in: Capsule())` or
+`.overlay(Capsule().stroke(...))` inside `.toolbar` or `ToolbarItem` views.
+Consumers must not pack multiple bordered or filled capsule buttons inside a
+single shared toolbar glass pill. The system toolbar chrome is the sole outer
+bezel.
+
+### Rule 2 — Token Contrast Matrix (WCAG AA ≥ 4.5:1)
+
+Primary filled controls, including detached UIKit `inputView` custom keyboard
+`Done` keys and floating dock confirmation pills, must bind foreground and
+background to `onInteractiveAccent` and `interactiveAccent`. They must never
+pair a surface-tinted `primaryText` token with an accent fill or use
+low-contrast gray-on-gray disabled pills.
+
+### Rule 3 — Inline Status Ring Optical Center Alignment
+
+Status and metric rows combining progress rings (`Circle().trim`), icons,
+monospaced digits, and unit labels must align on one `.center` vertical axis.
+Progress rings use a 14×14 frame with `lineWidth: 2`, and the row uses a
+unified `minHeight: 24`.
+
 ## 6-Dimension design specification
 
 - **Visual modes:** `Strata-Core` (native solid foundation), `Strata-Glass`
