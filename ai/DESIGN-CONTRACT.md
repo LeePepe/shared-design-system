@@ -69,6 +69,21 @@ When snackbars or banners are `.none`, consumers must reserve zero dead space
 for their hidden slot. Custom multi-column keypads must distribute their
 columns across the same grid height so the top and bottom edges align.
 
+### Rule 7 — Sticky Section Header Compactness & Hit-Target Separation
+
+Sticky section headers must keep `.padding(.top, 6)` and
+`.padding(.bottom, 4)`, with compact vertical content spacing, and must
+separate visual pill backgrounds (approximately 32pt high) from the outer
+44×44 hit target. A pinned header must never inflate to 100pt or more or
+crowd the first row.
+
+### Rule 8 — Narrow Sidebar Rail CJK Ergonomics & Multi-State/RTL Verification
+
+Narrow CJK rails (`64pt`) must use no more than `2pt` of inner horizontal
+padding to maximize glyph capacity per line. Stateful or filterable views must
+use reduce-motion-aware spring choreography through `StrataMotion` and verify
+Light, Dark, Large-Font, and RTL (`layoutDirection = .rightToLeft`) snapshots.
+
 ## 6-Dimension design specification
 
 - **Visual modes:** `Strata-Core` (native solid foundation), `Strata-Glass`
