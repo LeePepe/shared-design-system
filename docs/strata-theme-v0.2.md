@@ -43,6 +43,12 @@
 
 嵌套时按 32 → 24 → 16 的关系收敛，留出足够内边距，不用增大圆角挤压内容。窄屏内容卡片采用单列，参考内边距 16px、卡间距 12px。元信息需频繁阅读时，应优先提升可读性，而不是为了紧凑继续缩小字号。
 
+共享原生组件遵循六维设计规格：`Strata-Core`、`Strata-Glass`、
+`Independent-Glass`、`Independent-Custom` 四种视觉模式；密集集合和自定义
+键盘使用 `compactCellRadius`（由 `radius.small` 解析，当前为 6pt）。
+同一行控件使用 `.strataControlCenter` 或 `.strataInputBaseline`，图标与文字
+使用 `.firstTextBaseline`，避免标签、结果摘要等附属内容改变控制框的对齐。
+
 上述 px 值记录已接受的网页比例。SwiftUI 使用语义字体并支持 Dynamic Type；尺寸按平台单位、命中区域、键盘交互和布局密度单独验证，不能把 14px 字体或 40px 高度当作所有原生平台的固定限制。原型的 1232px 最大内容宽、双列工作台和 420px 单列断点属于展示布局，不是库组件的页面结构要求。
 
 ## Glass 与实底
@@ -60,6 +66,17 @@
 这些是网页校准记录，不是跨平台相同效果的承诺。原生实现应使用目标系统可用的 SwiftUI 材质能力；不得把 CSS 的 blur / saturation 视为等价的原生 API，也不要求升级最低系统版本或实现 Liquid Glass 折射。Glass 用于合适的外层或浮动表面；不把每张内容卡、表单、开关和标签都变成独立玻璃层。
 
 实底是同一主题的可读性回退：保留配色、布局、圆角和状态语义，关闭背景色形、模糊、材质高光及装饰阴影。减少透明度或系统能力不足时使用实底，不把实底截图标为 Glass。材质与明暗选择是不同维度；处理无障碍偏好不能隐式改成另一个明暗主题或默认品牌。
+
+Anti-collision 规则固定功能层 Glass 与内容层实底的边界：Card、List、表单和
+键盘保持实底，禁止 Glass-on-Glass。底部只允许一个
+`.safeAreaInset(edge: .bottom)` 堆栈，顺序为
+`Content -> Snackbar -> DockedBar -> Safe Area/Keyboard`；脱离视图树的宿主
+（例如 `UITextField.inputView`）必须显式注入 `theme` 与 `colorScheme`。
+
+原生宏观布局分为 `Compact-Portrait`（iPhone 竖屏）、`Wide-Touch`（iPhone
+横屏 / iPad）和 `Desktop-Pointer`（macOS）。设计阶段先输出两阶段 verbal
+spec：Stage 1 术语与关系，Stage 2 参数表；随后直接实现，不创建一次性 HTML
+或 `Prototype/` 代码演示。
 
 ## 组件状态与动效
 

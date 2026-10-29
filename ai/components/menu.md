@@ -31,3 +31,8 @@ metrics.
 
 The trigger has the token minimum hit size and does not own row completion,
 navigation, localization, persistence, or business data.
+
+`StrataComponentMetrics.compactCellRadius` resolves `radius.small` (6pt in the
+current DesignTokens profile) for compact collections and custom keyboards.
+Compose the menu trigger with `.strataControlCenter` or
+`.strataInputBaseline` when it shares a row with other controls.

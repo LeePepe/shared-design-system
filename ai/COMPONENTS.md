@@ -57,6 +57,16 @@ Component-specific contracts are added under `components/` by their PRs.
 DesignTokens-backed metrics in throwing initializers; use `try` when constructing
 them.
 
+## Shared geometry and alignment
+
+`StrataComponentMetrics.compactCellRadius` is resolved from
+`StyleTokens.radius("radius.small")` and is the shared dense-cell radius
+for compact collections and custom keyboards. Controls expose
+`.strataControlCenter` and `.strataInputBaseline` alignment guides on their
+44pt input/button boxes, so labels and summaries outside those boxes cannot
+skew same-row alignment. List icons align with copy using
+`HStack(alignment: .firstTextBaseline)`.
+
 | Component | Contract |
 | --- | --- |
 | Button | [StrataButton](components/button.md) |

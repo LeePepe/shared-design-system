@@ -68,6 +68,8 @@ public struct StrataButton<Label: View, LoadingLabel: View>: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
             .frame(minWidth: 44, minHeight: 44)
+            .alignmentGuide(.strataControlCenter) { $0[VerticalAlignment.center] }
+            .alignmentGuide(.strataInputBaseline) { $0[.firstTextBaseline] }
             .contentShape(StrataButtonShape())
         }
         .buttonStyle(StrataActionButtonStyle(theme: theme, variant: variant, surface: surface,

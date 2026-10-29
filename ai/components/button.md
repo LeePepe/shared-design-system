@@ -32,6 +32,11 @@ explicit. Supply localized content in both builders and own
 the loading state and action. The loading builder should describe the work
 (e.g. `Text("Saving changes…")`), rather than supplying a spinner alone.
 
+The 44pt label/frame publishes `.strataControlCenter` and
+`.strataInputBaseline` guides for same-row compositions. Use
+`StrataComponentMetrics.compactCellRadius` for dense button cells instead of
+inventing a local radius.
+
 ```swift
 StrataButton(theme: theme, variant: .primary, surface: .glass, isLoading: isSaving,
              action: save) {
