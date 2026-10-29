@@ -1,4 +1,3 @@
-import DesignTokens
 import SwiftUI
 
 /// A compact, opaque section header designed to remain readable when pinned.
@@ -48,7 +47,7 @@ public struct StrataStickySectionHeader<Accessory: View>: View {
         .overlay(alignment: .bottom) {
             Rectangle()
                 .fill(theme.secondaryForeground.opacity(0.24))
-            .frame(height: CGFloat(try! StyleTokens.border("border.hairline")))
+            .frame(height: 0.5)
         }
         .accessibilityAddTraits(.isHeader)
         .accessibilityValue("\(completedCount) of \(totalCount) completed")
