@@ -49,6 +49,26 @@ monospaced digits, and unit labels must align on one `.center` vertical axis.
 Progress rings use a 14×14 frame with `lineWidth: 2`, and the row uses a
 unified `minHeight: 24`.
 
+### Rule 4 — Single-Line Filter Chip Rail (`StrataFilterBar`)
+
+Filter chip collections must use `StrataFilterBar` or an equivalent single-line
+horizontal scroll rail. Chips must never wrap onto multiple rows; each chip
+keeps a minimum 44pt touch target and exposes selection through accessibility
+semantics.
+
+### Rule 5 — Single-Trailing-Action Card Ergonomics (`StrataActionCardRow`)
+
+Cards in lists and sheets must not stack two trailing buttons such as `Detail`
+and `Select`. Use `StrataActionCardRow` with a text column at
+`layoutPriority(1)` and one visually and interactively separate 44×44 trailing
+action slot.
+
+### Rule 6 — Keyboard-Persistent Vertical Space Budget & Flush Keypad Matrix
+
+When snackbars or banners are `.none`, consumers must reserve zero dead space
+for their hidden slot. Custom multi-column keypads must distribute their
+columns across the same grid height so the top and bottom edges align.
+
 ## 6-Dimension design specification
 
 - **Visual modes:** `Strata-Core` (native solid foundation), `Strata-Glass`
