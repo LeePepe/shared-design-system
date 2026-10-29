@@ -12,11 +12,39 @@ import UIKit
 @available(macOS 13, iOS 16, *)
 final class StrataRound3SnapshotTests: XCTestCase {
     @MainActor
-    func testMotionRespectsReduceMotion() {
-        XCTAssertNil(StrataMotion.animation(reduceMotion: true))
-        XCTAssertNotNil(StrataMotion.animation(reduceMotion: false))
-        XCTAssertNotNil(Animation.strataSnappy)
-        XCTAssertNotNil(Animation.strataGentle)
+    func testMotionRespectsReduceMotion() throws {
+        let motion = try StrataMotion()
+        XCTAssertNil(StrataMotion.animation(motion.standard, reduceMotion: true))
+        XCTAssertNotNil(StrataMotion.animation(motion.standard, reduceMotion: false))
+        XCTAssertNoThrow(try StrataMotion.snappy())
+        XCTAssertNoThrow(try StrataMotion.gentle())
+    }
+
+    @MainActor
+    func testMotionAndStickyHeaderPropagateTokenErrorsUnchanged() throws {
+        let expected = StyleTokenError.unknownToken("spring.failure")
+        XCTAssertThrowsError(
+            try StrataMotion(spring: { _ in throw expected })
+        ) { error in
+            XCTAssertEqual(error as? StyleTokenError, expected)
+        }
+
+        let theme = try StrataTheme(theme: .light, brand: "ocean")
+        let borderError = StyleTokenError.unknownToken("border.failure")
+        XCTAssertThrowsError(
+            try StrataStickySectionHeader(
+                theme: theme,
+                index: 1,
+                completedCount: 0,
+                totalCount: 1,
+                title: "Section",
+                border: { _ in throw borderError }
+            ) {
+                EmptyView()
+            }
+        ) { error in
+            XCTAssertEqual(error as? StyleTokenError, borderError)
+        }
     }
 
     @MainActor
@@ -24,22 +52,22 @@ final class StrataRound3SnapshotTests: XCTestCase {
         for mode in Theme.allCases {
             let theme = try StrataTheme(theme: mode, brand: "ocean")
             try renderSnapshot(
-                header(theme: theme, title: "Strength", isLargeMode: false, completedCount: 2)
+                try header(theme: theme, title: "Strength", isLargeMode: false, completedCount: 2)
                     .frame(width: 390),
                 named: "sticky-header-normal-\(mode.rawValue)"
             )
             try renderSnapshot(
-                header(theme: theme, title: "弹力带俯身髋部伸展", isLargeMode: true, completedCount: 2)
+                try header(theme: theme, title: "弹力带俯身髋部伸展", isLargeMode: true, completedCount: 2)
                     .frame(width: 390),
                 named: "sticky-header-large-\(mode.rawValue)"
             )
             try renderSnapshot(
-                header(theme: theme, title: "Completed", isLargeMode: false, completedCount: 3)
+                try header(theme: theme, title: "Completed", isLargeMode: false, completedCount: 3)
                     .frame(width: 390),
                 named: "sticky-header-completed-\(mode.rawValue)"
             )
             try renderSnapshot(
-                header(theme: theme, title: "RTL section", isLargeMode: true, completedCount: 1)
+                try header(theme: theme, title: "RTL section", isLargeMode: true, completedCount: 1)
                     .environment(\.layoutDirection, .rightToLeft)
                     .frame(width: 390),
                 named: "sticky-header-rtl-\(mode.rawValue)"
@@ -54,8 +82,8 @@ final class StrataRound3SnapshotTests: XCTestCase {
         title: String,
         isLargeMode: Bool,
         completedCount: Int
-    ) -> some View {
-        StrataStickySectionHeader(
+    ) throws -> some View {
+        try StrataStickySectionHeader(
             theme: theme,
             index: 2,
             completedCount: completedCount,
