@@ -71,10 +71,10 @@ columns across the same grid height so the top and bottom edges align.
 
 ### Rule 7 — Sticky Section Header Compactness & Hit-Target Separation
 
-Sticky section headers must keep `.padding(.top, 6)` and
-`.padding(.bottom, 4)`, with compact vertical content spacing, and must
-separate visual pill backgrounds (approximately 32pt high) from the outer
-44×44 hit target. A pinned header must never inflate to 100pt or more or
+Sticky section headers use the same strict header contract as Rule 9: no more
+than `4pt` total vertical padding or outer vertical padding on either edge,
+a maximum total height of `44pt`, and visual chrome compact inside that
+44×44 hit envelope. A pinned header must never inflate to 52pt or more or
 crowd the first row.
 
 ### Rule 8 — Narrow Sidebar Rail CJK Ergonomics & Multi-State/RTL Verification
@@ -83,6 +83,44 @@ Narrow CJK rails (`64pt`) must use no more than `2pt` of inner horizontal
 padding to maximize glyph capacity per line. Stateful or filterable views must
 use reduce-motion-aware spring choreography through `StrataMotion` and verify
 Light, Dark, Large-Font, and RTL (`layoutDirection = .rightToLeft`) snapshots.
+
+### Rule 9 — Compact Unified-Surface Section Headers
+
+`StrataSectionHeader` and `StrataStickySectionHeader` keep the title on one
+line (`lineLimit(1)`, tail truncation when necessary), use compact vertical
+padding of no more than `4pt` per edge and a strict total height envelope of
+`44pt` maximum, and bind their fill to the same `theme.surface` token as the
+adjacent card or row. Trailing accessories may use a `44×44` hit target, but
+their visual chrome stays compact and contributes no extra vertical padding.
+Trailing actions remain compact and must not consume the title's horizontal
+budget with full-width text pills.
+
+### Rule 10 — Single-Axis Tabular Rows & Inline Hints
+
+Dense data-entry rows use one horizontal grid:
+`[Index/Tag] -> [Checkbox] -> [Input + Inline Hint] -> [Input + Inline Hint] -> [Badge/Menu]`.
+Warm-up, RPE, and progressive-overload recommendations remain compact inline
+metadata; recommendations must not render as a row-bottom banner. Inputs,
+badges, and trailing actions preserve the row's shared center axis and minimum
+touch target.
+
+### Rule 11 — Shared-Grid Sub-Rows & Motion
+
+Sub-rows such as drop sets reuse the parent row's column geometry rather than
+adding a nested card or secondary indentation. Insertions and removals use
+`StrataMotion.subRowAnimation(reduceMotion:)` together with
+`StrataMotion.subRowTransition(reduceMotion:)`. Motion allowed uses
+`.spring(response: 0.30, dampingFraction: 0.82)`; reduced motion uses
+`.linear(duration: 0.12)`, with an opacity transition.
+Containers must not clip the expanding row or its footer action.
+
+### Rule 12 — Zero-Height Inactive Slots & Seamless Docks
+
+Inactive bottom slots are conditionally omitted (`StrataBottomSlot(isActive:)`)
+and must never use `.opacity(0)` to hide a view that still reserves height.
+Custom keyboard or bottom docks use one continuous `theme.surface` plane,
+extend through the bottom safe area, and expose at most one token-backed top
+hairline. Content-layer rows and key cells remain solid rather than glass.
 
 ## 6-Dimension design specification
 

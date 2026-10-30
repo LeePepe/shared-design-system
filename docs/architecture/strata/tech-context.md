@@ -39,3 +39,10 @@ Strata on watchOS before component use.
   iPhone simulator. All four run in CI through `scripts/verify --all`.
 - **Contract:** `ai/` travels with each release tag; update it in the same PR
   as any public API change.
+
+## TK2 dense-header layout contract
+
+`StrataSectionHeader` and `StrataStickySectionHeader` keep a strict `44pt`
+maximum total height, with at most `4pt` vertical outer padding. A caller
+supplied accessory may retain a `44×44` hit target; visual chrome remains
+compact inside the header envelope and must not add outer vertical height.

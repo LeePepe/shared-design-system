@@ -38,16 +38,15 @@ public struct StrataStickySectionHeader<Accessory: View>: View {
             Text(title)
                 .font(isLargeMode ? .title3.weight(.semibold) : .headline)
                 .foregroundStyle(theme.foreground)
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(1)
+                .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
             accessory
                 .foregroundStyle(theme.foreground)
+                .fixedSize()
         }
-        .padding(.top, 6)
-        .padding(.bottom, 4)
-        .frame(minHeight: 44)
-        .background(theme.canvas)
+        .frame(height: 44)
+        .background(theme.surface)
         .overlay(alignment: .bottom) {
             Rectangle()
                 .fill(theme.secondaryForeground.opacity(0.24))
