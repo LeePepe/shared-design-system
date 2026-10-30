@@ -84,6 +84,40 @@ padding to maximize glyph capacity per line. Stateful or filterable views must
 use reduce-motion-aware spring choreography through `StrataMotion` and verify
 Light, Dark, Large-Font, and RTL (`layoutDirection = .rightToLeft`) snapshots.
 
+### Rule 9 — Compact Unified-Surface Section Headers
+
+`StrataSectionHeader` and `StrataStickySectionHeader` keep the title on one
+line (`lineLimit(1)`, tail truncation when necessary), use compact vertical
+padding of no more than `4pt` per edge, and bind their fill to the same
+`theme.surface` token as the adjacent card or row. Trailing actions remain
+compact and must not consume the title's horizontal budget with full-width
+text pills.
+
+### Rule 10 — Single-Axis Tabular Rows & Inline Hints
+
+Dense data-entry rows use one horizontal grid:
+`[Index/Tag] -> [Checkbox] -> [Input + Inline Hint] -> [Input + Inline Hint] -> [Badge/Menu]`.
+Warm-up, RPE, and progressive-overload recommendations remain compact inline
+metadata; recommendations must not render as a row-bottom banner. Inputs,
+badges, and trailing actions preserve the row's shared center axis and minimum
+touch target.
+
+### Rule 11 — Shared-Grid Sub-Rows & Motion
+
+Sub-rows such as drop sets reuse the parent row's column geometry rather than
+adding a nested card or secondary indentation. Insertions and removals use
+`StrataMotion.subRowTransition(reduceMotion:)` and a token-backed spring when
+motion is allowed; reduced motion falls back to an opacity-only transition.
+Containers must not clip the expanding row or its footer action.
+
+### Rule 12 — Zero-Height Inactive Slots & Seamless Docks
+
+Inactive bottom slots are conditionally omitted (`StrataBottomSlot(isActive:)`)
+and must never use `.opacity(0)` to hide a view that still reserves height.
+Custom keyboard or bottom docks use one continuous `theme.surface` plane,
+extend through the bottom safe area, and expose at most one token-backed top
+hairline. Content-layer rows and key cells remain solid rather than glass.
+
 ## 6-Dimension design specification
 
 - **Visual modes:** `Strata-Core` (native solid foundation), `Strata-Glass`

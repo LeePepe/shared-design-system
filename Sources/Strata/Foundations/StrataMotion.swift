@@ -48,6 +48,13 @@ public struct StrataMotion {
         try animation(for: spring("spring.gentle"))
     }
 
+    /// Standard insertion/removal transition for shared-grid sub-rows.
+    public static func subRowTransition(reduceMotion: Bool) -> AnyTransition {
+        reduceMotion
+            ? .opacity
+            : .opacity.combined(with: .move(edge: .top))
+    }
+
     private static func animation(for token: SpringToken) -> Animation {
         return .spring(
             response: token.response,
