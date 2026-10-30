@@ -27,79 +27,80 @@ final class StrataRound4SnapshotTests: XCTestCase {
     }
 
     @MainActor
+    func testHeaderAndInactiveSlotGeometryStayWithinDenseContracts() throws {
+        let theme = try StrataTheme(theme: .light, brand: "strata-blue")
+        for isLargeMode in [false, true] {
+            let sectionHeader = StrataSectionHeader(
+                theme: theme,
+                title: "弹力带俯身髋部伸展",
+                subtitle: nil,
+                badgeText: "3组"
+            ) {
+                Button("More", systemImage: "ellipsis") {}
+                    .labelStyle(.iconOnly)
+                    .frame(width: 44, height: 44)
+            }
+            let stickyHeader = try StrataStickySectionHeader(
+                theme: theme,
+                index: 1,
+                completedCount: 1,
+                totalCount: 3,
+                title: "弹力带俯身髋部伸展",
+                isLargeMode: isLargeMode
+            ) {
+                Button("Add", systemImage: "plus") {}
+                    .labelStyle(.iconOnly)
+                    .frame(width: 44, height: 44)
+            }
+
+            XCTAssertLessThanOrEqual(renderedHeight(sectionHeader), 44)
+            XCTAssertLessThanOrEqual(renderedHeight(stickyHeader), 44)
+        }
+
+        let inactive = StrataBottomSlot(isActive: false) {
+            Text("Active snackbar content")
+        }
+        XCTAssertEqual(renderedHeight(inactive), 0)
+    }
+
+    @MainActor
+    func testSubRowMotionAndTransitionsCoverReduceMotionModes() {
+        let normalAnimation = StrataMotion.subRowAnimation(reduceMotion: false)
+        let reduceAnimation = StrataMotion.subRowAnimation(reduceMotion: true)
+        XCTAssertNotNil(normalAnimation as Animation?)
+        XCTAssertNotNil(reduceAnimation as Animation?)
+
+        let normalTransition = StrataMotion.subRowTransition(reduceMotion: false)
+        let reduceTransition = StrataMotion.subRowTransition(reduceMotion: true)
+        XCTAssertNotNil(normalTransition)
+        XCTAssertNotNil(reduceTransition)
+    }
+
+    @MainActor
     func testHighDensityTabularSnapshotsExportPNGForBothAppearancesAndRTL() throws {
         for mode in Theme.allCases {
             let theme = try StrataTheme(theme: mode, brand: "strata-blue")
             for (name, direction) in [("normal", LayoutDirection.leftToRight), ("rtl", .rightToLeft)] {
                 try renderSnapshot(
-                    try composite(theme: theme, isLargeMode: false)
+                    HighDensityComposite(theme: theme, isLargeMode: false, isSnackbarActive: false)
                         .environment(\.layoutDirection, direction)
                         .frame(width: 390),
                     named: "round-4-\(mode.rawValue)-\(name)"
                 )
                 try renderSnapshot(
-                    try composite(theme: theme, isLargeMode: true)
+                    HighDensityComposite(theme: theme, isLargeMode: true, isSnackbarActive: false)
                         .environment(\.layoutDirection, direction)
                         .frame(width: 390),
                     named: "round-4-\(mode.rawValue)-\(name)-large"
                 )
+                try renderSnapshot(
+                    HighDensityComposite(theme: theme, isLargeMode: true, isSnackbarActive: true)
+                        .environment(\.layoutDirection, direction)
+                        .frame(width: 390),
+                    named: "round-4-\(mode.rawValue)-\(name)-active"
+                )
             }
         }
-    }
-
-    @MainActor
-    private func composite(theme: StrataTheme, isLargeMode: Bool) throws -> some View {
-        let metrics = try StrataTabularRowMetrics()
-        let header = try StrataStickySectionHeader(
-            theme: theme,
-            index: 1,
-            completedCount: 0,
-            totalCount: 3,
-            title: "弹力带俯身髋部伸展",
-            isLargeMode: isLargeMode
-        ) {
-            Image(systemName: "ellipsis")
-                .frame(width: 44, height: 44)
-        }
-        return VStack(spacing: 0) {
-            header
-            HStack(spacing: metrics.controlSpacing) {
-                Text("1")
-                    .frame(width: metrics.indexWidth)
-                Image(systemName: "circle")
-                    .frame(width: metrics.checkboxHitTarget, height: metrics.checkboxHitTarget)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("0 lb")
-                    StrataInlineHint(theme: theme, label: "建议重量", hint: "建议 0lb")
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("12")
-                    StrataInlineHint(theme: theme, label: "建议次数", hint: "建议 12")
-                }
-                Text("RPE 8")
-                    .font(.caption.weight(.semibold))
-                    .padding(.horizontal, 6)
-                    .frame(minHeight: metrics.compactBadgeHeight)
-                    .background(theme.accentSubtle, in: Capsule())
-            }
-            .frame(minHeight: metrics.minimumRowHeight)
-            .padding(.horizontal, 12)
-            StrataBottomSlot(isActive: true) {
-                Text("↳ 85% 递减组")
-                    .frame(maxWidth: .infinity, minHeight: metrics.minimumRowHeight, alignment: .leading)
-                    .padding(.horizontal, 12)
-                    .transition(StrataMotion.subRowTransition(reduceMotion: false))
-            }
-            StrataBottomSlot(isActive: false) {
-                Text("inactive")
-            }
-            StrataDockedBar(theme: theme, style: .solid) {
-                Text("+ 添加动作")
-                    .font(.subheadline.weight(.semibold))
-            }
-        }
-        .background(theme.surface)
-        .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
     }
 
     @MainActor
@@ -136,5 +137,211 @@ final class StrataRound4SnapshotTests: XCTestCase {
             return URL(fileURLWithPath: path, isDirectory: true)
         }
         return FileManager.default.temporaryDirectory.appendingPathComponent("strata-snapshots/round-4")
+    }
+
+    @MainActor
+    private func renderedHeight<V: View>(_ view: V) -> CGFloat {
+        #if os(macOS)
+        return NSHostingView(rootView: view).fittingSize.height
+        #elseif canImport(UIKit)
+        let host = UIHostingController(rootView: view)
+        return host.view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
+        #else
+        return 0
+        #endif
+    }
+}
+
+@available(macOS 13, iOS 16, *)
+private struct HighDensityComposite: View {
+    let theme: StrataTheme
+    let isLargeMode: Bool
+    let isSnackbarActive: Bool
+    @State private var weightOne = ""
+    @State private var repsOne = ""
+    @State private var weightTwo = "85"
+    @State private var repsTwo = "8"
+    @State private var weightThree = "72"
+    @State private var repsThree = "10"
+    @State private var showsSubRows = true
+
+    var body: some View {
+        VStack(spacing: 0) {
+            sectionHeader
+            stickyHeader
+            HStack(alignment: .top, spacing: 0) {
+                sidebar
+                VStack(spacing: 0) {
+                    setRow(index: "1", checkboxOn: true, weight: $weightOne, reps: $repsOne, warmUp: true)
+                        .transition(StrataMotion.subRowTransition(reduceMotion: false))
+                    if showsSubRows {
+                        subRow(index: "↳1", weight: $weightTwo, reps: $repsTwo)
+                            .transition(StrataMotion.subRowTransition(reduceMotion: false))
+                        subRow(index: "↳2", weight: $weightThree, reps: $repsThree)
+                            .transition(StrataMotion.subRowTransition(reduceMotion: false))
+                    }
+                    Text("+ 递减组")
+                        .font(.caption.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 36, alignment: .leading)
+                        .padding(.horizontal, 12)
+                        .foregroundStyle(theme.accent)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation(StrataMotion.subRowAnimation(reduceMotion: false)) {
+                                showsSubRows.toggle()
+                            }
+                        }
+                }
+                .frame(maxWidth: .infinity)
+                .animation(
+                    StrataMotion.subRowAnimation(reduceMotion: false),
+                    value: showsSubRows
+                )
+            }
+            StrataBottomSlot(isActive: isSnackbarActive) {
+                Text("组间休息 01:30")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .background(theme.surface(.card))
+                    .transition(StrataMotion.subRowTransition(reduceMotion: false))
+            }
+            keyboardDock
+        }
+        .background(theme.surface)
+        .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
+        .environment(\.dynamicTypeSize, isLargeMode ? .xxxLarge : .medium)
+    }
+
+    private var sectionHeader: some View {
+        StrataSectionHeader(
+            theme: theme,
+            title: "弹力带俯身髋部伸展",
+            subtitle: nil,
+            badgeText: "3组"
+        ) {
+            Button("More", systemImage: "ellipsis") {}
+                .labelStyle(.iconOnly)
+                .frame(width: 44, height: 44)
+        }
+    }
+
+    private var stickyHeader: some View {
+        try! StrataStickySectionHeader(
+            theme: theme,
+            index: 1,
+            completedCount: 1,
+            totalCount: 3,
+            title: "弹力带俯身髋部伸展",
+            isLargeMode: isLargeMode
+        ) {
+            Button("Add", systemImage: "plus") {}
+                .labelStyle(.iconOnly)
+                .frame(width: 44, height: 44)
+        }
+    }
+
+    private var sidebar: some View {
+        VStack(spacing: 6) {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(theme.accent)
+                .frame(height: 44)
+                .overlay(Text("1").foregroundStyle(theme.onAccent).font(.caption.weight(.bold)))
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(theme.surface(.card))
+                .frame(height: 44)
+                .overlay(Text("2").foregroundStyle(theme.foreground).font(.caption.weight(.bold)))
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(theme.surface(.card))
+                .frame(height: 44)
+                .overlay(Text("+").foregroundStyle(theme.foreground).font(.title3.weight(.semibold)))
+        }
+        .frame(width: 64)
+        .padding(.vertical, 6)
+        .background(theme.surface(.card))
+    }
+
+    private func setRow(
+        index: String,
+        checkboxOn: Bool,
+        weight: Binding<String>,
+        reps: Binding<String>,
+        warmUp: Bool
+    ) -> some View {
+        HStack(alignment: .center, spacing: 4) {
+            Text(index).frame(width: 24)
+            Image(systemName: checkboxOn ? "checkmark.circle.fill" : "circle")
+                .frame(width: 44, height: 44)
+            editableCell(title: "重量", text: weight, hint: "建议 0lb")
+            editableCell(title: "次数", text: reps, hint: "建议 12")
+            VStack(alignment: .leading, spacing: 4) {
+                if warmUp {
+                    Text("热身")
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, 5)
+                        .frame(height: 22)
+                        .background(theme.accentSubtle, in: Capsule())
+                }
+                Text("RPE 8")
+                    .font(.caption.weight(.semibold))
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+                    .padding(.horizontal, 5)
+                    .frame(height: 22)
+                    .background(theme.accentSubtle, in: Capsule())
+            }
+        }
+        .frame(minHeight: 44)
+        .padding(.horizontal, 4)
+    }
+
+    private func subRow(index: String, weight: Binding<String>, reps: Binding<String>) -> some View {
+        HStack(alignment: .center, spacing: 4) {
+            Text(index).font(.caption2).frame(width: 24)
+            Color.clear.frame(width: 44, height: 44)
+            editableCell(title: "重量", text: weight, hint: "递减")
+            editableCell(title: "次数", text: reps, hint: "递减")
+            Text("递减组")
+                .font(.caption2)
+                .frame(width: 48)
+        }
+        .frame(minHeight: 44)
+        .padding(.horizontal, 4)
+        .background(theme.surface(.card).opacity(0.35))
+    }
+
+    private func editableCell(title: String, text: Binding<String>, hint: String) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(title).font(.caption2).foregroundStyle(theme.secondaryForeground)
+            TextField(hint, text: text)
+                .textFieldStyle(.plain)
+                .frame(width: 58, height: 30)
+                .padding(.horizontal, 4)
+                .background(theme.surface(.card), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+            StrataInlineHint(theme: theme, label: title, hint: hint)
+        }
+    }
+
+    private var keyboardDock: some View {
+        VStack(spacing: 4) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 3), spacing: 4) {
+                ForEach(["1", "2", "3", "4", "5", "6", "7", "8", "9"], id: \.self) { key in
+                    Text(key)
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, minHeight: 34)
+                        .background(theme.surface(.card), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                }
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.top, 6)
+        .padding(.bottom, 34)
+        .frame(maxWidth: .infinity)
+        .background(theme.surface)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(theme.secondaryForeground.opacity(0.24))
+                .frame(height: 1 / 2)
+        }
     }
 }

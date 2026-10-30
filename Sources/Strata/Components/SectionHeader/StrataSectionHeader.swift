@@ -53,8 +53,7 @@ public struct StrataSectionHeader<TrailingContent: View>: View {
                 .foregroundStyle(theme.foreground)
                 .fixedSize()
         }
-        .padding(.vertical, 4)
-        .frame(minHeight: 36, alignment: .center)
+        .frame(height: 44, alignment: .center)
         .background(theme.surface)
         .accessibilityAddTraits(.isHeader)
         .environment(\.colorScheme, theme.mode == .light ? .light : .dark)

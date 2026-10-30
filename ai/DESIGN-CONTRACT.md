@@ -71,10 +71,10 @@ columns across the same grid height so the top and bottom edges align.
 
 ### Rule 7 — Sticky Section Header Compactness & Hit-Target Separation
 
-Sticky section headers must keep `.padding(.top, 6)` and
-`.padding(.bottom, 4)`, with compact vertical content spacing, and must
-separate visual pill backgrounds (approximately 32pt high) from the outer
-44×44 hit target. A pinned header must never inflate to 100pt or more or
+Sticky section headers use the same strict header contract as Rule 9: no more
+than `4pt` total vertical padding or outer vertical padding on either edge,
+a maximum total height of `44pt`, and visual chrome compact inside that
+44×44 hit envelope. A pinned header must never inflate to 52pt or more or
 crowd the first row.
 
 ### Rule 8 — Narrow Sidebar Rail CJK Ergonomics & Multi-State/RTL Verification
@@ -88,10 +88,12 @@ Light, Dark, Large-Font, and RTL (`layoutDirection = .rightToLeft`) snapshots.
 
 `StrataSectionHeader` and `StrataStickySectionHeader` keep the title on one
 line (`lineLimit(1)`, tail truncation when necessary), use compact vertical
-padding of no more than `4pt` per edge, and bind their fill to the same
-`theme.surface` token as the adjacent card or row. Trailing actions remain
-compact and must not consume the title's horizontal budget with full-width
-text pills.
+padding of no more than `4pt` per edge and a strict total height envelope of
+`44pt` maximum, and bind their fill to the same `theme.surface` token as the
+adjacent card or row. Trailing accessories may use a `44×44` hit target, but
+their visual chrome stays compact and contributes no extra vertical padding.
+Trailing actions remain compact and must not consume the title's horizontal
+budget with full-width text pills.
 
 ### Rule 10 — Single-Axis Tabular Rows & Inline Hints
 
@@ -106,8 +108,10 @@ touch target.
 
 Sub-rows such as drop sets reuse the parent row's column geometry rather than
 adding a nested card or secondary indentation. Insertions and removals use
-`StrataMotion.subRowTransition(reduceMotion:)` and a token-backed spring when
-motion is allowed; reduced motion falls back to an opacity-only transition.
+`StrataMotion.subRowAnimation(reduceMotion:)` together with
+`StrataMotion.subRowTransition(reduceMotion:)`. Motion allowed uses
+`.spring(response: 0.30, dampingFraction: 0.82)`; reduced motion uses
+`.linear(duration: 0.12)`, with an opacity transition.
 Containers must not clip the expanding row or its footer action.
 
 ### Rule 12 — Zero-Height Inactive Slots & Seamless Docks

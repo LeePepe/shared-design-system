@@ -45,8 +45,7 @@ public struct StrataStickySectionHeader<Accessory: View>: View {
                 .foregroundStyle(theme.foreground)
                 .fixedSize()
         }
-        .padding(.vertical, 4)
-        .frame(minHeight: 36)
+        .frame(height: 44)
         .background(theme.surface)
         .overlay(alignment: .bottom) {
             Rectangle()

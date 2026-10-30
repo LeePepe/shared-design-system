@@ -127,6 +127,10 @@ final class StrataRound3SnapshotTests: XCTestCase {
             "\(named) PNG signature"
         )
         XCTAssertGreaterThanOrEqual(bytes.count, 24, "\(named) PNG IHDR")
+        let width = bytes[16...19].reduce(UInt32(0)) { ($0 << 8) | UInt32($1) }
+        let height = bytes[20...23].reduce(UInt32(0)) { ($0 << 8) | UInt32($1) }
+        XCTAssertEqual(width, 780, "\(named) PNG width")
+        XCTAssertLessThanOrEqual(height, 88, "\(named) sticky-header PNG height")
         let directory = snapshotDirectory()
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         try data.write(to: directory.appendingPathComponent("\(named).png"))
