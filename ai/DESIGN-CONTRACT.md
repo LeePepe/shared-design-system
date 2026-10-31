@@ -24,6 +24,18 @@ agents. A product may add requirements, but it must preserve the required
 sections, the four required view states, both appearance modes, and the
 upstream accessibility guarantees.
 
+Before adapting a consumer screen, R11 exploration must verify the consumer
+repository's pinned `shared-design-system` revision (or local `DesignKit`
+parity) and check whether the required UI pattern already exists in `Strata`
+or `DesignTokens`. When a consumer screen needs a reusable component variant,
+layout primitive, or more than 15 lines of custom layout or chrome glue that
+`Strata` does not provide, the Designer and TL must split an upstream
+`shared-design-system` task first rather than authoring an app-local workaround
+such as negative margins, ad-hoc toolbar capsules, or raw colors. Reusable
+layout and motion primitives validated in a downstream product task must be
+backported to `shared-design-system`, after which the downstream local glue is
+removed.
+
 ## Round 1 interaction contracts
 
 ### Rule 1 — System Chrome & Toolbar Integration Contract (Zero Double-Chrome)
@@ -121,6 +133,50 @@ and must never use `.opacity(0)` to hide a view that still reserves height.
 Custom keyboard or bottom docks use one continuous `theme.surface` plane,
 extend through the bottom safe area, and expose at most one token-backed top
 hairline. Content-layer rows and key cells remain solid rather than glass.
+
+### Rule 13 — Container-Driven Width Budget & Three-Tier Text Constraints
+
+Every compact layout starts with a top-down width budget:
+`Available Single-Line Width = Container Width - Outer Padding - Column Gaps - Fixed Control/Icon Widths`.
+For AppKit/UIKit fixed-width hosts such as `NSHostingView` and `NSPopover`,
+apply `.padding(P).frame(width: W)` so padding lives inside `W`; the rendered
+bitmap must satisfy `bitmap.pixelsWide == W * scale`.
+
+- **Tier 1 - Schema Labels:** In compact or half-width Bento cards
+  (`~140-170pt`) and narrow rails (`64-72pt`), cap labels at CJK <= 4
+  characters or EN <= 6-8 characters (for example, `Load` or `负载`, never
+  `Load 1/5/15m`). Move longer schema descriptions to section subtitles or
+  semantic icons.
+- **Tier 2 - Metric Readouts:** Lock a deterministic upper-bound format
+  template with explicit decimal precision such as `%.1f` and compact units
+  such as `16.8 / 24.0 GB`, and apply `.layoutPriority(1)`. Numeric values
+  and units must never truncate with an ellipsis (`…`). Side-by-side Bento
+  cards in an `HStack` must lock matching row heights so card bottoms align
+  within `<= 1px`.
+- **Tier 3 - Unbounded Dynamic Titles:** Never place unbounded titles
+  (exercise names, file paths, or localized error explanations) in the same
+  single-line `HStack` competing with multiple fixed buttons. Give them a
+  dedicated line or use `ViewThatFits(in: .horizontal)` with a one-line
+  compact form and a two-line fallback, as in `StrataStickySectionHeader`,
+  together with `lineLimit(2)` and `minimumScaleFactor(0.8-0.85)`, or enforce
+  an input character cap on user-created labels.
+- **No Placeholder/Unit Duplication:** In custom numeric inputs, never set the
+  placeholder string to the same unit or label already rendered as an inline
+  persistent suffix (`lb lb`, `次数 次数`).
+
+## Scenario-to-Pattern, Component, and Motion Decision Matrix
+
+Use the following prescriptive mapping before introducing a new layout,
+component, or animation. The anti-pattern column is a redline, not a
+suggestion.
+
+| Scenario | Required layout strategy | Required Strata primitives | Required StrataMotion choreography | Explicit anti-patterns |
+| --- | --- | --- | --- | --- |
+| High-Frequency Live Telemetry Panels | Use a stable metric grid with a deterministic numeric template, matched row heights, and no layout shift during updates. | `StrataStatusRing`, `StrataMetricRow`, and token-backed solid cards. | Use `snappy` for value refreshes; apply `.contentTransition(.numericText())`; use a Reduce Motion crossfade. | Unbounded decimals, ellipsis-truncated values or units, changing card geometry, and Glass-on-Glass telemetry cells. |
+| High-Density Single-Hand Entry Lists | Use one shared horizontal grid with compact inline hints, a single trailing action, and a single-line filter rail. | `StrataActionCardRow`, `StrataFilterBar`, and `.strataInputBaseline`. | Use `snappy` for commit and focus changes; use a Reduce Motion crossfade instead of spring travel. | Nested cards, wrapped filter chips, stacked trailing buttons, row-bottom recommendation banners, and oversized hit chrome. |
+| Dynamic Expand/Collapse & Sub-Rows | Reuse the parent row's column geometry; reserve no hidden height and never clip the expanding footer action. | `StrataSectionHeader`, `StrataStickySectionHeader`, and shared-grid sub-row primitives. | Use `StrataMotion.subRowAnimation(reduceMotion:)` and `subRowTransition(reduceMotion:)`; use `gentle` for section expansion and Reduce Motion crossfade. | Nested secondary cards, indentation that changes the grid, `.opacity(0)` placeholders, and clipped expansion content. |
+| Bottom Multi-Layer Floating Chrome Conflicts | Compose one `Content -> Snackbar -> DockedBar -> Safe Area/Keyboard` stack with one continuous surface plane and zero-height inactive slots. | `StrataBottomSlot`, bottom dock primitives, and token-backed surface/hairline styles. | Use `snappy` for dock appearance and dismissal; use a Reduce Motion crossfade with no vertical travel. | Multiple `safeAreaInset` stacks, floating chrome over floating chrome, duplicate capsules, glass content layers, and hidden views that reserve height. |
+| Multi-Dimensional Filter & Substitute Sheets | Use a structured sheet with grouped controls, a single-line filter rail, and explicit empty/loading/error states; keep selection and confirmation separate. | `StrataFilterBar`, `StrataSectionHeader`, `StrataActionCardRow`, and semantic token-backed controls. | Use `gentle` for sheet presentation and group transitions; use `.contentTransition(.numericText())` for numeric summaries and a Reduce Motion crossfade. | Ad-hoc toolbar capsules, filter-chip wrapping, ambiguous multi-action rows, negative-margin positioning, and raw colors. |
 
 ## 6-Dimension design specification
 
@@ -242,7 +298,9 @@ separate:
    code. Consume the Explorer receipt, `docs/design-contract.md`, and the
    upstream `ai/` contract to produce `design.md` with page structure,
    semantic-token bindings, all four states, both appearances, and
-   accessibility/responsive acceptance criteria.
+   accessibility/responsive acceptance criteria. When a reusable variant,
+   layout primitive, or more than 15 lines of unsupported layout/chrome glue
+   are needed, escalate upstream first; do not design an app-local workaround.
 3. **Writer** — Consume `design.md` and the frozen consumer contract. Implement
    the demo or view code with upstream components and tokens, cover every
    required state and appearance, and produce the required light/dark
@@ -252,6 +310,12 @@ separate:
    evidence with `design.md` on two axes: contract/scope compliance and
    quality/accessibility/redlines. A passing static check alone is
    insufficient.
+
+The TL owns the upstream-first split when the Explorer parity check finds a
+missing reusable primitive. After a downstream task validates a reusable
+layout or motion primitive, the Writer and CI/Reviewer must record the
+backport to `shared-design-system` and remove the downstream local glue before
+the product task is considered complete.
 
 The Explorer receipt and Designer `design.md` are evidence artifacts. They
 must identify the same contract revision that the Writer and CI validate.
