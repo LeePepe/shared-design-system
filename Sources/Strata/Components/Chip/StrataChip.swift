@@ -39,7 +39,7 @@ public struct StrataChip<Label: View>: View {
     }
 
     public var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 0) {
             HStack(spacing: 6) {
                 if tone == .critical {
                     Image(systemName: "exclamationmark.triangle.fill")
@@ -48,34 +48,40 @@ public struct StrataChip<Label: View>: View {
                 label.fixedSize(horizontal: false, vertical: true)
             }
             .padding(.leading, 12)
-            .padding(.trailing, removal == nil ? 12 : 0)
+            .padding(.trailing, removal == nil
+                ? 12
+                : StrataChipRemovalMetrics.visualLeadingSpacing
+                    + StrataChipRemovalMetrics.visualIconSize
+                    + StrataChipRemovalMetrics.visualTrailingInset)
             .padding(.vertical, 8)
             .layoutPriority(1)
-
+        }
+        .font(.subheadline.weight(.medium))
+        .foregroundStyle(foreground)
+        .frame(minHeight: 36)
+        .background(StrataChipShape().fill(background))
+        .overlay(alignment: .trailing) {
             if let removal {
                 Button {
                     StrataChipActivation.perform(isEnabled: isEnabled, action: removal.action)
                 } label: {
                     Image(systemName: "xmark")
                         .font(.body.weight(.semibold))
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
+                        .frame(width: StrataChipRemovalMetrics.visualIconSize,
+                               height: StrataChipRemovalMetrics.visualIconSize)
+                        .overlay {
+                            if removalIsFocused {
+                                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                    .strokeBorder(foreground, lineWidth: 2)
+                                    .allowsHitTesting(false)
+                            }
+                        }
                 }
                 .accessibilityLabel(removal.accessibilityLabel)
                 .buttonStyle(StrataChipRemovalStyle(foreground: foreground))
                 .focused($removalIsFocused)
-                .overlay {
-                    if removalIsFocused {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(foreground, lineWidth: 2)
-                            .allowsHitTesting(false)
-                    }
-                }
             }
         }
-        .font(.subheadline.weight(.medium))
-        .foregroundStyle(foreground)
-        .background(StrataChipShape().fill(background))
     }
 
     private var foreground: Color {
@@ -98,6 +104,14 @@ public struct StrataChip<Label: View>: View {
         let accessibilityLabel: Text
         let action: () -> Void
     }
+}
+
+enum StrataChipRemovalMetrics {
+    static let visualLeadingSpacing: CGFloat = 6
+    static let visualIconSize: CGFloat = 18
+    // The visual icon is centered inside the trailing 44pt button.
+    static let visualTrailingInset: CGFloat = 13
+    static let hitTargetSize: CGFloat = 44
 }
 
 /// Compact chips are capsules; growing text keeps bounded, continuous corners.
@@ -125,13 +139,16 @@ private struct StrataChipRemovalStyle: ButtonStyle {
             .foregroundStyle(foreground)
             .overlay {
                 if configuration.isPressed || !isEnabled {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
                         .strokeBorder(foreground, style: StrokeStyle(
                             lineWidth: 1, dash: isEnabled ? [] : [3, 3]
                         ))
-                        .padding(4)
                         .allowsHitTesting(false)
                 }
             }
+            // Expand the control itself after drawing chrome in the visual icon box.
+            .frame(width: StrataChipRemovalMetrics.hitTargetSize,
+                   height: StrataChipRemovalMetrics.hitTargetSize)
+            .contentShape(Rectangle())
     }
 }
