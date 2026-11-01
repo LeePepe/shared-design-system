@@ -125,3 +125,5 @@ public struct StrataFilterBar<ID: Hashable & Sendable>: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
+
+public typealias StrataFilterChipRail<ID: Hashable & Sendable> = StrataFilterBar<ID>
