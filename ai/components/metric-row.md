@@ -12,6 +12,8 @@ StrataMetricRow(theme: theme, item: item)
 ```
 
 Rows use the shared control-center alignment guide and an 18pt metric band.
-`instrument: true` adds the standard 14pt indeterminate progress ring. Theme
-and token errors remain explicit at the caller boundary; no default theme or
-business data is introduced.
+`instrument: true` adds a leading 14pt progress ring and uses a 24pt row band;
+callers may provide determinate `progress` and `total` values. Tier 1 and Tier
+2 inputs reject blank, multiline, and truncated text. Theme and token errors
+remain explicit at the caller boundary; no default theme or business data is
+introduced.

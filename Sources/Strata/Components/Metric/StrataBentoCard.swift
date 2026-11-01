@@ -22,23 +22,13 @@ public struct StrataBentoCardConfiguration: Sendable, Equatable {
         rows: [StrataMetricRowItem] = [],
         hostWidth: CGFloat? = nil
     ) {
-        precondition(Self.isValidLabel(title), "StrataBentoCard titles must be one line and at most eight characters.")
-        precondition(!primaryReadout.isEmpty && !primaryReadout.contains("…"),
-                     "StrataBentoCard primary readouts must be present and must not be truncated.")
-        if let statusBadgeText {
-            precondition(!statusBadgeText.isEmpty && !statusBadgeText.contains("…"),
-                         "StrataBentoCard status badges must be present and must not be truncated.")
-        }
-        if let hostWidth {
-            precondition(hostWidth > 0, "StrataBentoCard host width must be positive.")
-        }
-        switch instrument {
-        case let .progressRing(value, total), let .progressBar(value, total):
-            precondition(StrataProgressBarValue.accepts(value: value, total: total),
-                         "StrataBentoCard instruments require a finite positive total and a finite value or nil.")
-        case .none:
-            break
-        }
+        precondition(Self.accepts(
+            title: title,
+            primaryReadout: primaryReadout,
+            statusBadgeText: statusBadgeText,
+            instrument: instrument,
+            hostWidth: hostWidth
+        ), "StrataBentoCardConfiguration contains invalid telemetry content.")
         self.title = title
         self.primaryReadout = primaryReadout
         self.statusBadgeText = statusBadgeText
@@ -47,8 +37,41 @@ public struct StrataBentoCardConfiguration: Sendable, Equatable {
         self.hostWidth = hostWidth
     }
 
-    private static func isValidLabel(_ label: String) -> Bool {
-        !label.isEmpty && label.count <= (label.containsCJK ? 4 : 8)
+    static func accepts(
+        title: String,
+        primaryReadout: String,
+        statusBadgeText: String? = nil,
+        instrument: StrataBentoInstrument = .none,
+        hostWidth: CGFloat? = nil
+    ) -> Bool {
+        acceptsLabel(title) &&
+            acceptsReadout(primaryReadout) &&
+            (statusBadgeText.map(acceptsReadout) ?? true) &&
+            (hostWidth.map { $0 > 0 } ?? true) &&
+            acceptsInstrument(instrument)
+    }
+
+    private static func acceptsInstrument(_ instrument: StrataBentoInstrument) -> Bool {
+        switch instrument {
+        case .none:
+            true
+        case let .progressRing(value, total), let .progressBar(value, total):
+            StrataProgressBarValue.accepts(value: value, total: total)
+        }
+    }
+
+    private static func acceptsLabel(_ label: String) -> Bool {
+        let trimmed = label.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !trimmed.isEmpty &&
+            !label.containsNewline &&
+            label.count <= (label.containsCJK ? 4 : 8)
+    }
+
+    private static func acceptsReadout(_ readout: String) -> Bool {
+        !readout.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+            !readout.containsNewline &&
+            !readout.contains("…") &&
+            !readout.contains("...")
     }
 }
 
@@ -94,6 +117,7 @@ public struct StrataBentoCard: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .environment(\.colorScheme, theme.mode == .light ? .light : .dark)
     }
 
     @ViewBuilder
@@ -113,25 +137,39 @@ public struct StrataBentoCard: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         case let .progressBar(value, total):
-            StrataProgressBar(theme: theme, value: value, total: total) {
-                EmptyView()
-            } currentValueLabel: {
-                Text(verbatim: configuration.statusBadgeText ?? configuration.primaryReadout)
+            if let statusBadgeText = configuration.statusBadgeText {
+                StrataProgressBar(theme: theme, value: value, total: total) {
+                    EmptyView()
+                } currentValueLabel: {
+                    Text(verbatim: statusBadgeText)
+                        .font(.caption.monospacedDigit())
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: .infinity)
+            } else {
+                StrataProgressBar(theme: theme, value: value, total: total) {
+                    EmptyView()
+                } currentValueLabel: {
+                    EmptyView()
+                }
+                .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
         }
     }
 
     private var instrumentHeight: CGFloat {
         switch configuration.instrument {
         case .none: 0
-        case .progressRing: 44
-        case .progressBar: 52
+        case .progressRing, .progressBar: 48
         }
     }
 }
 
 private extension String {
+    var containsNewline: Bool {
+        contains("\n") || contains("\r")
+    }
+
     var containsCJK: Bool {
         unicodeScalars.contains {
             (0x4E00...0x9FFF).contains($0.value) ||

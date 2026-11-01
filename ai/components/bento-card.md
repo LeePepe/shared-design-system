@@ -16,8 +16,8 @@ let configuration = StrataBentoCardConfiguration(
 StrataBentoCard(theme: theme, configuration: configuration)
 ```
 
-The card locks the header to 22pt, the instrument band to 44pt for rings or
-52pt for bars, and each metric row to 18pt. It applies the required
+The card locks the header to 22pt, every active instrument band to a unified
+48pt, and each metric row to 18pt. It applies the required
 `.padding(12).frame(width: hostWidth)` host framing and a 16pt solid card
 surface. Instrument inputs reject invalid totals rather than silently
 substituting values.
