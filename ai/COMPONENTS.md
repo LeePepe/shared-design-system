@@ -1,9 +1,10 @@
-# Unreleased Strata components
+# Strata components
 
-The component API in this checkout is **unreleased**. Strata 0.3.0
-contains only `StrataTokenColor`; it does not contain these components. Evaluate
-this work using an explicitly reviewed immutable revision until a component
-release is published. The unreleased Strata foundation consumes public exact DesignTokens 0.2.0 at
+The component API in this checkout is **unreleased** from the 0.3.0 color-only
+release. Evaluate these components using an explicitly reviewed immutable
+revision. `Package.swift` builds the in-repository `Packages/DesignTokens`
+target, and the unreleased Strata foundation consumes public exact DesignTokens
+0.2.0 at
 `87bef8fbab5bf67a748815d7ed04d7ae199f760a`; platform floors remain unchanged.
 The provider release does not release the native foundation or components.
 
@@ -70,22 +71,23 @@ skew same-row alignment. List icons align with copy using
 | Component | Contract |
 | --- | --- |
 | Button | [StrataButton](components/button.md) |
-| Card | [StrataCard](components/card.md) |
+| Card / ActionCardRow | [StrataCard](components/card.md) / [StrataActionCardRow](components/action-card-row.md) |
 | List | [StrataList](components/list.md) |
 | TextField | [StrataTextField](components/textfield.md) |
 | Switch | [StrataSwitch](components/switch.md) |
 | Checkbox | [StrataCheckbox](components/checkbox.md) |
 | RadioGroup | [StrataRadioGroup](components/radio-group.md) |
 | Slider | [StrataSlider](components/slider.md) |
-| ProgressBar | [StrataProgressBar](components/progress-bar.md) |
+| ProgressBar / StatusMetricBadge | [StrataProgressBar](components/progress-bar.md) / [StrataStatusMetricBadge](components/status-metric-badge.md) |
 | Avatar | [StrataAvatar](components/avatar.md) |
-| Chip | [StrataChip](components/chip.md) |
-| SearchField / NumberSlot | [search-field](components/search-field.md) |
+| Chip / FilterBar | [StrataChip](components/chip.md) / [StrataFilterBar](components/filter-bar.md) |
+| SearchField / NumberSlot | [search-field](components/search-field.md) / [StrataNumberSlot](components/number-slot.md) |
+| TabularLayout | [StrataTabularLayout](components/tabular-layout.md) |
 | DockedBar | [StrataDockedBar](components/docked-bar.md) |
-| SectionHeader | [StrataSectionHeader](components/section-header.md) |
+| SectionHeader / StickySectionHeader | [StrataSectionHeader](components/section-header.md) / [StrataStickySectionHeader](components/sticky-section-header.md) |
 | IndexRail | [StrataIndexRail](components/index-rail.md) |
 | Snackbar | [StrataSnackbar](components/snackbar.md) |
-| Dialog | [StrataDialog](components/dialog.md) |
+| Dialog / AlertDialog | [StrataDialog](components/dialog.md) / [StrataAlertDialog](components/alert-dialog.md) |
 | Menu | [StrataMenu](components/menu.md) |
 | SegmentedBar | [StrataSegmentedBar](components/segmented-bar.md) |
 | StateView | [StrataStateView](components/state-view.md) |

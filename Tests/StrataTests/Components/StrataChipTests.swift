@@ -39,4 +39,9 @@ final class StrataChipTests: XCTestCase {
         XCTAssertFalse(corners.allSatisfy { Capsule().path(in: rect).contains($0) },
                        "The control must exercise the multiline capsule regression.")
     }
+
+    func testRemovalTargetUsesCompactVisualBoxAndExpandedHitTarget() {
+        XCTAssertEqual(StrataChipRemovalMetrics.visualIconSize, 18)
+        XCTAssertEqual(StrataChipRemovalMetrics.hitTargetSize, 44)
+    }
 }

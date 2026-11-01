@@ -58,8 +58,16 @@ public struct StrataChip<Label: View>: View {
                 } label: {
                     Image(systemName: "xmark")
                         .font(.body.weight(.semibold))
-                        .frame(width: 44, height: 44)
+                        .frame(width: StrataChipRemovalMetrics.visualIconSize,
+                               height: StrataChipRemovalMetrics.visualIconSize)
                         .contentShape(Rectangle())
+                        .overlay {
+                            Rectangle()
+                                .fill(.clear)
+                                .frame(width: StrataChipRemovalMetrics.hitTargetSize,
+                                       height: StrataChipRemovalMetrics.hitTargetSize)
+                                .contentShape(Rectangle())
+                        }
                 }
                 .accessibilityLabel(removal.accessibilityLabel)
                 .buttonStyle(StrataChipRemovalStyle(foreground: foreground))
@@ -98,6 +106,11 @@ public struct StrataChip<Label: View>: View {
         let accessibilityLabel: Text
         let action: () -> Void
     }
+}
+
+enum StrataChipRemovalMetrics {
+    static let visualIconSize: CGFloat = 18
+    static let hitTargetSize: CGFloat = 44
 }
 
 /// Compact chips are capsules; growing text keeps bounded, continuous corners.
