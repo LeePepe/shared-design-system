@@ -58,30 +58,44 @@ final class StrataChipTests: XCTestCase {
     @MainActor
     @available(macOS 13, iOS 16, *)
     func testStaticAndRemovableChipsRenderAtTheSameVisualHeight() throws {
-        let theme = try StrataTheme(theme: .light, brand: DesignTokens.brandIDs[0])
-        let staticImage = try XCTUnwrap(
-            ImageRenderer(
-                content: StrataChip(theme: theme, tone: .neutral) {
-                    Text("Caller label")
-                }
-            ).renderedImage(scale: 2)
-        )
-        let removableImage = try XCTUnwrap(
-            ImageRenderer(
-                content: StrataChip(
-                    theme: theme,
-                    tone: .neutral,
-                    removalAccessibilityLabel: Text("Remove caller label"),
-                    onRemove: {}
-                ) {
-                    Text("Caller label")
-                }
-            ).renderedImage(scale: 2)
-        )
+        let scale: CGFloat = 2
+        let expectedWidthDelta = Int((
+            StrataChipRemovalMetrics.visualLeadingSpacing
+                + StrataChipRemovalMetrics.visualIconSize
+                + StrataChipRemovalMetrics.visualTrailingInset - 12
+        ) * scale)
+        XCTAssertEqual(expectedWidthDelta, 50)
 
-        XCTAssertEqual(staticImage.height, 72)
-        XCTAssertEqual(removableImage.height, 72)
-        XCTAssertEqual(staticImage.height, removableImage.height)
+        for mode in Theme.allCases {
+            let theme = try StrataTheme(theme: mode, brand: DesignTokens.brandIDs[0])
+            for tone in [StrataChipTone.neutral, .accent, .critical] {
+                let staticImage = try XCTUnwrap(
+                    ImageRenderer(
+                        content: StrataChip(theme: theme, tone: tone) {
+                            Text("Caller label")
+                        }
+                    ).renderedImage(scale: scale)
+                )
+                let removableImage = try XCTUnwrap(
+                    ImageRenderer(
+                        content: StrataChip(
+                            theme: theme,
+                            tone: tone,
+                            removalAccessibilityLabel: Text("Remove caller label"),
+                            onRemove: {}
+                        ) {
+                            Text("Caller label")
+                        }
+                    ).renderedImage(scale: scale)
+                )
+
+                XCTAssertEqual(staticImage.height, 72, "\(mode), \(tone)")
+                XCTAssertEqual(removableImage.height, 72, "\(mode), \(tone)")
+                XCTAssertEqual(staticImage.height, removableImage.height)
+                XCTAssertEqual(removableImage.width - staticImage.width, expectedWidthDelta,
+                               "Removal must reserve the icon and a positive label gap: \(mode), \(tone)")
+            }
+        }
     }
 }
 

@@ -50,7 +50,8 @@ public struct StrataChip<Label: View>: View {
             .padding(.leading, 12)
             .padding(.trailing, removal == nil
                 ? 12
-                : StrataChipRemovalMetrics.visualIconSize
+                : StrataChipRemovalMetrics.visualLeadingSpacing
+                    + StrataChipRemovalMetrics.visualIconSize
                     + StrataChipRemovalMetrics.visualTrailingInset)
             .padding(.vertical, 8)
             .layoutPriority(1)
@@ -68,21 +69,17 @@ public struct StrataChip<Label: View>: View {
                         .font(.body.weight(.semibold))
                         .frame(width: StrataChipRemovalMetrics.visualIconSize,
                                height: StrataChipRemovalMetrics.visualIconSize)
+                        .overlay {
+                            if removalIsFocused {
+                                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                    .strokeBorder(foreground, lineWidth: 2)
+                                    .allowsHitTesting(false)
+                            }
+                        }
                 }
-                .frame(width: StrataChipRemovalMetrics.hitTargetSize,
-                       height: StrataChipRemovalMetrics.hitTargetSize)
-                .contentShape(Rectangle())
                 .accessibilityLabel(removal.accessibilityLabel)
                 .buttonStyle(StrataChipRemovalStyle(foreground: foreground))
                 .focused($removalIsFocused)
-                .overlay {
-                    if removalIsFocused {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(foreground, lineWidth: 2)
-                            .allowsHitTesting(false)
-                    }
-                }
-                .offset(x: -1)
             }
         }
     }
@@ -110,8 +107,10 @@ public struct StrataChip<Label: View>: View {
 }
 
 enum StrataChipRemovalMetrics {
+    static let visualLeadingSpacing: CGFloat = 6
     static let visualIconSize: CGFloat = 18
-    static let visualTrailingInset: CGFloat = 12
+    // The visual icon is centered inside the trailing 44pt button.
+    static let visualTrailingInset: CGFloat = 13
     static let hitTargetSize: CGFloat = 44
 }
 
@@ -140,12 +139,16 @@ private struct StrataChipRemovalStyle: ButtonStyle {
             .foregroundStyle(foreground)
             .overlay {
                 if configuration.isPressed || !isEnabled {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
                         .strokeBorder(foreground, style: StrokeStyle(
                             lineWidth: 1, dash: isEnabled ? [] : [3, 3]
                         ))
                         .allowsHitTesting(false)
                 }
             }
+            // Expand the control itself after drawing chrome in the visual icon box.
+            .frame(width: StrataChipRemovalMetrics.hitTargetSize,
+                   height: StrataChipRemovalMetrics.hitTargetSize)
+            .contentShape(Rectangle())
     }
 }
