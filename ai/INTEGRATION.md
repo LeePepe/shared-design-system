@@ -3,9 +3,11 @@
 ## Prerequisites and dependency resolution
 
 The package declares Swift tools 6.0, iOS 15, macOS 12 and a watchOS 8 floor for
-the data-only DesignTokens product. Strata remains iOS/macOS-only. See
+the data-only DesignTokens product. Strata remains iOS/macOS-only; watchOS
+consumers must select DesignTokens alone. See
 the distinction
-between declared and tested support in [COMPATIBILITY.md](COMPATIBILITY.md).
+between declared and tested support in [COMPATIBILITY.md](COMPATIBILITY.md);
+the watchOS boundary is documented in `docs/watchos-boundary.md`.
 There are no credentials, network calls, persistence or runtime permissions.
 
 Pin the Strata 0.3.0 release with:

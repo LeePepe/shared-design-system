@@ -61,7 +61,7 @@ monospaced digits, and unit labels must align on one `.center` vertical axis.
 Progress rings use a 14×14 frame with `lineWidth: 2`, and the row uses a
 unified `minHeight: 24`.
 
-### Rule 4 — Single-Line Filter Chip Rail (`StrataFilterBar`)
+### Rule 4 — Single-Line Filter Chip Rail (`StrataFilterBar` / `StrataFilterChipRail`)
 
 Filter chip collections must use `StrataFilterBar` or an equivalent single-line
 horizontal scroll rail. Chips must never wrap onto multiple rows; each chip
@@ -157,9 +157,10 @@ bitmap must satisfy `bitmap.pixelsWide == W * scale`.
   (exercise names, file paths, or localized error explanations) in the same
   single-line `HStack` competing with multiple fixed buttons. Give them a
   dedicated line or use `ViewThatFits(in: .horizontal)` with a one-line
-  compact form and a two-line fallback, as in `StrataStickySectionHeader`,
+  compact form and a two-line fallback in a dedicated dynamic-title row,
   together with `lineLimit(2)` and `minimumScaleFactor(0.8-0.85)`, or enforce
-  an input character cap on user-created labels.
+  an input character cap on user-created labels. This exception does not apply
+  to the fixed-height `StrataStickySectionHeader`.
 - **No Placeholder/Unit Duplication:** In custom numeric inputs, never set the
   placeholder string to the same unit or label already rendered as an inline
   persistent suffix (`lb lb`, `次数 次数`).
@@ -172,8 +173,8 @@ suggestion.
 
 | Scenario | Required layout strategy | Required Strata primitives | Required StrataMotion choreography | Explicit anti-patterns |
 | --- | --- | --- | --- | --- |
-| High-Frequency Live Telemetry Panels | Use a stable metric grid with a deterministic numeric template, matched row heights, and no layout shift during updates. | `StrataStatusRing`, `StrataMetricRow`, and token-backed solid cards. | Use `snappy` for value refreshes; apply `.contentTransition(.numericText())`; use a Reduce Motion crossfade. | Unbounded decimals, ellipsis-truncated values or units, changing card geometry, and Glass-on-Glass telemetry cells. |
-| High-Density Single-Hand Entry Lists | Use one shared horizontal grid with compact inline hints, a single trailing action, and a single-line filter rail. | `StrataActionCardRow`, `StrataFilterBar`, and `.strataInputBaseline`. | Use `snappy` for commit and focus changes; use a Reduce Motion crossfade instead of spring travel. | Nested cards, wrapped filter chips, stacked trailing buttons, row-bottom recommendation banners, and oversized hit chrome. |
+| High-Frequency Live Telemetry Panels | Use a stable metric grid with a deterministic numeric template, matched row heights, and no layout shift during updates. | `StrataProgressRing` (`StrataStatusRing` alias), `StrataStatusMetricBadge`, and token-backed solid cards. | Use `snappy` for value refreshes; apply `.contentTransition(.numericText())`; use a Reduce Motion crossfade. | Unbounded decimals, ellipsis-truncated values or units, changing card geometry, and Glass-on-Glass telemetry cells. |
+| High-Density Single-Hand Entry Lists | Use one shared horizontal grid with compact inline hints, a single trailing action, and a single-line filter rail. | `StrataActionCardRow`, `StrataFilterBar` (`StrataFilterChipRail` alias), and `.strataInputBaseline`. | Use `snappy` for commit and focus changes; use a Reduce Motion crossfade instead of spring travel. | Nested cards, wrapped filter chips, stacked trailing buttons, row-bottom recommendation banners, and oversized hit chrome. |
 | Dynamic Expand/Collapse & Sub-Rows | Reuse the parent row's column geometry; reserve no hidden height and never clip the expanding footer action. | `StrataSectionHeader`, `StrataStickySectionHeader`, and shared-grid sub-row primitives. | Use `StrataMotion.subRowAnimation(reduceMotion:)` and `subRowTransition(reduceMotion:)`; use `gentle` for section expansion and Reduce Motion crossfade. | Nested secondary cards, indentation that changes the grid, `.opacity(0)` placeholders, and clipped expansion content. |
 | Bottom Multi-Layer Floating Chrome Conflicts | Compose one `Content -> Snackbar -> DockedBar -> Safe Area/Keyboard` stack with one continuous surface plane and zero-height inactive slots. | `StrataBottomSlot`, bottom dock primitives, and token-backed surface/hairline styles. | Use `snappy` for dock appearance and dismissal; use a Reduce Motion crossfade with no vertical travel. | Multiple `safeAreaInset` stacks, floating chrome over floating chrome, duplicate capsules, glass content layers, and hidden views that reserve height. |
 | Multi-Dimensional Filter & Substitute Sheets | Use a structured sheet with grouped controls, a single-line filter rail, and explicit empty/loading/error states; keep selection and confirmation separate. | `StrataFilterBar`, `StrataSectionHeader`, `StrataActionCardRow`, and semantic token-backed controls. | Use `gentle` for sheet presentation and group transitions; use `.contentTransition(.numericText())` for numeric summaries and a Reduce Motion crossfade. | Ad-hoc toolbar capsules, filter-chip wrapping, ambiguous multi-action rows, negative-margin positioning, and raw colors. |

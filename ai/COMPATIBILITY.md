@@ -29,8 +29,9 @@ The historical 0.1.1 requirement replaced candidate `1db868d` and release `0.1.0
 
 Strata is declared only for iOS and macOS. DesignTokens alone supports
 watchOS 8; selecting Strata for watchOS fails with its stable
-unavailability diagnostic. No watchOS component implementation or behavior is
-claimed.
+unavailability diagnostic. The watchOS boundary and DesignTokens-only path are
+documented in `docs/watchos-boundary.md`. No watchOS component implementation
+or behavior is claimed.
 
 ## Scoped local verification
 

@@ -56,3 +56,5 @@ public struct StrataStatusMetricBadge: View {
         .alignmentGuide(.strataControlCenter) { $0[VerticalAlignment.center] }
     }
 }
+
+public typealias StrataStatusRing = StrataProgressRing
