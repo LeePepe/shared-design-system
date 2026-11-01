@@ -70,7 +70,6 @@ final class StrataMetricBentoTests: XCTestCase {
     }
 
     @MainActor
-    @available(macOS 13, iOS 16, *)
     func testMetricRowsRenderAtRingDependentHeights() throws {
         guard #available(macOS 13, iOS 16, *) else { return }
         let theme = try StrataTheme(theme: .light, brand: "strata-blue")
@@ -83,7 +82,6 @@ final class StrataMetricBentoTests: XCTestCase {
     }
 
     @MainActor
-    @available(macOS 13, iOS 16, *)
     func testBentoHostWidthAndInstrumentSiblingHeightParityAcrossThemes() throws {
         guard #available(macOS 13, iOS 16, *) else { return }
         let rows = [StrataMetricRowItem(key: "CPU Load", value: "16.81 / 24.00 GB")]
