@@ -20,8 +20,8 @@ public struct StrataNumericKeypadMetrics: Equatable, Sendable {
         totalGridHeight = 232
         horizontalPadding = 12
         verticalPadding = 6
-        interColumnSpacing = CGFloat(try spacing("spacing.xs"))
-        interRowSpacing = CGFloat(try spacing("spacing.xs"))
+        interColumnSpacing = CGFloat(try spacing("spacing.sm"))
+        interRowSpacing = CGFloat(try spacing("spacing.sm"))
         sideColumnWidth = 68
         compactCellRadius = CGFloat(try radius("radius.small"))
         digitRowHeight = (totalGridHeight - (verticalPadding * 2) - (interRowSpacing * 3)) / 4

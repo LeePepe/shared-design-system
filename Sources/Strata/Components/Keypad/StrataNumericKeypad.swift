@@ -88,21 +88,41 @@ public struct StrataNumericKeypad: View {
         .padding(.vertical, metrics.verticalPadding)
         .frame(maxWidth: .infinity)
         .frame(height: metrics.totalGridHeight)
+        .background {
+            theme.surface.ignoresSafeArea(edges: .bottom)
+        }
         .overlay(alignment: .top) {
             Rectangle().fill(theme.material.edge).frame(height: 1)
         }
         .environment(\.colorScheme, colorScheme)
     }
 
+    var digitGridSlots: [StrataNumericKeypadKey?] {
+        (1...9).map { Optional(.digit($0)) } +
+            (configuration.mode == .decimal
+                ? [Optional(.decimalSeparator), Optional(.digit(0)), Optional(.backspace)]
+                : [nil, Optional(.digit(0)), Optional(.backspace)])
+    }
+
+    func trigger(_ key: StrataNumericKeypadKey) {
+        onKey(key)
+    }
+
     private var digitGrid: some View {
-        let keys: [StrataNumericKeypadKey] = (1...9).map { .digit($0) } +
-            (configuration.mode == .decimal ? [.decimalSeparator, .digit(0), .backspace] : [.decimalSeparator, .digit(0), .backspace])
         return LazyVGrid(
             columns: Array(repeating: GridItem(.flexible(), spacing: metrics.interColumnSpacing), count: 3),
             spacing: metrics.interRowSpacing
         ) {
-            ForEach(Array(keys.enumerated()), id: \.offset) { _, key in
-                keyButton(key, title: title(for: key), prominent: false)
+            ForEach(Array(digitGridSlots.enumerated()), id: \.offset) { _, key in
+                if let key {
+                    keyButton(key, title: title(for: key), prominent: false)
+                        .frame(height: metrics.digitRowHeight)
+                } else {
+                    Color.clear
+                        .frame(maxWidth: .infinity)
+                        .frame(height: metrics.digitRowHeight)
+                        .accessibilityHidden(true)
+                }
             }
         }
         .frame(maxWidth: .infinity)
@@ -115,15 +135,17 @@ public struct StrataNumericKeypad: View {
             : actions.map { Optional($0) }
         return VStack(spacing: metrics.interRowSpacing) {
             if slots.isEmpty {
-                Color.clear
+                Color.clear.frame(height: metrics.actionHeight(forCount: 0))
             } else {
                 ForEach(Array(slots.enumerated()), id: \.offset) { index, action in
                     if let action {
                         keyButton(.sideAction(id: action.id), title: action.title, image: action.systemImage, prominent: false)
+                            .frame(height: metrics.actionHeight(forCount: slots.count))
                     } else if includesDone && index == slots.count - 1 {
                         keyButton(.done, title: configuration.doneLabel, prominent: true)
+                            .frame(height: metrics.actionHeight(forCount: slots.count))
                     } else {
-                        Color.clear
+                        Color.clear.frame(height: metrics.actionHeight(forCount: slots.count))
                     }
                 }
             }
@@ -176,8 +198,13 @@ private struct StrataNumericKeypadButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundStyle(prominent ? theme.onInteractiveAccent : theme.foreground)
-            .background(prominent ? theme.interactiveAccent : theme.surface(.inset))
+            .background {
+                if prominent {
+                    (configuration.isPressed ? theme.accentActive : theme.interactiveAccent)
+                } else {
+                    (configuration.isPressed ? theme.surface(.selected) : theme.surface(.inset))
+                }
+            }
             .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
-            .opacity(configuration.isPressed ? 0.82 : 1)
     }
 }
