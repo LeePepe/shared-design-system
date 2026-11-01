@@ -39,7 +39,7 @@ public struct StrataChip<Label: View>: View {
     }
 
     public var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 0) {
             HStack(spacing: 6) {
                 if tone == .critical {
                     Image(systemName: "exclamationmark.triangle.fill")
@@ -48,10 +48,18 @@ public struct StrataChip<Label: View>: View {
                 label.fixedSize(horizontal: false, vertical: true)
             }
             .padding(.leading, 12)
-            .padding(.trailing, removal == nil ? 12 : 0)
+            .padding(.trailing, removal == nil
+                ? 12
+                : StrataChipRemovalMetrics.visualIconSize
+                    + StrataChipRemovalMetrics.visualTrailingInset)
             .padding(.vertical, 8)
             .layoutPriority(1)
-
+        }
+        .font(.subheadline.weight(.medium))
+        .foregroundStyle(foreground)
+        .frame(minHeight: 36)
+        .background(StrataChipShape().fill(background))
+        .overlay(alignment: .trailing) {
             if let removal {
                 Button {
                     StrataChipActivation.perform(isEnabled: isEnabled, action: removal.action)
@@ -60,15 +68,10 @@ public struct StrataChip<Label: View>: View {
                         .font(.body.weight(.semibold))
                         .frame(width: StrataChipRemovalMetrics.visualIconSize,
                                height: StrataChipRemovalMetrics.visualIconSize)
-                        .contentShape(Rectangle())
-                        .overlay {
-                            Rectangle()
-                                .fill(.clear)
-                                .frame(width: StrataChipRemovalMetrics.hitTargetSize,
-                                       height: StrataChipRemovalMetrics.hitTargetSize)
-                                .contentShape(Rectangle())
-                        }
                 }
+                .frame(width: StrataChipRemovalMetrics.hitTargetSize,
+                       height: StrataChipRemovalMetrics.hitTargetSize)
+                .contentShape(Rectangle())
                 .accessibilityLabel(removal.accessibilityLabel)
                 .buttonStyle(StrataChipRemovalStyle(foreground: foreground))
                 .focused($removalIsFocused)
@@ -79,11 +82,9 @@ public struct StrataChip<Label: View>: View {
                             .allowsHitTesting(false)
                     }
                 }
+                .offset(x: -1)
             }
         }
-        .font(.subheadline.weight(.medium))
-        .foregroundStyle(foreground)
-        .background(StrataChipShape().fill(background))
     }
 
     private var foreground: Color {
@@ -110,6 +111,7 @@ public struct StrataChip<Label: View>: View {
 
 enum StrataChipRemovalMetrics {
     static let visualIconSize: CGFloat = 18
+    static let visualTrailingInset: CGFloat = 12
     static let hitTargetSize: CGFloat = 44
 }
 
@@ -142,7 +144,6 @@ private struct StrataChipRemovalStyle: ButtonStyle {
                         .strokeBorder(foreground, style: StrokeStyle(
                             lineWidth: 1, dash: isEnabled ? [] : [3, 3]
                         ))
-                        .padding(4)
                         .allowsHitTesting(false)
                 }
             }

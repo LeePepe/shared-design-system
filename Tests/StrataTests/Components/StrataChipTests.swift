@@ -9,6 +9,16 @@ final class StrataChipTests: XCTestCase {
         for brand in DesignTokens.brandIDs {
             for mode in Theme.allCases {
                 let theme = try StrataTheme(theme: mode, brand: brand)
+                let selection = Binding<String?>(
+                    get: { nil },
+                    set: { _ in }
+                )
+                _ = StrataFilterChipRail(
+                    theme: theme,
+                    items: [StrataFilterItem(id: "all", title: "All")],
+                    selection: selection
+                )
+                _ = StrataStatusRing(theme: theme, value: 0.5, total: 1)
                 for tone in [StrataChipTone.neutral, .accent, .critical] {
                     _ = StrataChip(theme: theme, tone: tone) { Text("Caller label") }
                     _ = StrataChip(theme: theme, tone: tone,
@@ -43,5 +53,43 @@ final class StrataChipTests: XCTestCase {
     func testRemovalTargetUsesCompactVisualBoxAndExpandedHitTarget() {
         XCTAssertEqual(StrataChipRemovalMetrics.visualIconSize, 18)
         XCTAssertEqual(StrataChipRemovalMetrics.hitTargetSize, 44)
+    }
+
+    @MainActor
+    @available(macOS 13, iOS 16, *)
+    func testStaticAndRemovableChipsRenderAtTheSameVisualHeight() throws {
+        let theme = try StrataTheme(theme: .light, brand: DesignTokens.brandIDs[0])
+        let staticImage = try XCTUnwrap(
+            ImageRenderer(
+                content: StrataChip(theme: theme, tone: .neutral) {
+                    Text("Caller label")
+                }
+            ).renderedImage(scale: 2)
+        )
+        let removableImage = try XCTUnwrap(
+            ImageRenderer(
+                content: StrataChip(
+                    theme: theme,
+                    tone: .neutral,
+                    removalAccessibilityLabel: Text("Remove caller label"),
+                    onRemove: {}
+                ) {
+                    Text("Caller label")
+                }
+            ).renderedImage(scale: 2)
+        )
+
+        XCTAssertEqual(staticImage.height, 72)
+        XCTAssertEqual(removableImage.height, 72)
+        XCTAssertEqual(staticImage.height, removableImage.height)
+    }
+}
+
+@available(macOS 13, iOS 16, *)
+private extension ImageRenderer {
+    @MainActor
+    func renderedImage(scale: CGFloat) -> CGImage? {
+        self.scale = scale
+        return cgImage
     }
 }

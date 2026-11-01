@@ -68,8 +68,6 @@ public struct StrataFilterBar<ID: Hashable & Sendable>: View {
         self.onSelect = onSelect
     }
 
-    public typealias StrataFilterChipRail<T: Hashable & Sendable> = StrataFilterBar<T>
-
     public var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -127,3 +125,5 @@ public struct StrataFilterBar<ID: Hashable & Sendable>: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
+
+public typealias StrataFilterChipRail<ID: Hashable & Sendable> = StrataFilterBar<ID>
