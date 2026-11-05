@@ -26,7 +26,7 @@ concurrency:
 jobs:
   quality:
     # shared-ci v0.8.0; required check names and lane commands stay unchanged.
-    uses: LeePepe/shared-ci/.github/workflows/quality.yml@fd8a187ef4872aa1aa69c4e9afec9782183cc02d
+    uses: LeePepe/shared-ci/.github/workflows/quality.yml@838e10a059979e6732446cb26edc95d173cc7e3a
     with:
       runs-on: macos-15
       setup-command: scripts/ci/setup.sh
