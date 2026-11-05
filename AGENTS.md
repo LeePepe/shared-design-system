@@ -13,8 +13,8 @@ point here.
 
 ## Protocol
 
-Follow `LeePepe/shared-ci@fd8a187ef4872aa1aa69c4e9afec9782183cc02d/ai/agent-protocol.md`
-(https://github.com/LeePepe/shared-ci/blob/fd8a187ef4872aa1aa69c4e9afec9782183cc02d/ai/agent-protocol.md).
+Follow `LeePepe/shared-ci@838e10a059979e6732446cb26edc95d173cc7e3a/ai/agent-protocol.md`
+(https://github.com/LeePepe/shared-ci/blob/838e10a059979e6732446cb26edc95d173cc7e3a/ai/agent-protocol.md).
 It must be the same SHA as the `uses:` pins in `.github/workflows/`.
 
 ## Verify
@@ -58,7 +58,7 @@ iOS simulator build and test), contract audit, workflow-lint and the PR-body che
 
 ## Dependencies
 
-- `shared-ci` `fd8a187ef4872aa1aa69c4e9afec9782183cc02d` — https://github.com/LeePepe/shared-ci/blob/fd8a187ef4872aa1aa69c4e9afec9782183cc02d/ai/
+- `shared-ci` `838e10a059979e6732446cb26edc95d173cc7e3a` — https://github.com/LeePepe/shared-ci/blob/838e10a059979e6732446cb26edc95d173cc7e3a/ai/
 - `Strata` depends on the repository-local `DesignTokens` target.
 - The root package publishes both stable products from one exact
   `shared-design-system` revision. The nested npm artifact remains
