@@ -68,7 +68,7 @@ private struct SnackbarReviewBoard: View {
             guard item == nil else { return }
             let isLong = configuration.scenario == "long"
             let actionLabel = isLong ? "撤销删除" : "Undo"
-            let closeLabel = isLong ? "关闭" : "Dismiss"
+            let closeLabel = isLong ? "关闭" : "Close"
             let message = isLong
                 ? "已删除 16.81 / 24.00 GB：可在 5 秒内撤销 (Deleted 16.81 / 24.00 GB)"
                 : "Set deleted"
@@ -77,7 +77,7 @@ private struct SnackbarReviewBoard: View {
                 closeLabel: closeLabel,
                 action: try! StrataSnackbarAction(label: actionLabel) {
                     result = "action"
-                    item = try! StrataSnackbarItem(message: "Undo available", closeLabel: "Dismiss")
+                    item = try! StrataSnackbarItem(message: "Undo available", closeLabel: "Close")
                 }
             )
         }
