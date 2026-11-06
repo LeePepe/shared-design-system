@@ -34,10 +34,28 @@ private struct SnackbarReviewBoard: View {
     }
 
     var body: some View {
-        StrataSnackbar<AnyView, AnyView>.build(
-            theme: theme,
-            item: $item,
-            result: $result
+        try! StrataSnackbar(
+            configuration: .init(
+                theme: theme,
+                item: $item,
+                onDismiss: { _, dismissal in result = String(describing: dismissal) },
+                content: {
+                    AnyView(VStack(alignment: .leading, spacing: 16) {
+                        Text("Snackbar review")
+                            .font(.title.bold())
+                            .accessibilityIdentifier("board-title")
+                        Text("\(theme.mode == .dark ? "dark" : "light")")
+                        Text("Result: \(result)")
+                            .accessibilityIdentifier("result")
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .padding(24))
+                },
+                bottomBar: {
+                    AnyView(Text("Bottom bar coordination")
+                        .accessibilityIdentifier("bottom-bar"))
+                }
+            )
         )
         .onAppear {
             guard item == nil else { return }
@@ -50,41 +68,5 @@ private struct SnackbarReviewBoard: View {
                 }
             )
         }
-    }
-}
-
-private extension StrataSnackbar where Content == AnyView, BottomBar == AnyView {
-    @MainActor
-    static func build(
-        theme: StrataTheme,
-        item: Binding<StrataSnackbarItem?>,
-        result: Binding<String>
-    ) -> some View {
-        try! StrataSnackbar(
-            configuration: .init(
-                theme: theme,
-                item: item,
-                onDismiss: { _, dismissal in
-                    result.wrappedValue = String(describing: dismissal)
-                },
-                content: {
-                    AnyView(VStack(alignment: .leading, spacing: 16) {
-                        Text("Snackbar review")
-                            .font(.title.bold())
-                            .accessibilityIdentifier("board-title")
-                        Text("\(theme.mode == .dark ? "dark" : "light")")
-                        Text("Result: \(result.wrappedValue)")
-                            .accessibilityIdentifier("result")
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                    .padding(24))
-                },
-                bottomBar: {
-                    AnyView(Text("Bottom bar coordination")
-                        .accessibilityIdentifier("bottom-bar")
-                    )
-                }
-            )
-        )
     }
 }
