@@ -139,7 +139,6 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
         let spacingXS: CGFloat
         let spacingSM: CGFloat
         let spacingMD: CGFloat
-        let spacingLG: CGFloat
         let minimumHit: CGFloat
         let border: CGFloat
         let bodyTypography: TypographyToken
@@ -170,18 +169,13 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
             spacingXS = try CGFloat(StyleTokens.spacing("spacing.xs"))
             spacingSM = try CGFloat(StyleTokens.spacing("spacing.sm"))
             spacingMD = try CGFloat(StyleTokens.spacing("spacing.md"))
-            spacingLG = try CGFloat(StyleTokens.spacing("spacing.lg"))
             minimumHit = try CGFloat(StyleTokens.dimension("dimension.hit.minimum"))
             border = try CGFloat(StyleTokens.border("border.regular"))
-            let subtleOpacity = try StyleTokens.opacity("opacity.subtle")
-            self.borderOpacity = CGFloat(subtleOpacity)
             bodyTypography = try StyleTokens.typography("typography.body")
             calloutTypography = try StyleTokens.typography("typography.callout")
             shadow = try StyleTokens.shadow("shadow.medium")
             motion = try StrataMotion.snappy()
         }
-
-        let borderOpacity: CGFloat
     }
 
     private let configuration: Configuration
@@ -270,6 +264,10 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
                 .padding(.horizontal, configuration.spacingMD)
                 .frame(minWidth: configuration.minimumHit, minHeight: configuration.minimumHit)
                 .background(configuration.theme.interactiveAccent, in: RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous)
+                        .stroke(configuration.theme.material.edge, lineWidth: configuration.border)
+                }
                 .contentShape(RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous))
                 .accessibilityIdentifier("strata-snackbar-action")
                 .focused($ownedFocus, equals: .action)
@@ -283,6 +281,10 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
             .padding(.horizontal, configuration.spacingSM)
             .frame(minWidth: configuration.minimumHit, minHeight: configuration.minimumHit)
             .background(configuration.theme.surface(.inset), in: RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous)
+                    .stroke(configuration.theme.material.edge, lineWidth: configuration.border)
+            }
             .contentShape(RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous))
             .accessibilityLabel(item.closeLabel)
             .accessibilityIdentifier("strata-snackbar-close")

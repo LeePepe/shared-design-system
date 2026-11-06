@@ -13,11 +13,13 @@ struct SnackbarReviewApp: App {
 private struct ReviewConfiguration {
     let brand: String
     let mode: String
+    let scenario: String
 
     init() {
         let environment = ProcessInfo.processInfo.environment
         brand = environment["NDK_BRAND"] ?? "strata-blue"
         mode = environment["NDK_THEME"] ?? "light"
+        scenario = environment["NDK_SCENARIO"] ?? "default"
     }
 }
 
@@ -38,7 +40,7 @@ private struct SnackbarReviewBoard: View {
             configuration: .init(
                 theme: theme,
                 item: $item,
-                onDismiss: { _, dismissal in result = String(describing: dismissal) },
+                onDismiss: { _, dismissal in result = String(describing: dismissal).lowercased() },
                 content: {
                     AnyView(VStack(alignment: .leading, spacing: 16) {
                         Text("Snackbar review")
@@ -57,14 +59,25 @@ private struct SnackbarReviewBoard: View {
                 }
             )
         )
+        .transaction { transaction in
+            if configuration.scenario == "reduce_motion" {
+                transaction.animation = nil
+            }
+        }
         .onAppear {
             guard item == nil else { return }
+            let isLong = configuration.scenario == "long"
+            let actionLabel = isLong ? "撤销删除" : "Undo"
+            let closeLabel = isLong ? "关闭" : "Dismiss"
+            let message = isLong
+                ? "已删除 16.81 / 24.00 GB：可在 5 秒内撤销 (Deleted 16.81 / 24.00 GB)"
+                : "Set deleted"
             item = try! StrataSnackbarItem(
-                message: "Set deleted",
-                closeLabel: "Close",
-                action: try! StrataSnackbarAction(label: "Undo") {
-                    result = "Action"
-                    item = try! StrataSnackbarItem(message: "Undo available", closeLabel: "Close")
+                message: message,
+                closeLabel: closeLabel,
+                action: try! StrataSnackbarAction(label: actionLabel) {
+                    result = "action"
+                    item = try! StrataSnackbarItem(message: "Undo available", closeLabel: "Dismiss")
                 }
             )
         }
