@@ -28,4 +28,8 @@ and modal/presentation visibility pause the timeout. Items with actions remain
 visible until the caller or user dismisses them.
 
 The content and bottom-bar slots are caller-owned SwiftUI views. The component
-does not own business state, localization, a global queue, or a default theme.
+uses a solid, token-backed elevated card with a wrapping message, a high-contrast
+interactive accent action, and localized close control; both controls retain the
+minimum hit target. Appearance changes use token-backed motion and reduce-motion
+crossfades. The component does not own business state, localization, a global
+queue, or a default theme.

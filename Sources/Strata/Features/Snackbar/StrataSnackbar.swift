@@ -139,11 +139,12 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
         let spacingXS: CGFloat
         let spacingSM: CGFloat
         let spacingMD: CGFloat
-        let spacingLG: CGFloat
         let minimumHit: CGFloat
         let border: CGFloat
         let bodyTypography: TypographyToken
         let calloutTypography: TypographyToken
+        let shadow: ShadowToken
+        let motion: Animation
 
         public init(
             theme: StrataTheme,
@@ -168,16 +169,13 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
             spacingXS = try CGFloat(StyleTokens.spacing("spacing.xs"))
             spacingSM = try CGFloat(StyleTokens.spacing("spacing.sm"))
             spacingMD = try CGFloat(StyleTokens.spacing("spacing.md"))
-            spacingLG = try CGFloat(StyleTokens.spacing("spacing.lg"))
             minimumHit = try CGFloat(StyleTokens.dimension("dimension.hit.minimum"))
             border = try CGFloat(StyleTokens.border("border.regular"))
-            let subtleOpacity = try StyleTokens.opacity("opacity.subtle")
-            self.borderOpacity = CGFloat(subtleOpacity)
             bodyTypography = try StyleTokens.typography("typography.body")
             calloutTypography = try StyleTokens.typography("typography.callout")
+            shadow = try StyleTokens.shadow("shadow.medium")
+            motion = try StrataMotion.snappy()
         }
-
-        let borderOpacity: CGFloat
     }
 
     private let configuration: Configuration
@@ -214,12 +212,15 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
                 if let item = configuration.item.wrappedValue, !isObscured {
                     snackbar(item)
                         .padding(.horizontal, configuration.spacingMD)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
                 }
-                configuration.bottomBar
-                    .padding(.horizontal, configuration.spacingMD)
+                if !(configuration.bottomBar is EmptyView) {
+                    configuration.bottomBar
+                        .padding(.horizontal, configuration.spacingMD)
+                }
             }
-            .padding(.bottom, configuration.spacingSM)
+            .padding(.bottom, (configuration.item.wrappedValue != nil && !isObscured) || !(configuration.bottomBar is EmptyView) ? configuration.spacingSM : 0)
+            .animation(StrataMotion.animation(configuration.motion, reduceMotion: reduceMotion), value: configuration.item.wrappedValue?.id)
         }
         .background(configuration.theme.canvas.ignoresSafeArea())
         .environment(\.colorScheme, configuration.theme.mode == .light ? .light : .dark)
@@ -246,12 +247,12 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
     }
 
     private func snackbar(_ item: StrataSnackbarItem) -> some View {
-        HStack(spacing: configuration.spacingSM) {
+        HStack(alignment: .center, spacing: configuration.spacingSM) {
             Text(item.message)
-                .font(.system(size: configuration.bodyTypography.size,
-                              weight: .regular,
-                              design: .default))
+                .font(.system(size: configuration.bodyTypography.size, weight: .regular))
                 .foregroundStyle(configuration.theme.foreground)
+                .layoutPriority(1)
+                .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityIdentifier("strata-snackbar-message")
             if let action = item.action {
@@ -259,7 +260,15 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
                     dismiss(item, reason: .action)
                 }
                 .font(.system(size: configuration.calloutTypography.size, weight: .semibold))
+                .foregroundStyle(configuration.theme.onInteractiveAccent)
+                .padding(.horizontal, configuration.spacingMD)
                 .frame(minWidth: configuration.minimumHit, minHeight: configuration.minimumHit)
+                .background(configuration.theme.interactiveAccent, in: RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous)
+                        .stroke(configuration.theme.material.edge, lineWidth: configuration.border)
+                }
+                .contentShape(RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous))
                 .accessibilityIdentifier("strata-snackbar-action")
                 .focused($ownedFocus, equals: .action)
                 .accessibilityFocused($ownedAccessibilityFocus, equals: .action)
@@ -268,7 +277,16 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
                 dismiss(item, reason: .close)
             }
             .font(.system(size: configuration.calloutTypography.size, weight: .semibold))
+            .foregroundStyle(configuration.theme.secondaryForeground)
+            .padding(.horizontal, configuration.spacingSM)
             .frame(minWidth: configuration.minimumHit, minHeight: configuration.minimumHit)
+            .background(configuration.theme.surface(.inset), in: RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous)
+                    .stroke(configuration.theme.material.edge, lineWidth: configuration.border)
+            }
+            .contentShape(RoundedRectangle(cornerRadius: configuration.controlRadius, style: .continuous))
+            .accessibilityLabel(item.closeLabel)
             .accessibilityIdentifier("strata-snackbar-close")
             .focused($ownedFocus, equals: .close)
             .accessibilityFocused($ownedAccessibilityFocus, equals: .close)
@@ -276,19 +294,20 @@ public struct StrataSnackbar<Content: View, BottomBar: View>: View {
         .padding(.horizontal, configuration.spacingMD)
         .padding(.vertical, configuration.spacingXS)
         .frame(maxWidth: .infinity, minHeight: configuration.minimumHit)
-        .background(
-            RoundedRectangle(cornerRadius: configuration.radius, style: .continuous)
-                .fill(configuration.theme.surface(.card))
-        )
+        .background(configuration.theme.surface(.card), in: RoundedRectangle(cornerRadius: configuration.radius, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: configuration.radius, style: .continuous)
-                .stroke(configuration.theme.foreground.opacity(configuration.borderOpacity), lineWidth: configuration.border)
+                .stroke(configuration.theme.material.edge, lineWidth: configuration.border)
+                .overlay(alignment: .top) {
+                    RoundedRectangle(cornerRadius: configuration.radius, style: .continuous)
+                        .stroke(configuration.theme.material.highlight, lineWidth: configuration.border)
+                }
         }
+        .shadow(color: configuration.theme.material.shadow.opacity(configuration.shadow.opacity), radius: configuration.shadow.radius, x: configuration.shadow.x, y: configuration.shadow.y)
         .onHover { isHovered = $0 }
         .focused($isFocused)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("strata-snackbar")
-        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: item.id)
         .escapeDismissal { dismiss(item, reason: .escape) }
     }
 

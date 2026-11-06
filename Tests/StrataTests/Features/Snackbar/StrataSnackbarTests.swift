@@ -117,4 +117,36 @@ final class StrataSnackbarTests: XCTestCase {
         )
         _ = StrataSnackbar<Text, EmptyView>(configuration: configuration).body
     }
+
+    @MainActor
+    func testRedesignTokenContractResolvesForEveryBrandAndAppearance() throws {
+        for brand in ["strata-blue", "strata-green", "strata-pink", "strata-yellow", "strata-purple"] {
+            for mode in [Theme.light, Theme.dark] {
+                let theme = try StrataTheme(theme: mode, brand: brand)
+                XCTAssertGreaterThan(try StyleTokens.radius("radius.large"), 0)
+                XCTAssertGreaterThan(try StyleTokens.radius("radius.medium"), 0)
+                XCTAssertGreaterThan(try StyleTokens.spacing("spacing.xs"), 0)
+                XCTAssertGreaterThan(try StyleTokens.spacing("spacing.sm"), 0)
+                XCTAssertGreaterThan(try StyleTokens.spacing("spacing.md"), 0)
+                XCTAssertEqual(try StyleTokens.dimension("dimension.hit.minimum"), 44)
+                XCTAssertGreaterThan(try StyleTokens.border("border.hairline"), 0)
+                XCTAssertGreaterThan(try StyleTokens.shadow("shadow.medium").radius, 0)
+                XCTAssertGreaterThan(try StyleTokens.typography("typography.body").size, 0)
+                XCTAssertGreaterThan(try StyleTokens.typography("typography.callout").size, 0)
+                _ = theme.surface(.card)
+                _ = theme.interactiveAccent
+                _ = theme.onInteractiveAccent
+                _ = theme.secondaryForeground
+                _ = theme.material.edge
+                _ = theme.material.highlight
+                _ = theme.material.shadow
+            }
+        }
+    }
+
+    func testRedesignMotionContractHonorsReduceMotion() throws {
+        let snappy = try StrataMotion.snappy()
+        XCTAssertNotNil(StrataMotion.animation(snappy, reduceMotion: false))
+        XCTAssertNil(StrataMotion.animation(snappy, reduceMotion: true))
+    }
 }
