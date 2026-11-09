@@ -7,10 +7,8 @@ final class RenameReviewMacTests: XCTestCase {
     @MainActor
     func testStrataPublicSurface() throws {
         let theme = try StrataTheme(theme: .dark, brand: "strata-purple")
-        _ = StrataButton(theme: theme, variant: .secondary, isLoading: false, action: {}) {
-            Text("Continue")
-        } loadingLabel: {
-            Text("Loading")
+        _ = StrataSectionHeader(theme: theme, title: "Continue") {
+            Button("Action") {}
         }
         XCTAssertEqual(theme.mode, .dark)
     }

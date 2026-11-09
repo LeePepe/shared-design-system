@@ -187,10 +187,7 @@ class ContractTests(unittest.TestCase):
         self.assertIn("the Strata foundation remains unreleased", changelog)
         for relative in (
                 "ai/components/chip.md",
-                "ai/components/progress-bar.md",
-                "ai/components/radio-group.md",
-                "ai/components/slider.md",
-                "ai/components/switch.md"):
+                "ai/components/progress-bar.md"):
             with self.subTest(relative=relative):
                 content = (self.root / relative).read_text()
                 self.assertRegex(

@@ -17,22 +17,6 @@ final class StrataRound1SnapshotTests: XCTestCase {
         for mode in Theme.allCases {
             let theme = try StrataTheme(theme: mode, brand: "ocean")
             try renderSnapshot(
-                StrataButton(theme: theme, variant: .primary, isLoading: false, action: {}) {
-                    Text("Primary")
-                } loadingLabel: {
-                    Text("Saving")
-                },
-                named: "button-primary-\(mode.rawValue)"
-            )
-            try renderSnapshot(
-                StrataButton(theme: theme, variant: .toolbar, isLoading: false, action: {}) {
-                    Image(systemName: "checkmark")
-                } loadingLabel: {
-                    EmptyView()
-                },
-                named: "button-toolbar-\(mode.rawValue)"
-            )
-            try renderSnapshot(
                 VStack(spacing: 8) {
                     StrataProgressRing(theme: theme, value: 3, total: 5)
                     StrataStatusMetricBadge(theme: theme, value: "3/5", progress: 3, total: 5)

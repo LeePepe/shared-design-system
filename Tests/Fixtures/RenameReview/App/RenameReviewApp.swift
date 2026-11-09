@@ -15,12 +15,8 @@ struct RenameReviewApp: App {
             VStack(spacing: 20) {
                 Text("Strata")
                     .accessibilityIdentifier("strata-title")
-                StrataButton(theme: theme, variant: .primary, isLoading: false, action: {}) {
-                    Text("Action")
-                } loadingLabel: {
-                    Text("Loading")
-                }
-                .accessibilityIdentifier("strata-button")
+                Button("Action") {}
+                    .accessibilityIdentifier("strata-button")
             }
             .padding(32)
             .strataSurface(theme: theme, style: .solid, cornerRadius: 16, role: .region)
