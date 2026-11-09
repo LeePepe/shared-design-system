@@ -149,4 +149,10 @@ final class StrataSnackbarTests: XCTestCase {
         XCTAssertNotNil(StrataMotion.animation(snappy, reduceMotion: false))
         XCTAssertNil(StrataMotion.animation(snappy, reduceMotion: true))
     }
+
+    @MainActor
+    func testStrataModalPresentedModifierBuildsCleanly() {
+        _ = Text("Content").strataModalPresented(true)
+        _ = Text("Content").strataModalPresented(false)
+    }
 }
