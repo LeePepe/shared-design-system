@@ -36,7 +36,11 @@ Strata on watchOS before component use.
 - **Gates:** `build` and `test` run on the macOS host. `swift_package_test`
   proves deterministic complete-scheme selection and executes the two-product
   fixture; `ios` builds and tests the real package on the newest available
-  iPhone simulator. All four run in CI through `scripts/verify --all`.
+  iPhone simulator. For isolated local validation, set
+  `SWIFT_PACKAGE_SIMULATOR_ID` to an available iPhone simulator UUID; the
+  runner validates that it is real, available, iOS and iPhone-only. When unset,
+  discovery remains the newest-runtime default. All four run in CI through
+  `scripts/verify --all`.
 - **Contract:** `ai/` travels with each release tag; update it in the same PR
   as any public API change.
 

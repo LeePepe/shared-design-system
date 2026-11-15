@@ -56,6 +56,7 @@ class SchemeSelectionTests(unittest.TestCase):
         self._write_stub("xcrun", """
             #!/usr/bin/env python3
             import json
+            import os
             from pathlib import Path
             import sys
             if "xcresulttool" in sys.argv:
@@ -64,11 +65,11 @@ class SchemeSelectionTests(unittest.TestCase):
                     raise SystemExit(1)
                 print((result / "tests.json").read_text())
                 raise SystemExit(0)
-            print(json.dumps({"devices": {
+            print(os.environ.get("P190_DEVICES_JSON", json.dumps({"devices": {
                 "com.apple.CoreSimulator.SimRuntime.iOS-18-0": [{
                     "name": "iPhone 16", "udid": "FIXTURE-DEVICE"
                 }]
-            }}))
+            }})))
         """)
         self._write_stub("xcodebuild", """
             #!/usr/bin/env python3
@@ -119,7 +120,8 @@ class SchemeSelectionTests(unittest.TestCase):
         path.write_text(textwrap.dedent(content).lstrip(), encoding="utf-8")
         path.chmod(0o755)
 
-    def run_helper(self, schemes_json, enumerations, targets=None):
+    def run_helper(self, schemes_json, enumerations, targets=None, simulator_id=None,
+                   devices=None):
         package = {
             "targets": targets or [
                 {"name": "StrataTests", "type": "test"},
@@ -136,6 +138,11 @@ class SchemeSelectionTests(unittest.TestCase):
             "P190_SCHEMES_JSON": schemes_json,
             "SWIFT_PACKAGE_ROOT": str(self.root),
         })
+        environment.pop("SWIFT_PACKAGE_SIMULATOR_ID", None)
+        if simulator_id is not None:
+            environment["SWIFT_PACKAGE_SIMULATOR_ID"] = simulator_id
+        if devices is not None:
+            environment["P190_DEVICES_JSON"] = json.dumps({"devices": devices})
         return subprocess.run(
             [HELPER, "ios"],
             text=True,
@@ -202,6 +209,47 @@ class SchemeSelectionTests(unittest.TestCase):
             ["package", "resolve"],
             ["package", "dump-package"],
         ])
+
+    def test_simulator_override_selects_requested_available_iphone(self):
+        requested = "486DBAA5-D880-4904-8288-56D29E435538"
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture", "schemes": ["Complete"]}}),
+            {"Complete": {"output": enumeration(
+                "DesignTokensTests", "StrataTests")}},
+            simulator_id=requested,
+            devices={"com.apple.CoreSimulator.SimRuntime.iOS-27-0": [{
+                "name": "iPhone-TIA434-Verification", "udid": requested,
+                "isAvailable": True,
+            }]},
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        commands = self.invocations()
+        self.assertTrue(any(
+            "id=" + requested in command for command in commands
+            if "-enumerate-tests" in command
+        ))
+
+    def test_simulator_override_fails_closed_for_invalid_or_non_iphone(self):
+        cases = [
+            ("not-a-uuid", {"com.apple.CoreSimulator.SimRuntime.iOS-27-0": []}),
+            ("00000000-0000-0000-0000-000000000001", {
+                "com.apple.CoreSimulator.SimRuntime.iOS-27-0": [{
+                    "name": "iPad TIA434", "udid": "00000000-0000-0000-0000-000000000001",
+                    "isAvailable": True,
+                }],
+            }),
+        ]
+        for simulator_id, devices in cases:
+            with self.subTest(simulator_id=simulator_id):
+                result = self.run_helper(
+                    json.dumps({"workspace": {"name": "Fixture", "schemes": ["Complete"]}}),
+                    {"Complete": {"output": enumeration(
+                        "DesignTokensTests", "StrataTests")}},
+                    simulator_id=simulator_id,
+                    devices=devices,
+                )
+                self.assertNotEqual(result.returncode, 0)
+                self.assert_no_final_test()
 
     def test_missing_malformed_and_empty_scheme_metadata_fail_closed(self):
         cases = [

@@ -27,7 +27,27 @@ case "$mode" in
     ios)
         metadata_dir="$(mktemp -d "${TMPDIR:-/tmp}/swift-package.XXXXXX")"
         trap 'rm -rf "$metadata_dir"' EXIT
-        device="$(xcrun simctl list devices available -j | python3 -c '
+        if [ -n "${SWIFT_PACKAGE_SIMULATOR_ID:-}" ]; then
+            device="$(xcrun simctl list devices available -j | SWIFT_PACKAGE_SIMULATOR_ID="$SWIFT_PACKAGE_SIMULATOR_ID" python3 -c '
+import json, os, sys, uuid
+requested = os.environ["SWIFT_PACKAGE_SIMULATOR_ID"]
+try:
+    normalized = str(uuid.UUID(requested)).lower()
+except ValueError:
+    sys.exit(f"[swift] invalid SWIFT_PACKAGE_SIMULATOR_ID: {requested!r} is not a UUID")
+devices = json.load(sys.stdin).get("devices", {})
+for runtime, entries in devices.items():
+    if ".iOS-" not in runtime:
+        continue
+    for device in entries:
+        if (str(device.get("udid", "")).lower() == normalized and
+                str(device.get("name", "")).startswith("iPhone") and
+                device.get("isAvailable", True)):
+            print(device["udid"])
+            sys.exit(0)
+sys.exit(f"[swift] SWIFT_PACKAGE_SIMULATOR_ID {requested!r} is not an available iOS iPhone simulator")')"
+        else
+            device="$(xcrun simctl list devices available -j | python3 -c '
 import json, sys
 devices = json.load(sys.stdin)["devices"]
 for runtime in sorted(devices, reverse=True):
@@ -36,6 +56,7 @@ for runtime in sorted(devices, reverse=True):
             if d["name"].startswith("iPhone"):
                 print(d["udid"]); sys.exit(0)
 sys.exit("no available iPhone simulator")')"
+        fi
 
         # Xcode 26+ may omit the aggregate package scheme until SwiftPM has
         # resolved the package in this checkout. Resolve first so -list sees
