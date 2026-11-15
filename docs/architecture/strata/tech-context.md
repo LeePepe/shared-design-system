@@ -38,7 +38,9 @@ Strata on watchOS before component use.
   fixture; `ios` builds and tests the real package on the newest available
   iPhone simulator. For isolated local validation, set
   `SWIFT_PACKAGE_SIMULATOR_ID` to an available iPhone simulator UUID; the
-  runner validates that it is real, available, iOS and iPhone-only. When unset,
+  runner validates that it is real, available, iOS and iPhone-only, using the
+  canonical device type when available so custom display names are supported.
+  When unset,
   discovery remains the newest-runtime default. All four run in CI through
   `scripts/verify --all`. Both enumeration and final iOS test actions use
   `-collect-test-diagnostics never` to avoid Xcode's prolonged simulator

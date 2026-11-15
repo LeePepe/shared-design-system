@@ -228,22 +228,27 @@ class SchemeSelectionTests(unittest.TestCase):
 
     def test_simulator_override_selects_requested_available_iphone(self):
         requested = "486DBAA5-D880-4904-8288-56D29E435538"
-        result = self.run_helper(
-            json.dumps({"workspace": {"name": "Fixture", "schemes": ["Complete"]}}),
-            {"Complete": {"output": enumeration(
-                "DesignTokensTests", "StrataTests")}},
-            simulator_id=requested,
-            devices={"com.apple.CoreSimulator.SimRuntime.iOS-27-0": [{
-                "name": "iPhone-TIA434-Verification", "udid": requested,
-                "isAvailable": True,
-            }]},
-        )
-        self.assertEqual(result.returncode, 0, result.stderr)
-        commands = self.invocations()
-        self.assertTrue(any(
-            "id=" + requested in command for command in commands
-            if "-enumerate-tests" in command
-        ))
+        devices = [
+            {"name": "iPhone Fixture", "udid": requested, "isAvailable": True},
+            {"name": "Renamed fixture", "udid": requested, "isAvailable": True,
+             "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPhone-17"},
+        ]
+        for device in devices:
+            with self.subTest(device=device):
+                self.log.unlink(missing_ok=True)
+                result = self.run_helper(
+                    json.dumps({"workspace": {"name": "Fixture", "schemes": ["Complete"]}}),
+                    {"Complete": {"output": enumeration(
+                        "DesignTokensTests", "StrataTests")}},
+                    simulator_id=requested,
+                    devices={"com.apple.CoreSimulator.SimRuntime.iOS-27-0": [device]},
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                commands = self.invocations()
+                self.assertTrue(any(
+                    "id=" + requested in command for command in commands
+                    if "-enumerate-tests" in command
+                ))
 
     def test_simulator_override_fails_closed_for_invalid_or_non_iphone(self):
         cases = [
@@ -251,6 +256,14 @@ class SchemeSelectionTests(unittest.TestCase):
             ("00000000-0000-0000-0000-000000000001", {
                 "com.apple.CoreSimulator.SimRuntime.iOS-27-0": [{
                     "name": "iPad TIA434", "udid": "00000000-0000-0000-0000-000000000001",
+                    "isAvailable": True,
+                }],
+            }),
+            ("00000000-0000-0000-0000-000000000001", {
+                "com.apple.CoreSimulator.SimRuntime.iOS-27-0": [{
+                    "name": "iPhone label on an iPad",
+                    "udid": "00000000-0000-0000-0000-000000000001",
+                    "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPad-Pro",
                     "isAvailable": True,
                 }],
             }),

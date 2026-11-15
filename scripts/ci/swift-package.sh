@@ -40,9 +40,13 @@ for runtime, entries in devices.items():
     if ".iOS-" not in runtime:
         continue
     for device in entries:
+        device_type = device.get("deviceTypeIdentifier")
+        is_iphone = (
+            isinstance(device_type, str) and
+            device_type.startswith("com.apple.CoreSimulator.SimDeviceType.iPhone-")
+        ) if device_type is not None else str(device.get("name", "")).startswith("iPhone")
         if (str(device.get("udid", "")).lower() == normalized and
-                str(device.get("name", "")).startswith("iPhone") and
-                device.get("isAvailable", True)):
+                is_iphone and device.get("isAvailable", True)):
             print(device["udid"])
             sys.exit(0)
 sys.exit(f"[swift] SWIFT_PACKAGE_SIMULATOR_ID {requested!r} is not an available iOS iPhone simulator")')"
