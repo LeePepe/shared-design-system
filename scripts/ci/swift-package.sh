@@ -27,7 +27,31 @@ case "$mode" in
     ios)
         metadata_dir="$(mktemp -d "${TMPDIR:-/tmp}/swift-package.XXXXXX")"
         trap 'rm -rf "$metadata_dir"' EXIT
-        device="$(xcrun simctl list devices available -j | python3 -c '
+        if [ -n "${SWIFT_PACKAGE_SIMULATOR_ID:-}" ]; then
+            device="$(xcrun simctl list devices available -j | SWIFT_PACKAGE_SIMULATOR_ID="$SWIFT_PACKAGE_SIMULATOR_ID" python3 -c '
+import json, os, sys, uuid
+requested = os.environ["SWIFT_PACKAGE_SIMULATOR_ID"]
+try:
+    normalized = str(uuid.UUID(requested)).lower()
+except ValueError:
+    sys.exit(f"[swift] invalid SWIFT_PACKAGE_SIMULATOR_ID: {requested!r} is not a UUID")
+devices = json.load(sys.stdin).get("devices", {})
+for runtime, entries in devices.items():
+    if ".iOS-" not in runtime:
+        continue
+    for device in entries:
+        device_type = device.get("deviceTypeIdentifier")
+        is_iphone = (
+            isinstance(device_type, str) and
+            device_type.startswith("com.apple.CoreSimulator.SimDeviceType.iPhone-")
+        ) if device_type is not None else str(device.get("name", "")).startswith("iPhone")
+        if (str(device.get("udid", "")).lower() == normalized and
+                is_iphone and device.get("isAvailable", True)):
+            print(device["udid"])
+            sys.exit(0)
+sys.exit(f"[swift] SWIFT_PACKAGE_SIMULATOR_ID {requested!r} is not an available iOS iPhone simulator")')"
+        else
+            device="$(xcrun simctl list devices available -j | python3 -c '
 import json, sys
 devices = json.load(sys.stdin)["devices"]
 for runtime in sorted(devices, reverse=True):
@@ -36,7 +60,12 @@ for runtime in sorted(devices, reverse=True):
             if d["name"].startswith("iPhone"):
                 print(d["udid"]); sys.exit(0)
 sys.exit("no available iPhone simulator")')"
+        fi
 
+        # Xcode 26+ may omit the aggregate package scheme until SwiftPM has
+        # resolved the package in this checkout. Resolve first so -list sees
+        # the complete test-capable scheme in fresh temporary fixtures.
+        swift package resolve >/dev/null
         swift package dump-package > "$metadata_dir/package.json"
         python3 - "$metadata_dir/package.json" "$metadata_dir/expected-tests.json" <<'PY'
 import json
@@ -97,6 +126,7 @@ PY
                 -scheme "$candidate" \
                 -destination "id=$device" \
                 -skipPackagePluginValidation \
+                -collect-test-diagnostics never \
                 -resultBundlePath "$enumeration_result" \
                 test \
                 -enumerate-tests \
@@ -228,6 +258,7 @@ PY
             -scheme "$scheme"
             -destination "id=$device"
             -skipPackagePluginValidation
+            -collect-test-diagnostics never
         )
         if [ -n "${SWIFT_PACKAGE_RESULT_BUNDLE_PATH:-}" ]; then
             test_args+=(-resultBundlePath "$SWIFT_PACKAGE_RESULT_BUNDLE_PATH")

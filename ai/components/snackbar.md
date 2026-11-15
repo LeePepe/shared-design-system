@@ -27,7 +27,10 @@ Blank messages, close labels, and action labels throw
 and modal/presentation visibility pause the timeout. Items with actions remain
 visible until the caller or user dismisses them.
 
-The content and bottom-bar slots are caller-owned SwiftUI views. The component
+The content and bottom-bar slots are caller-owned SwiftUI views. Use
+`View.strataModalPresented(_:)` on native `.sheet`, `.alert`, or
+`.confirmationDialog` presentations so `StrataSnackbar` pauses its timer and
+hides while a modal is active. The component
 uses a solid, token-backed elevated card with a wrapping message, a high-contrast
 interactive accent action, and localized close control; both controls retain the
 minimum hit target. Appearance changes use token-backed motion and reduce-motion

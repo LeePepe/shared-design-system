@@ -13,6 +13,22 @@ provides the stable primitives and their light/dark behavior; it does not
 choose a product's brand, page hierarchy, business terminology, or required
 content.
 
+### Apple-Native First & Minimum Retention Boundary
+
+Standard controls (`Button`, `Toggle`, `Picker`, `Slider`, `TextField`, `Menu`,
+`List`, `ContentUnavailableView`, `.alert`/`.sheet`, and `.searchable`) must use
+pure Apple Native SwiftUI APIs directly. Basic 1:1 wrappers over standard
+SwiftUI controls are retired from `Strata`. Downstream products may either pin
+`shared-design-system` or use a project-local `<80`-line `AppTheme.swift`
+(`Independent-Glass` / `Strata-Core` governed by `appearance-ledger.md`) for
+brand and surface tokens, while `Strata` is reserved for token/motion
+foundations (`StrataTheme`, `StrataSurfaceStyle`, `StrataMotion`,
+`StrataTabularLayout`) and high-density non-standard composite primitives
+(`StrataActionCardRow`, `StrataChip`, `StrataFilterBar`, `StrataDockedBar`,
+`StrataIndexRail`, `StrataNumericKeypad`, `StrataBentoCard`, `StrataMetricRow`,
+`StrataSectionHeader`, `StrataStickySectionHeader`, `StrataNumberSlot`,
+`StrataProgressBar`, `StrataStatusMetricBadge`, and `StrataSnackbar`).
+
 Each downstream product owns a thin `docs/design-contract.md`. That document
 locks the exact upstream package revision or release, records the product's
 brand and business-semantic token bindings, describes the page and component
@@ -45,6 +61,24 @@ Consumers must not apply custom `.background(..., in: Capsule())` or
 Consumers must not pack multiple bordered or filled capsule buttons inside a
 single shared toolbar glass pill. The system toolbar chrome is the sole outer
 bezel.
+
+- **Shared Optical Sampling (`GlassEffectContainer`):** Adjacent or morphing
+  custom glass controls must share one `GlassEffectContainer` paired with
+  `.glassEffectID(_:in:)` because Liquid Glass lenses cannot sample another
+  glass surface.
+- **Toolbar Pill Detachment & Group Separation:** Use
+  `.sharedBackgroundVisibility(.hidden)` when a `ToolbarItem` (such as a
+  standalone avatar) must detach from the shared toolbar glass pill, and use
+  `ToolbarSpacer(.fixed)` or `ToolbarSpacer(.flexible)` for group separation.
+- **Adaptive Toolbar Progressive Disclosure & Scroll Edge:** Use
+  `.visibilityPriority(.high)`, `ToolbarOverflowMenu`, and
+  `.topBarPinnedTrailing` for adaptive toolbar progressive disclosure, and apply
+  `.scrollEdgeEffectStyle(.hard, for: .top)` (or OS 27 `.automatic`) when
+  scrolling beneath pinned headers.
+- **Window Focus Dimming & Clear Glass Preconditions:** Custom sidebar/chrome
+  elements must observe `@Environment(\.appearsActive)` to dim when the window
+  becomes inactive, and `Clear` glass requires all 3 optical preconditions
+  (media-rich backdrop, dimming layer, and bold bright foreground).
 
 ### Rule 2 — Token Contrast Matrix (WCAG AA ≥ 4.5:1)
 
@@ -164,6 +198,29 @@ bitmap must satisfy `bitmap.pixelsWide == W * scale`.
 - **No Placeholder/Unit Duplication:** In custom numeric inputs, never set the
   placeholder string to the same unit or label already rendered as an inline
   persistent suffix (`lb lb`, `次数 次数`).
+
+### Rule 14 — Lazy Stack Prefetching, 1:1 Subview Stability & Free-Form Window Geometry Contract
+
+- **1:1 Subview Resolution:** Leaf views inside `LazyVStack`/`LazyHStack` ->
+  `ForEach` must never wrap their top-level body in a conditional `if` that
+  changes the resolved subview count to `0` or `1` (which breaks index
+  estimation and leaks offscreen views in memory); filter data upstream via
+  `@Query(filter: #Predicate)` or the data collection.
+- **Frame-Deadline Prefetching:** Configure data loaders and `@State`
+  `@Observable` models inside `init` (using OS 27 `@State` macro lazy single
+  initialization) rather than deferring model creation to `.onAppear`.
+- **Single-Pass Layout & Pin Alignment:** Never mutate `@State` subview height
+  inside `.onGeometryChange` inside lazy scroll containers (use the `Layout`
+  protocol for single-pass sizing), and use `.overlay(alignment:)` +
+  `.alignmentGuide` pin-flip rather than `GeometryReader` or hardcoded
+  `.offset` for edge badges.
+- **Free-Form Resizable Windows:** Under iOS 27 and macOS 27 iPhone Mirroring,
+  iPhone windows resize freely to wide aspect ratios while
+  `userInterfaceIdiom` remains `.phone` and `interfaceOrientation` remains
+  `.portrait`. Layout branching on `UIScreen.main`, `userInterfaceIdiom`, or
+  `interfaceOrientation` is forbidden; drive `Compact-Portrait` vs.
+  `Wide-Touch` strictly from `horizontalSizeClass`, `effectiveGeometry`, and
+  `ViewThatFits`.
 
 ## Scenario-to-Pattern, Component, and Motion Decision Matrix
 

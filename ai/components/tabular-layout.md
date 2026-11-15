@@ -6,5 +6,8 @@ cell radius, and border hairline. Its throwing initializer resolves metrics
 from the local DesignTokens target.
 
 `StrataInlineHint` provides compact inline metadata and `StrataBottomSlot`
-omits inactive bottom content instead of reserving hidden height. Keep rows on
-one shared horizontal grid and pass an explicit theme to consuming controls.
+omits inactive bottom content instead of reserving hidden height.
+`StrataComponentMetrics` and the `.strataControlCenter` /
+`.strataInputBaseline` vertical alignment guides also live in
+`StrataTabularLayout` for shared dense-row geometry. Keep rows on one shared
+horizontal grid and pass an explicit theme to consuming controls.

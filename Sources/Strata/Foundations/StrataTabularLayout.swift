@@ -69,3 +69,69 @@ public struct StrataBottomSlot<Content: View>: View {
         }
     }
 }
+
+public struct StrataComponentMetrics: Equatable, Sendable {
+    public let cardRadius: CGFloat
+    public let controlRadius: CGFloat
+    public let compactCellRadius: CGFloat
+    public let minimumHit: CGFloat
+    public let verticalItemWidth: CGFloat
+    public let spacingXS: CGFloat
+    public let spacingSM: CGFloat
+    public let spacingMD: CGFloat
+    public let spacingLG: CGFloat
+    public let spacingXL: CGFloat
+    public let borderRegular: CGFloat
+
+    public init(
+        dimension: (String) throws -> Double = StyleTokens.dimension,
+        spacing: (String) throws -> Double = StyleTokens.spacing,
+        radius: (String) throws -> Double = StyleTokens.radius,
+        border: (String) throws -> Double = StyleTokens.border
+    ) throws {
+        let minimumHit = CGFloat(try dimension("dimension.hit.minimum"))
+        let spacingXS = CGFloat(try spacing("spacing.xs"))
+        let spacingSM = CGFloat(try spacing("spacing.sm"))
+        let spacingMD = CGFloat(try spacing("spacing.md"))
+        let spacingLG = CGFloat(try spacing("spacing.lg"))
+        let spacingXL = CGFloat(try spacing("spacing.xl"))
+        let radiusMedium = CGFloat(try radius("radius.medium"))
+        let radiusLarge = CGFloat(try radius("radius.large"))
+        let compactCellRadius = CGFloat(try radius("radius.small"))
+        let borderRegular = CGFloat(try border("border.regular"))
+
+        self.minimumHit = minimumHit
+        self.spacingXS = spacingXS
+        self.spacingSM = spacingSM
+        self.spacingMD = spacingMD
+        self.spacingLG = spacingLG
+        self.spacingXL = spacingXL
+        self.cardRadius = radiusLarge + spacingXS
+        self.controlRadius = radiusMedium + spacingXS
+        self.compactCellRadius = compactCellRadius
+        self.verticalItemWidth = minimumHit + spacingXL + spacingSM
+        self.borderRegular = borderRegular
+    }
+}
+
+public extension VerticalAlignment {
+    static let strataControlCenter = VerticalAlignment(
+        StrataControlCenterAlignment.self
+    )
+
+    static let strataInputBaseline = VerticalAlignment(
+        StrataInputBaselineAlignment.self
+    )
+}
+
+private enum StrataControlCenterAlignment: AlignmentID {
+    static func defaultValue(in context: ViewDimensions) -> CGFloat {
+        context[VerticalAlignment.center]
+    }
+}
+
+private enum StrataInputBaselineAlignment: AlignmentID {
+    static func defaultValue(in context: ViewDimensions) -> CGFloat {
+        context[.firstTextBaseline]
+    }
+}

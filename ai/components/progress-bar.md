@@ -69,14 +69,9 @@ there is no fixed text height or truncation policy. Caller builders should
 contain descriptive content rather than interactive controls.
 
 Package tests cover normalization, undefined-input policy and generic public
-construction. The standalone `ProgressBarReview` synthetic fixture covers native
-accessibility values, caller state changes, state footprint, long narrow text
-and accessibility typography. Screenshots come from real XCTest iOS SwiftUI
-runtime runs; their exact SHA/platform/test counts belong in the delivery
-evidence. The fixture labels its Reduce Motion request and reports the observed
-read-only system environment separately; it does not change the preference.
-System Reduce Motion enabled remains separate evidence. No VoiceOver session, hardware, minimum-OS or macOS
-visual acceptance is inferred.
+construction. The former standalone review fixture was removed; runtime
+screenshots, accessibility observations and Reduce Motion observations are not
+claimed by this consumer contract.
 
 Rollback removes these call sites before restoring a previously reviewed
 package revision. No library-owned data or persistence needs migration.

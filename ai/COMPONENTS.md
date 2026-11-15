@@ -54,9 +54,33 @@ The public `StrataSurfaceModifier` and
 `theme: StrataTheme` on every call.
 
 Component-specific contracts are added under `components/` by their PRs.
-`StrataMenu`, `StrataSegmentedBar`, `StrataStateView`, and
-`StrataStickySectionHeader` resolve DesignTokens-backed metrics in throwing
-initializers; use `try` when constructing them.
+`StrataStickySectionHeader`, `StrataTabularRowMetrics`,
+`StrataComponentMetrics`, `StrataNumberSlotConfiguration`,
+`StrataNumericKeypad`, and `StrataSnackbar` resolve DesignTokens-backed metrics
+in throwing initializers; use `try` when constructing them.
+
+## Apple-Native First boundary & retired wrappers
+
+Standard controls use pure Apple Native SwiftUI APIs (`Button`, `TextField`,
+`Toggle`, `Picker`, `Slider`, `Menu`, `List`, `ContentUnavailableView`,
+`.alert`/`.sheet`, and `.searchable`) paired with `StrataTheme` or a
+project-local `<80`-line `AppTheme.swift`. Redundant 1:1 basic wrappers were
+retired under the Apple-Native First boundary:
+
+| Retired wrapper | Apple-Native SwiftUI replacement |
+| --- | --- |
+| `StrataButton` | `Button` + `.buttonStyle` / `theme.interactiveAccent` & `theme.onInteractiveAccent` |
+| `StrataTextField` | `TextField` + `.strataInputBaseline` |
+| `StrataSwitch` / `StrataCheckbox` | `Toggle` (`.switch` / `.checkbox`) |
+| `StrataRadioGroup` / `StrataSegmentedBar` | `Picker` (`.radioGroup` / `.segmented`) |
+| `StrataSlider` | `Slider` |
+| `StrataMenu` | `Menu` (`StrataComponentMetrics` & alignment guides live in `StrataTabularLayout`) |
+| `StrataSearchField` | `.searchable` |
+| `StrataAvatar` | `Image` / `AsyncImage` + `.clipShape(Circle())` |
+| `StrataCard` | View composition with `.strataSurface(theme:style:cornerRadius:role: .card)` |
+| `StrataList` | `List` / `LazyVStack` |
+| `StrataStateView` | `ContentUnavailableView` |
+| `StrataDialog` / `StrataAlertDialog` | `.sheet` / `.alert` / `.confirmationDialog` + `.strataModalPresented(_:)` |
 
 ## Shared geometry and alignment
 
@@ -70,24 +94,14 @@ skew same-row alignment. List icons align with copy using
 
 | Component | Contract |
 | --- | --- |
-| Button | [StrataButton](components/button.md) |
-| Card / ActionCardRow | [StrataCard](components/card.md) / [StrataActionCardRow](components/action-card-row.md) |
-| List | [StrataList](components/list.md) |
-| TextField | [StrataTextField](components/textfield.md) |
-| Switch | [StrataSwitch](components/switch.md) |
-| Checkbox | [StrataCheckbox](components/checkbox.md) |
-| RadioGroup | [StrataRadioGroup](components/radio-group.md) |
-| Slider | [StrataSlider](components/slider.md) |
-| ProgressBar / StatusMetricBadge | [StrataProgressBar](components/progress-bar.md) / [StrataStatusMetricBadge](components/status-metric-badge.md) |
-| Avatar | [StrataAvatar](components/avatar.md) |
+| ActionCardRow | [StrataActionCardRow](components/action-card-row.md) |
+| BentoCard / MetricRow | [StrataBentoCard](components/bento-card.md) / [StrataMetricRow](components/metric-row.md) |
 | Chip / FilterBar | [StrataChip](components/chip.md) / [StrataFilterBar](components/filter-bar.md) |
-| SearchField / NumberSlot | [search-field](components/search-field.md) / [StrataNumberSlot](components/number-slot.md) |
-| TabularLayout | [StrataTabularLayout](components/tabular-layout.md) |
 | DockedBar | [StrataDockedBar](components/docked-bar.md) |
-| SectionHeader / StickySectionHeader | [StrataSectionHeader](components/section-header.md) / [StrataStickySectionHeader](components/sticky-section-header.md) |
 | IndexRail | [StrataIndexRail](components/index-rail.md) |
+| NumberSlot | [StrataNumberSlot](components/number-slot.md) |
+| NumericKeypad | [StrataNumericKeypad](components/numeric-keypad.md) |
+| ProgressBar / StatusMetricBadge | [StrataProgressBar](components/progress-bar.md) / [StrataStatusMetricBadge](components/status-metric-badge.md) |
+| SectionHeader / StickySectionHeader | [StrataSectionHeader](components/section-header.md) / [StrataStickySectionHeader](components/sticky-section-header.md) |
 | Snackbar | [StrataSnackbar](components/snackbar.md) |
-| Dialog / AlertDialog | [StrataDialog](components/dialog.md) / [StrataAlertDialog](components/alert-dialog.md) |
-| Menu | [StrataMenu](components/menu.md) |
-| SegmentedBar | [StrataSegmentedBar](components/segmented-bar.md) |
-| StateView | [StrataStateView](components/state-view.md) |
+| TabularLayout | [StrataTabularLayout](components/tabular-layout.md) |

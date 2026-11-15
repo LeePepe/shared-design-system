@@ -25,16 +25,8 @@ overload requires an explicit `surface`, making material selection independent
 from palette, light/dark and caller state. Rollback removes uses of that overload
 before returning to the earlier package revision; no stored data is involved.
 
-The dedicated [ButtonReview fixture](../../Tests/Fixtures/ButtonReview/README.md)
-composes actual StrataButton controls inside the shared 32 pt specimen shell
-and a dense 24 pt inner stage. Its 20 theme/material captures retain the same
-content and geometry. Separate behavior boards preserve the existing enabled,
-disabled and loading dispatch checks, 320 pt German localization, Dynamic Type
-growth, full-label containment and stable loading footprint assertions. Legacy
-brand matrices remain covered. Package tests additionally verify the provider
-primary/hover/active contrast pairs, Ghost's role, disabled colors and the
-bounded-corner regression. Actual composite contrast and Reduce Transparency
-need the runtime evidence recorded against the exact PR head.
+Package tests cover the supported StrataButton construction, behavior and
+provider-role contract. The former standalone review fixture is not retained.
 
 A separate original-initializer runtime lane calls the public overload without
 `surface`. It adds the same strict enabled/disabled/loading and held-press action

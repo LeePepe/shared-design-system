@@ -401,6 +401,13 @@ private extension View {
     }
 }
 
+public extension View {
+    func strataModalPresented(_ isPresented: Bool) -> some View {
+        preference(key: StrataModalVisibilityPreference.self, value: isPresented)
+            .environment(\.strataPresentationObscured, isPresented)
+    }
+}
+
 @MainActor
 public extension StrataSnackbar where BottomBar == EmptyView {
     init(

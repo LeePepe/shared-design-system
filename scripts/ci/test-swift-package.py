@@ -42,14 +42,21 @@ class SchemeSelectionTests(unittest.TestCase):
         self.bin = self.root / "bin"
         self.bin.mkdir()
         self.log = self.root / "xcodebuild.log"
+        self.swift_log = self.root / "swift.log"
         self._write_stub("swift", """
             #!/usr/bin/env python3
+            import json
             import os
+            from pathlib import Path
+            import sys
+            with Path(os.environ["P190_SWIFT_LOG"]).open("a", encoding="utf-8") as stream:
+                stream.write(json.dumps(sys.argv[1:]) + "\\n")
             print(os.environ["P190_PACKAGE_JSON"])
         """)
         self._write_stub("xcrun", """
             #!/usr/bin/env python3
             import json
+            import os
             from pathlib import Path
             import sys
             if "xcresulttool" in sys.argv:
@@ -58,11 +65,11 @@ class SchemeSelectionTests(unittest.TestCase):
                     raise SystemExit(1)
                 print((result / "tests.json").read_text())
                 raise SystemExit(0)
-            print(json.dumps({"devices": {
+            print(os.environ.get("P190_DEVICES_JSON", json.dumps({"devices": {
                 "com.apple.CoreSimulator.SimRuntime.iOS-18-0": [{
                     "name": "iPhone 16", "udid": "FIXTURE-DEVICE"
                 }]
-            }}))
+            }})))
         """)
         self._write_stub("xcodebuild", """
             #!/usr/bin/env python3
@@ -113,7 +120,8 @@ class SchemeSelectionTests(unittest.TestCase):
         path.write_text(textwrap.dedent(content).lstrip(), encoding="utf-8")
         path.chmod(0o755)
 
-    def run_helper(self, schemes_json, enumerations, targets=None):
+    def run_helper(self, schemes_json, enumerations, targets=None, simulator_id=None,
+                   devices=None):
         package = {
             "targets": targets or [
                 {"name": "StrataTests", "type": "test"},
@@ -125,10 +133,16 @@ class SchemeSelectionTests(unittest.TestCase):
             "PATH": f"{self.bin}{os.pathsep}{environment['PATH']}",
             "P190_ENUMERATIONS": json.dumps(enumerations),
             "P190_LOG": str(self.log),
+            "P190_SWIFT_LOG": str(self.swift_log),
             "P190_PACKAGE_JSON": json.dumps(package),
             "P190_SCHEMES_JSON": schemes_json,
             "SWIFT_PACKAGE_ROOT": str(self.root),
         })
+        environment.pop("SWIFT_PACKAGE_SIMULATOR_ID", None)
+        if simulator_id is not None:
+            environment["SWIFT_PACKAGE_SIMULATOR_ID"] = simulator_id
+        if devices is not None:
+            environment["P190_DEVICES_JSON"] = json.dumps({"devices": devices})
         return subprocess.run(
             [HELPER, "ios"],
             text=True,
@@ -180,6 +194,91 @@ class SchemeSelectionTests(unittest.TestCase):
                                  "Complete")
                 self.assertNotIn("-only-testing", final[0])
                 self.assertNotIn("-skip-testing", final[0])
+
+    def test_disables_diagnostic_collection_for_all_test_actions(self):
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture", "schemes": ["Complete"]}}),
+            {"Complete": {"output": enumeration(
+                "DesignTokensTests", "StrataTests")}},
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        test_actions = [command for command in self.invocations() if "test" in command]
+        self.assertEqual(len(test_actions), 2)
+        for command in test_actions:
+            self.assertIn("-collect-test-diagnostics", command)
+            self.assertEqual(command[command.index("-collect-test-diagnostics") + 1],
+                             "never")
+            self.assertNotIn("-only-testing", command)
+            self.assertNotIn("-skip-testing", command)
+
+    def test_resolves_package_before_listing_schemes(self):
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture", "schemes": ["Complete"]}}),
+            {"Complete": {"output": enumeration(
+                "DesignTokensTests", "StrataTests")}},
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        swift_commands = [
+            json.loads(line) for line in self.swift_log.read_text(encoding="utf-8").splitlines()
+        ]
+        self.assertEqual(swift_commands[:2], [
+            ["package", "resolve"],
+            ["package", "dump-package"],
+        ])
+
+    def test_simulator_override_selects_requested_available_iphone(self):
+        requested = "486DBAA5-D880-4904-8288-56D29E435538"
+        devices = [
+            {"name": "iPhone Fixture", "udid": requested, "isAvailable": True},
+            {"name": "Renamed fixture", "udid": requested, "isAvailable": True,
+             "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPhone-17"},
+        ]
+        for device in devices:
+            with self.subTest(device=device):
+                self.log.unlink(missing_ok=True)
+                result = self.run_helper(
+                    json.dumps({"workspace": {"name": "Fixture", "schemes": ["Complete"]}}),
+                    {"Complete": {"output": enumeration(
+                        "DesignTokensTests", "StrataTests")}},
+                    simulator_id=requested,
+                    devices={"com.apple.CoreSimulator.SimRuntime.iOS-27-0": [device]},
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                commands = self.invocations()
+                self.assertTrue(any(
+                    "id=" + requested in command for command in commands
+                    if "-enumerate-tests" in command
+                ))
+
+    def test_simulator_override_fails_closed_for_invalid_or_non_iphone(self):
+        cases = [
+            ("not-a-uuid", {"com.apple.CoreSimulator.SimRuntime.iOS-27-0": []}),
+            ("00000000-0000-0000-0000-000000000001", {
+                "com.apple.CoreSimulator.SimRuntime.iOS-27-0": [{
+                    "name": "iPad TIA434", "udid": "00000000-0000-0000-0000-000000000001",
+                    "isAvailable": True,
+                }],
+            }),
+            ("00000000-0000-0000-0000-000000000001", {
+                "com.apple.CoreSimulator.SimRuntime.iOS-27-0": [{
+                    "name": "iPhone label on an iPad",
+                    "udid": "00000000-0000-0000-0000-000000000001",
+                    "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPad-Pro",
+                    "isAvailable": True,
+                }],
+            }),
+        ]
+        for simulator_id, devices in cases:
+            with self.subTest(simulator_id=simulator_id):
+                result = self.run_helper(
+                    json.dumps({"workspace": {"name": "Fixture", "schemes": ["Complete"]}}),
+                    {"Complete": {"output": enumeration(
+                        "DesignTokensTests", "StrataTests")}},
+                    simulator_id=simulator_id,
+                    devices=devices,
+                )
+                self.assertNotEqual(result.returncode, 0)
+                self.assert_no_final_test()
 
     def test_missing_malformed_and_empty_scheme_metadata_fail_closed(self):
         cases = [

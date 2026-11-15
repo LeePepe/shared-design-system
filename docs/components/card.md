@@ -18,12 +18,8 @@ new card focus target is introduced.
 
 ## Composition and behavior
 
-[CardReview](../../Tests/Fixtures/CardReview/README.md) keeps the original
-behavior fixture and adds a faithful visual composition through the actual
-component and shared `StrataSpecimen` helper. The caller supplies an icon plate,
-context pill, concise title/body, footer/action and a separate synthetic progress
-card. The statistic and success roles are independent of the selected brand.
-The specimen uses native semantic typography and a 44pt action target.
+Package tests retain the public Card behavior and composition contract. The
+former standalone review fixture and shared specimen helper are not retained.
 
 The package public-import test covers the original two brands and the five
 explicit Strata families in both modes and surfaces, plus empty and content-only
