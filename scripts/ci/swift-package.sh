@@ -122,6 +122,7 @@ PY
                 -scheme "$candidate" \
                 -destination "id=$device" \
                 -skipPackagePluginValidation \
+                -collect-test-diagnostics never \
                 -resultBundlePath "$enumeration_result" \
                 test \
                 -enumerate-tests \
@@ -253,6 +254,7 @@ PY
             -scheme "$scheme"
             -destination "id=$device"
             -skipPackagePluginValidation
+            -collect-test-diagnostics never
         )
         if [ -n "${SWIFT_PACKAGE_RESULT_BUNDLE_PATH:-}" ]; then
             test_args+=(-resultBundlePath "$SWIFT_PACKAGE_RESULT_BUNDLE_PATH")

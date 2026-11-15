@@ -195,6 +195,22 @@ class SchemeSelectionTests(unittest.TestCase):
                 self.assertNotIn("-only-testing", final[0])
                 self.assertNotIn("-skip-testing", final[0])
 
+    def test_disables_diagnostic_collection_for_all_test_actions(self):
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture", "schemes": ["Complete"]}}),
+            {"Complete": {"output": enumeration(
+                "DesignTokensTests", "StrataTests")}},
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        test_actions = [command for command in self.invocations() if "test" in command]
+        self.assertEqual(len(test_actions), 2)
+        for command in test_actions:
+            self.assertIn("-collect-test-diagnostics", command)
+            self.assertEqual(command[command.index("-collect-test-diagnostics") + 1],
+                             "never")
+            self.assertNotIn("-only-testing", command)
+            self.assertNotIn("-skip-testing", command)
+
     def test_resolves_package_before_listing_schemes(self):
         result = self.run_helper(
             json.dumps({"workspace": {"name": "Fixture", "schemes": ["Complete"]}}),

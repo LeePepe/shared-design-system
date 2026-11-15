@@ -40,7 +40,10 @@ Strata on watchOS before component use.
   `SWIFT_PACKAGE_SIMULATOR_ID` to an available iPhone simulator UUID; the
   runner validates that it is real, available, iOS and iPhone-only. When unset,
   discovery remains the newest-runtime default. All four run in CI through
-  `scripts/verify --all`.
+  `scripts/verify --all`. Both enumeration and final iOS test actions use
+  `-collect-test-diagnostics never` to avoid Xcode's prolonged simulator
+  diagnostic collection after SwiftUI runtime issues. Test execution, failure
+  reporting, complete-target enumeration and result bundles remain enabled.
 - **Contract:** `ai/` travels with each release tag; update it in the same PR
   as any public API change.
 
