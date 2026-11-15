@@ -22,9 +22,8 @@ multiple toggling, external changes, preservation of unavailable IDs,
 disabled writes and read-only behavior. Public-import tests exercise custom
 identity, empty data, all five palettes, explicit solid/glass, and both full
 and header/footer-free APIs without writing selection during construction.
-The real [ListReview fixture](../../Tests/Fixtures/ListReview/README.md) checks
-native activation, disabled coordinate taps, stable identity after reorder,
-external binding state, multiple selection, static rows and 44pt targets.
+Package tests cover native selection behavior, stable identity and public
+construction. No standalone List review fixture is retained.
 
 Verification uses SwiftPM build/tests followed by the actual SwiftUI fixture.
 Text-frame telemetry is attached with raw screenshots to inspect primary,

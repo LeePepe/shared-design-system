@@ -49,13 +49,9 @@ multiline height growth. Compact chips have a capsule silhouette; continuous
 corners stay bounded as content grows so long labels remain on opaque fill.
 Do not constrain caller content to a fixed height or add a one-line limit.
 
-The portable SwiftUI fixture at `Tests/Fixtures/ChipReview` covers all three
-tones, static/removable/disabled states, actual removal dispatch, caller-owned
-state, accessibility labels, target size, stable geometry and narrow long-text
-growth. Real XCTest captures cover ocean/graphite × light/dark and a narrow
-accessibility-size case. These establish evidence only for the tested simulator
-and exact SHA recorded by the runner; they do not establish minimum-OS,
-physical-device, macOS rendering or observed VoiceOver/keyboard operation.
+Package tests cover the public construction and token-resolution contract.
+The former standalone review fixture was removed; runtime screenshots and
+accessibility observations are not claimed by this consumer contract.
 
 Strata 0.3.0 uses the repository-local DesignTokens target;
 NativeDesignKit 0.3.0 uses the repository-local DesignTokens target;

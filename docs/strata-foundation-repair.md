@@ -22,12 +22,10 @@ remove material decoration; fixture ambient also disappears. Layout, brand and
 mode remain explicit and unchanged. No CSS/native blur equivalence is claimed.
 
 Tests cover fresh provider role resolution, exact errors, legacy behavior,
-neutral state planes, one inherited blur, and solid/fallback equivalence. Native
-runtime specimens separately check actual composites, hierarchy and geometry.
-`Tests/Fixtures/Shared/StrataSpecimen.swift` is a reusable test-only SwiftUI
-composition. Fixture targets include it explicitly and use DEBUG testability;
-it owns no business data or UIKit/AppKit hosting code. Component fixtures retain
-their interaction and accessibility evidence.
+neutral state planes, one inherited blur, and solid/fallback equivalence. The
+former standalone review fixtures and shared specimen helper were removed;
+package tests remain test-only and contain no business data or UIKit/AppKit
+hosting code.
 
 ## Public provider provenance
 
