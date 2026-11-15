@@ -42,9 +42,15 @@ class SchemeSelectionTests(unittest.TestCase):
         self.bin = self.root / "bin"
         self.bin.mkdir()
         self.log = self.root / "xcodebuild.log"
+        self.swift_log = self.root / "swift.log"
         self._write_stub("swift", """
             #!/usr/bin/env python3
+            import json
             import os
+            from pathlib import Path
+            import sys
+            with Path(os.environ["P190_SWIFT_LOG"]).open("a", encoding="utf-8") as stream:
+                stream.write(json.dumps(sys.argv[1:]) + "\\n")
             print(os.environ["P190_PACKAGE_JSON"])
         """)
         self._write_stub("xcrun", """
@@ -125,6 +131,7 @@ class SchemeSelectionTests(unittest.TestCase):
             "PATH": f"{self.bin}{os.pathsep}{environment['PATH']}",
             "P190_ENUMERATIONS": json.dumps(enumerations),
             "P190_LOG": str(self.log),
+            "P190_SWIFT_LOG": str(self.swift_log),
             "P190_PACKAGE_JSON": json.dumps(package),
             "P190_SCHEMES_JSON": schemes_json,
             "SWIFT_PACKAGE_ROOT": str(self.root),
@@ -180,6 +187,21 @@ class SchemeSelectionTests(unittest.TestCase):
                                  "Complete")
                 self.assertNotIn("-only-testing", final[0])
                 self.assertNotIn("-skip-testing", final[0])
+
+    def test_resolves_package_before_listing_schemes(self):
+        result = self.run_helper(
+            json.dumps({"workspace": {"name": "Fixture", "schemes": ["Complete"]}}),
+            {"Complete": {"output": enumeration(
+                "DesignTokensTests", "StrataTests")}},
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        swift_commands = [
+            json.loads(line) for line in self.swift_log.read_text(encoding="utf-8").splitlines()
+        ]
+        self.assertEqual(swift_commands[:2], [
+            ["package", "resolve"],
+            ["package", "dump-package"],
+        ])
 
     def test_missing_malformed_and_empty_scheme_metadata_fail_closed(self):
         cases = [

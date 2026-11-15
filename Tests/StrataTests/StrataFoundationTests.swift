@@ -4,6 +4,63 @@ import XCTest
 @testable import Strata
 
 final class StrataFoundationTests: XCTestCase {
+    func testComponentMetricsRetainsResolvedValues() throws {
+        let metrics = try StrataComponentMetrics(
+            dimension: { _ in 48 },
+            spacing: { id in
+                switch id {
+                case "spacing.xs": return 5
+                case "spacing.sm": return 7
+                case "spacing.md": return 9
+                case "spacing.lg": return 11
+                case "spacing.xl": return 13
+                default: XCTFail("Unexpected spacing token: \(id)"); return 0
+                }
+            },
+            radius: { id in id == "radius.medium" ? 15 : 17 },
+            border: { _ in 2 }
+        )
+
+        XCTAssertEqual(metrics.minimumHit, 48)
+        XCTAssertEqual(metrics.spacingXS, 5)
+        XCTAssertEqual(metrics.spacingSM, 7)
+        XCTAssertEqual(metrics.spacingMD, 9)
+        XCTAssertEqual(metrics.spacingLG, 11)
+        XCTAssertEqual(metrics.spacingXL, 13)
+        XCTAssertEqual(metrics.controlRadius, 20)
+        XCTAssertEqual(metrics.cardRadius, 22)
+        XCTAssertEqual(metrics.verticalItemWidth, 68)
+        XCTAssertEqual(metrics.borderRegular, 2)
+    }
+
+    func testComponentMetricsResolvesCompactCellRadius() throws {
+        let defaultMetrics = try StrataComponentMetrics()
+        XCTAssertEqual(defaultMetrics.compactCellRadius, 6)
+
+        let customMetrics = try StrataComponentMetrics(
+            dimension: { _ in 44 },
+            spacing: { _ in 0 },
+            radius: { id in id == "radius.small" ? 6 : 12 },
+            border: { _ in 1 }
+        )
+        XCTAssertEqual(customMetrics.compactCellRadius, 6)
+    }
+
+    func testComponentMetricsPropagatesTokenErrorsUnchanged() {
+        let expected = StyleTokenError.unknownToken("dimension.failure")
+
+        XCTAssertThrowsError(
+            try StrataComponentMetrics(
+                dimension: { _ in throw expected },
+                spacing: { _ in 0 },
+                radius: { _ in 0 },
+                border: { _ in 0 }
+            )
+        ) { error in
+            XCTAssertEqual(error as? StyleTokenError, expected)
+        }
+    }
+
     func testFiveExplicitFamiliesResolveDistinctSurfacesAndBrandStates() throws {
         for family in ["blue", "green", "pink", "yellow", "purple"] {
             for mode in [Theme.light, .dark, .light] {

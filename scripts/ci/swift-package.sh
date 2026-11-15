@@ -37,6 +37,10 @@ for runtime in sorted(devices, reverse=True):
                 print(d["udid"]); sys.exit(0)
 sys.exit("no available iPhone simulator")')"
 
+        # Xcode 26+ may omit the aggregate package scheme until SwiftPM has
+        # resolved the package in this checkout. Resolve first so -list sees
+        # the complete test-capable scheme in fresh temporary fixtures.
+        swift package resolve >/dev/null
         swift package dump-package > "$metadata_dir/package.json"
         python3 - "$metadata_dir/package.json" "$metadata_dir/expected-tests.json" <<'PY'
 import json
